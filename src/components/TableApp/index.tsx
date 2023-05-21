@@ -16,11 +16,11 @@ import { Loading } from '../Loading'
 
 interface TableAppProps {
   columns: GridColDef[]
-  rowsData: ServiceSchedulesListProps[]
+  rowsData: ServiceSchedulesListProps[] | []
   handlePages: (nextPage: string) => void
-  pages: { current: number; next: boolean; previous: boolean }
+  pages: { next: boolean; previous: boolean }
   loading: boolean
-  companyId: string | undefined
+  companyId: number | null | undefined
 }
 
 declare module '@mui/x-data-grid' {

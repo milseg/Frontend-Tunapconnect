@@ -34,8 +34,6 @@ export default function CompanyList() {
     },
   )
 
-  console.log(data)
-
   return (
     <>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -95,6 +93,5 @@ export default function CompanyList() {
     </>
   )
 }
-console.log('================================')
 
 CompanyList.auth = true

@@ -37,9 +37,14 @@ type SearchFormProps = {
   search: string
 }
 
-// type PagesProps = {
-//   search: string
-// }
+type DataFetchProps = {
+  paginate: {
+    current_page: number
+    total_pages: number
+    total_results: number
+  }
+  serviceSchedulesList: ServiceSchedulesListProps[] | []
+}
 
 const api = new ApiCore()
 
@@ -56,10 +61,9 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
 
 export default function ServiceSchedulesList() {
   const [pages, setPages] = useState<{
-    current: number
     next: boolean
     previous: boolean
-  }>({ current: 1, next: false, previous: false })
+  }>({ next: true, previous: true })
 
   const { companySelected } = useContext(CompanyContext)
 
@@ -77,7 +81,6 @@ export default function ServiceSchedulesList() {
   })
 
   function onSubmitSearch(data: SearchFormProps) {
-    // setSearch(data.search)
     router.push(
       `/service-schedule?company_id=${companySelected}${
         data.search ? '&search=' + data.search : ''
@@ -91,10 +94,6 @@ export default function ServiceSchedulesList() {
 
   const handleDelete = (id: number) => {
     // setRows(rows.filter((row) => row.id !== id))
-  }
-
-  function handlePages(nextPage: any): void {
-    setPages(nextPage)
   }
 
   let url = `/service-schedule?company_id=${companySelected}`
@@ -223,33 +222,78 @@ export default function ServiceSchedulesList() {
     // isFetched,
     refetch,
     isFetching,
-  } = useQuery<ServiceSchedulesListProps[] | []>(
+  } = useQuery<DataFetchProps>(
     ['service-scheduler-list', companySelected],
     () =>
-      api
-        .get(url)
-        .then((response) => {
-          console.log(response)
-          const resp = response.data.data.map((data: any) => ({
-            id: data?.id ?? 'Não informado',
-            client: data?.client?.name ?? 'Não informado',
-            plate: data?.client_vehicle?.plate ?? 'Não informado',
-            chassis: data?.client_vehicle?.chasis ?? 'Não informado',
-            technical_consultant:
-              data?.technical_consultant?.name ?? 'Não informado',
-            typeEstimate: 'não definido',
-            totalDiscount: 0,
-            total: 0,
-          }))
-          return resp
-        })
-        .catch((err) => {
-          console.log(err)
-          return []
-        }),
+      api.get(url).then((response) => {
+        const resp = response.data.data.map((data: any) => ({
+          id: data?.id ?? 'Não informado',
+          client: data?.client?.name ?? 'Não informado',
+          plate: data?.client_vehicle?.plate ?? 'Não informado',
+          chassis: data?.client_vehicle?.chasis ?? 'Não informado',
+          technical_consultant:
+            data?.technical_consultant?.name ?? 'Não informado',
+          typeEstimate: 'não definido',
+          totalDiscount: 0,
+          total: 0,
+        }))
+        const paginate = {
+          current_page: response.data.current_page,
+          total_pages: response.data.total_pages,
+          total_results: response.data.total_results,
+        }
+        console.log(paginate)
+
+        return {
+          paginate: {
+            current_page: response.data.current_page,
+            total_pages: response.data.total_pages,
+            total_results: response.data.total_results,
+          },
+          serviceSchedulesList: resp,
+        }
+      }),
+
     { enabled: !!companySelected, refetchOnWindowFocus: false },
   )
 
+  function handlePages(nextPage: any): void {
+    let newCurrent_page = 1
+    const actualCurrent_page = router.query.current_page
+      ? parseInt(router.query.current_page as string)
+      : 1
+
+    if (!rows?.paginate) {
+      return
+    }
+
+    if (nextPage === 'next') {
+      newCurrent_page = actualCurrent_page + 1
+      console.log(nextPage)
+      if (newCurrent_page > rows?.paginate.total_pages) {
+        return
+      }
+      console.log(newCurrent_page)
+    }
+    if (nextPage === 'back') {
+      console.log(nextPage)
+      newCurrent_page = actualCurrent_page - 1
+      if (newCurrent_page < 1) {
+        return
+      }
+      console.log(newCurrent_page)
+    }
+
+    const newUrlPagination = `/service-schedule?company_id=${companySelected}${
+      router.query.search ? '&search=' + router.query.search : ''
+    }${'&current_page=' + newCurrent_page}${
+      router.query.limit ? '&limit=' + router.query.limit : ''
+    }`
+
+    console.log(newUrlPagination)
+
+    router.push(newUrlPagination)
+  }
   useEffect(() => {
     async function refetchUrl() {
       if (router.query.search) {
@@ -258,11 +302,44 @@ export default function ServiceSchedulesList() {
         setValue('search', '')
       }
 
+      if (router.query.current_page) {
+        const currentPage = parseInt(router.query.current_page as string)
+        if (rows?.paginate) {
+          if (currentPage >= rows?.paginate.total_pages) {
+            setPages({
+              next: false,
+              previous: true,
+            })
+          } else {
+            if (pages.next === false) {
+              setPages((prevState) => ({ ...prevState, next: true }))
+            }
+          }
+          if (currentPage <= 1) {
+            setPages({
+              next: true,
+              previous: false,
+            })
+          } else {
+            if (pages.previous === false) {
+              setPages((prevState) => ({ ...prevState, previous: true }))
+            }
+          }
+        }
+      }
+
+      if (rows?.paginate) {
+        if (rows.paginate.total_pages === 1)
+          setPages({
+            next: false,
+            previous: false,
+          })
+      }
+
       await refetch()
     }
     refetchUrl()
   }, [router])
-
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={3}>
@@ -320,7 +397,7 @@ export default function ServiceSchedulesList() {
                   sx={{ alignSelf: 'flex-end' }}
                   startIcon={<AddCircleOutlineIcon />}
                   onClick={async () => {
-                    router.push(`/service-schedules/create`)
+                    await router.push(`/service-schedules/create`)
                   }}
                 >
                   Adicionar novo
@@ -340,11 +417,11 @@ export default function ServiceSchedulesList() {
           {!isFetching ? (
             <TableApp
               columns={columns}
-              rowsData={isSuccess ? rows : []}
+              rowsData={isSuccess ? rows.serviceSchedulesList : []}
               handlePages={handlePages}
               pages={pages}
               loading={isFetching}
-              companyId={companySelected as string}
+              companyId={companySelected}
             />
           ) : (
             <Skeleton variant="rounded" sx={{ width: '100%' }} height={150} />
