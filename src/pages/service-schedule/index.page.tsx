@@ -93,7 +93,7 @@ export default function ServiceSchedulesList() {
   }
 
   const handleDelete = (id: number) => {
-    // setRows(rows.filter((row) => row.id !== id))
+    refetch()
   }
 
   let url = `/service-schedule?company_id=${companySelected}`
