@@ -156,7 +156,7 @@ export default function ServiceSchedulesEdit() {
       technical_consultant_id: technicalConsultant?.id,
       client_id: client?.id,
       client_vehicle_id: clientVehicle?.id,
-      company_id: companySelected as string,
+      company_id: `${companySelected}`,
       chasis: clientVehicle?.chassis,
       plate: clientVehicle?.plate,
       claims_service: [],
