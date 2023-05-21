@@ -237,12 +237,6 @@ export default function ServiceSchedulesList() {
           totalDiscount: 0,
           total: 0,
         }))
-        const paginate = {
-          current_page: response.data.current_page,
-          total_pages: response.data.total_pages,
-          total_results: response.data.total_results,
-        }
-        console.log(paginate)
 
         return {
           paginate: {
@@ -269,19 +263,15 @@ export default function ServiceSchedulesList() {
 
     if (nextPage === 'next') {
       newCurrent_page = actualCurrent_page + 1
-      console.log(nextPage)
       if (newCurrent_page > rows?.paginate.total_pages) {
         return
       }
-      console.log(newCurrent_page)
     }
     if (nextPage === 'back') {
-      console.log(nextPage)
       newCurrent_page = actualCurrent_page - 1
       if (newCurrent_page < 1) {
         return
       }
-      console.log(newCurrent_page)
     }
 
     const newUrlPagination = `/service-schedule?company_id=${companySelected}${
@@ -289,8 +279,6 @@ export default function ServiceSchedulesList() {
     }${'&current_page=' + newCurrent_page}${
       router.query.limit ? '&limit=' + router.query.limit : ''
     }`
-
-    console.log(newUrlPagination)
 
     router.push(newUrlPagination)
   }
