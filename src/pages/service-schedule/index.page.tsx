@@ -238,6 +238,16 @@ export default function ServiceSchedulesList() {
           total: 0,
         }))
 
+        if (response.data.total_pages === 1)
+          setPages({
+            next: false,
+            previous: false,
+          })
+        if (!router.query.current_page) {
+          if (response.data.current_page === 1) {
+            setPages((prevState) => ({ ...prevState, previous: false }))
+          }
+        }
         return {
           paginate: {
             current_page: response.data.current_page,
@@ -314,14 +324,6 @@ export default function ServiceSchedulesList() {
             }
           }
         }
-      }
-
-      if (rows?.paginate) {
-        if (rows.paginate.total_pages === 1)
-          setPages({
-            next: false,
-            previous: false,
-          })
       }
 
       await refetch()
