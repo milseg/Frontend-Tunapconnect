@@ -394,6 +394,7 @@ function TabContent({
     )
 
     if (!!isAlreadyInspections && inspectionData.length === 0) {
+      // @ts-ignore
       setInspectionData(isAlreadyInspections[0].values.labels as InspectionData)
     }
   }, [])
