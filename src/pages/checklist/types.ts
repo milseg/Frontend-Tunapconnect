@@ -23,8 +23,8 @@ type InpectionData = {
     id: number
     type: 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
     positions: {
-      top: string
-      left: string
+      top: number
+      left: number
     }
   }[]
   comment: string

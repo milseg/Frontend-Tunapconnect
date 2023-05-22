@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import ButtonBase from '@mui/material/ButtonBase'
-import { Button, Stack, Tabs, TextField, Typography } from '@mui/material'
+import { Box, Button, Stack, Tabs, TextField, Typography } from '@mui/material'
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 
@@ -11,6 +11,20 @@ interface LabelButtonMarkupTypeProps {
 interface ClickableAreaProps {
   urlImg: string
 }
+// interface ButtonMarkupProps {
+//   topmarkup: number
+//   leftmarkup: number
+// }
+// interface ButtonMarkupProps {
+//   mobile: {
+//     top: number
+//     left: number
+//   }
+//   web: {
+//     top: number
+//     left: number
+//   }
+// }
 
 export const TabsContainer = styled(Tabs)(({ theme }) => ({
   color: 'black',
@@ -68,40 +82,105 @@ export const ButtonMarkupType = styled.button<LabelButtonMarkupTypeProps>`
     cursor: pointer;
   }
 `
+export const ContainerButtonsMarkupType = styled(Stack)`
+  @media (max-width: 600px) {
+    /* width: 330px; */
+  }
+  @media (min-width: 601px) and (max-width: 900px) {
+    /* margin-right: -150px; */
+  }
+  @media (min-width: 901px) and (max-width: 1200px) {
+    margin-right: -230px;
+  }
+`
 
-export const ButtonMarkup = styled(ButtonBase)(({ theme }) => ({
-  color: '#707070',
-  background: 'rgb(237, 234, 234, 0.7)',
-  width: '44px',
-  height: '44px',
-  fontSize: '25px',
-  textTransforme: 'uppercase',
-  position: 'absolute',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+export const ButtonMarkup = styled(ButtonBase)`
+  color: #707070;
+  background: rgba(237, 234, 234, 0.7);
+  width: 44px;
+  height: 44px;
+  font-size: 25px;
+  text-transform: uppercase;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  lineHeight: '25px',
-  border: '3px solid #93BE0F',
+  line-height: 25px;
+  border: 3px solid #93be0f;
 
-  borderRadius: '50%',
-  padding: 0,
-  '& > svg': {
-    display: 'none',
-  },
-  textTransform: 'none',
-  '&:hover': {
-    border: '3px solid #f26960',
-    color: '#f26960',
-    '& > svg': {
-      display: 'block',
-    },
-    '& > span': {
-      display: 'none',
-    },
-    transition: `all .3s ease-in-out`,
-  },
-}))
+  border-radius: 50%;
+  padding: 0;
+  & > svg {
+    display: none;
+  }
+  text-transform: none;
+  &:hover {
+    border: 3px solid #f26960;
+    color: #f26960;
+    & > svg {
+      display: block;
+    }
+    & > span {
+      display: none;
+    }
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* @media (max-width: 768px) {
+  
+  } */
+`
+
+export const ContainerClickableArea = styled(Box)`
+  width: 470px;
+  height: 350px;
+  /* background-color: red; */
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  margin: 0 auto;
+  /* display: flex;
+  align-items: center;
+  justify-content: center; */
+  @media (max-width: 600px) {
+    width: 330px;
+    height: 250px;
+    /* width: calc(490px - (490px * 0.3)); */
+    /* height: calc(350px - (350px * 0.28)); */
+  }
+  /* @media (min-width: 601px) and (max-width: 960px) {
+    margin: 0;
+  } */
+`
+
+export const ClickableArea = styled('img')<ClickableAreaProps>`
+  /* width: 490px; */
+  width: 470px;
+  height: 350px;
+  position: relative;
+  border: 1px solid #acaaaa;
+  border-radius: 9px;
+  overflow: hidden;
+  /* margin: 0 auto; */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url(${(props) => props.urlImg});
+  & * {
+    pointer-events: none;
+    background: red;
+  }
+
+  @media (max-width: 600px) {
+    width: 330px;
+    height: 250px;
+    margin: 0 auto;
+    /* width: calc(490px - (490px * 0.3)); */
+    /* height: calc(350px - (350px * 0.28)); */
+  }
+`
+
 export const MyButton = styled(Button)(({ theme }) => ({
   color: 'white',
   background: '#0E948B',
@@ -142,12 +221,39 @@ export const ButtonRight = styled(Button)(({ theme }) => ({
   },
 }))
 
-export const ContainerInformation = styled(Stack)(({ theme }) => ({
-  border: '1px solid #ACAAAA',
-  borderRadius: 9,
-  padding: 2,
-  justifyContent: 'center',
-}))
+export const ContainerInformation = styled(Stack)`
+  border: 1px solid #acaaaa;
+  border-radius: 9px;
+  /* padding: 2px; */
+  justify-content: center;
+  /* width: 200px; */
+  width: 100%;
+  margin: 0 auto;
+  @media (max-width: 600px) {
+    width: 330px;
+    margin: 0 auto;
+  }
+  @media (min-width: 601px) and (max-width: 900px) {
+    width: 470px;
+  }
+  @media (min-width: 901px) and (max-width: 1200px) {
+    width: 560px;
+    margin: 0 auto;
+  }
+`
+export const ContainerButtonsInformation = styled(Stack)`
+  width: 100%;
+  margin: 10px auto 0 auto;
+  @media (max-width: 600px) {
+    width: 330px;
+  }
+  @media (min-width: 601px) and (max-width: 900px) {
+    width: 470px;
+  }
+  @media (min-width: 901px) and (max-width: 1200px) {
+    width: 560px;
+  }
+`
 export const IconUpload = styled(FileUploadOutlinedIcon)(({ theme }) => ({
   fontSize: '16px',
 }))
@@ -167,42 +273,3 @@ export const TextAreaField = styled(TextField)(({ theme }) => ({
     fontSize: 10,
   },
 }))
-
-export const ClickableArea = styled('svg')<ClickableAreaProps>`
-  width: 490px;
-  height: 350px;
-  // background: 'red';
-  // position: 'relative';
-  border: 1px solid #acaaaa;
-  border-radius: 9px;
-  overflow: 'hidden';
-  // backgroundAttachment: 'fixed';
-  // backgroundImage: 'url("/images/background-logo-login.svg")';
-  background-repeat: 'no-repeat';
-  background-position: 'center';
-  background-size: '100% 100%';
-  // backgroundSize: '100% 380px';
-  background-image: url(${(props) => props.urlImg});
-  '& *': {
-    pointerevents: 'none';
-  }
-`
-// export const ClickableArea = styled(Box)(({ theme }) => ({
-//   width: '490px',
-//   height: '350px',
-//   // background: 'red',
-//   // position: 'relative',
-//   border: '1px solid #ACAAAA',
-//   borderRadius: 9,
-//   overflow: 'hidden',
-//   // backgroundAttachment: 'fixed',
-//   // backgroundImage: 'url("/images/background-logo-login.svg")',
-//   backgroundRepeat: 'no-repeat',
-//   backgroundPosition: 'center',
-//   backgroundSize: '100% 100%',
-//   // backgroundSize: '100% 380px',
-//   backgroundImage: `url('/images/carros-inspect/carro-frente.svg')`,
-//   '& *': {
-//     pointerEvents: 'none',
-//   },
-// }))
