@@ -113,8 +113,6 @@ function TabContent({
     })
   const [listImage, setListImage] = useState<ImageListProps>([])
   const [inspectionData, setInspectionData] = useState<InspectionData>([])
-  // const [stageValues, setStageValues] = useState<FieldValues | []>([])
-  // const [count, setCount] = useState()
 
   const defaultValues = {
     [stageName]: stageData?.itens.map((item, index) => {
@@ -505,6 +503,7 @@ function TabContent({
         isOpen={openModalInspectCar}
         closeModalInspectCar={closeModalInspectCar}
         stageData={stageData}
+        // @ts-ignore
         handleInspectionData={handleInspectionData}
       />
       <ModalSigntures

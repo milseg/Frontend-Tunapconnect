@@ -15,16 +15,16 @@ interface ClickableAreaProps {
 //   topmarkup: number
 //   leftmarkup: number
 // }
-// interface ButtonMarkupProps {
-//   mobile: {
-//     top: number
-//     left: number
-//   }
-//   web: {
-//     top: number
-//     left: number
-//   }
-// }
+interface ButtonMarkupProps {
+  mobile: {
+    top: number
+    left: number
+  }
+  web: {
+    top: number
+    left: number
+  }
+}
 
 export const TabsContainer = styled(Tabs)(({ theme }) => ({
   color: 'black',
@@ -94,7 +94,7 @@ export const ContainerButtonsMarkupType = styled(Stack)`
   }
 `
 
-export const ButtonMarkup = styled(ButtonBase)`
+export const ButtonMarkup = styled(ButtonBase)<ButtonMarkupProps>`
   color: #707070;
   background: rgba(237, 234, 234, 0.7);
   width: 44px;
@@ -114,6 +114,8 @@ export const ButtonMarkup = styled(ButtonBase)`
   & > svg {
     display: none;
   }
+  top: ${(props) => props.web.top}px;
+  left: ${(props) => props.web.left}px;
   text-transform: none;
   &:hover {
     border: 3px solid #f26960;
@@ -127,27 +129,26 @@ export const ButtonMarkup = styled(ButtonBase)`
     transition: all 0.3s ease-in-out;
   }
 
-  /* @media (max-width: 768px) {
-  
-  } */
+  @media (max-width: 600px) {
+    top: ${(props) => props.mobile.top}px;
+    left: ${(props) => props.mobile.left}px;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+  }
 `
 
 export const ContainerClickableArea = styled(Box)`
   width: 470px;
   height: 350px;
-  /* background-color: red; */
   position: relative;
   cursor: pointer;
   overflow: hidden;
   margin: 0 auto;
-  /* display: flex;
-  align-items: center;
-  justify-content: center; */
+
   @media (max-width: 600px) {
-    width: 330px;
-    height: 250px;
-    /* width: calc(490px - (490px * 0.3)); */
-    /* height: calc(350px - (350px * 0.28)); */
+    width: calc(470px - (470px * 0.3));
+    height: calc(350px - (350px * 0.3));
   }
   /* @media (min-width: 601px) and (max-width: 960px) {
     margin: 0;
@@ -173,11 +174,9 @@ export const ClickableArea = styled('img')<ClickableAreaProps>`
   }
 
   @media (max-width: 600px) {
-    width: 330px;
-    height: 250px;
     margin: 0 auto;
-    /* width: calc(490px - (490px * 0.3)); */
-    /* height: calc(350px - (350px * 0.28)); */
+    width: calc(470px - (470px * 0.3));
+    height: calc(350px - (350px * 0.3));
   }
 `
 
