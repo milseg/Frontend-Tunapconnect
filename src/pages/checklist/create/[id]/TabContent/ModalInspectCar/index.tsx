@@ -69,8 +69,14 @@ type MarkupType = {
   id: number
   type: markupTypesEnum
   positions: {
-    top: number
-    left: number
+    web: {
+      top: number
+      left: number
+    }
+    mobile: {
+      top: number
+      left: number
+    }
   }
 }
 
@@ -209,6 +215,7 @@ export default function ModalInspectCar({
     })
 
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
+  const isMobile = useMediaQuery('(max-width:600px)')
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setTabsValue(newValue)
@@ -241,8 +248,8 @@ export default function ModalInspectCar({
 
   async function addMarkup(event: any) {
     const [x, y] = getClickCoords(event)
-    const positionTop = y - 22
-    const positionLeft = x - 22
+    const positionTop = y
+    const positionLeft = x
     if (!Object.hasOwn(markupTagTypes, markupValue)) {
       return
     }
@@ -259,8 +266,22 @@ export default function ModalInspectCar({
             id: idByTimestamp,
             type: markupValue,
             positions: {
-              top: positionTop,
-              left: positionLeft,
+              web: {
+                top: isMobile
+                  ? positionTop + positionTop * 0.3
+                  : positionTop - 22,
+                left: isMobile
+                  ? positionLeft + positionLeft * 0.3
+                  : positionLeft - 22,
+              },
+              mobile: {
+                top: isMobile
+                  ? positionTop - 15
+                  : positionTop - positionTop * 0.3 - 15,
+                left: isMobile
+                  ? positionLeft - 15
+                  : positionLeft - positionLeft * 0.3 - 15,
+              },
             },
           },
         ],
@@ -523,12 +544,12 @@ export default function ModalInspectCar({
                   <ButtonMarkup
                     key={m.id}
                     mobile={{
-                      top: m?.positions?.top - m?.positions?.top * 0.3,
-                      left: m?.positions?.left - m?.positions?.left * 0.3,
+                      top: m?.positions?.mobile?.top,
+                      left: m?.positions?.mobile?.left,
                     }}
                     web={{
-                      top: m?.positions?.top,
-                      left: m?.positions?.left,
+                      top: m?.positions?.web?.top,
+                      left: m?.positions?.web?.left,
                     }}
                     onClick={() => removeMarkup(m.id)}
                   >
@@ -551,12 +572,12 @@ export default function ModalInspectCar({
                   <ButtonMarkup
                     key={m.id}
                     mobile={{
-                      top: m?.positions?.top - m?.positions?.top * 0.3,
-                      left: m?.positions?.left - m?.positions?.left * 0.3,
+                      top: m?.positions?.mobile?.top,
+                      left: m?.positions?.mobile?.left,
                     }}
                     web={{
-                      top: m?.positions?.top,
-                      left: m?.positions?.left,
+                      top: m?.positions?.web?.top,
+                      left: m?.positions?.web?.left,
                     }}
                     onClick={() => removeMarkup(m.id)}
                   >
@@ -578,12 +599,12 @@ export default function ModalInspectCar({
                   <ButtonMarkup
                     key={m.id}
                     mobile={{
-                      top: m?.positions?.top - m?.positions?.top * 0.3,
-                      left: m?.positions?.left - m?.positions?.left * 0.3,
+                      top: m?.positions?.mobile?.top,
+                      left: m?.positions?.mobile?.left,
                     }}
                     web={{
-                      top: m?.positions?.top,
-                      left: m?.positions?.left,
+                      top: m?.positions?.web?.top,
+                      left: m?.positions?.web?.left,
                     }}
                     onClick={() => removeMarkup(m.id)}
                   >
@@ -605,12 +626,12 @@ export default function ModalInspectCar({
                   <ButtonMarkup
                     key={m.id}
                     mobile={{
-                      top: m?.positions?.top - m?.positions?.top * 0.3,
-                      left: m?.positions?.left - m?.positions?.left * 0.3,
+                      top: m?.positions?.mobile?.top,
+                      left: m?.positions?.mobile?.left,
                     }}
                     web={{
-                      top: m?.positions?.top,
-                      left: m?.positions?.left,
+                      top: m?.positions?.web?.top,
+                      left: m?.positions?.web?.left,
                     }}
                     onClick={() => removeMarkup(m.id)}
                   >
@@ -632,12 +653,12 @@ export default function ModalInspectCar({
                   <ButtonMarkup
                     key={m.id}
                     mobile={{
-                      top: m?.positions?.top - m?.positions?.top * 0.3,
-                      left: m?.positions?.left - m?.positions?.left * 0.3,
+                      top: m?.positions?.mobile?.top,
+                      left: m?.positions?.mobile?.left,
                     }}
                     web={{
-                      top: m?.positions?.top,
-                      left: m?.positions?.left,
+                      top: m?.positions?.web?.top,
+                      left: m?.positions?.web?.left,
                     }}
                     onClick={() => removeMarkup(m.id)}
                   >
