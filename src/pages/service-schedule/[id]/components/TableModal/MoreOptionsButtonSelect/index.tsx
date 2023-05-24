@@ -14,6 +14,8 @@ import { useRouter } from 'next/router'
 export function MoreOptionsButtonSelect({
   disabledButton,
   checklistId,
+  status,
+  handleDeleteChecklist,
 }: MoreOptionsButtonSelectProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -23,15 +25,22 @@ export function MoreOptionsButtonSelect({
   }
   const router = useRouter()
 
-  const { companyId, id } = router.query
-
-  console.log({ companyId, id })
-
   const handleClose = () => {
     setAnchorEl(null)
   }
   const handleClickEdit = () => {
     router.push(`/checklist/create/${checklistId}`)
+  }
+  const handleClickDelete = async () => {
+    try {
+      await handleDeleteChecklist(Number(100000))
+      alert(`Checklist${checklistId} excluído com sucesso`)
+    } catch (e) {
+      alert(`Erro ao excluir Checklist - ${checklistId}`)
+      console.log(e)
+    }
+    // await handleDeleteChecklist(Number(100000))
+    // handleDeleteChecklist(Number(checklistId))
   }
   return (
     <div>
@@ -83,10 +92,13 @@ export function MoreOptionsButtonSelect({
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         <MenuItemButton onClick={handleClickEdit}>Editar</MenuItemButton>
-        <MenuItemButton onClick={handleClickEdit}>Visualizar</MenuItemButton>
-        <MenuItemButton onClick={handleClickEdit}>Enviar</MenuItemButton>
-        <MenuItemButton onClick={handleClickEdit}>Duplicar</MenuItemButton>
-        <MenuItemButton onClick={handleClickEdit}>Imprimir</MenuItemButton>
+        {/* <MenuItemButton onClick={() => {}}>Visualizar</MenuItemButton> */}
+        {status !== 'Finalizado' && (
+          <MenuItemButton onClick={handleClickDelete}>Excluir</MenuItemButton>
+        )}
+        {/* <MenuItemButton onClick={() => {}}>Enviar</MenuItemButton>
+        <MenuItemButton onClick={() => {}}>Duplicar</MenuItemButton>
+        <MenuItemButton onClick={() => {}}>Imprimir</MenuItemButton> */}
       </Menu>
     </div>
   )

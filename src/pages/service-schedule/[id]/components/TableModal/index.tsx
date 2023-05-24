@@ -9,8 +9,8 @@ import {
 } from '@mui/x-data-grid'
 
 import { BoxContainer, TableDataGrid } from './styles'
-import { CustomNoRowsOverlay } from './NoRows'
-import { CustomFooterStatusComponent } from './FooterPaginate'
+// import { CustomNoRowsOverlay } from './NoRows'
+// import { CustomFooterStatusComponent } from './FooterPaginate'
 
 // import { useTheme } from '@mui/material/styles'
 import Dialog from '@mui/material/Dialog'
@@ -114,7 +114,13 @@ export function TableModal({
           //   const id = params.id;
           // }
           const idCell = params.id
-          return <MoreOptionsButtonSelect checklistId={idCell as number} />
+          return (
+            <MoreOptionsButtonSelect
+              checklistId={idCell as number}
+              status={params.row.status}
+              handleDeleteChecklist={handleDeleteChecklist}
+            />
+          )
         },
       },
     ],
@@ -124,6 +130,17 @@ export function TableModal({
   // const router = useRouter()
 
   const apiRef = useGridApiRef()
+
+  async function handleDeleteChecklist(checklistId: number) {
+    console.log(checklistId)
+    try {
+      await api.delete('/checklist/' + checklistId)
+    } catch (err) {
+      console.log(err)
+      throw new Error(`Falha ao excluir`)
+      // alert(`Falha ao excluir`)
+    }
+  }
 
   const {
     data: dataCheckList,
@@ -138,7 +155,6 @@ export function TableModal({
         )
         .then((response) => {
           const { data } = response.data
-          console.log(data)
           return data.map((item: any) => {
             return {
               id: item?.id,
@@ -175,10 +191,10 @@ export function TableModal({
               autoHeight
               columnHeaderHeight={70}
               disableColumnMenu
-              slots={{
-                noRowsOverlay: CustomNoRowsOverlay,
-                footer: CustomFooterStatusComponent,
-              }}
+              // slots={{
+              //   noRowsOverlay: CustomNoRowsOverlay,
+              //   footer: CustomFooterStatusComponent,
+              // }}
               // slotProps={{
               //   footer: { nextPage: pages?.next, previousPage: pages?.previous, handlePages }
               // }}

@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import Box from '@mui/material/Box'
 
-import { TabItem, TabsContainer } from './styles'
+import { LinkNext, TabItem, TabsContainer, Title } from './styles'
 import TabContent from './TabContent'
 import { ApiCore } from '@/lib/api'
 import { Skeleton } from '@mui/material'
@@ -17,6 +17,7 @@ import {
 import { useRouter } from 'next/router'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import ActionAlerts from '@/components/ActionAlerts'
+
 // import { useForm } from 'react-hook-form'
 
 // type InspectionCarDataType = {
@@ -172,6 +173,15 @@ export default function ChecklistCreateById() {
   // }
 
   async function handleAddListCheckList(stageData: StagesDataProps) {
+    console.log(stageData)
+    const isFinalizedArray = data?.stages.map((item) => {
+      if (item.name === stageData.name) {
+        return stageData.status
+      }
+
+      return item.status
+    })
+    const isFinalized = isFinalizedArray?.every((item) => item === 'finalizado')
     const dataForPost = {
       company_id: data?.company_id,
       brand_id: data?.brand_id,
@@ -183,7 +193,7 @@ export default function ChecklistCreateById() {
       client_id: data?.client_id,
       service_schedule_id: data?.service_schedule_id,
       checklist_model: data?.checklist_model,
-      status: 'pendente',
+      status: isFinalized ? 'finalizado' : 'pendente',
       stages: data?.stages.map((item) => {
         // if (item.name === stageData.name) {
         //   return {
@@ -221,9 +231,17 @@ export default function ChecklistCreateById() {
   }
 
   if (isSuccess) {
+    console.log(data)
     return (
       <>
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Box sx={{ mt: 2, ml: 2 }}>
+          <LinkNext href={`/service-schedule/${data.service_schedule_id}`}>
+            <Title variant="h6">
+              Agenda:{router.query.id} - {'Pablo'}
+            </Title>
+          </LinkNext>
+        </Box>
+        <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Paper
@@ -292,33 +310,7 @@ export default function ChecklistCreateById() {
                   alignItems: 'center',
                   alignContent: 'center',
                 }}
-              >
-                {/* <Stack direction="row" spacing={2}>
-                  <MyButton
-                    type="submit"
-                    variant="contained"
-                    form={`form-${
-                      data?.stages[painelValue].name ?? ''
-                    }-${painelValue}`}
-                    onClick={() => setTypeSubmitForm('salvo')}
-                  >
-                    Salvar
-                  </MyButton>
-                  <MyButton
-                    type="submit"
-                    variant="contained"
-                    form={`form-${
-                      data?.stages[painelValue].name ?? ''
-                    }-${painelValue}`}
-                    onClick={() => {
-                      console.log(inspectionCarData)
-                      setTypeSubmitForm('finalizado')
-                    }}
-                  >
-                    Finalizar
-                  </MyButton>
-                </Stack> */}
-              </Grid>
+              ></Grid>
             </Grid>
           </Grid>
         </Container>

@@ -8,4 +8,6 @@ export type MoreOptionsButtonSelectProps = {
     action?: (value?: any) => void
   }[]
   checklistId?: number | undefined
+  status: string
+  handleDeleteChecklist: (id: number) => Promise<void>
 }
