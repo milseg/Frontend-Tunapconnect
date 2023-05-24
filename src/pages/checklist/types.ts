@@ -23,8 +23,14 @@ type InpectionData = {
     id: number
     type: 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
     positions: {
-      top: number
-      left: number
+      mobile: {
+        top: number
+        left: number
+      }
+      web: {
+        top: number
+        left: number
+      }
     }
   }[]
   comment: string

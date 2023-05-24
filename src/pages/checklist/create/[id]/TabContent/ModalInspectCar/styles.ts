@@ -91,6 +91,7 @@ export const ContainerButtonsMarkupType = styled(Stack)`
   }
   @media (min-width: 901px) and (max-width: 1200px) {
     margin-right: -230px;
+    z-index: 1000;
   }
 `
 
@@ -121,7 +122,8 @@ export const ButtonMarkup = styled(ButtonBase)<ButtonMarkupProps>`
     border: 3px solid #f26960;
     color: #f26960;
     & > svg {
-      display: block;
+      display: inline;
+      position: absolute;
     }
     & > span {
       display: none;

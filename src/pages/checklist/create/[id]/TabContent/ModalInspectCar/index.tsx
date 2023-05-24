@@ -122,13 +122,14 @@ type formattedDataType = {
   value: MarkupType[]
   comment: string
   images: imageData[]
-}[]
+}
 
 interface ModalInspectCarProps {
   isOpen: boolean
   closeModalInspectCar: () => void
   stageData: StagesDataProps | undefined
-  handleInspectionData: (data: formattedDataType) => void
+  handleInspectionData: (data: formattedDataType[]) => void
+  // handleSaveInspectionCarData: (data: formattedDataType[]) => void
 }
 
 const positionsCar: Array<positionsTypes> = [
@@ -255,8 +256,6 @@ export default function ModalInspectCar({
     }
 
     const idByTimestamp = dayjs(new Date()).valueOf()
-    console.log('top', positionTop)
-    console.log('left', positionLeft)
     setMarkups((prevState) => {
       return {
         ...prevState,
@@ -297,8 +296,6 @@ export default function ModalInspectCar({
     images: imageData[],
     position: positionsTypes,
   ) {
-    console.log(images)
-    console.log(position)
     setListImagesUpload((prevState) => {
       return {
         ...prevState,
@@ -314,11 +311,9 @@ export default function ModalInspectCar({
         [positionsCar[tabsValue]]: event.target.value,
       }
     })
-    console.log(event.target.value)
   }
 
   function handleSave() {
-    console.log(imgPositionCarUrl)
     const formattedData = [
       {
         name: 'Frente',

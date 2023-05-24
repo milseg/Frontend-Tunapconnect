@@ -4,20 +4,54 @@ import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import Box from '@mui/material/Box'
 
-import { MyButton, TabItem, TabsContainer } from './styles'
+import { TabItem, TabsContainer } from './styles'
 import TabContent from './TabContent'
 import { ApiCore } from '@/lib/api'
-import { Skeleton, Stack } from '@mui/material'
+import { Skeleton } from '@mui/material'
 import {
   ChecklistProps,
   ReponseGetCheckList,
   StagesDataProps,
 } from '../../types'
 
-// import { AuthContext } from '@/contexts/AuthContext'
-
 import { useRouter } from 'next/router'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
+import ActionAlerts from '@/components/ActionAlerts'
+// import { useForm } from 'react-hook-form'
+
+// type InspectionCarDataType = {
+//   name: string
+//   url_image: string
+//   value: {
+//     id: number
+//     type: 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
+//     positions: {
+//       web: {
+//         top: number
+//         left: number
+//       }
+//       mobile: {
+//         top: number
+//         left: number
+//       }
+//     }
+//   }[]
+//   comment: string
+//   images: {
+//     id: number
+//     name: string
+//     url: string
+//     size: string
+//   }[]
+// }
+
+// type CheckListSignatures = {
+//   name: string
+//   rules: {
+//     required: boolean
+//   }
+//   image: string[]
+// }
 
 interface TabPanelProps {
   children?: ReactNode
@@ -32,6 +66,13 @@ function a11yProps(index: number) {
   }
 }
 
+export type ActionAlertsStateProps = {
+  isOpen: boolean
+  title: string
+  type: 'error' | 'warning' | 'success'
+  redirectTo?: string | undefined
+}
+
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props
 
@@ -43,14 +84,22 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box>{children}</Box>}
+      {value === index && <Box sx={{ position: 'relative' }}>{children}</Box>}
     </div>
   )
 }
 
 export default function ChecklistCreateById() {
-  const [value, setValue] = useState(0)
+  const [painelValue, setPainelValue] = useState(0)
+  // const [typeSubmitForm, setTypeSubmitForm] = useState<
+  //   'salvo' | 'finalizado' | 'rascunho'
+  // >('rascunho')
 
+  const [actionAlerts, setActionAlerts] = useState<ActionAlertsStateProps>({
+    isOpen: false,
+    title: '',
+    type: 'success',
+  })
   const queryClient = useQueryClient()
   const api = new ApiCore()
   const router = useRouter()
@@ -69,10 +118,20 @@ export default function ChecklistCreateById() {
       onSuccess: (data) => {
         // queryClient.invalidateQueries({ queryKey: ['checklist-createByID'] })
         // queryClient.setQueryData(['checklist-createByID'], data)
+        setActionAlerts({
+          isOpen: true,
+          title: 'Salvo com sucesso',
+          type: 'success',
+        })
         queryClient.invalidateQueries({ queryKey: ['checklist-createByID'] })
         return data
       },
       onError: (err: any) => {
+        setActionAlerts({
+          isOpen: true,
+          title: 'Salvo com sucesso',
+          type: 'error',
+        })
         console.log(err)
       },
     },
@@ -86,12 +145,32 @@ export default function ChecklistCreateById() {
         .then((response) => {
           return response.data.data
         }),
-    // refetchOnMount: 'always',
-    // enabled: !!router?.query?.id,
     {
       refetchOnWindowFocus: false,
+      enabled: !!router?.query?.id,
     },
   )
+
+  function handleAlert(isOpen: boolean) {
+    setActionAlerts((previState) => ({
+      ...previState,
+      isOpen,
+    }))
+  }
+
+  // function handleSaveFormSubmit(data: InspectionCarDataType[]) {
+  //   console.log(data)
+  //   setInspectionCarData(data)
+  // }
+
+  // function handleSaveInspectionCarData(data: InspectionCarDataType[]) {
+  //   setInspectionCarData(data)
+  // }
+  // function handleSaveSignatures(signatures: CheckListSignatures[]) {
+  //   console.log(signatures)
+  //   // setInspectionCarData(data)
+  // }
+
   async function handleAddListCheckList(stageData: StagesDataProps) {
     const dataForPost = {
       company_id: data?.company_id,
@@ -104,8 +183,15 @@ export default function ChecklistCreateById() {
       client_id: data?.client_id,
       service_schedule_id: data?.service_schedule_id,
       checklist_model: data?.checklist_model,
-      status: 'salvo', // salvo // finalizado // rascunho
+      status: 'pendente',
       stages: data?.stages.map((item) => {
+        // if (item.name === stageData.name) {
+        //   return {
+        //     ...stageData,
+        //     status: typeSubmitForm,
+        //   }
+        // }
+
         return item.name === stageData.name ? stageData : item
       }),
     }
@@ -116,9 +202,9 @@ export default function ChecklistCreateById() {
   }
 
   const handleChange = async (event: SyntheticEvent, newValue: number) => {
-    console.log(newValue)
+    // console.log(newValue)
     // if (data?.stages[value].status !== 'finalizado') setValue(newValue)
-    setValue(newValue)
+    setPainelValue(newValue)
   }
 
   if (isLoading) {
@@ -154,7 +240,7 @@ export default function ChecklistCreateById() {
                   }}
                 >
                   <TabsContainer
-                    value={value}
+                    value={painelValue}
                     onChange={handleChange}
                     textColor="inherit"
                     centered
@@ -163,7 +249,6 @@ export default function ChecklistCreateById() {
                   >
                     {data?.stages?.length > 0 &&
                       data.stages.map((stage, index) => {
-                        console.log(stage)
                         // const isDisabled = stage.status === 'finalizado'
                         return (
                           <TabItem
@@ -181,7 +266,7 @@ export default function ChecklistCreateById() {
                     return (
                       <TabPanel
                         key={`${Math.random() * 2000}-${stage.name}-${index}`}
-                        value={value}
+                        value={painelValue}
                         index={index}
                       >
                         <TabContent
@@ -208,22 +293,41 @@ export default function ChecklistCreateById() {
                   alignContent: 'center',
                 }}
               >
-                <Stack direction="row" spacing={2}>
+                {/* <Stack direction="row" spacing={2}>
                   <MyButton
                     type="submit"
                     variant="contained"
-                    form={`form-${data?.stages[value].name ?? ''}-${value}`}
+                    form={`form-${
+                      data?.stages[painelValue].name ?? ''
+                    }-${painelValue}`}
+                    onClick={() => setTypeSubmitForm('salvo')}
                   >
                     Salvar
                   </MyButton>
-                  <MyButton type="submit" variant="contained">
+                  <MyButton
+                    type="submit"
+                    variant="contained"
+                    form={`form-${
+                      data?.stages[painelValue].name ?? ''
+                    }-${painelValue}`}
+                    onClick={() => {
+                      console.log(inspectionCarData)
+                      setTypeSubmitForm('finalizado')
+                    }}
+                  >
                     Finalizar
                   </MyButton>
-                </Stack>
+                </Stack> */}
               </Grid>
             </Grid>
           </Grid>
         </Container>
+        <ActionAlerts
+          isOpen={actionAlerts?.isOpen}
+          title={'salvo'}
+          type={'success'}
+          handleAlert={handleAlert}
+        />
       </>
     )
   }

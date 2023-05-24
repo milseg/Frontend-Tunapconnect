@@ -45,7 +45,7 @@ export default function ActionAlerts({
       open={open}
       autoHideDuration={3000}
       onClose={handleClose}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
     >
       <Alert onClose={handleClose} severity={type} sx={{ width: '100%' }}>
         {title}

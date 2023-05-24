@@ -6,7 +6,7 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 
 import TableRow from '@mui/material/TableRow'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useFieldArray, useForm } from 'react-hook-form'
 import { Itens, ReponseGetCheckList, StagesDataProps } from '../../../types'
@@ -22,18 +22,12 @@ import { genereteInput } from './GenereteInputs'
 import ModalImages from './ModalImages'
 import ModalInspectCar from './ModalInspectCar'
 import ModalSigntures from './ModalSigntures'
-import { ButtonSignatures } from './styles'
-
-type TabContentProps = {
-  stageData: StagesDataProps | undefined
-  checklistModel: ReponseGetCheckList | undefined
-  stageName: string
-  stageItems: Itens[]
-  formIDSubmit: string
-  isClosed: boolean
-  stageSaved?: boolean
-  handleAddListCheckList: (data: StagesDataProps) => void
-}
+import {
+  ButtonsFinalized,
+  ButtonSignatures,
+  ButtonsSave,
+  MarginBottomHack,
+} from './styles'
 
 type ImageListProps = Array<{
   [key: string]: {
@@ -71,15 +65,29 @@ type OnSubmitData = {
     | undefined
 }
 
-type InspectionData = {
+type CheckListSignatures = {
+  name: string
+  rules: {
+    required: boolean
+  }
+  image: string[]
+}
+
+type InspectionCarData = {
   name: string
   url_image: string
   value: {
     id: number
     type: 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
     positions: {
-      top: string
-      left: string
+      web: {
+        top: number
+        left: number
+      }
+      mobile: {
+        top: number
+        left: number
+      }
     }
   }[]
   comment: string
@@ -89,7 +97,44 @@ type InspectionData = {
     url: string
     size: string
   }[]
-}[]
+}
+
+type TabContentProps = {
+  stageData: StagesDataProps | undefined
+  checklistModel: ReponseGetCheckList | undefined
+  stageName: string
+  stageItems: Itens[]
+  formIDSubmit: string
+  isClosed: boolean
+  stageSaved?: boolean
+  handleAddListCheckList: (data: StagesDataProps) => void
+}
+// type InspectionData = {
+//   name: string
+//   url_image: string
+//   value: {
+//     id: number
+//     type: 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
+//     positions: {
+//       web: {
+//         top: number
+//         left: number
+//       }
+//       mobile: {
+//         top: number
+//         left: number
+//       }
+//     }[]
+//   }
+
+//   comment: string
+//   images: {
+//     id: number
+//     name: string
+//     url: string
+//     size: string
+//   }[]
+// }[]
 
 function TabContent({
   stageData,
@@ -99,8 +144,8 @@ function TabContent({
   handleAddListCheckList,
   isClosed,
   checklistModel,
-  stageSaved,
-}: TabContentProps) {
+}: // handleSaveSignatures,
+TabContentProps) {
   const [openModalInspectCar, setOpenModalInspectCar] = useState(false)
   const [openModalImage, setOpenModalImage] = useState<OpenModalImage>({
     id: null,
@@ -112,7 +157,17 @@ function TabContent({
       open: false,
     })
   const [listImage, setListImage] = useState<ImageListProps>([])
-  const [inspectionData, setInspectionData] = useState<InspectionData>([])
+  const [typeSubmitForm, setTypeSubmitForm] = useState<
+    'salvo' | 'finalizado' | 'rascunho'
+  >('rascunho')
+
+  const [dataModals, setDataModals] = useState<{
+    signatures: CheckListSignatures[]
+    inspection: InspectionCarData[]
+  }>({
+    signatures: [],
+    inspection: [],
+  })
 
   const defaultValues = {
     [stageName]: stageData?.itens.map((item, index) => {
@@ -131,13 +186,7 @@ function TabContent({
     }),
   }
 
-  const {
-    control,
-    register,
-    handleSubmit,
-    getValues,
-    // formState: { isDirty },
-  } = useForm({
+  const { control, register, handleSubmit } = useForm({
     defaultValues,
   })
 
@@ -146,8 +195,6 @@ function TabContent({
     control,
     name: stageName,
   })
-
-  // console.log('touchedFields', touchedFields)
 
   function handleOpenModalInspectCar(value: boolean) {
     setOpenModalInspectCar(value)
@@ -226,7 +273,6 @@ function TabContent({
     const findIndexListImage = listImage[indexStageName][stageName].findIndex(
       (item) => item.id === index,
     )
-    console.log(listImage[indexStageName][stageName][findIndexListImage])
     setListImage((prevState) => {
       const newListImage = [...prevState]
       newListImage[indexStageName][stageName][findIndexListImage].images =
@@ -245,23 +291,58 @@ function TabContent({
     })
   }
 
-  function handleInspectionData(data: InspectionData) {
-    setInspectionData(data)
+  function handleSaveSignatures(signatures: CheckListSignatures[]) {
+    console.log(signatures)
+    setDataModals((prevState) => {
+      return {
+        ...prevState,
+        signatures,
+      }
+    })
+  }
+
+  function handleInspectionData(data: InspectionCarData[]) {
+    setDataModals((prevState) => {
+      return {
+        ...prevState,
+        inspection: data,
+      }
+    })
+    // setInspectionData(data)
   }
 
   function onSubmitData(data: OnSubmitData) {
+    console.log(data)
+    const isAlreadyInspections = stageData?.itens.filter(
+      (item) => item.rules.type === 'visual_inspect',
+    )
+
+    let defaultLabel: any
+
+    if (isAlreadyInspections) {
+      defaultLabel = isAlreadyInspections[0].values
+        .labels as InspectionCarData[]
+    }
+
+    console.log(dataModals)
+
     const dataFormatted = {
       ...stageData,
-      status: 'closed',
+      status: typeSubmitForm,
+      signatures:
+        dataModals?.signatures.length > 0
+          ? dataModals?.signatures
+          : stageData?.signatures,
       itens: stageItems.map((item, index) => {
         if (item.rules.type === 'visual_inspect') {
           return {
             ...item,
             comment: data[stageName]?.[index]?.observation,
             values: {
-              labels: {
-                ...inspectionData,
-              },
+              labels:
+                dataModals?.inspection.length > 0
+                  ? dataModals?.inspection
+                  : defaultLabel,
             },
           }
         }
@@ -276,10 +357,9 @@ function TabContent({
         }
       }),
     }
-
-    handleAddListCheckList(dataFormatted as StagesDataProps)
     console.log('data formatted', dataFormatted)
-    console.log('data inspectionData', inspectionData)
+    // console.log('data formatted', stageData)
+    handleAddListCheckList(dataFormatted as StagesDataProps)
   }
 
   // useEffect(() => {
@@ -347,55 +427,57 @@ function TabContent({
   //   }
   // }, [touchedFields])
 
-  useEffect(() => {
-    console.log(getValues(stageName))
-  }, [])
-  useEffect(() => {
-    const indexStageName = listImage.findIndex((item) =>
-      Object.hasOwn(item, stageName),
-    )
-    const sessionStorageData = sessionStorage.getItem(
-      `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
-    )
+  // useEffect(() => {
+  //   console.log(getValues(stageName))
+  // }, [])
+  // useEffect(() => {
+  //   const indexStageName = listImage.findIndex((item) =>
+  //     Object.hasOwn(item, stageName),
+  //   )
+  //   const sessionStorageData = sessionStorage.getItem(
+  //     `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
+  //   )
 
-    const data = sessionStorageData ? JSON.parse(sessionStorageData) : null
-    console.log(stageData)
-    // console.log(data)
-    if (indexStageName > -1) {
-      if (data) {
-        sessionStorage.setItem(
-          `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
-          JSON.stringify({
-            ...data,
-            [stageName]: {
-              ...data[stageName],
-              imagesList: listImage[indexStageName][stageName],
-            },
-          }),
-        )
-      } else {
-        sessionStorage.setItem(
-          `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
-          JSON.stringify({
-            [stageName]: {
-              imagesList: listImage[indexStageName][stageName],
-            },
-          }),
-        )
-      }
-    }
-  }, [listImage])
+  //   const data = sessionStorageData ? JSON.parse(sessionStorageData) : null
 
-  useEffect(() => {
-    const isAlreadyInspections = stageData?.itens.filter(
-      (item) => item.rules.type === 'visual_inspect',
-    )
+  //   if (indexStageName > -1) {
+  //     if (data) {
+  //       sessionStorage.setItem(
+  //         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
+  //         JSON.stringify({
+  //           ...data,
+  //           [stageName]: {
+  //             ...data[stageName],
+  //             imagesList: listImage[indexStageName][stageName],
+  //           },
+  //         }),
+  //       )
+  //     } else {
+  //       sessionStorage.setItem(
+  //         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
+  //         JSON.stringify({
+  //           [stageName]: {
+  //             imagesList: listImage[indexStageName][stageName],
+  //           },
+  //         }),
+  //       )
+  //     }
+  //   }
+  // }, [listImage])
 
-    if (!!isAlreadyInspections && inspectionData.length === 0) {
-      // @ts-ignore
-      setInspectionData(isAlreadyInspections[0].values.labels as InspectionData)
-    }
-  }, [])
+  // useEffect(() => {
+  //   const isAlreadyInspections = stageData?.itens.filter(
+  //     (item) => item.rules.type === 'visual_inspect',
+  //   )
+
+  //   if (isAlreadyInspections && inspectionData === undefined) {
+  //     console.log(isAlreadyInspections)
+  //     setInspectionData(
+  //       // @ts-ignore
+  //       isAlreadyInspections[0].values.labels as InspectionData,
+  //     )
+  //   }
+  // }, [])
 
   return (
     <>
@@ -490,6 +572,25 @@ function TabContent({
             </TableRow>
           </TableBody>
         </Table>
+        <ButtonsSave
+          type="submit"
+          variant="contained"
+          // form={`form-${data?.stages[painelValue].name ?? ''}-${painelValue}`}
+          onClick={() => setTypeSubmitForm('salvo')}
+        >
+          Salvar
+        </ButtonsSave>
+        <ButtonsFinalized
+          type="submit"
+          variant="contained"
+          // form={`form-${data?.stages[painelValue].name ?? ''}-${painelValue}`}
+          onClick={() => {
+            setTypeSubmitForm('finalizado')
+          }}
+        >
+          Finalizar
+        </ButtonsFinalized>
+        <MarginBottomHack />
       </TableContainer>
       <ModalImages
         isOpen={openModalImage}
@@ -508,9 +609,11 @@ function TabContent({
       />
       <ModalSigntures
         isOpen={openModalSignature}
-        closeModalSigntures={handleCloseModalSignature}
+        closeModalSignatures={handleCloseModalSignature}
         stageName={stageName}
-        signaturesData={stageData?.signatures}
+        signaturesData={dataModals?.signatures}
+        stageData={stageData?.signatures}
+        handleSaveSignatures={handleSaveSignatures}
       />
     </>
   )

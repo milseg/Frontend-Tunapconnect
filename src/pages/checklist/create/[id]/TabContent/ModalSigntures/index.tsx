@@ -2,7 +2,8 @@ import { Box, Dialog, DialogActions, DialogContent, Stack } from '@mui/material'
 import { MyButton } from './styles'
 
 import SignaturePad from 'react-signature-canvas'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 
 interface Signature {
   name: string
@@ -17,30 +18,99 @@ interface ModalInspectCarProps {
     id: number | null
     open: boolean
   }
-  closeModalSigntures: () => void
+  closeModalSignatures: () => void
   stageName: string
   signaturesData: Signature[] | undefined
+  stageData: Signature[] | undefined
+  handleSaveSignatures: (data: Signature[]) => void
 }
 
 export default function ModalSigntures({
   isOpen,
-  closeModalSigntures,
+  closeModalSignatures,
   stageName,
   signaturesData,
+  handleSaveSignatures,
+  stageData,
 }: ModalInspectCarProps) {
   const signatureRef = useRef<SignaturePad>(null)
+  const [isSignature, setIsSignature] = useState<string | null>(null)
 
   const handleClose = () => {
-    closeModalSigntures()
+    closeModalSignatures()
+  }
+  const handleClear = () => {
+    if (signatureRef.current) signatureRef.current?.clear()
+    setIsSignature(null)
   }
 
-  function handleSaveSignature() {
+  function handleSave() {
     if (signatureRef.current) {
-      console.log(
-        signatureRef.current.getTrimmedCanvas().toDataURL('image/png'),
-      )
+      const signature = signatureRef.current
+        .getTrimmedCanvas()
+        .toDataURL('image/png')
+      if (signaturesData) {
+        if (signaturesData?.length > 0) {
+          const newArraySignatures = signaturesData.map((item, index) => {
+            if (isOpen.id === index) {
+              return {
+                ...item,
+                image: [signature],
+              }
+            }
+            return item
+          })
+          handleSaveSignatures(newArraySignatures)
+        } else {
+          if (stageData) {
+            const newArraySignatures = stageData.map((item, index) => {
+              if (isOpen.id === index) {
+                return {
+                  ...item,
+                  image: [signature],
+                }
+              }
+              return item
+            })
+            handleSaveSignatures(newArraySignatures)
+          }
+        }
+      } else {
+        if (stageData) {
+          const newArraySignatures = stageData.map((item, index) => {
+            if (isOpen.id === index) {
+              return {
+                ...item,
+                image: [signature],
+              }
+            }
+            return item
+          })
+          handleSaveSignatures(newArraySignatures)
+        }
+      }
     }
   }
+
+  useEffect(() => {
+    if (isOpen?.id !== null) {
+      if (signaturesData) {
+        if (signaturesData[isOpen.id]?.image[0]) {
+          setIsSignature(signaturesData[isOpen.id].image[0])
+        } else {
+          setIsSignature(null)
+        }
+      }
+    }
+  }, [isOpen?.id])
+  useEffect(() => {
+    if (isOpen?.id) {
+      if (stageData && !signaturesData) {
+        if (stageData[isOpen.id].image[0])
+          setIsSignature(stageData[isOpen.id].image[0])
+      }
+    }
+  }, [])
 
   return (
     <Dialog
@@ -63,13 +133,22 @@ export default function ModalSigntures({
             height: 200,
           }}
         >
-          <SignaturePad
-            canvasProps={{ width: 400, height: 200, className: 'sigCanvas' }}
-            ref={signatureRef}
-            // ref={(ref) => {
-            //   console.log(ref && ref.getTrimmedCanvas().toDataURL('image/png'))
-            // }}
-          />
+          {!isSignature && (
+            <SignaturePad
+              canvasProps={{ width: 400, height: 200, className: 'sigCanvas' }}
+              ref={signatureRef}
+            />
+          )}
+          {isSignature && (
+            <Image
+              src={isSignature}
+              width={300}
+              height={150}
+              alt=" "
+              style={{ margin: 20 }}
+              onClick={() => setIsSignature(null)}
+            />
+          )}
         </Box>
       </DialogContent>
       <DialogActions sx={{ paddingX: 3, paddingBottom: 2, paddingTop: 0 }}>
@@ -77,13 +156,16 @@ export default function ModalSigntures({
           <MyButton
             variant="contained"
             onClick={() => {
-              handleSaveSignature()
+              handleSave()
             }}
           >
             salvar
           </MyButton>
           <MyButton variant="contained" onClick={handleClose}>
             sair
+          </MyButton>
+          <MyButton variant="contained" onClick={handleClear}>
+            limpar
           </MyButton>
         </Stack>
       </DialogActions>
