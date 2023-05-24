@@ -33,7 +33,7 @@ export function MoreOptionsButtonSelect({
   }
   const handleClickDelete = async () => {
     try {
-      await handleDeleteChecklist(Number(100000))
+      await handleDeleteChecklist(Number(checklistId))
       alert(`Checklist${checklistId} excluído com sucesso`)
     } catch (e) {
       alert(`Erro ao excluir Checklist - ${checklistId}`)
