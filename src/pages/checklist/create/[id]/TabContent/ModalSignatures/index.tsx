@@ -167,6 +167,7 @@ export default function ModalSignatures({
             variant="contained"
             onClick={() => {
               handleSave()
+              handleClose()
             }}
           >
             salvar
