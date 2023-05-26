@@ -1,4 +1,4 @@
-import { ReactNode, SyntheticEvent, useState } from 'react'
+import { ReactNode, SyntheticEvent, useRef, useState } from 'react'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -60,6 +60,10 @@ interface TabPanelProps {
   value: number
 }
 
+interface RefTabContentRefType {
+  handleOpenAlertDialog: (value: number) => void
+}
+
 function a11yProps(index: number) {
   return {
     id: `simple-tab-${index}`,
@@ -104,6 +108,8 @@ export default function ChecklistCreateById() {
   const queryClient = useQueryClient()
   const api = new ApiCore()
   const router = useRouter()
+
+  const tabContentRef = useRef<RefTabContentRefType>(null)
 
   const updateChecklistmutations = useMutation(
     (newDataChecklist: ChecklistProps) => {
@@ -214,6 +220,12 @@ export default function ChecklistCreateById() {
   const handleChange = async (event: SyntheticEvent, newValue: number) => {
     // console.log(newValue)
     // if (data?.stages[value].status !== 'finalizado') setValue(newValue)
+    if (tabContentRef.current && tabContentRef.current.handleOpenAlertDialog) {
+      tabContentRef.current.handleOpenAlertDialog(newValue)
+    }
+  }
+
+  function handleChangeTabContent(newValue: number) {
     setPainelValue(newValue)
   }
 
@@ -290,11 +302,13 @@ export default function ChecklistCreateById() {
                         <TabContent
                           stageItems={stage.itens}
                           stageData={stage}
-                          checklistModel={data}
+                          ref={tabContentRef}
+                          // checklistModel={data}
                           stageName={stage.name}
                           formIDSubmit={`form-${stage.name}-${index}`}
                           handleAddListCheckList={handleAddListCheckList}
                           isClosed={stage.status === 'finalizado'}
+                          handleChangeTabContent={handleChangeTabContent}
                         />
                       </TabPanel>
                     )

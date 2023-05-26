@@ -25,7 +25,7 @@ interface ModalInspectCarProps {
   handleSaveSignatures: (data: Signature[]) => void
 }
 
-export default function ModalSigntures({
+export default function ModalSignatures({
   isOpen,
   closeModalSignatures,
   stageName,

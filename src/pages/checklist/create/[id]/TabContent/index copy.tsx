@@ -1,4 +1,3 @@
-import { AlertDialog } from '@/components/AlertDialog'
 import { IconButton, Stack, Typography } from '@mui/material'
 
 import Table from '@mui/material/Table'
@@ -7,10 +6,10 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 
 import TableRow from '@mui/material/TableRow'
-import { forwardRef, useImperativeHandle, useState } from 'react'
+import { useState } from 'react'
 
 import { useFieldArray, useForm } from 'react-hook-form'
-import { Itens, StagesDataProps } from '../../../types'
+import { Itens, ReponseGetCheckList, StagesDataProps } from '../../../types'
 import {
   // ButtonItemChecklist,
   ImageUploadBadge,
@@ -22,7 +21,7 @@ import {
 import { genereteInput } from './GenereteInputs'
 import ModalImages from './ModalImages'
 import ModalInspectCar from './ModalInspectCar'
-import ModalSignatures from './ModalSignatures'
+import ModalSigntures from './ModalSignatures'
 import {
   ButtonsFinalized,
   ButtonSignatures,
@@ -102,33 +101,51 @@ type InspectionCarData = {
 
 type TabContentProps = {
   stageData: StagesDataProps | undefined
-  // checklistModel: ReponseGetCheckList | undefined
+  checklistModel: ReponseGetCheckList | undefined
   stageName: string
   stageItems: Itens[]
   formIDSubmit: string
   isClosed: boolean
   stageSaved?: boolean
   handleAddListCheckList: (data: StagesDataProps) => void
-  handleChangeTabContent: (newValue: number) => void
 }
+// type InspectionData = {
+//   name: string
+//   url_image: string
+//   value: {
+//     id: number
+//     type: 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
+//     positions: {
+//       web: {
+//         top: number
+//         left: number
+//       }
+//       mobile: {
+//         top: number
+//         left: number
+//       }
+//     }[]
+//   }
 
-interface RefType {
-  handleOpenAlertDialog: (value: number) => void
-}
+//   comment: string
+//   images: {
+//     id: number
+//     name: string
+//     url: string
+//     size: string
+//   }[]
+// }[]
 
-const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
-  props,
-  ref,
-) {
-  const {
-    stageData,
-    stageName,
-    stageItems,
-    formIDSubmit,
-    handleAddListCheckList,
-    isClosed,
-    handleChangeTabContent,
-  } = props
+function TabContent({
+  stageData,
+  stageName,
+  stageItems,
+  formIDSubmit,
+  handleAddListCheckList,
+  isClosed,
+  checklistModel,
+}: // handleSaveSignatures,
+TabContentProps) {
   const [openModalInspectCar, setOpenModalInspectCar] = useState(false)
   const [openModalImage, setOpenModalImage] = useState<OpenModalImage>({
     id: null,
@@ -151,15 +168,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     signatures: [],
     inspection: [],
   })
-  const [alertDialog, setAlertDialog] = useState<{
-    isOpen: boolean
-    newTab: null | number
-  }>({
-    isOpen: false,
-    newTab: null,
-  })
-
-  const [isAlteredForm, setIsAlteredForm] = useState(false)
 
   const defaultValues = {
     [stageName]: stageData?.itens.map((item, index) => {
@@ -178,13 +186,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     }),
   }
 
-  const {
-    control,
-    register,
-    handleSubmit,
-    getValues,
-    formState: { isDirty },
-  } = useForm({
+  const { control, register, handleSubmit } = useForm({
     defaultValues,
   })
 
@@ -193,10 +195,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     control,
     name: stageName,
   })
-
-  useImperativeHandle(ref, () => ({
-    handleOpenAlertDialog,
-  }))
 
   function handleOpenModalInspectCar(value: boolean) {
     setOpenModalInspectCar(value)
@@ -265,7 +263,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         return newListImage
       }
     })
-    setIsAlteredForm(true)
   }
 
   function handleRemoveImageInListImage(index: number, imageId: number) {
@@ -284,7 +281,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 
       return newListImage
     })
-    setIsAlteredForm(true)
   }
 
   function handleCloseModalSignature() {
@@ -302,7 +298,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         signatures,
       }
     })
-    setIsAlteredForm(true)
   }
 
   function handleInspectionData(data: InspectionCarData[]) {
@@ -312,31 +307,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         inspection: data,
       }
     })
-    setIsAlteredForm(true)
-  }
-
-  async function handleOpenAlertDialog(value: number) {
-    console.log(isAlteredForm, isDirty)
-    if (!isDirty && !isAlteredForm) {
-      handleChangeTabContent(value)
-    } else {
-      setAlertDialog({ isOpen: true, newTab: value })
-    }
-  }
-
-  function handleOpenAlertDialogIsSave(isSave: boolean, newTap: null | number) {
-    if (isSave) {
-      const valuesActual = getValues(stageName)
-      setTypeSubmitForm('salvo')
-      // @ts-ignore
-      const valuesActualFormatted = { [stageName]: [...valuesActual] }
-      onSubmitData(valuesActualFormatted)
-      setIsAlteredForm(false)
-      if (newTap !== null) handleChangeTabContent(newTap)
-    } else {
-      setIsAlteredForm(false)
-      if (newTap !== null) handleChangeTabContent(newTap)
-    }
+    // setInspectionData(data)
   }
 
   function onSubmitData(data: OnSubmitData) {
@@ -351,6 +322,8 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       defaultLabel = isAlreadyInspections[0].values
         .labels as InspectionCarData[]
     }
+
+    console.log(dataModals)
 
     const dataFormatted = {
       ...stageData,
@@ -383,16 +356,9 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         }
       }),
     }
-    // console.log('data formatted', dataFormatted)
+    console.log('data formatted', dataFormatted)
     // console.log('data formatted', stageData)
     handleAddListCheckList(dataFormatted as StagesDataProps)
-  }
-
-  function handleCloseAlertDialog() {
-    setAlertDialog({
-      isOpen: false,
-      newTab: null,
-    })
   }
 
   // useEffect(() => {
@@ -640,7 +606,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         // @ts-ignore
         handleInspectionData={handleInspectionData}
       />
-      <ModalSignatures
+      <ModalSigntures
         isOpen={openModalSignature}
         closeModalSignatures={handleCloseModalSignature}
         stageName={stageName}
@@ -648,15 +614,8 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         stageData={stageData?.signatures}
         handleSaveSignatures={handleSaveSignatures}
       />
-      <AlertDialog
-        isOpen={alertDialog}
-        handleClose={handleCloseAlertDialog}
-        handleOpenAlertDialogIsSave={handleOpenAlertDialogIsSave}
-      />
     </>
   )
-})
+}
 
 export default TabContent
-
-// export default TabContent

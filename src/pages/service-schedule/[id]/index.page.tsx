@@ -267,10 +267,10 @@ export default function ServiceSchedulesEdit() {
       console.log(router.query)
       const dataCreateChecklist = {
         company_id: companySelected,
-        brand_id: null,
+        brand_id: null, // brand_id
         vehicle_id: null, //  vehicle id
-        model_id: null,
-        vehicle_client_id: null,
+        model_id: null, // model id
+        vehicle_client_id: null, // vehicle client id
         km: null,
         fuel: null,
         client_id: null, // client id
@@ -278,7 +278,7 @@ export default function ServiceSchedulesEdit() {
           ? parseInt(router?.query?.id as string)
           : null,
         checklist_model: 1,
-        status: 'rascunho', // salvo // finalizado // rascunho
+        status: 'rascunho', // finalizado // pendente // rascunho
         stages: modelChecklist.data.data[0].stages,
       }
 
