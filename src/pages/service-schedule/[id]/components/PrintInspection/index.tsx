@@ -1,8 +1,15 @@
 // import { ApiCore } from '@/lib/api'
-import { useEffect } from 'react'
 import classNames from 'classnames'
 import style from '@/sass/styles/printInspection.module.scss'
 import { ApiCore } from '@/lib/api'
+import { useRouter } from 'next/router'
+import {
+  Itens,
+  ResponseGetCheckList,
+  StagesDataProps,
+} from '@/pages/checklist/types'
+import { useQuery } from 'react-query'
+import { useState } from 'react'
 
 const SquareCheck = ({ type = 'success', checked = false }) => (
   <div className={classNames(style['square-check'], style[`bg-${type}`])}>
@@ -22,134 +29,92 @@ const TripleSquareCheck = ({
   </div>
 )
 
-export function PrintInspection(props: {
-  company?: any
+interface PrintInspectionProps {
+  companyId: number | null
   id: number
   type: string
   checklistId: number
   refPrint: any
-}) {
+}
+
+export function PrintInspection({
+  companyId,
+  id,
+  type,
+  checklistId,
+  refPrint,
+}: PrintInspectionProps) {
   const api = new ApiCore()
-  // export function PrintInspection(props) {
+  const router = useRouter()
 
-  // const history = useNavigate();
-  /* const { id, type, checklistId } = useParams(); */
-  // const [data, setData] = useState(null)
-  // const [vehicleService, setVehicleService] = useState(null)
-  // const [stages, setStages] = useState([])
-  // const [evidences, setEvidences] = useState([])
-  // const [checklistData, setChecklistData] = useState({})
+  const [receptionStage, setReceptionStage] = useState<StagesDataProps>()
+  const [deliveryStage, setDeliveryStage] = useState<StagesDataProps>()
 
-  // const api = new ApiCore()
-  // const steps = {
-  //   '1': 'Frente',
-  //   '2': 'Lateral esquerda',
-  //   '3': 'Lateral direita',
-  //   '4': 'Traseira',
-  //   '5': 'Teto',
-  // }
+  const { data } = useQuery<ResponseGetCheckList>(
+    ['checklist-createByID-print', router?.query?.id, checklistId, companyId],
+    () =>
+      api.get(`/checklist/${279}?company_id=${companyId}`).then((response) => {
+        const reception = response.data.data.stages.filter(
+          (st: any) => st.name === 'Recepção',
+        )
+        const delivery = response.data.data.stages.filter(
+          (st: any) => st.name === 'Entrega',
+        )
+        // console.log(reception[0])
+        setReceptionStage(reception[0])
+        setDeliveryStage(delivery[0])
+        return response.data.data
+      }),
+    {
+      refetchOnWindowFocus: false,
+    },
+  )
 
-  // const getData = () => {
-  //   if (props?.id) {
-  //     let ajaxCall
+  // console.log(receptionStage)
+  console.log(deliveryStage)
 
-  //     switch (props?.type) {
-  //       case 'service-schedules':
-  //         ajaxCall = api.get('/vehicle-service/' + props?.checklistId)
-  //         break
-  //     }
-  //     ajaxCall.then(
-  //       (response) => {
-  //         console.log(response)
-  //         switch (props?.type) {
-  //           case 'service-schedules':
-  //             let data
-  //             const checklistData = {}
-  //             const {
-  //               brand,
-  //               client,
-  //               vehicle,
-  //               technical_consultant: technicalConsultant,
-  //               checklist_version: checklistVersion,
-  //               service_schedule: {
-  //                 client_vehicle: clientVehicle,
-  //                 ...serviceSchedule
-  //               },
-  //               ...vehicleService
-  //             } = response.data.data
-  //             data = {
-  //               brand,
-  //               client,
-  //               technicalConsultant,
-  //               vehicle,
-  //               serviceSchedule,
-  //               checklistVersion,
-  //               clientVehicle,
-  //             }
-
-  //             vehicleService.items.forEach((checklistItem) => {
-  //               if (checklistItem.code !== null) {
-  //                 checklistData[checklistItem.code] = {
-  //                   id: checklistItem.id,
-  //                   value: checklistItem.pivot.value,
-  //                   evidence: checklistItem.pivot.evidence,
-  //                   observations: checklistItem.pivot.observations,
-  //                   type: checklistItem.validation.type,
-  //                 }
-  //               }
-  //             })
-
-  //             const stages = vehicleService.stages.filter(
-  //               (stage) => stage.pivot.processed,
-  //             )
-  //             stages.forEach((stage, index) => {
-  //               stages[index].evidences = [].concat(
-  //                 ...stage.items.map((checklistItem) =>
-  //                   (checklistData[checklistItem.code]?.evidence || []).map(
-  //                     (evidence) => {
-  //                       return {
-  //                         evidence,
-  //                         name: checklistItem.name,
-  //                         observations:
-  //                           checklistData[checklistItem.code].observations,
-  //                       }
-  //                     },
-  //                   ),
-  //                 ),
-  //               )
-  //             })
-
-  //             setVehicleService(vehicleService)
-  //             setStages(stages)
-  //             setChecklistData(checklistData)
-  //             setData(data)
-  //             break
-  //           default:
-  //             setData(response.data.data)
-  //             break
-  //         }
-  //       },
-  //       (error) => {
-  //         setData(null)
-  //       },
-  //     )
-  //   } else {
-  //     setData(null)
-  //   }
-  // }
-
-  useEffect(() => {
-    if (props?.checklistId) {
-      api
-        .get('/checklist/list?company_id=1&service_schedule_id=7')
-        .then((response) => {
-          console.log(response.data.data[0])
-        })
+  function getCodeReceptionStage(code: string): Itens {
+    const result = receptionStage?.itens.filter((it) => it.Code === code)
+    if (result) {
+      if (result.length > 0) {
+        const auxResult = result[0]
+        return auxResult
+      }
     }
-  }, [])
+    return {
+      name: 'nao encontrado',
+      comment: '',
+      Code: 'none',
+      rules: {
+        required: false,
+        type: 'none',
+      },
+
+      values: { value: false, images: [] },
+    }
+  }
+  function getCodeDeliveryStage(code: string): Itens {
+    const result = deliveryStage?.itens.filter((it) => it.Code === code)
+    if (result) {
+      if (result.length > 0) {
+        const auxResult = result[0]
+        return auxResult
+      }
+    }
+    return {
+      name: 'nao encontrado',
+      comment: '',
+      Code: 'none',
+      rules: {
+        required: false,
+        type: 'none',
+      },
+      values: { value: false, images: [] },
+    }
+  }
 
   return (
-    <div className={classNames(style.page)} ref={props.refPrint}>
+    <div className={classNames(style.page)} ref={refPrint}>
       <header>
         <div className={style.row}>
           <div
@@ -325,32 +290,116 @@ export function PrintInspection(props: {
                   </div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div></div>
-                  <div></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-CAI').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-CAI').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div></div>
-                  <div></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-FTG').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-FTG').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div className={style.checked}></div>
-                  <div></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-M').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-M').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div></div>
-                  <div></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-TRI').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-TRI').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div></div>
-                  <div></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-CHA').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-CHA').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div></div>
-                  <div className={style.checked}></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-EST').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-EST').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div></div>
-                  <div></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-DLG').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeReceptionStage('RE-DLG').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={style['blue-slots']}>
                   <div></div>
@@ -408,32 +457,116 @@ export function PrintInspection(props: {
                   </div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div></div>
-                  <div></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-CAI').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-CAI').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div></div>
-                  <div></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-FTG').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-FTG').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div className={style.checked}></div>
-                  <div></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-M').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-M').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div></div>
-                  <div></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-TRI').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-TRI').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div></div>
-                  <div></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-CHA').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-CHA').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div></div>
-                  <div className={style.checked}></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-EST').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-EST').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={classNames(style.row, style['two-checkboxes'])}>
-                  <div></div>
-                  <div></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-CL').values.value
+                        ? style.checked
+                        : ''
+                    }
+                  ></div>
+                  <div
+                    className={
+                      getCodeDeliveryStage('ENT-CL').values.value
+                        ? ''
+                        : style.checked
+                    }
+                  ></div>
                 </div>
                 <div className={style['blue-slots']}>
                   <div></div>

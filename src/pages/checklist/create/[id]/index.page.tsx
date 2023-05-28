@@ -10,7 +10,7 @@ import { ApiCore } from '@/lib/api'
 import { Skeleton } from '@mui/material'
 import {
   ChecklistProps,
-  ReponseGetCheckList,
+  ResponseGetCheckList,
   StagesDataProps,
 } from '../../types'
 
@@ -144,7 +144,7 @@ export default function ChecklistCreateById() {
     },
   )
 
-  const { data, isSuccess, isLoading } = useQuery<ReponseGetCheckList>(
+  const { data, isSuccess, isLoading } = useQuery<ResponseGetCheckList>(
     ['checklist-createByID'],
     () =>
       api

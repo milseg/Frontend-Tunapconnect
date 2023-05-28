@@ -263,17 +263,15 @@ export default function ServiceSchedulesEdit() {
   async function createCheckListBase() {
     try {
       const modelChecklist = await api.get('/checklist_model/list')
-      console.log(modelChecklist)
-      console.log(router.query)
       const dataCreateChecklist = {
         company_id: companySelected,
         brand_id: null, // brand_id
         vehicle_id: null, //  vehicle id
         model_id: null, // model id
-        vehicle_client_id: null, // vehicle client id
+        vehicle_client_id: clientVehicle?.id, // vehicle client id
         km: null,
         fuel: null,
-        client_id: null, // client id
+        client_id: client?.id, // client id
         service_schedule_id: router?.query?.id
           ? parseInt(router?.query?.id as string)
           : null,
@@ -281,7 +279,7 @@ export default function ServiceSchedulesEdit() {
         status: 'rascunho', // finalizado // pendente // rascunho
         stages: modelChecklist.data.data[0].stages,
       }
-
+      // console.log(dataCreateChecklist)
       if (modelChecklist.data.data.length > 0) {
         const createdDefault = await api.create(
           '/checklist',
@@ -601,7 +599,6 @@ export default function ServiceSchedulesEdit() {
               </ButtonLeft>
               <ButtonCenter
                 onClick={() => {
-                  console.log('print Checklists')
                   setOpenPrintInspectionModal(true)
                 }}
               >

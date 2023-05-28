@@ -62,9 +62,9 @@ export function PrintInspectionModal({
           <BoxContainer>
             <PrintInspection
               refPrint={printInspectionRef}
-              checklistId={1}
+              checklistId={361}
               type="service-schedule"
-              company={companySelected}
+              companyId={companySelected}
               id={1}
             />
           </BoxContainer>
