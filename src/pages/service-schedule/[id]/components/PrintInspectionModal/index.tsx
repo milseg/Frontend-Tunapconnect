@@ -18,11 +18,13 @@ import { CompanyContext } from '@/contexts/CompanyContext'
 interface PrintInspectionModalProps {
   isOpen: boolean
   closeModal: () => void
+  checkListIdForModal: number
 }
 
 export function PrintInspectionModal({
   isOpen,
   closeModal,
+  checkListIdForModal,
 }: PrintInspectionModalProps) {
   const [open, setOpen] = useState(false)
   const theme = useTheme()
@@ -62,7 +64,7 @@ export function PrintInspectionModal({
           <BoxContainer>
             <PrintInspection
               refPrint={printInspectionRef}
-              checklistId={366}
+              checklistId={checkListIdForModal}
               type="service-schedule"
               companyId={companySelected}
               id={1}

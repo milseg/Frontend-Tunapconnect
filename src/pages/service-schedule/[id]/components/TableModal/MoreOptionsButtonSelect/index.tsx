@@ -8,6 +8,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { MoreOptionsButtonSelectProps } from './types'
 import { MenuItemButton } from './styles'
 import { useRouter } from 'next/router'
+import { PrintInspectionModal } from '../../PrintInspectionModal'
 
 // const ITEM_HEIGHT = 38
 
@@ -23,7 +24,12 @@ export function MoreOptionsButtonSelect({
     event.stopPropagation()
     setAnchorEl(event.currentTarget)
   }
+  const [openPrintInspectionModal, setOpenPrintInspectionModal] =
+    useState(false)
   const router = useRouter()
+  const closePrintInspectionModalModal = () => {
+    setOpenPrintInspectionModal(false)
+  }
 
   const handleClose = () => {
     setAnchorEl(null)
@@ -96,10 +102,17 @@ export function MoreOptionsButtonSelect({
         {status !== 'Finalizado' && (
           <MenuItemButton onClick={handleClickDelete}>Excluir</MenuItemButton>
         )}
-        {/* <MenuItemButton onClick={() => {}}>Enviar</MenuItemButton>
-        <MenuItemButton onClick={() => {}}>Duplicar</MenuItemButton>
-        <MenuItemButton onClick={() => {}}>Imprimir</MenuItemButton> */}
+        {/* <MenuItemButton onClick={() => {}}>Enviar</MenuItemButton> */}
+        {/* <MenuItemButton onClick={() => {}}>Duplicar</MenuItemButton> */}
+        <MenuItemButton onClick={() => setOpenPrintInspectionModal(true)}>
+          Imprimir
+        </MenuItemButton>
       </Menu>
+      <PrintInspectionModal
+        isOpen={openPrintInspectionModal}
+        closeModal={closePrintInspectionModalModal}
+        checkListIdForModal={checklistId as number}
+      />
     </div>
   )
 }

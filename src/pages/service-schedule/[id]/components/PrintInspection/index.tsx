@@ -123,8 +123,8 @@ export function PrintInspection({
   }
 
   return (
-    <>
-      <div className={classNames(style.page)} ref={refPrint}>
+    <div ref={refPrint}>
+      <div className={classNames(style.page)}>
         <header>
           <div className={style.row}>
             <div
@@ -1600,6 +1600,6 @@ export function PrintInspection({
             })}
         </Stack>
       </Paper>
-    </>
+    </div>
   )
 }
