@@ -41,6 +41,7 @@ import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded'
 import dayjs from 'dayjs'
 import { StagesDataProps } from '@/pages/checklist/types'
 import { toPng } from 'html-to-image'
+// import { ApiCore } from '@/lib/api'
 
 // import carroFrenteImg from '@/assets/images/inspection/carro-frente.svg'
 
@@ -221,6 +222,7 @@ export default function ModalInspectCar({
     teto: '',
   })
 
+  // const api = new ApiCore()
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
   const isMobile = useMediaQuery('(max-width:600px)')
 
@@ -436,7 +438,52 @@ export default function ModalInspectCar({
     })
   }
 
+  // async function uploadImg(file: string) {
+  //   const formData = new FormData()
+  //   formData.append('file', file)
+  //   try {
+  //     return await api.create('/uploads', formData, {
+  //       headers: { 'Content-Type': 'multipart/form-data' },
+  //     })
+  //   } catch (err) {
+  //     console.error(err)
+  //   }
+  // }
+
+  // async function uploadScreenshots(): Promise<void> {
+  //   const newScreenShot = await screenShotToPng(tabsValue)
+  //   const newScreenShots = {
+  //     frente: tabsValue === 0 ? newScreenShot : screenShots.frente,
+  //     lateralEsquerdo:
+  //       tabsValue === 1 ? newScreenShot : screenShots.lateralEsquerdo,
+  //     lateralDireito:
+  //       tabsValue === 2 ? newScreenShot : screenShots.lateralDireito,
+  //     traseira: tabsValue === 3 ? newScreenShot : screenShots.traseira,
+  //     teto: tabsValue === 4 ? newScreenShot : screenShots.teto,
+  //   }
+  //   const newScreenShotsUrl = {
+  //     frente: '',
+  //     lateralEsquerdo: '',
+  //     lateralDireito: '',
+  //     traseira: '',
+  //     teto: '',
+  //   }
+  //   for (const [key, value] of Object.entries(newScreenShots)) {
+  //     console.log(`${key}: ${''}`)
+  //     if (value) {
+  //       newScreenShotsUrl[key] = await uploadImg(value)
+  //     }
+  //   }
+  //   console.log(newScreenShotsUrl)
+  //   // const formData = new FormData()
+  //   //   formData.append('file', file)
+  //   //   api.create('/uploads', formData, {
+  //   //     headers: { 'Content-Type': 'multipart/form-data' },
+  //   //   })
+  // }
+
   async function handleSave() {
+    // await uploadScreenshots()
     console.log(screenShots)
     const newScreenShot = await screenShotToPng(tabsValue)
     const newScreenShots = {
@@ -533,6 +580,13 @@ export default function ModalInspectCar({
       traseira: '',
       teto: '',
     }
+    const newScreenShots: ObservationsType = {
+      frente: '',
+      lateralEsquerdo: '',
+      lateralDireito: '',
+      traseira: '',
+      teto: '',
+    }
 
     if (positonsCarData) {
       positonsCarData[0]?.values?.labels?.forEach((item) => {
@@ -543,6 +597,7 @@ export default function ModalInspectCar({
             newPositionsMarkups.frente = item.value ?? []
             newPositionsObservations.frente = item.comment ?? ''
             newPositionsImageList.frente = item.images ?? []
+            newScreenShots.frente = item.screenShot ?? ''
             break
           case 'Lateral esquerda':
             newPositionsUrl.lateralEsquerdo = item.url_image
@@ -550,6 +605,7 @@ export default function ModalInspectCar({
             newPositionsMarkups.lateralEsquerdo = item.value ?? []
             newPositionsObservations.lateralEsquerdo = item.comment ?? ''
             newPositionsImageList.lateralEsquerdo = item.images ?? []
+            newScreenShots.lateralEsquerdo = item.screenShot ?? ''
             break
           case 'Lateral direita':
             newPositionsUrl.lateralDireito = item.url_image
@@ -557,6 +613,7 @@ export default function ModalInspectCar({
             newPositionsMarkups.lateralDireito = item.value ?? []
             newPositionsObservations.lateralDireito = item.comment ?? ''
             newPositionsImageList.lateralDireito = item.images ?? []
+            newScreenShots.lateralDireito = item.screenShot ?? ''
             break
           case 'Traseira':
             newPositionsUrl.traseira = item.url_image
@@ -564,6 +621,7 @@ export default function ModalInspectCar({
             newPositionsMarkups.traseira = item.value ?? []
             newPositionsObservations.traseira = item.comment ?? ''
             newPositionsImageList.traseira = item.images ?? []
+            newScreenShots.traseira = item.screenShot ?? ''
             break
           case 'Teto':
             newPositionsUrl.teto = item.url_image
@@ -571,6 +629,7 @@ export default function ModalInspectCar({
             newPositionsMarkups.teto = item.value ?? []
             newPositionsObservations.teto = item.comment ?? ''
             newPositionsImageList.teto = item.images ?? []
+            newScreenShots.teto = item.screenShot ?? ''
             break
           default:
             break
@@ -580,6 +639,7 @@ export default function ModalInspectCar({
       setMarkups(newPositionsMarkups)
       setListImagesUpload(newPositionsImageList)
       setObservations(newPositionsObservations)
+      setScreenShots(newScreenShots)
     }
   }, [])
 

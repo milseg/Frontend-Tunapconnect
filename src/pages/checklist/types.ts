@@ -19,6 +19,7 @@ export interface Values {
 type InpectionData = {
   name: string
   url_image: string
+  screenShot?: string
   value: {
     id: number
     type: 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
