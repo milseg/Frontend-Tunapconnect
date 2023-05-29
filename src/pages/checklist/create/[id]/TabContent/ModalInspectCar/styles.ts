@@ -9,7 +9,7 @@ interface LabelButtonMarkupTypeProps {
 }
 
 interface ClickableAreaProps {
-  urlImg: string
+  urlImg?: string
 }
 // interface ButtonMarkupProps {
 //   topmarkup: number
@@ -166,10 +166,10 @@ export const ClickableArea = styled('img')<ClickableAreaProps>`
   border-radius: 9px;
   overflow: hidden;
   /* margin: 0 auto; */
-  background-repeat: no-repeat;
+  /* background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  background-image: url(${(props) => props.urlImg});
+  background-image: url(${(props) => props.urlImg}); */
   & * {
     pointer-events: none;
     background: red;
