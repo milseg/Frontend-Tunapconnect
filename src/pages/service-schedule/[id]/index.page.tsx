@@ -845,6 +845,7 @@ export default function ServiceSchedulesEdit() {
       <PrintInspectionModal
         isOpen={openPrintInspectionModal}
         closeModal={closePrintInspectionModalModal}
+        checkListIdForModal={366}
       />
     </Container>
   )
