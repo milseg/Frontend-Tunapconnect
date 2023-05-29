@@ -12,7 +12,6 @@ import { forwardRef, useImperativeHandle, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { Itens, StagesDataProps } from '../../../types'
 import {
-  // ButtonItemChecklist,
   ImageUploadBadge,
   ImageUploadImg,
   InputContainer,
@@ -55,7 +54,7 @@ type OnSubmitData = {
   [x: string]:
     | (
         | {
-            inputs: string
+            inputs: string | boolean
             observation: string | undefined
           }
         | {
@@ -340,7 +339,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   }
 
   function onSubmitData(data: OnSubmitData) {
-    console.log(data)
     const isAlreadyInspections = stageData?.itens.filter(
       (item) => item.rules.type === 'visual_inspect',
     )
@@ -383,8 +381,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         }
       }),
     }
-    // console.log('data formatted', dataFormatted)
-    // console.log('data formatted', stageData)
     handleAddListCheckList(dataFormatted as StagesDataProps)
   }
 
@@ -394,123 +390,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       newTab: null,
     })
   }
-
-  // useEffect(() => {
-  //   const sessionStorageData = sessionStorage.getItem(
-  //     `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
-  //   )
-
-  //   const data = sessionStorageData ? JSON.parse(sessionStorageData) : null
-  //   if (data && Object.hasOwn(data, stageName)) {
-  //     console.log('entrou', data)
-  //     data[stageName]?.formState?.forEach((item: any, index: number) => {
-  //       update(index, { inputs: item.inputs, observation: item.observation })
-  //     })
-  //     if (data[stageName]?.imagesList?.length > 0) {
-  //       setListImage((prevState) => {
-  //         const indexStageName = prevState.findIndex((item) =>
-  //           Object.hasOwn(item, stageName),
-  //         )
-  //         const newListImage = [...prevState]
-  //         if (indexStageName > -1) {
-  //           newListImage[indexStageName][stageName] = data[stageName].imagesList
-  //           return newListImage
-  //         } else {
-  //           return [
-  //             ...newListImage,
-  //             {
-  //               [stageName]: data[stageName].imagesList,
-  //             },
-  //           ]
-  //         }
-  //       })
-  //     }
-  //   }
-  // }, [stageName])
-
-  // useEffect(() => {
-  //   if (isDirty) {
-  //     const sessionStorageData = sessionStorage.getItem(
-  //       `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
-  //     )
-  //     const data = sessionStorageData ? JSON.parse(sessionStorageData) : null
-  //     console.log(stageValuesWatch)
-
-  //     if (data) {
-  //       sessionStorage.setItem(
-  //         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
-  //         JSON.stringify({
-  //           ...data,
-  //           [stageName]: {
-  //             ...data[stageName],
-  //             formState: stageValuesWatch,
-  //           },
-  //         }),
-  //       )
-  //     } else {
-  //       sessionStorage.setItem(
-  //         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
-  //         JSON.stringify({
-  //           [stageName]: {
-  //             formState: stageValuesWatch,
-  //           },
-  //         }),
-  //       )
-  //     }
-  //   }
-  // }, [touchedFields])
-
-  // useEffect(() => {
-  //   console.log(getValues(stageName))
-  // }, [])
-  // useEffect(() => {
-  //   const indexStageName = listImage.findIndex((item) =>
-  //     Object.hasOwn(item, stageName),
-  //   )
-  //   const sessionStorageData = sessionStorage.getItem(
-  //     `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
-  //   )
-
-  //   const data = sessionStorageData ? JSON.parse(sessionStorageData) : null
-
-  //   if (indexStageName > -1) {
-  //     if (data) {
-  //       sessionStorage.setItem(
-  //         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
-  //         JSON.stringify({
-  //           ...data,
-  //           [stageName]: {
-  //             ...data[stageName],
-  //             imagesList: listImage[indexStageName][stageName],
-  //           },
-  //         }),
-  //       )
-  //     } else {
-  //       sessionStorage.setItem(
-  //         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
-  //         JSON.stringify({
-  //           [stageName]: {
-  //             imagesList: listImage[indexStageName][stageName],
-  //           },
-  //         }),
-  //       )
-  //     }
-  //   }
-  // }, [listImage])
-
-  // useEffect(() => {
-  //   const isAlreadyInspections = stageData?.itens.filter(
-  //     (item) => item.rules.type === 'visual_inspect',
-  //   )
-
-  //   if (isAlreadyInspections && inspectionData === undefined) {
-  //     console.log(isAlreadyInspections)
-  //     setInspectionData(
-  //       // @ts-ignore
-  //       isAlreadyInspections[0].values.labels as InspectionData,
-  //     )
-  //   }
-  // }, [])
 
   return (
     <>
