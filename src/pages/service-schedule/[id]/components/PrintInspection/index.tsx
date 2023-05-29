@@ -53,25 +53,28 @@ export function PrintInspection({
   const { data } = useQuery<ResponseGetCheckList>(
     ['checklist-createByID-print', router?.query?.id, checklistId, companyId],
     () =>
-      api.get(`/checklist/${279}?company_id=${companyId}`).then((response) => {
-        const reception = response.data.data.stages.filter(
-          (st: any) => st.name === 'Recepção',
-        )
-        const delivery = response.data.data.stages.filter(
-          (st: any) => st.name === 'Entrega',
-        )
-        // console.log(reception[0])
-        setReceptionStage(reception[0])
-        setDeliveryStage(delivery[0])
-        return response.data.data
-      }),
+      api
+        .get(`/checklist/${checklistId}?company_id=${companyId}`)
+        .then((response) => {
+          const reception = response.data.data.stages.filter(
+            (st: any) => st.name === 'Recepção',
+          )
+          const delivery = response.data.data.stages.filter(
+            (st: any) => st.name === 'Entrega',
+          )
+          // console.log(reception[0])
+          setReceptionStage(reception[0])
+          setDeliveryStage(delivery[0])
+          return response.data.data
+        }),
     {
       refetchOnWindowFocus: false,
+      enabled: !!checklistId && !!router?.query?.id,
     },
   )
 
   // console.log(receptionStage)
-  console.log(deliveryStage)
+  console.log(data)
 
   function getCodeReceptionStage(code: string): Itens {
     const result = receptionStage?.itens.filter((it) => it.Code === code)
@@ -124,6 +127,7 @@ export function PrintInspection({
               style['align-items-center'],
             )}
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/toyota.png" alt="Toyota Logotype" />
           </div>
           <div>
@@ -198,7 +202,7 @@ export function PrintInspection({
             style={{ alignSelf: 'start' }}
           >
             <div className={classNames(style['form-slot'], style['me-2'])}>
-              <label>Cliente:</label>
+              <label>Cliente:</label> {data?.client.name}
             </div>
             <div
               className={classNames(
@@ -586,11 +590,15 @@ export function PrintInspection({
               </div>
             </div>
           </div>
-          <div className={style['col-7']}>
-            <div className={classNames(style['border-wrapper'], style['p-1'])}>
+          <div className={style['col-7']} style={{}}>
+            <div
+              className={classNames(style['border-wrapper'], style['p-1'])}
+              style={{ paddingTop: 3, paddingBottom: 7 }}
+            >
               <div className={style.row}>
                 <div className={classNames(style['col-7'], style['pe-1'])}>
                   <figure className={classNames(style.figure, style['mb-10'])}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/images/carrinho.jpg" alt="" />
                   </figure>
                   <table

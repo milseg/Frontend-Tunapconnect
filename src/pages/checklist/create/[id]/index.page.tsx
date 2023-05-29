@@ -116,7 +116,6 @@ export default function ChecklistCreateById() {
       return api
         .update(`/checklist/${router?.query?.id}`, newDataChecklist)
         .then((resp) => {
-          console.log(resp.data.data)
           return resp.data.data[0]
         })
     },
@@ -179,7 +178,6 @@ export default function ChecklistCreateById() {
   // }
 
   async function handleAddListCheckList(stageData: StagesDataProps) {
-    console.log(stageData)
     const isFinalizedArray = data?.stages.map((item) => {
       if (item.name === stageData.name) {
         return stageData.status
@@ -212,7 +210,6 @@ export default function ChecklistCreateById() {
       }),
     }
 
-    console.log(dataForPost)
     // @ts-ignore
     updateChecklistmutations.mutate(dataForPost)
   }
@@ -249,7 +246,7 @@ export default function ChecklistCreateById() {
         <Box sx={{ mt: 2, ml: 2 }}>
           <LinkNext href={`/service-schedule/${data.service_schedule_id}`}>
             <Title variant="h6">
-              Agenda:{router.query.id} - {'Pablo'}
+              Agenda:{router.query.id} - {data?.client?.name ?? 'Não informado'}
             </Title>
           </LinkNext>
         </Box>

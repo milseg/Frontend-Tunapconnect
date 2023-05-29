@@ -265,13 +265,15 @@ export default function ServiceSchedulesEdit() {
       const modelChecklist = await api.get('/checklist_model/list')
       const dataCreateChecklist = {
         company_id: companySelected,
-        brand_id: null, // brand_id
-        vehicle_id: null, //  vehicle id
-        model_id: null, // model id
-        vehicle_client_id: clientVehicle?.id, // vehicle client id
-        km: null,
+        brand_id:
+          dataServiceSchedule?.client_vehicle?.vehicle?.brand_id ?? null,
+        vehicle_id: dataServiceSchedule?.client_vehicle?.vehicle?.id ?? null,
+        model_id:
+          dataServiceSchedule?.client_vehicle?.vehicle?.model?.id ?? null,
+        vehicle_client_id: clientVehicle?.id ?? null,
+        km: dataServiceSchedule?.client_vehicle?.mileage ?? null,
         fuel: null,
-        client_id: client?.id, // client id
+        client_id: client?.id,
         service_schedule_id: router?.query?.id
           ? parseInt(router?.query?.id as string)
           : null,
@@ -279,7 +281,6 @@ export default function ServiceSchedulesEdit() {
         status: 'rascunho', // finalizado // pendente // rascunho
         stages: modelChecklist.data.data[0].stages,
       }
-      // console.log(dataCreateChecklist)
       if (modelChecklist.data.data.length > 0) {
         const createdDefault = await api.create(
           '/checklist',
