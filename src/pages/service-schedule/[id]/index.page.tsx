@@ -104,6 +104,9 @@ export default function ServiceSchedulesEdit() {
   const [isEditSelectedCard, setIsEditSelectedCard] =
     useState<isEditSelectedCardType>(null)
   const [wasEdited, setWasEdited] = useState(false)
+  const [defaultCheckListPrint, setDefaultCheckListPrint] = useState<
+    number | null
+  >(null)
   const [actionAlerts, setActionAlerts] =
     useState<ActionAlertsStateProps | null>(null)
 
@@ -369,6 +372,21 @@ export default function ServiceSchedulesEdit() {
     }
   }, [dataServiceScheduleStatus, dataServiceSchedule])
 
+  useEffect(() => {
+    api
+      .get(
+        `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}`,
+      )
+      .then((response) => {
+        const result = response.data.data
+        if (result.length > 0) {
+          setDefaultCheckListPrint(result[0].id)
+        } else {
+          setDefaultCheckListPrint(null)
+        }
+      })
+  }, [])
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={3}>
@@ -599,6 +617,7 @@ export default function ServiceSchedulesEdit() {
                 Listar Checklists
               </ButtonLeft>
               <ButtonCenter
+                disabled={defaultCheckListPrint === null}
                 onClick={() => {
                   setOpenPrintInspectionModal(true)
                 }}
@@ -842,11 +861,13 @@ export default function ServiceSchedulesEdit() {
         serviceScheduleId={router?.query?.id as string}
         closeChecklistModal={closeChecklistModal}
       />
-      <PrintInspectionModal
-        isOpen={openPrintInspectionModal}
-        closeModal={closePrintInspectionModalModal}
-        checkListIdForModal={366}
-      />
+      {defaultCheckListPrint !== null && (
+        <PrintInspectionModal
+          isOpen={openPrintInspectionModal}
+          closeModal={closePrintInspectionModalModal}
+          checkListIdForModal={defaultCheckListPrint}
+        />
+      )}
     </Container>
   )
 }
