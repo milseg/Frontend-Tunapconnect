@@ -84,7 +84,7 @@ export function PrintInspection({
     (item) => item.rules.type === 'visual_inspect',
   )
 
-  console.log(data?.stages[0])
+  console.log(data)
 
   function getCodeReceptionStage(code: string): Itens {
     const result = receptionStage?.itens.filter((it) => it.Code === code)
@@ -148,7 +148,7 @@ export function PrintInspection({
               </h3>
             </div>
           </div>
-          <div className={classNames(style.row, style['red-tag'])}>
+          {/* <div className={classNames(style.row, style['red-tag'])}>
             <div className={classNames(style.col, style['text-white'])}>
               <b>Sorocaba</b> • Av. Dom Aguirre, 2001 • Sta. Rosalia • CEP:
               18090-002 • (15) 3224-5444 <br />
@@ -161,7 +161,7 @@ export function PrintInspection({
               18407-110 • (15) 3524-4848
             </div>
             <div className={style['col-35']}>Toyota Ramires</div>
-          </div>
+          </div> */}
         </header>
         <div className={style['container-fluid']}>
           <div
@@ -224,7 +224,8 @@ export function PrintInspection({
               >
                 <div className={style.col}>
                   <div className={classNames(style['form-slot'], style.placa)}>
-                    <label>Placa:</label>
+                    {/* @ts-ignore */}
+                    <label>Placa:</label> {data?.vehicleclient?.plate}
                   </div>
                   <div className={style['blue-slots']}>
                     <div>Cliente acompanha inspeção?</div>
