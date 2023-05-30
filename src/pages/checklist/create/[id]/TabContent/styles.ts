@@ -39,3 +39,49 @@ export const InputLabelRow = styled(Typography)(({ theme }) => ({
 export const InputText = styled(OutlinedInput)(({ theme }) => ({
   flex: 1,
 }))
+
+// export const StackButtonsSubmit = styled(Stack)`
+//   margin-top: 50px;
+//   z-index: 1000;
+//   position: 'absolute';
+// `
+export const ButtonsSave = styled(Button)(({ theme }) => ({
+  color: 'white',
+  background: '#0E948B',
+  borderRadius: 4,
+  position: 'absolute',
+  right: 86,
+  bottom: -56,
+  // borderTopRightRadius: 0,
+  // borderBottomRightRadius: 0,
+  // padding: '5px 16px',
+  flex: 1,
+  textTransform: 'none',
+  '&:hover': {
+    background: '#1ACABA',
+  },
+}))
+export const ButtonsFinalized = styled(Button)(({ theme }) => ({
+  color: 'white',
+  background: '#0E948B',
+  borderRadius: 4,
+  position: 'absolute',
+  right: -16,
+  bottom: -56,
+  // borderTopRightRadius: 0,
+  // borderBottomRightRadius: 0,
+  // padding: '5px 16px',
+  flex: 1,
+  textTransform: 'none',
+  '&:hover': {
+    background: '#1ACABA',
+  },
+}))
+
+export const MarginBottomHack = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  right: -16,
+  bottom: -86,
+  width: '100%',
+  height: '20px',
+}))

@@ -104,6 +104,9 @@ export default function ServiceSchedulesEdit() {
   const [isEditSelectedCard, setIsEditSelectedCard] =
     useState<isEditSelectedCardType>(null)
   const [wasEdited, setWasEdited] = useState(false)
+  const [defaultCheckListPrint, setDefaultCheckListPrint] = useState<
+    number | null
+  >(null)
   const [actionAlerts, setActionAlerts] =
     useState<ActionAlertsStateProps | null>(null)
 
@@ -163,7 +166,7 @@ export default function ServiceSchedulesEdit() {
       technical_consultant_id: technicalConsultant?.id,
       client_id: client?.id,
       client_vehicle_id: clientVehicle?.id,
-      company_id: companySelected as string,
+      company_id: `${companySelected}`,
       chasis: clientVehicle?.chassis,
       plate: clientVehicle?.plate,
       claims_service: [],
@@ -263,25 +266,24 @@ export default function ServiceSchedulesEdit() {
   async function createCheckListBase() {
     try {
       const modelChecklist = await api.get('/checklist_model/list')
-      console.log(modelChecklist)
-      console.log(router.query)
       const dataCreateChecklist = {
         company_id: companySelected,
-        brand_id: null,
-        vehicle_id: null, //  vehicle id
-        model_id: null,
-        vehicle_client_id: null,
-        km: null,
+        brand_id:
+          dataServiceSchedule?.client_vehicle?.vehicle?.brand_id ?? null,
+        vehicle_id: dataServiceSchedule?.client_vehicle?.vehicle?.id ?? null,
+        model_id:
+          dataServiceSchedule?.client_vehicle?.vehicle?.model?.id ?? null,
+        vehicle_client_id: clientVehicle?.id ?? null,
+        km: dataServiceSchedule?.client_vehicle?.mileage ?? null,
         fuel: null,
-        client_id: null, // client id
+        client_id: client?.id,
         service_schedule_id: router?.query?.id
           ? parseInt(router?.query?.id as string)
           : null,
         checklist_model: 1,
-        status: 'rascunho', // salvo // finalizado // rascunho
+        status: 'rascunho', // finalizado // pendente // rascunho
         stages: modelChecklist.data.data[0].stages,
       }
-
       if (modelChecklist.data.data.length > 0) {
         const createdDefault = await api.create(
           '/checklist',
@@ -369,6 +371,21 @@ export default function ServiceSchedulesEdit() {
       })
     }
   }, [dataServiceScheduleStatus, dataServiceSchedule])
+
+  useEffect(() => {
+    api
+      .get(
+        `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}`,
+      )
+      .then((response) => {
+        const result = response.data.data
+        if (result.length > 0) {
+          setDefaultCheckListPrint(result[0].id)
+        } else {
+          setDefaultCheckListPrint(null)
+        }
+      })
+  }, [])
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -600,8 +617,8 @@ export default function ServiceSchedulesEdit() {
                 Listar Checklists
               </ButtonLeft>
               <ButtonCenter
+                disabled={defaultCheckListPrint === null}
                 onClick={() => {
-                  console.log('print Checklists')
                   setOpenPrintInspectionModal(true)
                 }}
               >
@@ -614,20 +631,20 @@ export default function ServiceSchedulesEdit() {
                 Novo
               </ButtonRight>
             </Stack>
-            <Stack
+            {/* <Stack
               spacing={2}
               direction="row"
               display="flex"
               justifyContent="center"
             >
-              <ButtonLeft>Listar Orçamentos</ButtonLeft>
-              <ButtonCenter>
+              <ButtonLeft disabled>Listar Orçamentos</ButtonLeft>
+              <ButtonCenter disabled>
                 <PrintIcon />
               </ButtonCenter>
-              <ButtonRight startIcon={<AddCircleOutlineIcon />}>
+              <ButtonRight disabled startIcon={<AddCircleOutlineIcon />}>
                 Novo
               </ButtonRight>
-            </Stack>
+            </Stack> */}
             {/* Agendamento */}
             <Paper
               sx={{
@@ -844,10 +861,13 @@ export default function ServiceSchedulesEdit() {
         serviceScheduleId={router?.query?.id as string}
         closeChecklistModal={closeChecklistModal}
       />
-      <PrintInspectionModal
-        isOpen={openPrintInspectionModal}
-        closeModal={closePrintInspectionModalModal}
-      />
+      {defaultCheckListPrint !== null && (
+        <PrintInspectionModal
+          isOpen={openPrintInspectionModal}
+          closeModal={closePrintInspectionModalModal}
+          checkListIdForModal={defaultCheckListPrint}
+        />
+      )}
     </Container>
   )
 }

@@ -4,11 +4,7 @@ import { useContext, useState, useMemo, useEffect } from 'react'
 
 import Container from '@mui/material/Container'
 
-import {
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
-} from '@mui/x-data-grid'
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
@@ -16,20 +12,20 @@ import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import SearchIcon from '@mui/icons-material/Search'
 
-import { ButtonAdd, ButtonIcon } from './style'
+import { ButtonIcon } from './style'
 import { ServiceSchedulesListProps } from '@/types/service-schedule'
 import { ApiCore } from '@/lib/api'
 import IconButton from '@mui/material/IconButton'
 import { Delete } from '@mui/icons-material'
 
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+// import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { ActionDeleteConfirmations } from '@/helpers/ActionConfirmations'
 import { useRouter } from 'next/router'
 import { TableApp } from '@/components/TableApp'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
 import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
-import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
+
 import { useQuery } from 'react-query'
 import Skeleton from '@mui/material/Skeleton'
 
@@ -37,9 +33,14 @@ type SearchFormProps = {
   search: string
 }
 
-// type PagesProps = {
-//   search: string
-// }
+type DataFetchProps = {
+  paginate: {
+    current_page: number
+    total_pages: number
+    total_results: number
+  }
+  serviceSchedulesList: ServiceSchedulesListProps[] | []
+}
 
 const api = new ApiCore()
 
@@ -56,10 +57,9 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
 
 export default function ServiceSchedulesList() {
   const [pages, setPages] = useState<{
-    current: number
     next: boolean
     previous: boolean
-  }>({ current: 1, next: false, previous: false })
+  }>({ next: true, previous: true })
 
   const { companySelected } = useContext(CompanyContext)
 
@@ -77,7 +77,6 @@ export default function ServiceSchedulesList() {
   })
 
   function onSubmitSearch(data: SearchFormProps) {
-    // setSearch(data.search)
     router.push(
       `/service-schedule?company_id=${companySelected}${
         data.search ? '&search=' + data.search : ''
@@ -90,11 +89,7 @@ export default function ServiceSchedulesList() {
   }
 
   const handleDelete = (id: number) => {
-    // setRows(rows.filter((row) => row.id !== id))
-  }
-
-  function handlePages(nextPage: any): void {
-    setPages(nextPage)
+    refetch()
   }
 
   let url = `/service-schedule?company_id=${companySelected}`
@@ -119,7 +114,7 @@ export default function ServiceSchedulesList() {
         headerClassName: 'super-app-theme--header',
         width: 90,
         type: 'number',
-        align: 'center',
+        align: 'left',
         sortable: false,
       },
       {
@@ -136,7 +131,7 @@ export default function ServiceSchedulesList() {
         field: 'plate',
         headerName: 'Placa',
         headerClassName: 'super-app-theme--header',
-        width: 90,
+        width: 120,
         sortable: false,
       },
       {
@@ -144,7 +139,7 @@ export default function ServiceSchedulesList() {
         headerName: 'Chassis',
         headerClassName: 'super-app-theme--header',
         flex: 1,
-        maxWidth: 200,
+        maxWidth: 240,
         minWidth: 120,
         sortable: false,
       },
@@ -153,45 +148,45 @@ export default function ServiceSchedulesList() {
         headerName: 'Responsavél',
         headerClassName: 'super-app-theme--header',
         flex: 1,
-        maxWidth: 120,
-        minWidth: 80,
+        maxWidth: 200,
+        minWidth: 120,
         sortable: false,
       },
       {
-        field: 'typeEstimate',
-        headerName: 'Tipo Orçamento',
+        field: 'vehicle',
+        headerName: 'Veículo',
         headerClassName: 'super-app-theme--header',
-        width: 120,
+        width: 160,
         sortable: false,
       },
-      {
-        field: 'totalDiscount',
-        headerName: 'Tipo Desconto',
-        headerClassName: 'super-app-theme--header',
-        // type: 'number',
-        width: 110,
-        align: 'center',
-        sortable: false,
-        valueGetter: (params: GridValueGetterParams) =>
-          `${formatMoneyPtBR(params.row.totalDiscount) || ''}`,
-      },
-      {
-        field: 'total',
-        headerName: 'Total Geral',
-        headerClassName: 'super-app-theme--header',
-        // type: 'number',
-        width: 110,
-        align: 'center',
-        sortable: false,
-        valueGetter: (params: GridValueGetterParams) =>
-          `${formatMoneyPtBR(params.row.total) || ''}`,
-      },
+      // {
+      //   field: 'totalDiscount',
+      //   headerName: 'Tipo Desconto',
+      //   headerClassName: 'super-app-theme--header',
+      //   // type: 'number',
+      //   width: 110,
+      //   align: 'center',
+      //   sortable: false,
+      //   valueGetter: (params: GridValueGetterParams) =>
+      //     `${formatMoneyPtBR(params.row.totalDiscount) || ''}`,
+      // },
+      // {
+      //   field: 'total',
+      //   headerName: 'Total Geral',
+      //   headerClassName: 'super-app-theme--header',
+      //   // type: 'number',
+      //   width: 110,
+      //   align: 'center',
+      //   sortable: false,
+      //   valueGetter: (params: GridValueGetterParams) =>
+      //     `${formatMoneyPtBR(params.row.total) || ''}`,
+      // },
       {
         field: 'action',
         headerName: 'Ação',
         headerClassName: 'super-app-theme--header',
         sortable: false,
-        width: 80,
+        width: 90,
         align: 'left',
         renderCell: (params: GridRenderCellParams) => {
           const onClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -223,33 +218,77 @@ export default function ServiceSchedulesList() {
     // isFetched,
     refetch,
     isFetching,
-  } = useQuery<ServiceSchedulesListProps[] | []>(
+  } = useQuery<DataFetchProps>(
     ['service-scheduler-list', companySelected],
     () =>
-      api
-        .get(url)
-        .then((response) => {
-          console.log(response)
-          const resp = response.data.data.map((data: any) => ({
+      api.get(url).then((response) => {
+        const resp = response.data.data.map((data: any) => {
+          console.log(data.client_vehicle.vehicle.name)
+          return {
             id: data?.id ?? 'Não informado',
             client: data?.client?.name ?? 'Não informado',
             plate: data?.client_vehicle?.plate ?? 'Não informado',
             chassis: data?.client_vehicle?.chasis ?? 'Não informado',
             technical_consultant:
               data?.technical_consultant?.name ?? 'Não informado',
-            typeEstimate: 'não definido',
-            totalDiscount: 0,
-            total: 0,
-          }))
-          return resp
+            vehicle: data?.client_vehicle?.vehicle?.name ?? 'não definido',
+          }
         })
-        .catch((err) => {
-          console.log(err)
-          return []
-        }),
+
+        if (response.data.total_pages === 1)
+          setPages({
+            next: false,
+            previous: false,
+          })
+        if (!router.query.current_page) {
+          if (response.data.current_page === 1) {
+            setPages((prevState) => ({ ...prevState, previous: false }))
+          }
+        }
+        return {
+          paginate: {
+            current_page: response.data.current_page,
+            total_pages: response.data.total_pages,
+            total_results: response.data.total_results,
+          },
+          serviceSchedulesList: resp,
+        }
+      }),
+
     { enabled: !!companySelected, refetchOnWindowFocus: false },
   )
 
+  function handlePages(nextPage: any): void {
+    let newCurrent_page = 1
+    const actualCurrent_page = router.query.current_page
+      ? parseInt(router.query.current_page as string)
+      : 1
+
+    if (!rows?.paginate) {
+      return
+    }
+
+    if (nextPage === 'next') {
+      newCurrent_page = actualCurrent_page + 1
+      if (newCurrent_page > rows?.paginate.total_pages) {
+        return
+      }
+    }
+    if (nextPage === 'back') {
+      newCurrent_page = actualCurrent_page - 1
+      if (newCurrent_page < 1) {
+        return
+      }
+    }
+
+    const newUrlPagination = `/service-schedule?company_id=${companySelected}${
+      router.query.search ? '&search=' + router.query.search : ''
+    }${'&current_page=' + newCurrent_page}${
+      router.query.limit ? '&limit=' + router.query.limit : ''
+    }`
+
+    router.push(newUrlPagination)
+  }
   useEffect(() => {
     async function refetchUrl() {
       if (router.query.search) {
@@ -258,11 +297,36 @@ export default function ServiceSchedulesList() {
         setValue('search', '')
       }
 
+      if (router.query.current_page) {
+        const currentPage = parseInt(router.query.current_page as string)
+        if (rows?.paginate) {
+          if (currentPage >= rows?.paginate.total_pages) {
+            setPages({
+              next: false,
+              previous: true,
+            })
+          } else {
+            if (pages.next === false) {
+              setPages((prevState) => ({ ...prevState, next: true }))
+            }
+          }
+          if (currentPage <= 1) {
+            setPages({
+              next: true,
+              previous: false,
+            })
+          } else {
+            if (pages.previous === false) {
+              setPages((prevState) => ({ ...prevState, previous: true }))
+            }
+          }
+        }
+      }
+
       await refetch()
     }
     refetchUrl()
   }, [router])
-
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={3}>
@@ -314,17 +378,17 @@ export default function ServiceSchedulesList() {
                   justifyContent: 'center',
                 }}
               >
-                <ButtonAdd
+                {/* <ButtonAdd
                   size="large"
                   variant="contained"
                   sx={{ alignSelf: 'flex-end' }}
                   startIcon={<AddCircleOutlineIcon />}
                   onClick={async () => {
-                    router.push(`/service-schedules/create`)
+                    await router.push(`/service-schedules/create`)
                   }}
                 >
                   Adicionar novo
-                </ButtonAdd>
+                </ButtonAdd> */}
               </Grid>
             </Grid>
           </Paper>
@@ -340,11 +404,11 @@ export default function ServiceSchedulesList() {
           {!isFetching ? (
             <TableApp
               columns={columns}
-              rowsData={isSuccess ? rows : []}
+              rowsData={isSuccess ? rows.serviceSchedulesList : []}
               handlePages={handlePages}
               pages={pages}
               loading={isFetching}
-              companyId={companySelected as string}
+              companyId={companySelected}
             />
           ) : (
             <Skeleton variant="rounded" sx={{ width: '100%' }} height={150} />

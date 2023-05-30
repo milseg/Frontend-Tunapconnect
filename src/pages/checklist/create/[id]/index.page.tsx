@@ -1,23 +1,58 @@
-import { ReactNode, SyntheticEvent, useState } from 'react'
+import { ReactNode, SyntheticEvent, useRef, useState } from 'react'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import Box from '@mui/material/Box'
 
-import { MyButton, TabItem, TabsContainer } from './styles'
+import { LinkNext, TabItem, TabsContainer, Title } from './styles'
 import TabContent from './TabContent'
 import { ApiCore } from '@/lib/api'
-import { Skeleton, Stack } from '@mui/material'
+import { Backdrop, CircularProgress, Skeleton } from '@mui/material'
 import {
   ChecklistProps,
-  ReponseGetCheckList,
+  ResponseGetCheckList,
   StagesDataProps,
 } from '../../types'
 
-// import { AuthContext } from '@/contexts/AuthContext'
-
 import { useRouter } from 'next/router'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
+import ActionAlerts from '@/components/ActionAlerts'
+
+// import { useForm } from 'react-hook-form'
+
+// type InspectionCarDataType = {
+//   name: string
+//   url_image: string
+//   value: {
+//     id: number
+//     type: 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
+//     positions: {
+//       web: {
+//         top: number
+//         left: number
+//       }
+//       mobile: {
+//         top: number
+//         left: number
+//       }
+//     }
+//   }[]
+//   comment: string
+//   images: {
+//     id: number
+//     name: string
+//     url: string
+//     size: string
+//   }[]
+// }
+
+// type CheckListSignatures = {
+//   name: string
+//   rules: {
+//     required: boolean
+//   }
+//   image: string[]
+// }
 
 interface TabPanelProps {
   children?: ReactNode
@@ -25,11 +60,22 @@ interface TabPanelProps {
   value: number
 }
 
+interface RefTabContentRefType {
+  handleOpenAlertDialog: (value: number) => void
+}
+
 function a11yProps(index: number) {
   return {
     id: `simple-tab-${index}`,
     'aria-controls': `simple-tabpanel-${index}`,
   }
+}
+
+export type ActionAlertsStateProps = {
+  isOpen: boolean
+  title: string
+  type: 'error' | 'warning' | 'success'
+  redirectTo?: string | undefined
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -43,24 +89,33 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box>{children}</Box>}
+      {value === index && <Box sx={{ position: 'relative' }}>{children}</Box>}
     </div>
   )
 }
 
 export default function ChecklistCreateById() {
-  const [value, setValue] = useState(0)
+  const [painelValue, setPainelValue] = useState(0)
+  // const [typeSubmitForm, setTypeSubmitForm] = useState<
+  //   'salvo' | 'finalizado' | 'rascunho'
+  // >('rascunho')
 
+  const [actionAlerts, setActionAlerts] = useState<ActionAlertsStateProps>({
+    isOpen: false,
+    title: '',
+    type: 'success',
+  })
   const queryClient = useQueryClient()
   const api = new ApiCore()
   const router = useRouter()
+
+  const tabContentRef = useRef<RefTabContentRefType>(null)
 
   const updateChecklistmutations = useMutation(
     (newDataChecklist: ChecklistProps) => {
       return api
         .update(`/checklist/${router?.query?.id}`, newDataChecklist)
         .then((resp) => {
-          console.log(resp.data.data)
           return resp.data.data[0]
         })
     },
@@ -69,30 +124,56 @@ export default function ChecklistCreateById() {
       onSuccess: (data) => {
         // queryClient.invalidateQueries({ queryKey: ['checklist-createByID'] })
         // queryClient.setQueryData(['checklist-createByID'], data)
-        queryClient.invalidateQueries({ queryKey: ['checklist-createByID'] })
+        setActionAlerts({
+          isOpen: true,
+          title: 'Salvo com sucesso',
+          type: 'success',
+        })
+        queryClient.invalidateQueries('checklist-createByID')
         return data
       },
       onError: (err: any) => {
+        setActionAlerts({
+          isOpen: true,
+          title: 'Salvo com sucesso',
+          type: 'error',
+        })
         console.log(err)
       },
     },
   )
 
-  const { data, isSuccess, isLoading } = useQuery<ReponseGetCheckList>(
-    ['checklist-createByID'],
-    () =>
-      api
-        .get(`/checklist/${router?.query?.id}?company_id=`)
-        .then((response) => {
-          return response.data.data
-        }),
-    // refetchOnMount: 'always',
-    // enabled: !!router?.query?.id,
-    {
-      refetchOnWindowFocus: false,
-    },
-  )
+  const { data, isSuccess, isLoading, isFetching } =
+    useQuery<ResponseGetCheckList>(
+      ['checklist-createByID'],
+      () =>
+        api
+          .get(`/checklist/${router?.query?.id}?company_id=`)
+          .then((response) => {
+            return response.data.data
+          }),
+      {
+        refetchOnWindowFocus: false,
+        enabled: !!router?.query?.id,
+      },
+    )
+
+  function handleAlert(isOpen: boolean) {
+    setActionAlerts((previState) => ({
+      ...previState,
+      isOpen,
+    }))
+  }
+
   async function handleAddListCheckList(stageData: StagesDataProps) {
+    const isFinalizedArray = data?.stages.map((item) => {
+      if (item.name === stageData.name) {
+        return stageData.status
+      }
+
+      return item.status
+    })
+    const isFinalized = isFinalizedArray?.every((item) => item === 'finalizado')
     const dataForPost = {
       company_id: data?.company_id,
       brand_id: data?.brand_id,
@@ -104,21 +185,33 @@ export default function ChecklistCreateById() {
       client_id: data?.client_id,
       service_schedule_id: data?.service_schedule_id,
       checklist_model: data?.checklist_model,
-      status: 'salvo', // salvo // finalizado // rascunho
+      status: isFinalized ? 'finalizado' : 'pendente',
       stages: data?.stages.map((item) => {
+        // if (item.name === stageData.name) {
+        //   return {
+        //     ...stageData,
+        //     status: typeSubmitForm,
+        //   }
+        // }
+
         return item.name === stageData.name ? stageData : item
       }),
     }
 
-    console.log(dataForPost)
     // @ts-ignore
     updateChecklistmutations.mutate(dataForPost)
   }
 
   const handleChange = async (event: SyntheticEvent, newValue: number) => {
-    console.log(newValue)
+    // console.log(newValue)
     // if (data?.stages[value].status !== 'finalizado') setValue(newValue)
-    setValue(newValue)
+    if (tabContentRef.current && tabContentRef.current.handleOpenAlertDialog) {
+      tabContentRef.current.handleOpenAlertDialog(newValue)
+    }
+  }
+
+  function handleChangeTabContent(newValue: number) {
+    setPainelValue(newValue)
   }
 
   if (isLoading) {
@@ -135,9 +228,17 @@ export default function ChecklistCreateById() {
   }
 
   if (isSuccess) {
+    console.log(data)
     return (
       <>
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Box sx={{ mt: 2, ml: 2 }}>
+          <LinkNext href={`/service-schedule/${data.service_schedule_id}`}>
+            <Title variant="h6">
+              Agenda:{router.query.id} - {data?.client?.name ?? 'Não informado'}
+            </Title>
+          </LinkNext>
+        </Box>
+        <Container maxWidth="lg" sx={{ mt: 2, mb: 4 }}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Paper
@@ -154,7 +255,7 @@ export default function ChecklistCreateById() {
                   }}
                 >
                   <TabsContainer
-                    value={value}
+                    value={painelValue}
                     onChange={handleChange}
                     textColor="inherit"
                     centered
@@ -163,7 +264,6 @@ export default function ChecklistCreateById() {
                   >
                     {data?.stages?.length > 0 &&
                       data.stages.map((stage, index) => {
-                        console.log(stage)
                         // const isDisabled = stage.status === 'finalizado'
                         return (
                           <TabItem
@@ -181,17 +281,19 @@ export default function ChecklistCreateById() {
                     return (
                       <TabPanel
                         key={`${Math.random() * 2000}-${stage.name}-${index}`}
-                        value={value}
+                        value={painelValue}
                         index={index}
                       >
                         <TabContent
                           stageItems={stage.itens}
                           stageData={stage}
-                          checklistModel={data}
+                          ref={tabContentRef}
+                          // checklistModel={data}
                           stageName={stage.name}
                           formIDSubmit={`form-${stage.name}-${index}`}
                           handleAddListCheckList={handleAddListCheckList}
                           isClosed={stage.status === 'finalizado'}
+                          handleChangeTabContent={handleChangeTabContent}
                         />
                       </TabPanel>
                     )
@@ -207,23 +309,24 @@ export default function ChecklistCreateById() {
                   alignItems: 'center',
                   alignContent: 'center',
                 }}
-              >
-                <Stack direction="row" spacing={2}>
-                  <MyButton
-                    type="submit"
-                    variant="contained"
-                    form={`form-${data?.stages[value].name ?? ''}-${value}`}
-                  >
-                    Salvar
-                  </MyButton>
-                  <MyButton type="submit" variant="contained">
-                    Finalizar
-                  </MyButton>
-                </Stack>
-              </Grid>
+              ></Grid>
             </Grid>
           </Grid>
         </Container>
+
+        <Backdrop
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={isFetching}
+          onClick={() => {}}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        <ActionAlerts
+          isOpen={actionAlerts?.isOpen && !isFetching}
+          title={'salvo'}
+          type={'success'}
+          handleAlert={handleAlert}
+        />
       </>
     )
   }

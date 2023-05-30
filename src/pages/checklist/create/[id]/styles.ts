@@ -10,6 +10,7 @@ import {
 import { alpha, styled } from '@mui/material/styles'
 import Badge, { BadgeProps } from '@mui/material/Badge'
 import CropOriginalIcon from '@mui/icons-material/CropOriginal'
+import Link from 'next/link'
 
 export const TabItem = styled(Tab)(({ theme }) => ({
   color: '#1ACABA',
@@ -111,3 +112,18 @@ export const ButtonDialog = styled(Button)(({ theme }) => ({
     background: '#1ACABA',
   },
 }))
+export const LinkNext = styled(Link)`
+  text-decoration: none;
+`
+
+export const Title = styled(Typography)`
+  color: #004d40;
+  font-weight: bold;
+  margin: 0;
+  &:hover {
+    color: #1acaba;
+    & span {
+      color: #1acaba;
+    }
+  }
+`

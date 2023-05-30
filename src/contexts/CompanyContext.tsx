@@ -79,7 +79,7 @@ export function CompanyProvider({ children }: GeralProviderProps) {
           return company.id === parseInt(company_id as string)
         })
         if (isExistCompany.length === 0) {
-          router.push('/companies')
+          router.push('/company')
         }
         const cookies = parseCookies()
         if (
@@ -91,11 +91,11 @@ export function CompanyProvider({ children }: GeralProviderProps) {
           if (`${companySelectedCookie.companySelected}` !== company_id) {
             createCompany(
               {
-                id: isExistCompany[0].id,
-                name: isExistCompany[0].name,
-                cnpj: isExistCompany[0].cnpj,
-                cpf: isExistCompany[0].cpf,
-                active: isExistCompany[0].active,
+                id: isExistCompany[0]?.id,
+                name: isExistCompany[0]?.name,
+                cnpj: isExistCompany[0]?.cnpj,
+                cpf: isExistCompany[0]?.cpf,
+                active: isExistCompany[0]?.active,
               },
               false,
             )

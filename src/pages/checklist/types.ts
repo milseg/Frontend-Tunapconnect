@@ -19,12 +19,19 @@ export interface Values {
 type InpectionData = {
   name: string
   url_image: string
+  screenShot?: string
   value: {
     id: number
     type: 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
     positions: {
-      top: string
-      left: string
+      mobile: {
+        top: number
+        left: number
+      }
+      web: {
+        top: number
+        left: number
+      }
     }
   }[]
   comment: string
@@ -37,7 +44,7 @@ type InpectionData = {
 }[]
 
 export interface Value {
-  value: string
+  value: boolean | string
   images?: Image[] | undefined | []
   labels?: InpectionData
   values?: Values | undefined
@@ -52,6 +59,7 @@ export interface Rule {
 export interface Itens {
   name: string
   comment?: string
+  Code?: string
   rules: Rule
   values: Value
 }
@@ -121,7 +129,7 @@ export interface Serviceschedule {
   status: any
 }
 
-export interface ReponseGetCheckList {
+export interface ResponseGetCheckList {
   id: number
   company_id: number
   brand_id: number | null

@@ -25,6 +25,7 @@ export function CustomFooterStatusComponent(
     >
       <ButtonIcon
         aria-label="back"
+        disabled={!props.previousPage}
         onClick={() => {
           if (props?.handlePages) {
             props?.handlePages('back')
@@ -36,7 +37,7 @@ export function CustomFooterStatusComponent(
       </ButtonIcon>
       <ButtonIcon
         aria-label="next"
-        // disabled={!props.nextPage}
+        disabled={!props.nextPage}
         onClick={() => {
           if (props?.handlePages) {
             props?.handlePages('next')

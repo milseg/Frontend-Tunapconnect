@@ -2,7 +2,9 @@ import {
   ChangeEvent,
   ReactNode,
   SyntheticEvent,
+  useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react'
 // import Image from 'next/image'
@@ -24,6 +26,9 @@ import {
   ButtonMarkupType,
   ButtonRight,
   ClickableArea,
+  ContainerButtonsInformation,
+  ContainerButtonsMarkupType,
+  ContainerClickableArea,
   ContainerInformation,
   LabelButtonMarkupType,
   TabsContainer,
@@ -35,6 +40,8 @@ import { InspectionDropzone } from './DropZone'
 import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded'
 import dayjs from 'dayjs'
 import { StagesDataProps } from '@/pages/checklist/types'
+import { toPng } from 'html-to-image'
+// import { ApiCore } from '@/lib/api'
 
 // import carroFrenteImg from '@/assets/images/inspection/carro-frente.svg'
 
@@ -66,8 +73,14 @@ type MarkupType = {
   id: number
   type: markupTypesEnum
   positions: {
-    top: string
-    left: string
+    web: {
+      top: number
+      left: number
+    }
+    mobile: {
+      top: number
+      left: number
+    }
   }
 }
 
@@ -99,6 +112,13 @@ type ImgPositionCarUrlType = {
   traseira: string
   teto: string
 }
+type screenShotsType = {
+  frente: string
+  lateralEsquerdo: string
+  lateralDireito: string
+  traseira: string
+  teto: string
+}
 
 type positionsTypes =
   | 'frente'
@@ -113,13 +133,14 @@ type formattedDataType = {
   value: MarkupType[]
   comment: string
   images: imageData[]
-}[]
+}
 
 interface ModalInspectCarProps {
   isOpen: boolean
   closeModalInspectCar: () => void
   stageData: StagesDataProps | undefined
-  handleInspectionData: (data: formattedDataType) => void
+  handleInspectionData: (data: formattedDataType[]) => void
+  // handleSaveInspectionCarData: (data: formattedDataType[]) => void
 }
 
 const positionsCar: Array<positionsTypes> = [
@@ -142,18 +163,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box
-          sx={{
-            position: 'relative',
-            cursor: 'pointer',
-            width: 490,
-            height: 350,
-            marginRight: 10,
-            overflow: 'hidden',
-          }}
-        >
-          {children}
-        </Box>
+        <ContainerClickableArea>{children}</ContainerClickableArea>
       )}
     </div>
   )
@@ -204,8 +214,136 @@ export default function ModalInspectCar({
       traseira: '',
       teto: '',
     })
+  const [screenShots, setScreenShots] = useState<screenShotsType>({
+    frente: '',
+    lateralEsquerdo: '',
+    lateralDireito: '',
+    traseira: '',
+    teto: '',
+  })
 
-  const handleChange = (event: SyntheticEvent, newValue: number) => {
+  // const api = new ApiCore()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
+  const isMobile = useMediaQuery('(max-width:600px)')
+
+  const containerImageCarFrenteRef = useRef(null)
+  const containerImageCarTraseiraRef = useRef(null)
+  const containerImageCarLateralEsquerdaRef = useRef(null)
+  const containerImageCarLateralDireitaRef = useRef(null)
+  const containerImageCarTetoRef = useRef(null)
+
+  const screenShotToPng = useCallback(
+    async (tabPosition: number) => {
+      switch (tabPosition) {
+        case 0:
+          if (containerImageCarFrenteRef.current === null) {
+            break
+          } else {
+            try {
+              const result = await toPng(containerImageCarFrenteRef.current, {
+                cacheBust: true,
+              })
+              return result
+            } catch (error) {
+              console.log(error)
+            }
+          }
+          break
+        case 1:
+          if (containerImageCarLateralEsquerdaRef.current === null) {
+            break
+          } else {
+            try {
+              const result = await toPng(
+                containerImageCarLateralEsquerdaRef.current,
+                {
+                  cacheBust: true,
+                },
+              )
+              return result
+            } catch (error) {
+              console.log(error)
+            }
+          }
+          break
+        case 2:
+          if (containerImageCarLateralDireitaRef.current === null) {
+            break
+          } else {
+            try {
+              const result = await toPng(
+                containerImageCarLateralDireitaRef.current,
+                {
+                  cacheBust: true,
+                },
+              )
+              return result
+            } catch (error) {
+              console.log(error)
+            }
+          }
+          break
+        case 3:
+          if (containerImageCarTraseiraRef.current === null) {
+            break
+          } else {
+            try {
+              const result = await toPng(containerImageCarTraseiraRef.current, {
+                cacheBust: true,
+              })
+              return result
+            } catch (error) {
+              console.log(error)
+            }
+          }
+          break
+        case 4:
+          if (containerImageCarTetoRef.current === null) {
+            break
+          } else {
+            try {
+              const result = await toPng(containerImageCarTetoRef.current, {
+                cacheBust: true,
+              })
+              return result
+            } catch (error) {
+              console.log(error)
+            }
+          }
+          break
+        default:
+          return ''
+      }
+    },
+    [
+      containerImageCarFrenteRef,
+      containerImageCarLateralDireitaRef,
+      containerImageCarLateralEsquerdaRef,
+      containerImageCarTraseiraRef,
+      containerImageCarTetoRef,
+    ],
+  )
+
+  const handleChange = async (event: SyntheticEvent, newValue: number) => {
+    const result = await screenShotToPng(tabsValue)
+    // console.log(result)
+    // const img = new Image()
+    // img.src = result
+    // console.log(img)
+    // const link = document.createElement('a')
+    // link.download = 'my-image-name.png'
+    // link.href = result
+    // link.click()
+    if (result) {
+      setScreenShots((prevState) => ({
+        frente: tabsValue === 0 ? result : prevState.frente,
+        lateralEsquerdo: tabsValue === 1 ? result : prevState.lateralEsquerdo,
+        lateralDireito: tabsValue === 2 ? result : prevState.lateralDireito,
+        traseira: tabsValue === 3 ? result : prevState.traseira,
+        teto: tabsValue === 4 ? result : prevState.teto,
+      }))
+    }
+
     setTabsValue(newValue)
   }
 
@@ -236,14 +374,13 @@ export default function ModalInspectCar({
 
   async function addMarkup(event: any) {
     const [x, y] = getClickCoords(event)
-    const positionTop = y - 22
-    const positionLeft = x - 22
+    const positionTop = y
+    const positionLeft = x
     if (!Object.hasOwn(markupTagTypes, markupValue)) {
       return
     }
 
     const idByTimestamp = dayjs(new Date()).valueOf()
-    console.log(positionsCar[tabsValue])
     setMarkups((prevState) => {
       return {
         ...prevState,
@@ -253,8 +390,22 @@ export default function ModalInspectCar({
             id: idByTimestamp,
             type: markupValue,
             positions: {
-              top: `${positionTop}px`,
-              left: `${positionLeft}px`,
+              web: {
+                top: isMobile
+                  ? positionTop + positionTop * 0.3
+                  : positionTop - 22,
+                left: isMobile
+                  ? positionLeft + positionLeft * 0.3
+                  : positionLeft - 22,
+              },
+              mobile: {
+                top: isMobile
+                  ? positionTop - 15
+                  : positionTop - positionTop * 0.3 - 15,
+                left: isMobile
+                  ? positionLeft - 15
+                  : positionLeft - positionLeft * 0.3 - 15,
+              },
             },
           },
         ],
@@ -270,8 +421,6 @@ export default function ModalInspectCar({
     images: imageData[],
     position: positionsTypes,
   ) {
-    console.log(images)
-    console.log(position)
     setListImagesUpload((prevState) => {
       return {
         ...prevState,
@@ -287,11 +436,67 @@ export default function ModalInspectCar({
         [positionsCar[tabsValue]]: event.target.value,
       }
     })
-    console.log(event.target.value)
   }
 
-  function handleSave() {
-    console.log(imgPositionCarUrl)
+  // async function uploadImg(file: string) {
+  //   const formData = new FormData()
+  //   formData.append('file', file)
+  //   try {
+  //     return await api.create('/uploads', formData, {
+  //       headers: { 'Content-Type': 'multipart/form-data' },
+  //     })
+  //   } catch (err) {
+  //     console.error(err)
+  //   }
+  // }
+
+  // async function uploadScreenshots(): Promise<void> {
+  //   const newScreenShot = await screenShotToPng(tabsValue)
+  //   const newScreenShots = {
+  //     frente: tabsValue === 0 ? newScreenShot : screenShots.frente,
+  //     lateralEsquerdo:
+  //       tabsValue === 1 ? newScreenShot : screenShots.lateralEsquerdo,
+  //     lateralDireito:
+  //       tabsValue === 2 ? newScreenShot : screenShots.lateralDireito,
+  //     traseira: tabsValue === 3 ? newScreenShot : screenShots.traseira,
+  //     teto: tabsValue === 4 ? newScreenShot : screenShots.teto,
+  //   }
+  //   const newScreenShotsUrl = {
+  //     frente: '',
+  //     lateralEsquerdo: '',
+  //     lateralDireito: '',
+  //     traseira: '',
+  //     teto: '',
+  //   }
+  //   for (const [key, value] of Object.entries(newScreenShots)) {
+  //     console.log(`${key}: ${''}`)
+  //     if (value) {
+  //       newScreenShotsUrl[key] = await uploadImg(value)
+  //     }
+  //   }
+  //   console.log(newScreenShotsUrl)
+  //   // const formData = new FormData()
+  //   //   formData.append('file', file)
+  //   //   api.create('/uploads', formData, {
+  //   //     headers: { 'Content-Type': 'multipart/form-data' },
+  //   //   })
+  // }
+
+  async function handleSave() {
+    // await uploadScreenshots()
+    console.log(screenShots)
+    const newScreenShot = await screenShotToPng(tabsValue)
+    const newScreenShots = {
+      frente: tabsValue === 0 ? newScreenShot : screenShots.frente,
+      lateralEsquerdo:
+        tabsValue === 1 ? newScreenShot : screenShots.lateralEsquerdo,
+      lateralDireito:
+        tabsValue === 2 ? newScreenShot : screenShots.lateralDireito,
+      traseira: tabsValue === 3 ? newScreenShot : screenShots.traseira,
+      teto: tabsValue === 4 ? newScreenShot : screenShots.teto,
+    }
+
+    console.log(newScreenShots)
     const formattedData = [
       {
         name: 'Frente',
@@ -299,6 +504,7 @@ export default function ModalInspectCar({
         value: markups.frente,
         comment: observations.frente,
         images: listImagesUpload.frente,
+        screenShot: newScreenShots.frente,
       },
       {
         name: 'Lateral esquerda',
@@ -306,6 +512,7 @@ export default function ModalInspectCar({
         value: markups.lateralEsquerdo,
         comment: observations.lateralEsquerdo,
         images: listImagesUpload.lateralEsquerdo,
+        screenShot: newScreenShots.lateralEsquerdo,
       },
       {
         name: 'Lateral direita',
@@ -313,6 +520,7 @@ export default function ModalInspectCar({
         value: markups.lateralDireito,
         comment: observations.lateralDireito,
         images: listImagesUpload.lateralDireito,
+        screenShot: newScreenShots.lateralDireito,
       },
       {
         name: 'Traseira',
@@ -320,6 +528,7 @@ export default function ModalInspectCar({
         value: markups.traseira,
         comment: observations.traseira,
         images: listImagesUpload.traseira,
+        screenShot: newScreenShots.traseira,
       },
       {
         name: 'Teto',
@@ -327,6 +536,7 @@ export default function ModalInspectCar({
         value: markups.teto,
         comment: observations.teto,
         images: listImagesUpload.teto,
+        screenShot: newScreenShots.teto,
       },
     ]
     handleInspectionData(formattedData)
@@ -370,39 +580,56 @@ export default function ModalInspectCar({
       traseira: '',
       teto: '',
     }
+    const newScreenShots: ObservationsType = {
+      frente: '',
+      lateralEsquerdo: '',
+      lateralDireito: '',
+      traseira: '',
+      teto: '',
+    }
 
     if (positonsCarData) {
       positonsCarData[0]?.values?.labels?.forEach((item) => {
         switch (item.name) {
           case 'Frente':
             newPositionsUrl.frente = item.url_image ?? []
+            // @ts-ignore
             newPositionsMarkups.frente = item.value ?? []
             newPositionsObservations.frente = item.comment ?? ''
             newPositionsImageList.frente = item.images ?? []
+            newScreenShots.frente = item.screenShot ?? ''
             break
           case 'Lateral esquerda':
             newPositionsUrl.lateralEsquerdo = item.url_image
+            // @ts-ignore
             newPositionsMarkups.lateralEsquerdo = item.value ?? []
             newPositionsObservations.lateralEsquerdo = item.comment ?? ''
             newPositionsImageList.lateralEsquerdo = item.images ?? []
+            newScreenShots.lateralEsquerdo = item.screenShot ?? ''
             break
           case 'Lateral direita':
             newPositionsUrl.lateralDireito = item.url_image
+            // @ts-ignore
             newPositionsMarkups.lateralDireito = item.value ?? []
             newPositionsObservations.lateralDireito = item.comment ?? ''
             newPositionsImageList.lateralDireito = item.images ?? []
+            newScreenShots.lateralDireito = item.screenShot ?? ''
             break
           case 'Traseira':
             newPositionsUrl.traseira = item.url_image
+            // @ts-ignore
             newPositionsMarkups.traseira = item.value ?? []
             newPositionsObservations.traseira = item.comment ?? ''
             newPositionsImageList.traseira = item.images ?? []
+            newScreenShots.traseira = item.screenShot ?? ''
             break
           case 'Teto':
             newPositionsUrl.teto = item.url_image
+            // @ts-ignore
             newPositionsMarkups.teto = item.value ?? []
             newPositionsObservations.teto = item.comment ?? ''
             newPositionsImageList.teto = item.images ?? []
+            newScreenShots.teto = item.screenShot ?? ''
             break
           default:
             break
@@ -412,11 +639,9 @@ export default function ModalInspectCar({
       setMarkups(newPositionsMarkups)
       setListImagesUpload(newPositionsImageList)
       setObservations(newPositionsObservations)
+      setScreenShots(newScreenShots)
     }
   }, [])
-
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
-  const fullX = useMediaQuery(theme.breakpoints.down('md'))
 
   return (
     <Dialog
@@ -425,6 +650,7 @@ export default function ModalInspectCar({
       onClose={handleClose}
       fullWidth={true}
       maxWidth="md"
+      scroll={'paper'}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
@@ -432,11 +658,10 @@ export default function ModalInspectCar({
         sx={{
           paddingX: 0,
           paddingTop: 0,
-          justifyContent: 'center',
-          width: '100%',
-          height: fullX ? '100%' : 440,
-          overflowY: 'auto',
+          height: 440,
+          // overflowY: 'hidden',
         }}
+        dividers
       >
         <AppBar position="static">
           <TabsContainer
@@ -447,128 +672,86 @@ export default function ModalInspectCar({
             variant="fullWidth"
             aria-label="full width tabs"
           >
-            <Tab
-              label="Frente"
-              {...a11yProps(0)}
-              sx={{
-                whiteSpace: 'nowrap',
-                px: 5,
-                fontSize: { xl: 16, lg: 14, md: 12, sm: 10, xs: 8 },
-              }}
-            />
+            <Tab label="Frente" {...a11yProps(0)} />
             <Tab
               label="Lateral esquerdo"
-              sx={{
-                whiteSpace: 'nowrap',
-                px: 5,
-                fontSize: { xl: 16, lg: 14, md: 12, sm: 10, xs: 8 },
-              }}
+              sx={{ whiteSpace: 'nowrap', px: 5 }}
               {...a11yProps(1)}
             />
             <Tab
               label="Lateral direita"
-              sx={{
-                whiteSpace: 'nowrap',
-                px: 5,
-                fontSize: { xl: 16, lg: 14, md: 12, sm: 10, xs: 8 },
-              }}
+              sx={{ whiteSpace: 'nowrap', px: 4 }}
               {...a11yProps(2)}
             />
-            <Tab
-              label="Traseira"
-              {...a11yProps(3)}
-              sx={{
-                whiteSpace: 'nowrap',
-                px: 5,
-                fontSize: { xl: 16, lg: 14, md: 12, sm: 10, xs: 8 },
-              }}
-            />
-            <Tab
-              label="Teto"
-              {...a11yProps(4)}
-              sx={{
-                whiteSpace: 'nowrap',
-                px: 5,
-                fontSize: { xl: 16, lg: 14, md: 12, sm: 10, xs: 8 },
-              }}
-            />
+            <Tab label="Traseira" {...a11yProps(3)} />
+            <Tab label="Teto" {...a11yProps(4)} />
           </TabsContainer>
         </AppBar>
         <Grid
           container
-          sx={{
-            padding: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+          sx={{ padding: 2 }}
+          gap={{
+            lg: 0,
+            md: 1,
+            xs: 1,
           }}
         >
           <Grid
-            display={{
-              xl: 'flex',
-              lg: 'flex',
-              md: 'none',
-              sm: 'none',
-              xs: 'none',
-            }}
+            item
+            xs={12}
+            md={2}
+            lg={2}
+            width="100%"
+            display="flex"
+            alignItems="center"
             justifyContent="center"
           >
-            <Grid
-              item
-              md={2}
-              width="100%"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Stack
-                display="flex"
-                flexDirection={{
-                  xs: 'row',
-                  md: 'column',
-                }}
-                gap={2}
-              >
-                {Object.keys(markupTagTypes).map((item) => (
-                  <LabelButtonMarkupType key={item}>
-                    <ButtonMarkupType
-                      selectedActual={markupValue === item}
-                      onClick={() => {
-                        handleChangeMarkupValue(item as markupTypesEnum)
-                      }}
-                    >
-                      {markupTagTypes[item]}
-                    </ButtonMarkupType>
-                    <span>{item}</span>
-                  </LabelButtonMarkupType>
-                ))}
-              </Stack>
-            </Grid>
-            <Grid
-              item
-              width="100%"
-              display={{
-                xl: 'flex',
-                lg: 'block',
-                md: 'block',
-                sm: 'block',
-                xs: 'block',
+            <ContainerButtonsMarkupType
+              gap={2}
+              direction={{
+                xs: 'row',
+                md: 'column',
+                lg: 'column',
               }}
-              justifyContent="center"
             >
-              <TabPanel value={tabsValue} index={0} dir={theme.direction}>
+              {Object.keys(markupTagTypes).map((item) => (
+                <LabelButtonMarkupType key={item}>
+                  <ButtonMarkupType
+                    selectedActual={markupValue === item}
+                    onClick={() => {
+                      handleChangeMarkupValue(item as markupTypesEnum)
+                    }}
+                  >
+                    {markupTagTypes[item]}
+                  </ButtonMarkupType>
+                  <span>{item}</span>
+                </LabelButtonMarkupType>
+              ))}
+            </ContainerButtonsMarkupType>
+          </Grid>
+          <Grid item xs={12} md={9} lg={7}>
+            <TabPanel
+              value={tabsValue}
+              index={0}
+              dir={theme.direction}
+              // ref={containerImageCarFrenteRef}
+            >
+              <div ref={containerImageCarFrenteRef}>
                 <ClickableArea
                   onClick={addMarkup}
-                  urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.frente}`}
+                  src={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.frente}`}
                 />
                 {markups.frente.map((m) => {
                   return (
                     <ButtonMarkup
                       key={m.id}
-                      sx={{
-                        position: 'absolute',
-                        top: m?.positions?.top,
-                        left: m?.positions?.left,
+                      mobile={{
+                        top: m?.positions?.mobile?.top,
+                        left: m?.positions?.mobile?.left,
+                      }}
+                      web={{
+                        top: m?.positions?.web?.top,
+                        left: m?.positions?.web?.left,
                       }}
                       onClick={() => removeMarkup(m.id)}
                     >
@@ -579,21 +762,26 @@ export default function ModalInspectCar({
                     </ButtonMarkup>
                   )
                 })}
-                {/* </ClickableSVG> */}
-              </TabPanel>
-              <TabPanel value={tabsValue} index={1} dir={theme.direction}>
+              </div>
+              {/* </ClickableSVG> */}
+            </TabPanel>
+            <TabPanel value={tabsValue} index={1} dir={theme.direction}>
+              <div ref={containerImageCarLateralEsquerdaRef}>
                 <ClickableArea
                   onClick={addMarkup}
-                  urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.lateralEsquerdo}`}
+                  src={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.lateralEsquerdo}`}
                 />
                 {markups.lateralEsquerdo.map((m) => {
                   return (
                     <ButtonMarkup
                       key={m.id}
-                      sx={{
-                        position: 'absolute',
-                        top: m?.positions?.top,
-                        left: m?.positions?.left,
+                      mobile={{
+                        top: m?.positions?.mobile?.top,
+                        left: m?.positions?.mobile?.left,
+                      }}
+                      web={{
+                        top: m?.positions?.web?.top,
+                        left: m?.positions?.web?.left,
                       }}
                       onClick={() => removeMarkup(m.id)}
                     >
@@ -604,20 +792,25 @@ export default function ModalInspectCar({
                     </ButtonMarkup>
                   )
                 })}
-              </TabPanel>
-              <TabPanel value={tabsValue} index={2} dir={theme.direction}>
+              </div>
+            </TabPanel>
+            <TabPanel value={tabsValue} index={2} dir={theme.direction}>
+              <div ref={containerImageCarLateralDireitaRef}>
                 <ClickableArea
                   onClick={addMarkup}
-                  urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.lateralDireito}`}
+                  src={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.lateralDireito}`}
                 />
                 {markups.lateralDireito.map((m) => {
                   return (
                     <ButtonMarkup
                       key={m.id}
-                      sx={{
-                        position: 'absolute',
-                        top: m?.positions?.top,
-                        left: m?.positions?.left,
+                      mobile={{
+                        top: m?.positions?.mobile?.top,
+                        left: m?.positions?.mobile?.left,
+                      }}
+                      web={{
+                        top: m?.positions?.web?.top,
+                        left: m?.positions?.web?.left,
                       }}
                       onClick={() => removeMarkup(m.id)}
                     >
@@ -628,20 +821,25 @@ export default function ModalInspectCar({
                     </ButtonMarkup>
                   )
                 })}
-              </TabPanel>
-              <TabPanel value={tabsValue} index={3} dir={theme.direction}>
+              </div>
+            </TabPanel>
+            <TabPanel value={tabsValue} index={3} dir={theme.direction}>
+              <div ref={containerImageCarTraseiraRef}>
                 <ClickableArea
                   onClick={addMarkup}
-                  urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.traseira}`}
+                  src={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.traseira}`}
                 />
                 {markups.traseira.map((m) => {
                   return (
                     <ButtonMarkup
                       key={m.id}
-                      sx={{
-                        position: 'absolute',
-                        top: m?.positions?.top,
-                        left: m?.positions?.left,
+                      mobile={{
+                        top: m?.positions?.mobile?.top,
+                        left: m?.positions?.mobile?.left,
+                      }}
+                      web={{
+                        top: m?.positions?.web?.top,
+                        left: m?.positions?.web?.left,
                       }}
                       onClick={() => removeMarkup(m.id)}
                     >
@@ -652,20 +850,25 @@ export default function ModalInspectCar({
                     </ButtonMarkup>
                   )
                 })}
-              </TabPanel>
-              <TabPanel value={tabsValue} index={4} dir={theme.direction}>
+              </div>
+            </TabPanel>
+            <TabPanel value={tabsValue} index={4} dir={theme.direction}>
+              <div ref={containerImageCarTetoRef}>
                 <ClickableArea
                   onClick={addMarkup}
-                  urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.teto}`}
+                  src={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.teto}`}
                 />
                 {markups.teto.map((m) => {
                   return (
                     <ButtonMarkup
                       key={m.id}
-                      sx={{
-                        position: 'absolute',
-                        top: m?.positions?.top,
-                        left: m?.positions?.left,
+                      mobile={{
+                        top: m?.positions?.mobile?.top,
+                        left: m?.positions?.mobile?.left,
+                      }}
+                      web={{
+                        top: m?.positions?.web?.top,
+                        left: m?.positions?.web?.left,
                       }}
                       onClick={() => removeMarkup(m.id)}
                     >
@@ -676,598 +879,68 @@ export default function ModalInspectCar({
                     </ButtonMarkup>
                   )
                 })}
-              </TabPanel>
-            </Grid>
-            <Grid
-              item
-              marginTop={{ xl: 0, lg: 0, md: 2, sm: 2, xs: 2 }}
-              xs={7.7}
-              lg={3}
-              justifyContent="center"
-            >
-              <ContainerInformation width="100%" direction="column">
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  padding={0.7}
-                >
-                  <Title>
-                    {/* <IconUpload /> */}
-                    imagem
-                  </Title>
-                  {/* <IconClose /> */}
-                </Stack>
-                <Divider />
-                <Box sx={{ padding: 1 }}>
-                  <InspectionDropzone
-                    handleAddImageUrlList={handleAddImageUrlList}
-                    listImagesUpload={listImagesUpload}
-                    positionsCar={positionsCar[tabsValue]}
-                  />
-                </Box>
-                <Divider />
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  padding={0.7}
-                >
-                  <Title>observações</Title>
-                  {/* <IconClose /> */}
-                </Stack>
-                <Divider />
-                <Box sx={{ padding: 1 }}>
-                  {/* @ts-ignore */}
-                  <TextAreaField
-                    id="outlined-multiline-static"
-                    multiline
-                    rows={5}
-                    fullWidth
-                    size="small"
-                    value={observations[positionsCar[tabsValue]]}
-                    onChange={handleObservation}
-                  />
-                </Box>
-              </ContainerInformation>
-              <Stack direction="row" spacing={2} sx={{ marginTop: 1 }}>
-                <ButtonLeft
-                  variant="contained"
-                  onClick={() => {
-                    handleSave()
-                  }}
-                >
-                  salvar
-                </ButtonLeft>
-                <ButtonRight variant="contained" onClick={handleClose}>
-                  sair
-                </ButtonRight>
-              </Stack>
-            </Grid>
+              </div>
+            </TabPanel>
           </Grid>
-          <Grid
-            display={{
-              xl: 'none',
-              lg: 'none',
-              md: 'flex',
-              sm: 'none',
-              xs: 'none',
-            }}
-            flexDirection="column"
-            alignItems="center"
-            width="100%"
-            justifyContent="center"
-          >
-            <Grid
-              display={{
-                xl: 'none',
-                lg: 'flex',
-                md: 'flex',
-                sm: 'none',
-                xs: 'none',
-              }}
-              gap={2}
-              flexDirection="row"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Grid item display="flex">
-                <Stack
-                  display="flex"
-                  flexDirection={{
-                    xs: 'row',
-                    md: 'column',
-                  }}
-                  gap={2}
-                >
-                  {Object.keys(markupTagTypes).map((item) => (
-                    <LabelButtonMarkupType key={item}>
-                      <ButtonMarkupType
-                        selectedActual={markupValue === item}
-                        onClick={() => {
-                          handleChangeMarkupValue(item as markupTypesEnum)
-                        }}
-                      >
-                        {markupTagTypes[item]}
-                      </ButtonMarkupType>
-                      <span>{item}</span>
-                    </LabelButtonMarkupType>
-                  ))}
-                </Stack>
-              </Grid>
-              <Grid
-                item
-                sx={{
-                  display: 'flex',
-                  marginRight: -10,
-                }}
-              >
-                <TabPanel value={tabsValue} index={0} dir={theme.direction}>
-                  <ClickableArea
-                    onClick={addMarkup}
-                    urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.frente}`}
-                  />
-                  {markups.frente.map((m) => {
-                    return (
-                      <ButtonMarkup
-                        key={m.id}
-                        sx={{
-                          position: 'absolute',
-                          top: m?.positions?.top,
-                          left: m?.positions?.left,
-                        }}
-                        onClick={() => removeMarkup(m.id)}
-                      >
-                        <span>{markupTagTypes[m.type]}</span>
-                        <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: 'fixed' }}
-                        />
-                      </ButtonMarkup>
-                    )
-                  })}
-                  {/* </ClickableSVG> */}
-                </TabPanel>
-                <TabPanel value={tabsValue} index={1} dir={theme.direction}>
-                  <ClickableArea
-                    onClick={addMarkup}
-                    urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.lateralEsquerdo}`}
-                  />
-                  {markups.lateralEsquerdo.map((m) => {
-                    return (
-                      <ButtonMarkup
-                        key={m.id}
-                        sx={{
-                          position: 'absolute',
-                          top: m?.positions?.top,
-                          left: m?.positions?.left,
-                        }}
-                        onClick={() => removeMarkup(m.id)}
-                      >
-                        <span>{markupTagTypes[m.type]}</span>
-                        <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: 'fixed' }}
-                        />
-                      </ButtonMarkup>
-                    )
-                  })}
-                </TabPanel>
-                <TabPanel value={tabsValue} index={2} dir={theme.direction}>
-                  <ClickableArea
-                    onClick={addMarkup}
-                    urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.lateralDireito}`}
-                  />
-                  {markups.lateralDireito.map((m) => {
-                    return (
-                      <ButtonMarkup
-                        key={m.id}
-                        sx={{
-                          position: 'absolute',
-                          top: m?.positions?.top,
-                          left: m?.positions?.left,
-                        }}
-                        onClick={() => removeMarkup(m.id)}
-                      >
-                        <span>{markupTagTypes[m.type]}</span>
-                        <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: 'fixed' }}
-                        />
-                      </ButtonMarkup>
-                    )
-                  })}
-                </TabPanel>
-                <TabPanel value={tabsValue} index={3} dir={theme.direction}>
-                  <ClickableArea
-                    onClick={addMarkup}
-                    urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.traseira}`}
-                  />
-                  {markups.traseira.map((m) => {
-                    return (
-                      <ButtonMarkup
-                        key={m.id}
-                        sx={{
-                          position: 'absolute',
-                          top: m?.positions?.top,
-                          left: m?.positions?.left,
-                        }}
-                        onClick={() => removeMarkup(m.id)}
-                      >
-                        <span>{markupTagTypes[m.type]}</span>
-                        <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: 'fixed' }}
-                        />
-                      </ButtonMarkup>
-                    )
-                  })}
-                </TabPanel>
-                <TabPanel value={tabsValue} index={4} dir={theme.direction}>
-                  <ClickableArea
-                    onClick={addMarkup}
-                    urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.teto}`}
-                  />
-                  {markups.teto.map((m) => {
-                    return (
-                      <ButtonMarkup
-                        key={m.id}
-                        sx={{
-                          position: 'absolute',
-                          top: m?.positions?.top,
-                          left: m?.positions?.left,
-                        }}
-                        onClick={() => removeMarkup(m.id)}
-                      >
-                        <span>{markupTagTypes[m.type]}</span>
-                        <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: 'fixed' }}
-                        />
-                      </ButtonMarkup>
-                    )
-                  })}
-                </TabPanel>
-              </Grid>
-            </Grid>
-            <Grid
-              item
-              marginTop={{ xl: 0, lg: 0, md: 2, sm: 2, xs: 2 }}
-              justifyContent="center"
-              alignItems="center"
-            >
-              <ContainerInformation
-                display="flex"
-                width="610px"
-                direction="column"
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  padding={0.7}
-                >
-                  <Title>
-                    {/* <IconUpload /> */}
-                    imagem
-                  </Title>
-                  {/* <IconClose /> */}
-                </Stack>
-                <Divider />
-                <Box sx={{ padding: 1 }}>
-                  <InspectionDropzone
-                    handleAddImageUrlList={handleAddImageUrlList}
-                    listImagesUpload={listImagesUpload}
-                    positionsCar={positionsCar[tabsValue]}
-                  />
-                </Box>
-                <Divider />
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  padding={0.7}
-                >
-                  <Title>observações</Title>
-                  {/* <IconClose /> */}
-                </Stack>
-                <Divider />
-                <Box sx={{ padding: 1 }}>
-                  {/* @ts-ignore */}
-                  <TextAreaField
-                    id="outlined-multiline-static"
-                    multiline
-                    rows={5}
-                    fullWidth
-                    size="small"
-                    value={observations[positionsCar[tabsValue]]}
-                    onChange={handleObservation}
-                  />
-                </Box>
-              </ContainerInformation>
-              <Stack direction="row" spacing={2} sx={{ marginTop: 1 }}>
-                <ButtonLeft
-                  variant="contained"
-                  onClick={() => {
-                    handleSave()
-                  }}
-                >
-                  salvar
-                </ButtonLeft>
-                <ButtonRight variant="contained" onClick={handleClose}>
-                  sair
-                </ButtonRight>
-              </Stack>
-            </Grid>
-          </Grid>
-          <Grid
-            display={{
-              xl: 'none',
-              lg: 'none',
-              md: 'none',
-              sm: 'flex',
-              xs: 'flex',
-            }}
-            width="100%"
-            justifyContent="center"
-            flexDirection="column"
-          >
-            <Grid
-              item
-              md={2}
-              width="100%"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
+          <Grid item xs={12} md={12} lg={3}>
+            <ContainerInformation direction="column">
               <Stack
-                display="flex"
-                flexDirection={{
-                  xs: 'row',
-                  md: 'column',
-                }}
-                gap={2}
-              >
-                {Object.keys(markupTagTypes).map((item) => (
-                  <LabelButtonMarkupType key={item}>
-                    <ButtonMarkupType
-                      selectedActual={markupValue === item}
-                      onClick={() => {
-                        handleChangeMarkupValue(item as markupTypesEnum)
-                      }}
-                    >
-                      {markupTagTypes[item]}
-                    </ButtonMarkupType>
-                    <span>{item}</span>
-                  </LabelButtonMarkupType>
-                ))}
-              </Stack>
-            </Grid>
-            <Grid
-              display={{
-                xl: 'none',
-                lg: 'none',
-                md: 'none',
-                sm: 'flex',
-                xs: 'flex',
-              }}
-              margin={{
-                xs: '0 auto',
-                sm: '0 auto',
-              }}
-              paddingX={{
-                xs: 0,
-                sm: 2,
-              }}
-              flexDirection="column"
-              justifyContent="center"
-            >
-              <Grid
-                item
-                width="100%"
+                direction="row"
                 alignItems="center"
-                display={{
-                  xl: 'flex',
-                  lg: 'block',
-                  md: 'block',
-                  sm: 'block',
-                  xs: 'block',
+                justifyContent="space-between"
+                padding={0.7}
+              >
+                <Title>
+                  {/* <IconUpload /> */}
+                  imagem
+                </Title>
+                {/* <IconClose /> */}
+              </Stack>
+              <Divider />
+              <Box sx={{ padding: 1 }}>
+                <InspectionDropzone
+                  handleAddImageUrlList={handleAddImageUrlList}
+                  listImagesUpload={listImagesUpload}
+                  positionsCar={positionsCar[tabsValue]}
+                />
+              </Box>
+              <Divider />
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+                padding={0.7}
+              >
+                <Title>observações</Title>
+                {/* <IconClose /> */}
+              </Stack>
+              <Divider />
+              <Box sx={{ padding: 1 }}>
+                {/* @ts-ignore */}
+                <TextAreaField
+                  id="outlined-multiline-static"
+                  multiline
+                  rows={5}
+                  fullWidth
+                  size="small"
+                  value={observations[positionsCar[tabsValue]]}
+                  onChange={handleObservation}
+                />
+              </Box>
+            </ContainerInformation>
+            <ContainerButtonsInformation direction="row" spacing={2}>
+              <ButtonLeft
+                variant="contained"
+                onClick={() => {
+                  handleSave()
                 }}
-                justifyContent="center"
               >
-                <TabPanel value={tabsValue} index={0} dir={theme.direction}>
-                  <ClickableArea
-                    onClick={addMarkup}
-                    urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.frente}`}
-                  />
-                  {markups.frente.map((m) => {
-                    return (
-                      <ButtonMarkup
-                        key={m.id}
-                        sx={{
-                          position: 'absolute',
-                          top: m?.positions?.top,
-                          left: m?.positions?.left,
-                        }}
-                        onClick={() => removeMarkup(m.id)}
-                      >
-                        <span>{markupTagTypes[m.type]}</span>
-                        <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: 'fixed' }}
-                        />
-                      </ButtonMarkup>
-                    )
-                  })}
-                  {/* </ClickableSVG> */}
-                </TabPanel>
-                <TabPanel value={tabsValue} index={1} dir={theme.direction}>
-                  <ClickableArea
-                    onClick={addMarkup}
-                    urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.lateralEsquerdo}`}
-                  />
-                  {markups.lateralEsquerdo.map((m) => {
-                    return (
-                      <ButtonMarkup
-                        key={m.id}
-                        sx={{
-                          position: 'absolute',
-                          top: m?.positions?.top,
-                          left: m?.positions?.left,
-                        }}
-                        onClick={() => removeMarkup(m.id)}
-                      >
-                        <span>{markupTagTypes[m.type]}</span>
-                        <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: 'fixed' }}
-                        />
-                      </ButtonMarkup>
-                    )
-                  })}
-                </TabPanel>
-                <TabPanel value={tabsValue} index={2} dir={theme.direction}>
-                  <ClickableArea
-                    onClick={addMarkup}
-                    urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.lateralDireito}`}
-                  />
-                  {markups.lateralDireito.map((m) => {
-                    return (
-                      <ButtonMarkup
-                        key={m.id}
-                        sx={{
-                          position: 'absolute',
-                          top: m?.positions?.top,
-                          left: m?.positions?.left,
-                        }}
-                        onClick={() => removeMarkup(m.id)}
-                      >
-                        <span>{markupTagTypes[m.type]}</span>
-                        <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: 'fixed' }}
-                        />
-                      </ButtonMarkup>
-                    )
-                  })}
-                </TabPanel>
-                <TabPanel value={tabsValue} index={3} dir={theme.direction}>
-                  <ClickableArea
-                    onClick={addMarkup}
-                    urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.traseira}`}
-                  />
-                  {markups.traseira.map((m) => {
-                    return (
-                      <ButtonMarkup
-                        key={m.id}
-                        sx={{
-                          position: 'absolute',
-                          top: m?.positions?.top,
-                          left: m?.positions?.left,
-                        }}
-                        onClick={() => removeMarkup(m.id)}
-                      >
-                        <span>{markupTagTypes[m.type]}</span>
-                        <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: 'fixed' }}
-                        />
-                      </ButtonMarkup>
-                    )
-                  })}
-                </TabPanel>
-                <TabPanel value={tabsValue} index={4} dir={theme.direction}>
-                  <ClickableArea
-                    onClick={addMarkup}
-                    urlImg={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${imgPositionCarUrl.teto}`}
-                  />
-                  {markups.teto.map((m) => {
-                    return (
-                      <ButtonMarkup
-                        key={m.id}
-                        sx={{
-                          position: 'absolute',
-                          top: m?.positions?.top,
-                          left: m?.positions?.left,
-                        }}
-                        onClick={() => removeMarkup(m.id)}
-                      >
-                        <span>{markupTagTypes[m.type]}</span>
-                        <DeleteForeverRoundedIcon
-                          sx={{ zIndex: 10, position: 'fixed' }}
-                        />
-                      </ButtonMarkup>
-                    )
-                  })}
-                </TabPanel>
-              </Grid>
-              <Grid
-                item
-                marginTop={{ xl: 0, lg: 0, md: 2, sm: 2, xs: 2 }}
-                xs={7.7}
-                lg={3}
-                justifyContent="center"
-              >
-                <ContainerInformation width="490px" direction="column">
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    padding={0.7}
-                  >
-                    <Title>
-                      {/* <IconUpload /> */}
-                      imagem
-                    </Title>
-                    {/* <IconClose /> */}
-                  </Stack>
-                  <Divider />
-                  <Box sx={{ padding: 1 }}>
-                    <InspectionDropzone
-                      handleAddImageUrlList={handleAddImageUrlList}
-                      listImagesUpload={listImagesUpload}
-                      positionsCar={positionsCar[tabsValue]}
-                    />
-                  </Box>
-                  <Divider />
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    padding={0.7}
-                  >
-                    <Title>observações</Title>
-                    {/* <IconClose /> */}
-                  </Stack>
-                  <Divider />
-                  <Box sx={{ padding: 1 }}>
-                    {/* @ts-ignore */}
-                    <TextAreaField
-                      id="outlined-multiline-static"
-                      multiline
-                      rows={5}
-                      fullWidth
-                      size="small"
-                      value={observations[positionsCar[tabsValue]]}
-                      onChange={handleObservation}
-                    />
-                  </Box>
-                </ContainerInformation>
-                <Stack
-                  direction="row"
-                  spacing={4}
-                  sx={{
-                    marginTop: 1,
-                    width: '134%',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <ButtonLeft
-                    variant="contained"
-                    onClick={() => {
-                      handleSave()
-                    }}
-                  >
-                    salvar
-                  </ButtonLeft>
-                  <ButtonRight variant="contained" onClick={handleClose}>
-                    sair
-                  </ButtonRight>
-                </Stack>
-              </Grid>
-            </Grid>
+                salvar
+              </ButtonLeft>
+              <ButtonRight variant="contained" onClick={handleClose}>
+                sair
+              </ButtonRight>
+            </ContainerButtonsInformation>
           </Grid>
         </Grid>
       </DialogContent>
