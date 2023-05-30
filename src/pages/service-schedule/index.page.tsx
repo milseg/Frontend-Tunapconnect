@@ -381,7 +381,7 @@ export default function ServiceSchedulesList() {
                   justifyContent: 'center',
                 }}
               >
-                <ButtonAdd
+                {/* <ButtonAdd
                   size="large"
                   variant="contained"
                   sx={{ alignSelf: 'flex-end' }}
@@ -391,7 +391,7 @@ export default function ServiceSchedulesList() {
                   }}
                 >
                   Adicionar novo
-                </ButtonAdd>
+                </ButtonAdd> */}
               </Grid>
             </Grid>
           </Paper>

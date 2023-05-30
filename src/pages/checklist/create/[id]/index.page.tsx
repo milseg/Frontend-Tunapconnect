@@ -7,7 +7,7 @@ import Box from '@mui/material/Box'
 import { LinkNext, TabItem, TabsContainer, Title } from './styles'
 import TabContent from './TabContent'
 import { ApiCore } from '@/lib/api'
-import { Skeleton } from '@mui/material'
+import { Backdrop, CircularProgress, Skeleton } from '@mui/material'
 import {
   ChecklistProps,
   ResponseGetCheckList,
@@ -129,7 +129,7 @@ export default function ChecklistCreateById() {
           title: 'Salvo com sucesso',
           type: 'success',
         })
-        queryClient.invalidateQueries({ queryKey: ['checklist-createByID'] })
+        queryClient.invalidateQueries('checklist-createByID')
         return data
       },
       onError: (err: any) => {
@@ -143,19 +143,20 @@ export default function ChecklistCreateById() {
     },
   )
 
-  const { data, isSuccess, isLoading } = useQuery<ResponseGetCheckList>(
-    ['checklist-createByID'],
-    () =>
-      api
-        .get(`/checklist/${router?.query?.id}?company_id=`)
-        .then((response) => {
-          return response.data.data
-        }),
-    {
-      refetchOnWindowFocus: false,
-      enabled: !!router?.query?.id,
-    },
-  )
+  const { data, isSuccess, isLoading, isFetching } =
+    useQuery<ResponseGetCheckList>(
+      ['checklist-createByID'],
+      () =>
+        api
+          .get(`/checklist/${router?.query?.id}?company_id=`)
+          .then((response) => {
+            return response.data.data
+          }),
+      {
+        refetchOnWindowFocus: false,
+        enabled: !!router?.query?.id,
+      },
+    )
 
   function handleAlert(isOpen: boolean) {
     setActionAlerts((previState) => ({
@@ -163,19 +164,6 @@ export default function ChecklistCreateById() {
       isOpen,
     }))
   }
-
-  // function handleSaveFormSubmit(data: InspectionCarDataType[]) {
-  //   console.log(data)
-  //   setInspectionCarData(data)
-  // }
-
-  // function handleSaveInspectionCarData(data: InspectionCarDataType[]) {
-  //   setInspectionCarData(data)
-  // }
-  // function handleSaveSignatures(signatures: CheckListSignatures[]) {
-  //   console.log(signatures)
-  //   // setInspectionCarData(data)
-  // }
 
   async function handleAddListCheckList(stageData: StagesDataProps) {
     const isFinalizedArray = data?.stages.map((item) => {
@@ -325,8 +313,16 @@ export default function ChecklistCreateById() {
             </Grid>
           </Grid>
         </Container>
+
+        <Backdrop
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={isFetching}
+          onClick={() => {}}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
         <ActionAlerts
-          isOpen={actionAlerts?.isOpen}
+          isOpen={actionAlerts?.isOpen && !isFetching}
           title={'salvo'}
           type={'success'}
           handleAlert={handleAlert}
