@@ -988,19 +988,19 @@ export function PrintInspection({
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck third={{ checked: true }} />
+                      <TripleSquareCheck third={{ checked: false }} />
                     </td>
                     <td>Luzes do painel e de cortesia •</td>
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck first={{ checked: true }} />
+                      <TripleSquareCheck first={{ checked: false }} />
                     </td>
                     <td>Lavadores e limpadores</td>
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck second={{ checked: true }} />
+                      <TripleSquareCheck second={{ checked: false }} />
                     </td>
                     <td>Ventilador / Desembacadores</td>
                   </tr>
@@ -1018,7 +1018,7 @@ export function PrintInspection({
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck third={{ checked: true }} />
+                      <TripleSquareCheck third={{ checked: false }} />
                     </td>
                     <td>Volante e coluna de direção</td>
                   </tr>
@@ -1030,7 +1030,7 @@ export function PrintInspection({
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck first={{ checked: true }} />
+                      <TripleSquareCheck first={{ checked: false }} />
                     </td>
                     <td>Radio / Multimidia •</td>
                   </tr>
@@ -1042,13 +1042,13 @@ export function PrintInspection({
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck first={{ checked: true }} />
+                      <TripleSquareCheck first={{ checked: false }} />
                     </td>
                     <td>Vidros e trava eletrica</td>
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck second={{ checked: true }} />
+                      <TripleSquareCheck second={{ checked: false }} />
                     </td>
                     <td>Freios de estacionamento</td>
                   </tr>
@@ -1060,13 +1060,13 @@ export function PrintInspection({
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck first={{ checked: true }} />
+                      <TripleSquareCheck first={{ checked: false }} />
                     </td>
                     <td>Filtro de ar-condicionado</td>
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck third={{ checked: true }} />
+                      <TripleSquareCheck third={{ checked: false }} />
                     </td>
                     <td>Alavanca de mudanca de marcha</td>
                   </tr>
@@ -1107,13 +1107,13 @@ export function PrintInspection({
                 <tbody>
                   <tr>
                     <td width={5}>
-                      <TripleSquareCheck first={{ checked: true }} />
+                      <TripleSquareCheck first={{ checked: false }} />
                     </td>
                     <td>Iluminação dianteira e traseira •</td>
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck second={{ checked: true }} />
+                      <TripleSquareCheck second={{ checked: false }} />
                     </td>
                     <td>Tampa do tanque de combustível</td>
                   </tr>
@@ -1135,7 +1135,7 @@ export function PrintInspection({
                 <tbody>
                   <tr>
                     <td width={5}>
-                      <TripleSquareCheck first={{ checked: true }} />
+                      <TripleSquareCheck first={{ checked: false }} />
                     </td>
                     <td>
                       Vazamentos de óleo, água, combustível
@@ -1145,13 +1145,13 @@ export function PrintInspection({
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck second={{ checked: true }} />
+                      <TripleSquareCheck second={{ checked: false }} />
                     </td>
                     <td>Correias de acionamento</td>
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck second={{ checked: true }} />
+                      <TripleSquareCheck second={{ checked: false }} />
                     </td>
                     <td>
                       Velas de ignição (veículos flex - a cada 1 O revisões)
@@ -1159,13 +1159,13 @@ export function PrintInspection({
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck second={{ checked: true }} />
+                      <TripleSquareCheck second={{ checked: false }} />
                     </td>
                     <td>Condicões da bateria</td>
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck first={{ checked: true }} />
+                      <TripleSquareCheck first={{ checked: false }} />
                     </td>
                     <td>
                       Tensão da bateria. Encontrado:{' '}
@@ -1177,7 +1177,7 @@ export function PrintInspection({
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck first={{ checked: true }} />
+                      <TripleSquareCheck first={{ checked: false }} />
                     </td>
                     <td>Filtro de ar</td>
                   </tr>
@@ -1191,13 +1191,13 @@ export function PrintInspection({
                 <tbody>
                   <tr>
                     <td width={5}>
-                      <TripleSquareCheck first={{ checked: true }} />
+                      <TripleSquareCheck first={{ checked: false }} />
                     </td>
                     <td>Óleo do motor • </td>
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck second={{ checked: true }} />
+                      <TripleSquareCheck second={{ checked: false }} />
                     </td>
                     <td>Fluído do lavador de para-brisa • </td>
                   </tr>
@@ -1241,13 +1241,13 @@ export function PrintInspection({
                 <tbody>
                   <tr>
                     <td width={5}>
-                      <TripleSquareCheck first={{ checked: true }} />
+                      <TripleSquareCheck first={{ checked: false }} />
                     </td>
                     <td>Caixa de direção e barra de direção</td>
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck second={{ checked: true }} />
+                      <TripleSquareCheck second={{ checked: false }} />
                     </td>
                     <td>Cânister de carvão ativado (se aplicavel)</td>
                   </tr>
