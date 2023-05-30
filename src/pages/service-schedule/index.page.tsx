@@ -157,34 +157,34 @@ export default function ServiceSchedulesList() {
         sortable: false,
       },
       {
-        field: 'typeEstimate',
-        headerName: 'Tipo Orçamento',
+        field: 'vehicle',
+        headerName: 'Veículo',
         headerClassName: 'super-app-theme--header',
         width: 120,
         sortable: false,
       },
-      {
-        field: 'totalDiscount',
-        headerName: 'Tipo Desconto',
-        headerClassName: 'super-app-theme--header',
-        // type: 'number',
-        width: 110,
-        align: 'center',
-        sortable: false,
-        valueGetter: (params: GridValueGetterParams) =>
-          `${formatMoneyPtBR(params.row.totalDiscount) || ''}`,
-      },
-      {
-        field: 'total',
-        headerName: 'Total Geral',
-        headerClassName: 'super-app-theme--header',
-        // type: 'number',
-        width: 110,
-        align: 'center',
-        sortable: false,
-        valueGetter: (params: GridValueGetterParams) =>
-          `${formatMoneyPtBR(params.row.total) || ''}`,
-      },
+      // {
+      //   field: 'totalDiscount',
+      //   headerName: 'Tipo Desconto',
+      //   headerClassName: 'super-app-theme--header',
+      //   // type: 'number',
+      //   width: 110,
+      //   align: 'center',
+      //   sortable: false,
+      //   valueGetter: (params: GridValueGetterParams) =>
+      //     `${formatMoneyPtBR(params.row.totalDiscount) || ''}`,
+      // },
+      // {
+      //   field: 'total',
+      //   headerName: 'Total Geral',
+      //   headerClassName: 'super-app-theme--header',
+      //   // type: 'number',
+      //   width: 110,
+      //   align: 'center',
+      //   sortable: false,
+      //   valueGetter: (params: GridValueGetterParams) =>
+      //     `${formatMoneyPtBR(params.row.total) || ''}`,
+      // },
       {
         field: 'action',
         headerName: 'Ação',
@@ -226,17 +226,18 @@ export default function ServiceSchedulesList() {
     ['service-scheduler-list', companySelected],
     () =>
       api.get(url).then((response) => {
-        const resp = response.data.data.map((data: any) => ({
-          id: data?.id ?? 'Não informado',
-          client: data?.client?.name ?? 'Não informado',
-          plate: data?.client_vehicle?.plate ?? 'Não informado',
-          chassis: data?.client_vehicle?.chasis ?? 'Não informado',
-          technical_consultant:
-            data?.technical_consultant?.name ?? 'Não informado',
-          typeEstimate: 'não definido',
-          totalDiscount: 0,
-          total: 0,
-        }))
+        const resp = response.data.data.map((data: any) => {
+          console.log(data.client_vehicle.vehicle.name)
+          return {
+            id: data?.id ?? 'Não informado',
+            client: data?.client?.name ?? 'Não informado',
+            plate: data?.client_vehicle?.plate ?? 'Não informado',
+            chassis: data?.client_vehicle?.chasis ?? 'Não informado',
+            technical_consultant:
+              data?.technical_consultant?.name ?? 'Não informado',
+            vehicle: data?.client_vehicle?.vehicle?.name ?? 'não definido',
+          }
+        })
 
         if (response.data.total_pages === 1)
           setPages({
