@@ -114,7 +114,7 @@ export default function ServiceSchedulesList() {
         headerClassName: 'super-app-theme--header',
         width: 90,
         type: 'number',
-        align: 'center',
+        align: 'left',
         sortable: false,
       },
       {
@@ -131,7 +131,7 @@ export default function ServiceSchedulesList() {
         field: 'plate',
         headerName: 'Placa',
         headerClassName: 'super-app-theme--header',
-        width: 90,
+        width: 120,
         sortable: false,
       },
       {
@@ -139,7 +139,7 @@ export default function ServiceSchedulesList() {
         headerName: 'Chassis',
         headerClassName: 'super-app-theme--header',
         flex: 1,
-        maxWidth: 200,
+        maxWidth: 240,
         minWidth: 120,
         sortable: false,
       },
@@ -148,15 +148,15 @@ export default function ServiceSchedulesList() {
         headerName: 'Responsavél',
         headerClassName: 'super-app-theme--header',
         flex: 1,
-        maxWidth: 120,
-        minWidth: 80,
+        maxWidth: 200,
+        minWidth: 120,
         sortable: false,
       },
       {
         field: 'vehicle',
         headerName: 'Veículo',
         headerClassName: 'super-app-theme--header',
-        width: 120,
+        width: 160,
         sortable: false,
       },
       // {
@@ -186,7 +186,7 @@ export default function ServiceSchedulesList() {
         headerName: 'Ação',
         headerClassName: 'super-app-theme--header',
         sortable: false,
-        width: 80,
+        width: 90,
         align: 'left',
         renderCell: (params: GridRenderCellParams) => {
           const onClick = (e: React.MouseEvent<HTMLElement>) => {
