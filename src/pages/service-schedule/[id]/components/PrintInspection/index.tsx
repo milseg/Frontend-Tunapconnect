@@ -80,7 +80,11 @@ export function PrintInspection({
   const recepcaoInspecao = data?.stages[0].itens.filter(
     (item) => item.rules.type === 'visual_inspect',
   )
-  console.log(recepcaoInspecao)
+  const entregaInspecao = data?.stages[1].itens.filter(
+    (item) => item.rules.type === 'visual_inspect',
+  )
+
+  console.log(data?.stages[0])
 
   function getCodeReceptionStage(code: string): Itens {
     const result = receptionStage?.itens.filter((it) => it.Code === code)
@@ -1599,6 +1603,108 @@ export function PrintInspection({
               )
             })}
         </Stack>
+        <Stack
+          direction="row"
+          marginTop={10}
+          justifyContent="center"
+          alignItems="center"
+          spacing={10}
+        >
+          {data &&
+            // @ts-ignore
+            data?.stages[0]?.signatures.map((signature) => (
+              <Stack key={Math.random() * 200000} spacing={1}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  // @ts-ignore
+                  src={signature?.image}
+                  alt=""
+                  width={90}
+                  height={70}
+                  style={{ borderRadius: '5px' }}
+                />
+                <p>{signature.name}</p>
+              </Stack>
+            ))}
+        </Stack>
+      </Paper>
+      <Paper sx={{ marginTop: 2, py: 2, px: 5, width: 793 }}>
+        <Stack>
+          {entregaInspecao &&
+            // @ts-ignore
+            entregaInspecao[0]?.values?.labels.map((item, index) => {
+              return (
+                <div key={index + Math.random() * 20000}>
+                  {item?.screenShot && (
+                    <Typography
+                      key={index + Math.random() * 20000}
+                      variant="h6"
+                    >
+                      Entrega - {item.name}
+                    </Typography>
+                  )}
+                  <Stack
+                    direction="row"
+                    key={index + Math.random() * 20000}
+                    spacing={1.1}
+                    justifyContent="flex-start"
+                    alignItems="center"
+                    flexWrap="wrap"
+                  >
+                    {item?.screenShot && (
+                      <Image
+                        src={item?.screenShot ?? ''}
+                        alt=""
+                        key={index + Math.random() * 20000}
+                        width={135}
+                        height={100}
+                      />
+                    )}
+                    {item.images.length > 0 &&
+                      item.images.map((image, index) => {
+                        return (
+                          <Image
+                            src={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${image.url}`}
+                            // src={image.url}
+                            alt=""
+                            key={index + image.url}
+                            width={135}
+                            height={100}
+                            style={{ borderRadius: '5px' }}
+                          />
+                        )
+                      })}
+                  </Stack>
+                </div>
+              )
+            })}
+        </Stack>
+        {data && (
+          <Stack
+            direction="row"
+            marginTop={10}
+            justifyContent="center"
+            alignItems="center"
+            spacing={10}
+          >
+            {data &&
+              // @ts-ignore
+              data?.stages[1]?.signatures.map((signature) => (
+                <Stack key={Math.random() * 200000} spacing={1}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    // @ts-ignore
+                    src={signature?.image}
+                    alt=""
+                    width={90}
+                    height={70}
+                    style={{ borderRadius: '5px' }}
+                  />
+                  <p>{signature.name}</p>
+                </Stack>
+              ))}
+          </Stack>
+        )}
       </Paper>
     </div>
   )
