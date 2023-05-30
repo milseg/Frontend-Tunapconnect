@@ -1054,7 +1054,7 @@ export function PrintInspection({
                   </tr>
                   <tr>
                     <td>
-                      <TripleSquareCheck first={{ checked: true }} />
+                      <TripleSquareCheck first={{ checked: false }} />
                     </td>
                     <td>Pedal de freio</td>
                   </tr>
