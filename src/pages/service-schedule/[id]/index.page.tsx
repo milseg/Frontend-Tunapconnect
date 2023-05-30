@@ -631,20 +631,20 @@ export default function ServiceSchedulesEdit() {
                 Novo
               </ButtonRight>
             </Stack>
-            <Stack
+            {/* <Stack
               spacing={2}
               direction="row"
               display="flex"
               justifyContent="center"
             >
-              <ButtonLeft>Listar Orçamentos</ButtonLeft>
-              <ButtonCenter>
+              <ButtonLeft disabled>Listar Orçamentos</ButtonLeft>
+              <ButtonCenter disabled>
                 <PrintIcon />
               </ButtonCenter>
-              <ButtonRight startIcon={<AddCircleOutlineIcon />}>
+              <ButtonRight disabled startIcon={<AddCircleOutlineIcon />}>
                 Novo
               </ButtonRight>
-            </Stack>
+            </Stack> */}
             {/* Agendamento */}
             <Paper
               sx={{
