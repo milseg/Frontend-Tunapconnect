@@ -33,7 +33,7 @@ export const BoxContainer = styled(Box)(({ theme }) => ({
     border: 'none',
     // backgroundColor: '#1c4961',
     // color: 'white',
-
+    alignItems: 'flex-start',
     '& .MuiDataGrid-cell:focus': {
       outline: 0,
     },

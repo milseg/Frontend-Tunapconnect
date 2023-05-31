@@ -4,7 +4,11 @@ import { useContext, useState, useMemo, useEffect } from 'react'
 
 import Container from '@mui/material/Container'
 
-import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
+import {
+  GridColDef,
+  GridRenderCellParams,
+  GridValueGetterParams,
+} from '@mui/x-data-grid'
 
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
@@ -28,6 +32,7 @@ import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
 
 import { useQuery } from 'react-query'
 import Skeleton from '@mui/material/Skeleton'
+import { formatDateTime } from '@/ultis/formatDate'
 
 type SearchFormProps = {
   search: string
@@ -112,10 +117,21 @@ export default function ServiceSchedulesList() {
         field: 'id',
         headerName: 'Número',
         headerClassName: 'super-app-theme--header',
-        width: 90,
+        width: 80,
         type: 'number',
+        align: 'center',
+        sortable: false,
+      },
+      {
+        field: 'promised_date',
+        headerName: 'Data Prometida',
+        headerClassName: 'super-app-theme--header',
+        width: 150,
+        type: 'text',
         align: 'left',
         sortable: false,
+        valueGetter: (params: GridValueGetterParams) =>
+          `${formatDateTime(params.row.promised_date) || ''}`,
       },
       {
         field: 'client',
@@ -167,8 +183,8 @@ export default function ServiceSchedulesList() {
       //   width: 110,
       //   align: 'center',
       //   sortable: false,
-      //   valueGetter: (params: GridValueGetterParams) =>
-      //     `${formatMoneyPtBR(params.row.totalDiscount) || ''}`,
+      // valueGetter: (params: GridValueGetterParams) =>
+      //   `${formatMoneyPtBR(params.row.totalDiscount) || ''}`,
       // },
       // {
       //   field: 'total',
@@ -225,6 +241,7 @@ export default function ServiceSchedulesList() {
         const resp = response.data.data.map((data: any) => {
           return {
             id: data?.id ?? 'Não informado',
+            promised_date: data?.promised_date ?? 'Não informado',
             client: data?.client?.name ?? 'Não informado',
             plate: data?.client_vehicle?.plate ?? 'Não informado',
             chassis: data?.client_vehicle?.chasis ?? 'Não informado',
