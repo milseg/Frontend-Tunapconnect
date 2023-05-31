@@ -16,7 +16,7 @@ type User = {
 
 type AuthContextType = {
   isAuthenticated: boolean
-  signIn: (data: SignInData) => void
+  signIn: (data: SignInData) => Promise<void> | Promise<string>
   user: User | null
 }
 
@@ -37,7 +37,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       username: data.username,
       password: data.password,
     })
-
+    console.log(resp)
     if (resp?.ok && resp?.status === 200) {
       setUser({
         id: session?.user.id,
@@ -46,6 +46,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       })
       Router.push('/company')
     }
+
+    if (!resp?.ok && resp?.status === 401) {
+      return 'Usuário ou senha incorreto!'
+    }
+    return 'Falha ao realizar o login!'
   }
 
   useEffect(() => {
