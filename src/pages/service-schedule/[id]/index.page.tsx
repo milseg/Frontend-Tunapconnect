@@ -342,6 +342,7 @@ export default function ServiceSchedulesEdit() {
     if (dataServiceScheduleStatus === 'success') {
       const { client, client_vehicle, technical_consultant, promised_date } =
         dataServiceSchedule
+      console.log(client)
       setClient({
         id: client.id,
         name: client.name ?? 'Não informado',
@@ -415,12 +416,12 @@ export default function ServiceSchedulesEdit() {
                 <MoreOptionsButtonSelect
                   handleIsEditSelectedCard={handleIsEditSelectedCard}
                   typeEdit="client"
-                  disabledButton={true}
+                  // disabledButton={true}
                 />
               </Stack>
               <DividerCard />
               <List dense={false}>
-                <ListItemCard>
+                <ListItemCard alignItems="flex-start">
                   <InfoCardName>Nome:</InfoCardName>{' '}
                   {client?.name ? (
                     <InfoCardText>{client?.name}</InfoCardText>
@@ -434,7 +435,7 @@ export default function ServiceSchedulesEdit() {
                     </InfoCardText>
                   )}
                 </ListItemCard>
-                <ListItemCard>
+                <ListItemCard alignItems="flex-start">
                   <InfoCardName>CPF:</InfoCardName>{' '}
                   {client?.cpf ? (
                     <InfoCardText>{formatCPF(client?.cpf)}</InfoCardText>
@@ -448,11 +449,19 @@ export default function ServiceSchedulesEdit() {
                     </InfoCardText>
                   )}
                 </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>Telefone:</InfoCardName>{' '}
-                  {client?.telefone ? (
-                    <InfoCardText>{client?.telefone}</InfoCardText>
-                  ) : (
+                {client?.telefone ? (
+                  client?.telefone.map((phone, index) => (
+                    <ListItemCard
+                      key={index + '-' + phone}
+                      alignItems="flex-start"
+                    >
+                      <InfoCardName>Telefone:</InfoCardName>{' '}
+                      <InfoCardText>{phone}</InfoCardText>
+                    </ListItemCard>
+                  ))
+                ) : (
+                  <ListItemCard>
+                    <InfoCardName>Telefone:</InfoCardName>{' '}
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
@@ -460,13 +469,21 @@ export default function ServiceSchedulesEdit() {
                         width="100%"
                       />
                     </InfoCardText>
-                  )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>E-mail:</InfoCardName>{' '}
-                  {client?.email ? (
-                    <InfoCardText>{client?.email}</InfoCardText>
-                  ) : (
+                  </ListItemCard>
+                )}
+                {client?.email ? (
+                  client?.email.map((email, index) => (
+                    <ListItemCard
+                      key={index + '-' + email}
+                      alignItems="flex-start"
+                    >
+                      <InfoCardName>E-mail:</InfoCardName>{' '}
+                      <InfoCardText>{email}</InfoCardText>
+                    </ListItemCard>
+                  ))
+                ) : (
+                  <ListItemCard alignItems="flex-start">
+                    <InfoCardName>E-mail:</InfoCardName>{' '}
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
@@ -474,13 +491,21 @@ export default function ServiceSchedulesEdit() {
                         width="100%"
                       />
                     </InfoCardText>
-                  )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>Endereço:</InfoCardName>{' '}
-                  {client?.address ? (
-                    <InfoCardText>{client?.address}</InfoCardText>
-                  ) : (
+                  </ListItemCard>
+                )}
+                {client?.address ? (
+                  client?.address.map((address, index) => (
+                    <ListItemCard
+                      key={index + '-' + address}
+                      alignItems="flex-start"
+                    >
+                      <InfoCardName>Endereço:</InfoCardName>{' '}
+                      <InfoCardText>{address}</InfoCardText>
+                    </ListItemCard>
+                  ))
+                ) : (
+                  <ListItemCard alignItems="flex-start">
+                    <InfoCardName>Endereço:</InfoCardName>{' '}
                     <InfoCardText width="100%">
                       <Skeleton
                         variant="text"
@@ -488,8 +513,8 @@ export default function ServiceSchedulesEdit() {
                         width="100%"
                       />
                     </InfoCardText>
-                  )}
-                </ListItemCard>
+                  </ListItemCard>
+                )}
               </List>
             </Paper>
             {/* Veículo */}

@@ -49,7 +49,6 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
   const router = useRouter()
   const { companySelected } = useContext(CompanyContext)
   // console.log('aberto',opended)
-
   const memuList: memuListProps = useMemo(
     () => [
       {
@@ -71,7 +70,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
       //   title: 'Checklist',
       // },
     ],
-    [],
+    [companySelected],
   )
 
   const menuListCompanyId = useMemo(

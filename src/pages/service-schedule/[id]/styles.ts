@@ -50,6 +50,9 @@ export const ButtonCenter = styled(IconButton)(({ theme }) => ({
   '&:hover': {
     background: '#1ACABA',
   },
+  '&:disabled': {
+    background: 'rgba(0, 0, 0, 0.12)',
+  },
 }))
 export const ButtonRight = styled(Button)(({ theme }) => ({
   color: 'white',
