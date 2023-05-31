@@ -143,8 +143,7 @@ export function PrintInspection({
             </div>
             <div>
               <h3>
-                FOLHA DE INSPEÇÃO - CONDIÇÕES DE ENTRADA E SAÍDA DO VEÍCULO -
-                SEDAN
+                FOLHA DE INSPEÇÃO - CONDIÇÕES DE ENTRADA E SAÍDA DO VEÍCULO
               </h3>
             </div>
           </div>
