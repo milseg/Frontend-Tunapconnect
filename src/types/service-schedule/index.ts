@@ -13,9 +13,9 @@ export interface ClientInfor {
   id: number
   name: string
   cpf: string
-  telefone: string
-  email: string
-  address: string
+  telefone: string[]
+  email: string[]
+  address: string[]
 }
 
 export interface ClientVehicle {

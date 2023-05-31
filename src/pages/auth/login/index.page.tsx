@@ -12,7 +12,7 @@ import { useContext } from 'react'
 import { AuthContext } from '@/contexts/AuthContext'
 
 import tunapLogoImg from '@/assets/images/tunap-login.svg'
-import { alpha, Link, Paper, Stack } from '@mui/material'
+import { alpha, Paper, Stack } from '@mui/material'
 import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
 import { parseCookies } from 'nookies'
@@ -26,7 +26,8 @@ export default function SignIn() {
   const {
     register,
     handleSubmit,
-    // formState: { errors },
+    setError,
+    formState: { errors },
   } = useForm({
     defaultValues: {
       username: '',
@@ -36,7 +37,18 @@ export default function SignIn() {
   const { signIn } = useContext(AuthContext)
 
   async function handleSignIn(data: SignInDataProps) {
-    await signIn(data)
+    const errorMsg = await signIn(data)
+    if (errorMsg) {
+      setError('username', {
+        type: 'manual',
+        message: errorMsg,
+      })
+      setError('password', {
+        type: 'manual',
+        message: errorMsg,
+      })
+    }
+    console.log(errorMsg)
   }
   const ButtonAdd = styled(Button)(({ theme }) => ({
     color: 'white',
@@ -110,6 +122,8 @@ export default function SignIn() {
             size="small"
             {...register('username')}
           />
+
+          {/* <Typography component="h1" variant="h6"></Typography> */}
           <TextField
             margin="normal"
             required
@@ -122,6 +136,16 @@ export default function SignIn() {
             autoComplete="current-password"
             {...register('password')}
           />
+          {errors.username && (
+            <Typography
+              sx={{
+                color: 'red',
+                fontSize: 12,
+              }}
+            >
+              {errors.username.message}
+            </Typography>
+          )}
           <ButtonAdd
             type="submit"
             fullWidth
@@ -130,12 +154,12 @@ export default function SignIn() {
           >
             entrar
           </ButtonAdd>
-          <Link href="#" variant="body2">
+          {/* <Link href="#" variant="body2">
             {'Perdeu sua senha? Recupere sua senha'}
           </Link>
           <Link href="#" variant="body2">
             {'Termos de uso e a Política de privacidade'}
-          </Link>
+          </Link> */}
         </Stack>
       </Box>
     </Container>

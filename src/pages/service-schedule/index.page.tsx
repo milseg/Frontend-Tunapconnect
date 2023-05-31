@@ -12,13 +12,13 @@ import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import SearchIcon from '@mui/icons-material/Search'
 
-import { ButtonIcon } from './style'
+import { ButtonAdd, ButtonIcon } from './style'
 import { ServiceSchedulesListProps } from '@/types/service-schedule'
 import { ApiCore } from '@/lib/api'
 import IconButton from '@mui/material/IconButton'
 import { Delete } from '@mui/icons-material'
 
-// import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { ActionDeleteConfirmations } from '@/helpers/ActionConfirmations'
 import { useRouter } from 'next/router'
 import { TableApp } from '@/components/TableApp'
@@ -223,7 +223,6 @@ export default function ServiceSchedulesList() {
     () =>
       api.get(url).then((response) => {
         const resp = response.data.data.map((data: any) => {
-          console.log(data.client_vehicle.vehicle.name)
           return {
             id: data?.id ?? 'Não informado',
             client: data?.client?.name ?? 'Não informado',
@@ -378,7 +377,7 @@ export default function ServiceSchedulesList() {
                   justifyContent: 'center',
                 }}
               >
-                {/* <ButtonAdd
+                <ButtonAdd
                   size="large"
                   variant="contained"
                   sx={{ alignSelf: 'flex-end' }}
@@ -386,9 +385,10 @@ export default function ServiceSchedulesList() {
                   onClick={async () => {
                     await router.push(`/service-schedules/create`)
                   }}
+                  disabled
                 >
                   Adicionar novo
-                </ButtonAdd> */}
+                </ButtonAdd>
               </Grid>
             </Grid>
           </Paper>
