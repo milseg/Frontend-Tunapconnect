@@ -213,7 +213,7 @@ export default function ChecklistCreateById() {
   function handleChangeTabContent(newValue: number) {
     setPainelValue(newValue)
   }
-
+  console.log(data?.stages[1])
   if (isLoading) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>

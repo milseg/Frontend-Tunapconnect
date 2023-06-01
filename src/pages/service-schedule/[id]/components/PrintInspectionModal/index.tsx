@@ -14,11 +14,13 @@ import PrintIcon from '@mui/icons-material/Print'
 import { Button } from '@mui/material'
 
 import { CompanyContext } from '@/contexts/CompanyContext'
+import { ChecklistProps } from '@/pages/checklist/types'
 
 interface PrintInspectionModalProps {
   isOpen: boolean
   closeModal: () => void
   checkListIdForModal: number
+  checkListData?: ChecklistProps
 }
 
 export function PrintInspectionModal({

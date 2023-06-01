@@ -59,6 +59,7 @@ import { formatCPF } from '@/ultis/formatCPF'
 import { formatPlate } from '@/ultis/formatPlate'
 
 import { CompanyContext } from '@/contexts/CompanyContext'
+import { ChecklistProps } from '@/pages/checklist/types'
 
 const api = new ApiCore()
 
@@ -342,7 +343,6 @@ export default function ServiceSchedulesEdit() {
     if (dataServiceScheduleStatus === 'success') {
       const { client, client_vehicle, technical_consultant, promised_date } =
         dataServiceSchedule
-      console.log(client)
       setClient({
         id: client.id,
         name: client.name ?? 'Não informado',
@@ -373,20 +373,49 @@ export default function ServiceSchedulesEdit() {
     }
   }, [dataServiceScheduleStatus, dataServiceSchedule])
 
-  useEffect(() => {
-    api
-      .get(
-        `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}`,
-      )
-      .then((response) => {
-        const result = response.data.data
-        if (result.length > 0) {
-          setDefaultCheckListPrint(result[0].id)
+  const { data: serviceScheduleDefault, status: serviceScheduleDefaultStatus } =
+    useQuery<ChecklistProps>(
+      [
+        'service_schedule',
+        'by_id',
+        'edit',
+        'openModal',
+        'default',
+        companySelected,
+        router.query.id,
+      ],
+      async () => {
+        const resp = await api.get(
+          `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc&limit=1`,
+        )
+        if (resp.data.data.length > 0) {
+          setDefaultCheckListPrint(resp.data.data[0].id)
         } else {
           setDefaultCheckListPrint(null)
         }
-      })
-  }, [])
+        return resp.data.data
+      },
+      {
+        enabled: openPrintInspectionModal,
+      },
+    )
+
+  console.log(serviceScheduleDefaultStatus)
+
+  // useEffect(() => {
+  //   api
+  //     .get(
+  //       `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}`,
+  //     )
+  //     .then((response) => {
+  //       const result = response.data.data
+  //       if (result.length > 0) {
+  //         setDefaultCheckListPrint(result[0].id)
+  //       } else {
+  //         setDefaultCheckListPrint(null)
+  //       }
+  //     })
+  // }, [])
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -642,7 +671,7 @@ export default function ServiceSchedulesEdit() {
                 Listar Checklists
               </ButtonLeft>
               <ButtonCenter
-                disabled={defaultCheckListPrint === null}
+                // disabled={defaultCheckListPrint === null}
                 onClick={() => {
                   setOpenPrintInspectionModal(true)
                 }}
@@ -886,13 +915,15 @@ export default function ServiceSchedulesEdit() {
         serviceScheduleId={router?.query?.id as string}
         closeChecklistModal={closeChecklistModal}
       />
-      {defaultCheckListPrint !== null && (
-        <PrintInspectionModal
-          isOpen={openPrintInspectionModal}
-          closeModal={closePrintInspectionModalModal}
-          checkListIdForModal={defaultCheckListPrint}
-        />
-      )}
+      {serviceScheduleDefaultStatus === 'success' &&
+        defaultCheckListPrint !== null && (
+          <PrintInspectionModal
+            isOpen={openPrintInspectionModal}
+            closeModal={closePrintInspectionModalModal}
+            checkListIdForModal={defaultCheckListPrint}
+            checkListData={serviceScheduleDefault as ChecklistProps}
+          />
+        )}
     </Container>
   )
 }
