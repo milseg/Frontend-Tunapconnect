@@ -201,10 +201,11 @@ export function TableModal({
     () => {
       return api
         .get(
-          `/checklist/list?company_id=${companySelected}&service_schedule_id=${serviceScheduleId}`,
+          `/checklist/list?company_id=${companySelected}&service_schedule_id=${serviceScheduleId}&orderby=updated_at desc`,
         )
         .then((response) => {
           const { data } = response.data
+          localStorage.setItem('checklist-list', JSON.stringify(data))
           return data.map((item: any) => {
             return {
               id: item?.id,

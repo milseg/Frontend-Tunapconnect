@@ -48,7 +48,7 @@ export function PrintInspection({
 }: PrintInspectionProps) {
   const api = new ApiCore()
   const router = useRouter()
-
+  console.log(checklistId)
   const [receptionStage, setReceptionStage] = useState<StagesDataProps>()
   const [deliveryStage, setDeliveryStage] = useState<StagesDataProps>()
 
@@ -71,11 +71,10 @@ export function PrintInspection({
         }),
     {
       refetchOnWindowFocus: false,
-      enabled: !!checklistId && !!router?.query?.id,
+      // enabled: !!checklistId && !!router?.query?.id,
     },
   )
 
-  // console.log(receptionStage)
   // console.log(data)
   const recepcaoInspecao = data?.stages[0].itens.filter(
     (item) => item.rules.type === 'visual_inspect',
@@ -143,8 +142,7 @@ export function PrintInspection({
             </div>
             <div>
               <h3>
-                FOLHA DE INSPEÇÃO - CONDIÇÕES DE ENTRADA E SAÍDA DO VEÍCULO -
-                SEDAN
+                FOLHA DE INSPEÇÃO - CONDIÇÕES DE ENTRADA E SAÍDA DO VEÍCULO
               </h3>
             </div>
           </div>
@@ -432,18 +430,52 @@ export function PrintInspection({
                     ></div>
                   </div>
                   <div className={style['blue-slots']}>
-                    <div></div>
                     <div>
-                      <div className={style['form-slot']}></div>
+                      <div
+                        className={style['form-slot']}
+                        style={{ color: 'black' }}
+                      >
+                        {getCodeReceptionStage('RE-COMB').values.value}
+                      </div>
+                    </div>
+                    <div>
+                      <div
+                        className={style['form-slot']}
+                        style={{ color: 'black' }}
+                      >
+                        {data?.km}
+                      </div>
                     </div>
                   </div>
 
                   <div
                     className={classNames(style.row, style['three-checkboxes'])}
                   >
-                    <div></div> Boa
-                    <div></div> Regular
-                    <div></div> Ruim
+                    <div
+                      className={
+                        getCodeReceptionStage('RE-CL').values.value === 'Boa'
+                          ? style.checked
+                          : ''
+                      }
+                    ></div>{' '}
+                    Boa
+                    <div
+                      className={
+                        getCodeReceptionStage('RE-CL').values.value ===
+                        'Regular'
+                          ? style.checked
+                          : ''
+                      }
+                    ></div>{' '}
+                    Regular
+                    <div
+                      className={
+                        getCodeReceptionStage('RE-CL').values.value === 'Ruim'
+                          ? style.checked
+                          : ''
+                      }
+                    ></div>{' '}
+                    Ruim
                   </div>
                   <div className={style['form-slot']}></div>
                 </div>
@@ -613,18 +645,52 @@ export function PrintInspection({
                     ></div>
                   </div>
                   <div className={style['blue-slots']}>
-                    <div></div>
                     <div>
-                      <div className={style['form-slot']}></div>
+                      <div
+                        className={style['form-slot']}
+                        style={{ color: 'black' }}
+                      >
+                        {getCodeReceptionStage('RE-COMB').values.value}
+                      </div>
+                    </div>
+                    <div>
+                      <div
+                        className={style['form-slot']}
+                        style={{ color: 'black' }}
+                      >
+                        {data?.km}
+                      </div>
                     </div>
                   </div>
 
                   <div
                     className={classNames(style.row, style['three-checkboxes'])}
                   >
-                    <div></div> Boa
-                    <div></div> Regular
-                    <div></div> Ruim
+                    <div
+                      className={
+                        getCodeDeliveryStage('ENT-CL').values.value === 'Boa'
+                          ? style.checked
+                          : ''
+                      }
+                    ></div>{' '}
+                    Boa
+                    <div
+                      className={
+                        getCodeDeliveryStage('ENT-CL').values.value ===
+                        'Regular'
+                          ? style.checked
+                          : ''
+                      }
+                    ></div>{' '}
+                    Regular
+                    <div
+                      className={
+                        getCodeDeliveryStage('ENT-CL').values.value === 'Ruim'
+                          ? style.checked
+                          : ''
+                      }
+                    ></div>{' '}
+                    Ruim
                   </div>
                   <div className={style['form-slot']}></div>
                 </div>
@@ -678,30 +744,107 @@ export function PrintInspection({
                       <tbody>
                         <tr>
                           <td>Dianteiro Esquerdo</td>
-                          <td></td>
+                          <td>
+                            {getCodeReceptionStage('RE-PDE').values.value}
+                          </td>
                           <td className={style['text-end']}>
-                            ______(mm) <TripleSquareCheck />
+                            {/* getCodeReceptionStage('RE-SDE') */}
+                            ______(mm){' '}
+                            <TripleSquareCheck
+                              first={{
+                                checked:
+                                  getCodeReceptionStage('RE-SDE').values
+                                    .value === 'Bom',
+                              }}
+                              second={{
+                                checked:
+                                  getCodeReceptionStage('RE-SDE').values
+                                    .value === 'Médio',
+                              }}
+                              third={{
+                                checked:
+                                  getCodeReceptionStage('RE-SDE').values
+                                    .value === 'Ruim',
+                              }}
+                            />
                           </td>
                         </tr>
                         <tr>
                           <td>Traseiro Esquerdo</td>
-                          <td></td>
+                          <td>
+                            {getCodeReceptionStage('RE-PTE').values.value}
+                          </td>
                           <td className={style['text-end']}>
-                            ______(mm) <TripleSquareCheck />
+                            ______(mm){' '}
+                            <TripleSquareCheck
+                              first={{
+                                checked:
+                                  getCodeReceptionStage('RE-STE').values
+                                    .value === 'Bom',
+                              }}
+                              second={{
+                                checked:
+                                  getCodeReceptionStage('RE-STE').values
+                                    .value === 'Médio',
+                              }}
+                              third={{
+                                checked:
+                                  getCodeReceptionStage('RE-STE').values
+                                    .value === 'Ruim',
+                              }}
+                            />
                           </td>
                         </tr>
                         <tr>
                           <td>Dianteiro Direito</td>
-                          <td></td>
+                          <td>
+                            {getCodeReceptionStage('RE-PDD').values.value}
+                          </td>
                           <td className={style['text-end']}>
-                            ______(mm) <TripleSquareCheck />
+                            ______(mm){' '}
+                            <TripleSquareCheck
+                              first={{
+                                checked:
+                                  getCodeReceptionStage('RE-SDD').values
+                                    .value === 'Bom',
+                              }}
+                              second={{
+                                checked:
+                                  getCodeReceptionStage('RE-SDD').values
+                                    .value === 'Médio',
+                              }}
+                              third={{
+                                checked:
+                                  getCodeReceptionStage('RE-SDD').values
+                                    .value === 'Ruim',
+                              }}
+                            />
                           </td>
                         </tr>
                         <tr>
-                          <td>Dianteiro Direito</td>
-                          <td></td>
+                          <td>Traseiro Direito</td>
+                          <td>
+                            {getCodeReceptionStage('RE-PTD').values.value}
+                          </td>
                           <td className={style['text-end']}>
-                            ______(mm) <TripleSquareCheck />
+                            ______(mm){' '}
+                            <TripleSquareCheck
+                              first={{
+                                checked:
+                                  getCodeReceptionStage('RE-STD').values
+                                    .value === 'Bom',
+                              }}
+                              second={{
+                                checked:
+                                  getCodeReceptionStage('RE-STD').values
+                                    .value === 'Médio',
+                              }}
+                              third={{
+                                checked:
+                                  getCodeReceptionStage('RE-STD').values
+                                    .value === 'Ruim',
+                              }}
+                            />
                           </td>
                         </tr>
                       </tbody>
@@ -1613,24 +1756,29 @@ export function PrintInspection({
             spacing={10}
           >
             {/* @ts-ignore */}
-            {data?.stages[0]?.signatures[0].image.length > 0 &&
+            {data?.stages[0]?.signatures[0].image.length > 0 ||
             // @ts-ignore
             data?.stages[0]?.signatures[1].image.length > 0
               ? // @ts-ignore
-                data?.stages[0]?.signatures.map((signature) => (
-                  <Stack key={Math.random() * 200000} spacing={1}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      // @ts-ignore
-                      src={signature?.image}
-                      alt=""
-                      width={90}
-                      height={70}
-                      style={{ borderRadius: '5px' }}
-                    />
-                    <p>{signature.name}</p>
-                  </Stack>
-                ))
+                data?.stages[0]?.signatures.map((signature) => {
+                  if (signature.image.length === 0) {
+                    return null
+                  }
+                  return (
+                    <Stack key={Math.random() * 200000} spacing={1}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        // @ts-ignore
+                        src={signature?.image}
+                        alt=""
+                        width={90}
+                        height={70}
+                        style={{ borderRadius: '5px' }}
+                      />
+                      <p>{signature.name}</p>
+                    </Stack>
+                  )
+                })
               : null}
           </Stack>
         </Paper>
@@ -1688,7 +1836,7 @@ export function PrintInspection({
               })}
           </Stack>
           {/* @ts-ignore */}
-          {data?.stages[1]?.signatures[0].image.length > 0 &&
+          {data?.stages[1]?.signatures[0].image.length > 0 ||
           // @ts-ignore
           data?.stages[1]?.signatures[1].image.length > 0 ? (
             <Stack
@@ -1700,20 +1848,25 @@ export function PrintInspection({
             >
               {data &&
                 // @ts-ignore
-                data?.stages[1]?.signatures.map((signature) => (
-                  <Stack key={Math.random() * 200000} spacing={1}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      // @ts-ignore
-                      src={signature?.image}
-                      alt=""
-                      width={90}
-                      height={70}
-                      style={{ borderRadius: '5px' }}
-                    />
-                    <p>{signature.name}</p>
-                  </Stack>
-                ))}
+                data?.stages[1]?.signatures.map((signature) => {
+                  if (signature.image.length === 0) {
+                    return null
+                  }
+                  return (
+                    <Stack key={Math.random() * 200000} spacing={1}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        // @ts-ignore
+                        src={signature?.image}
+                        alt=""
+                        width={90}
+                        height={70}
+                        style={{ borderRadius: '5px' }}
+                      />
+                      <p>{signature.name}</p>
+                    </Stack>
+                  )
+                })}
             </Stack>
           ) : null}
         </Paper>

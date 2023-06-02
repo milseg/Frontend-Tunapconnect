@@ -38,6 +38,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       password: data.password,
     })
     console.log(resp)
+    localStorage.setItem(
+      process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME as string,
+      JSON.stringify('resp'),
+    )
+
+    console.log(resp)
     if (resp?.ok && resp?.status === 200) {
       setUser({
         id: session?.user.id,

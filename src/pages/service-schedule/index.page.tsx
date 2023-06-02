@@ -33,6 +33,7 @@ import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
 import { useQuery } from 'react-query'
 import Skeleton from '@mui/material/Skeleton'
 import { formatDateTime } from '@/ultis/formatDate'
+import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 
 type SearchFormProps = {
   search: string
@@ -67,6 +68,7 @@ export default function ServiceSchedulesList() {
   }>({ next: true, previous: true })
 
   const { companySelected } = useContext(CompanyContext)
+  const { setListServiceSchedule } = useContext(ServiceScheduleContext)
 
   const router = useRouter()
 
@@ -238,6 +240,11 @@ export default function ServiceSchedulesList() {
     ['service-scheduler-list', companySelected],
     () =>
       api.get(url).then((response) => {
+        setListServiceSchedule(response.data.data)
+        localStorage.setItem(
+          'service-schedule-list',
+          JSON.stringify(response.data.data),
+        )
         const resp = response.data.data.map((data: any) => {
           return {
             id: data?.id ?? 'Não informado',
@@ -261,6 +268,7 @@ export default function ServiceSchedulesList() {
             setPages((prevState) => ({ ...prevState, previous: false }))
           }
         }
+
         return {
           paginate: {
             current_page: response.data.current_page,

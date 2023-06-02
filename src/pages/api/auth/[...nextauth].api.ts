@@ -37,7 +37,6 @@ export const authOptions: NextAuthOptions = {
         } catch (error) {
           console.log('erro', error)
         }
-
         const user = await res?.json()
         if (res?.ok && user) {
           return user
