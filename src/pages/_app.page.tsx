@@ -17,6 +17,7 @@ import { globals } from '@/styles/globals'
 import { ReactQueryDevtools } from 'react-query/devtools'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { CompanyProvider } from '@/contexts/CompanyContext'
+import { ServiceScheduleProvider } from '@/contexts/ServiceScheduleContext'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -49,19 +50,21 @@ const MyApp = (props: CustomAppProps) => {
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
               <CompanyProvider>
-                {Component.auth ? (
-                  // @ts-ignore
-                  <Auth>
-                    <Layout>
-                      <Component {...props.pageProps} />
-                    </Layout>
-                  </Auth>
-                ) : (
-                  <Component {...pageProps} />
-                )}
+                <ServiceScheduleProvider>
+                  {Component.auth ? (
+                    // @ts-ignore
+                    <Auth>
+                      <Layout>
+                        <Component {...props.pageProps} />
+                      </Layout>
+                    </Auth>
+                  ) : (
+                    <Component {...pageProps} />
+                  )}
 
-                {/* <Component {...pageProps} /> */}
-                <ReactQueryDevtools initialIsOpen={false} />
+                  {/* <Component {...pageProps} /> */}
+                  <ReactQueryDevtools initialIsOpen={false} />
+                </ServiceScheduleProvider>
               </CompanyProvider>
             </AuthProvider>
           </QueryClientProvider>

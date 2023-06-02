@@ -35,11 +35,30 @@ export function MoreOptionsButtonSelect({
     setAnchorEl(null)
   }
   const handleClickEdit = () => {
-    router.push(`/checklist/create/${checklistId}`)
+    try {
+      const checklistListLocalStorage = localStorage.getItem('checklist-list')
+      if (checklistListLocalStorage) {
+        const checklistListLocalStorageParse = JSON.parse(
+          checklistListLocalStorage,
+        )
+        const checklistFindOne = checklistListLocalStorageParse.filter(
+          (c: any) => c.id === Number(checklistId),
+        )
+        localStorage.setItem(
+          'checklist-edit-byId',
+          JSON.stringify(checklistFindOne),
+        )
+        router.push(`/checklist/create/${checklistId}`)
+      }
+    } catch (e) {
+      console.log(e)
+    }
+    // router.push(`/checklist/create/${checklistId}`)
   }
   const handleClickDelete = async () => {
     try {
       await handleDeleteChecklist(Number(checklistId))
+
       alert(`Checklist${checklistId} excluído com sucesso`)
     } catch (e) {
       alert(`Erro ao excluir Checklist - ${checklistId}`)

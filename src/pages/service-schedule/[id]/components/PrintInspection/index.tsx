@@ -48,7 +48,7 @@ export function PrintInspection({
 }: PrintInspectionProps) {
   const api = new ApiCore()
   const router = useRouter()
-
+  console.log(checklistId)
   const [receptionStage, setReceptionStage] = useState<StagesDataProps>()
   const [deliveryStage, setDeliveryStage] = useState<StagesDataProps>()
 
@@ -75,7 +75,6 @@ export function PrintInspection({
     },
   )
 
-  console.log(receptionStage)
   // console.log(data)
   const recepcaoInspecao = data?.stages[0].itens.filter(
     (item) => item.rules.type === 'visual_inspect',
@@ -1757,24 +1756,29 @@ export function PrintInspection({
             spacing={10}
           >
             {/* @ts-ignore */}
-            {data?.stages[0]?.signatures[0].image.length > 0 &&
+            {data?.stages[0]?.signatures[0].image.length > 0 ||
             // @ts-ignore
             data?.stages[0]?.signatures[1].image.length > 0
               ? // @ts-ignore
-                data?.stages[0]?.signatures.map((signature) => (
-                  <Stack key={Math.random() * 200000} spacing={1}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      // @ts-ignore
-                      src={signature?.image}
-                      alt=""
-                      width={90}
-                      height={70}
-                      style={{ borderRadius: '5px' }}
-                    />
-                    <p>{signature.name}</p>
-                  </Stack>
-                ))
+                data?.stages[0]?.signatures.map((signature) => {
+                  if (signature.image.length === 0) {
+                    return null
+                  }
+                  return (
+                    <Stack key={Math.random() * 200000} spacing={1}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        // @ts-ignore
+                        src={signature?.image}
+                        alt=""
+                        width={90}
+                        height={70}
+                        style={{ borderRadius: '5px' }}
+                      />
+                      <p>{signature.name}</p>
+                    </Stack>
+                  )
+                })
               : null}
           </Stack>
         </Paper>
@@ -1832,7 +1836,7 @@ export function PrintInspection({
               })}
           </Stack>
           {/* @ts-ignore */}
-          {data?.stages[1]?.signatures[0].image.length > 0 &&
+          {data?.stages[1]?.signatures[0].image.length > 0 ||
           // @ts-ignore
           data?.stages[1]?.signatures[1].image.length > 0 ? (
             <Stack
@@ -1844,20 +1848,25 @@ export function PrintInspection({
             >
               {data &&
                 // @ts-ignore
-                data?.stages[1]?.signatures.map((signature) => (
-                  <Stack key={Math.random() * 200000} spacing={1}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      // @ts-ignore
-                      src={signature?.image}
-                      alt=""
-                      width={90}
-                      height={70}
-                      style={{ borderRadius: '5px' }}
-                    />
-                    <p>{signature.name}</p>
-                  </Stack>
-                ))}
+                data?.stages[1]?.signatures.map((signature) => {
+                  if (signature.image.length === 0) {
+                    return null
+                  }
+                  return (
+                    <Stack key={Math.random() * 200000} spacing={1}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        // @ts-ignore
+                        src={signature?.image}
+                        alt=""
+                        width={90}
+                        height={70}
+                        style={{ borderRadius: '5px' }}
+                      />
+                      <p>{signature.name}</p>
+                    </Stack>
+                  )
+                })}
             </Stack>
           ) : null}
         </Paper>

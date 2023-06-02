@@ -205,6 +205,7 @@ export function TableModal({
         )
         .then((response) => {
           const { data } = response.data
+          localStorage.setItem('checklist-list', JSON.stringify(data))
           return data.map((item: any) => {
             return {
               id: item?.id,

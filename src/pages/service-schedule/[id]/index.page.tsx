@@ -323,6 +323,7 @@ export default function ServiceSchedulesEdit() {
       queryFn: async () => {
         const { id } = router.query
         const resp = await api.get(`/service-schedule/${id}`)
+
         return resp.data.data
       },
       enabled: !!router?.query?.id && !!companySelected && !wasEdited,
@@ -402,20 +403,9 @@ export default function ServiceSchedulesEdit() {
 
   console.log(serviceScheduleDefaultStatus)
 
-  // useEffect(() => {
-  //   api
-  //     .get(
-  //       `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}`,
-  //     )
-  //     .then((response) => {
-  //       const result = response.data.data
-  //       if (result.length > 0) {
-  //         setDefaultCheckListPrint(result[0].id)
-  //       } else {
-  //         setDefaultCheckListPrint(null)
-  //       }
-  //     })
-  // }, [])
+  useEffect(() => {
+    localStorage.removeItem('service-schedule-list')
+  }, [])
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
