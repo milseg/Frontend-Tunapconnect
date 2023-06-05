@@ -11,6 +11,17 @@ export interface Image {
   size: string
 }
 
+type ImageList = {
+  [key: string]: {
+    id: number
+    images: {
+      id: number
+      name: string
+      url: string
+      size: string
+    }[]
+  }[]
+}
 export interface Values {
   apointments: Apointment[]
   images: Image[]
@@ -45,7 +56,7 @@ type InpectionData = {
 
 export interface Value {
   value: boolean | string
-  images?: Image[] | undefined | []
+  images?: ImageList[] | undefined | []
   labels?: InpectionData
   values?: Values | undefined
   options?: string[] | undefined

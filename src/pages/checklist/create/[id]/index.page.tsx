@@ -5,7 +5,7 @@ import Paper from '@mui/material/Paper'
 import Box from '@mui/material/Box'
 
 import { LinkNext, TabItem, TabsContainer, Title } from './styles'
-import TabContent from './TabContent'
+import TabContent, { handleGetValuesFormReturnType } from './TabContent'
 import { ApiCore } from '@/lib/api'
 import { Backdrop, CircularProgress, Skeleton } from '@mui/material'
 import {
@@ -62,6 +62,7 @@ interface TabPanelProps {
 
 interface RefTabContentRefType {
   handleOpenAlertDialog: (value: number) => void
+  handleGetValuesForm: () => Promise<handleGetValuesFormReturnType>
 }
 
 function a11yProps(index: number) {
@@ -208,12 +209,16 @@ export default function ChecklistCreateById() {
     if (tabContentRef.current && tabContentRef.current.handleOpenAlertDialog) {
       tabContentRef.current.handleOpenAlertDialog(newValue)
     }
+    if (tabContentRef.current && tabContentRef.current.handleGetValuesForm) {
+      const result = await tabContentRef.current.handleGetValuesForm()
+      console.log(result)
+    }
   }
 
   function handleChangeTabContent(newValue: number) {
     setPainelValue(newValue)
   }
-  console.log(data?.stages[1])
+
   if (isLoading) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -228,7 +233,7 @@ export default function ChecklistCreateById() {
   }
 
   if (isSuccess) {
-    console.log(data)
+    // console.log(data)
     return (
       <>
         <Box sx={{ mt: 2, ml: 2 }}>

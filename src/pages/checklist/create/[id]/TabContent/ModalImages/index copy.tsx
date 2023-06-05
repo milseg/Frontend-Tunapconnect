@@ -18,7 +18,7 @@ import { MyDropzone } from './DropZone'
 import Image from 'next/image'
 import { MyButton } from './styles'
 
-type ListImages = {
+type ListImages = Array<{
   [key: string]: {
     id: number
     images: {
@@ -28,7 +28,7 @@ type ListImages = {
       size: string
     }[]
   }[]
-}
+}>
 
 interface IModalImageProps {
   isOpen: { id: number | null; open: boolean }
@@ -45,7 +45,6 @@ interface IModalImageProps {
   handleRemoveImageInListImage: (index: number, idImage: number) => void
   listImage: ListImages
   stageName: string
-  idModal: number | null
 }
 
 export default function ModalImages({
@@ -55,7 +54,6 @@ export default function ModalImages({
   listImage,
   handleRemoveImageInListImage,
   stageName,
-  idModal,
 }: IModalImageProps) {
   async function handleAddImageUrlList(imageData: {
     id: number
@@ -68,16 +66,17 @@ export default function ModalImages({
     }
   }
 
-  const indexImageFind = listImage[stageName]?.findIndex((item) => {
-    return item.id === idModal
+  console.log(listImage)
+  const indexStageNameInListImage = listImage.findIndex((item) => {
+    return Object.hasOwn(item, stageName)
   })
 
-  console.log(indexImageFind)
-
   let imagesActual
-  if (indexImageFind >= 0) {
-    imagesActual = listImage[stageName][indexImageFind]
-    console.log(imagesActual)
+
+  if (indexStageNameInListImage > -1) {
+    imagesActual = listImage[indexStageNameInListImage][stageName].filter(
+      (image) => image.id === isOpen.id,
+    )[0]
   }
 
   const handleClose = () => {

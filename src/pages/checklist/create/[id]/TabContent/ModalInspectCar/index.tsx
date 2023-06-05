@@ -325,7 +325,7 @@ export default function ModalInspectCar({
   )
 
   const handleChange = async (event: SyntheticEvent, newValue: number) => {
-    const result = await screenShotToPng(tabsValue)
+    // const result = await screenShotToPng(tabsValue)
     // console.log(result)
     // const img = new Image()
     // img.src = result
@@ -334,15 +334,15 @@ export default function ModalInspectCar({
     // link.download = 'my-image-name.png'
     // link.href = result
     // link.click()
-    if (result) {
-      setScreenShots((prevState) => ({
-        frente: tabsValue === 0 ? result : prevState.frente,
-        lateralEsquerdo: tabsValue === 1 ? result : prevState.lateralEsquerdo,
-        lateralDireito: tabsValue === 2 ? result : prevState.lateralDireito,
-        traseira: tabsValue === 3 ? result : prevState.traseira,
-        teto: tabsValue === 4 ? result : prevState.teto,
-      }))
-    }
+    // if (result) {
+    //   setScreenShots((prevState) => ({
+    //     frente: tabsValue === 0 ? result : prevState.frente,
+    //     lateralEsquerdo: tabsValue === 1 ? result : prevState.lateralEsquerdo,
+    //     lateralDireito: tabsValue === 2 ? result : prevState.lateralDireito,
+    //     traseira: tabsValue === 3 ? result : prevState.traseira,
+    //     teto: tabsValue === 4 ? result : prevState.teto,
+    //   }))
+    // }
 
     setTabsValue(newValue)
   }
@@ -411,6 +411,16 @@ export default function ModalInspectCar({
         ],
       }
     })
+    const result = await screenShotToPng(tabsValue)
+    if (result) {
+      setScreenShots((prevState) => ({
+        frente: tabsValue === 0 ? result : prevState.frente,
+        lateralEsquerdo: tabsValue === 1 ? result : prevState.lateralEsquerdo,
+        lateralDireito: tabsValue === 2 ? result : prevState.lateralDireito,
+        traseira: tabsValue === 3 ? result : prevState.traseira,
+        teto: tabsValue === 4 ? result : prevState.teto,
+      }))
+    }
   }
 
   const handleChangeMarkupValue = (value: markupTypesEnum) => {
@@ -484,7 +494,6 @@ export default function ModalInspectCar({
 
   async function handleSave() {
     // await uploadScreenshots()
-    console.log(screenShots)
     const newScreenShot = await screenShotToPng(tabsValue)
     const newScreenShots = {
       frente: tabsValue === 0 ? newScreenShot : screenShots.frente,
@@ -496,7 +505,6 @@ export default function ModalInspectCar({
       teto: tabsValue === 4 ? newScreenShot : screenShots.teto,
     }
 
-    console.log(newScreenShots)
     const formattedData = [
       {
         name: 'Frente',

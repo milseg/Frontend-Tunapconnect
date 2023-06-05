@@ -105,11 +105,9 @@ export function CompanyProvider({ children }: GeralProviderProps) {
       }
     }
   }
-  console.log('doideira  do pablo')
 
   useEffect(() => {
     getSession().then((session) => {
-      console.log(session)
       localStorage.setItem('user', JSON.stringify(session?.user))
     })
 
