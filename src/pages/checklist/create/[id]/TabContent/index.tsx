@@ -9,7 +9,13 @@ import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
 import { useRouter } from 'next/router'
 
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react'
 
 import { useFieldArray, useForm } from 'react-hook-form'
 import { Itens, StagesDataProps } from '../../../types'
@@ -22,7 +28,9 @@ import {
 } from '../styles'
 import { genereteInput } from './GenereteInputs'
 import ModalImages from './ModalImages'
-import ModalInspectCar from './ModalInspectCar'
+import ModalInspectCar, {
+  getValuesInspectionReturnType,
+} from './ModalInspectCar'
 import ModalSignatures from './ModalSignatures'
 import {
   ButtonsFinalized,
@@ -135,6 +143,10 @@ interface RefType {
   handleGetValuesForm: () => Promise<StagesDataProps>
 }
 
+interface modalInspectionCarRefType {
+  getValuesInspection: () => getValuesInspectionReturnType
+}
+
 const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   props,
   ref,
@@ -180,6 +192,8 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 
   const [isAlteredForm, setIsAlteredForm] = useState(false)
   const router = useRouter()
+
+  const modalCarRef = useRef<modalInspectionCarRefType>(null)
 
   const defaultValues = {
     [stageName]: stageData?.itens.map((item, index) => {
@@ -349,6 +363,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         inspection: data,
       }
     })
+    console.log(data)
     setIsAlteredForm(true)
   }
 
@@ -362,18 +377,18 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     }
   }
 
-  async function handleGetValuesForm() {
-    const isAlreadyInspections = stageData?.itens.filter(
-      (item) => item.rules.type === 'visual_inspect',
-    )
-    const data = getValues()
-
-    let defaultLabel: any
-
-    if (isAlreadyInspections) {
-      defaultLabel = isAlreadyInspections[0].values
-        .labels as InspectionCarData[]
+  async function getValueInspectionCar() {
+    if (modalCarRef.current && modalCarRef.current.getValuesInspection) {
+      const result = await modalCarRef.current.getValuesInspection()
+      console.log(result)
+      return result
     }
+  }
+
+  async function handleGetValuesForm() {
+    const inspectionCarValues = await getValueInspectionCar()
+
+    const data = getValues()
 
     const dataFormatted = {
       ...stageData,
@@ -388,10 +403,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
             ...item,
             comment: data[stageName]?.[index]?.observation,
             values: {
-              labels:
-                dataModals?.inspection.length > 0
-                  ? dataModals?.inspection
-                  : defaultLabel,
+              labels: inspectionCarValues,
             },
           }
         }
@@ -480,86 +492,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     })
   }
 
-  // useEffect(() => {
-  // const sessionStorageData = sessionStorage.getItem(
-  //   `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-  // )
-  // const dataSessionStorage: StagesDataProps[] = sessionStorageData
-  //   ? JSON.parse(sessionStorageData)
-  //   : null
-  // console.log(dataSessionStorage)
-  // if (dataSessionStorage) {
-  //   const stageLocalSession = dataSessionStorage.filter(
-  //     (data) => data.name === stageName,
-  //   )[0]
-  //   if (stageLocalSession) {
-  //     // console.log(stageLocalSession)
-  //     stageLocalSession.itens.forEach((item: any, index: number) => {
-  //       update(index, { inputs: item.inputs, observation: item.observation })
-  //     })
-  //   }
-  // } else {
-  //   console.log('não exists')
-  // }
-  // if (data && Object.hasOwn(data, stageName)) {
-  //   data[stageName]?.formState?.forEach((item: any, index: number) => {
-  //     update(index, { inputs: item.inputs, observation: item.observation })
-  //   })
-  //   if (data[stageName]?.imagesList?.length > 0) {
-  //     setListImage((prevState) => {
-  //       const indexStageName = prevState.findIndex((item) =>
-  //         Object.hasOwn(item, stageName),
-  //       )
-  //       const newListImage = [...prevState]
-  //       if (indexStageName > -1) {
-  //         newListImage[indexStageName][stageName] = data[stageName].imagesList
-  //         return newListImage
-  //       } else {
-  //         return [
-  //           ...newListImage,
-  //           {
-  //             [stageName]: data[stageName].imagesList,
-  //           },
-  //         ]
-  //       }
-  //     })
-  //   }
-  // }
-  // }, [])
-
-  // useEffect(() => {
-  //   if (isDirty) {
-  //     const sessionStorageData = sessionStorage.getItem(
-  //       `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query?.id}`,
-  //     )
-  //     const data = sessionStorageData ? JSON.parse(sessionStorageData) : null
-  //     console.log(stageValuesWatch)
-
-  //     if (data) {
-  //       sessionStorage.setItem(
-  //         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
-  //         JSON.stringify({
-  //           ...data,
-  //           [stageName]: {
-  //             ...data[stageName],
-  //             formState: stageValuesWatch,
-  //           },
-  //         }),
-  //       )
-  //     } else {
-  //       sessionStorage.setItem(
-  //         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${checklistModel?.id}`,
-  //         JSON.stringify({
-  //           [stageName]: {
-  //             formState: stageValuesWatch,
-  //           },
-  //         }),
-  //       )
-  //     }
-  //   }
-  // }, [stageValuesWatch])
-  console.log(listImage)
-
   useEffect(() => {
     const sessionStorageData = sessionStorage.getItem(
       `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
@@ -568,10 +500,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     const dataSessionStorage: StagesDataProps[] = sessionStorageData
       ? JSON.parse(sessionStorageData)
       : null
-    // const listImageSessionStorage: ImageProps[] | [] = []
-    // const listImageSessionStorage = {
-    //   [stageName]: [],
-    // }
+
     const listImageSessionStorage: ImageProps[] = []
 
     if (dataSessionStorage) {
@@ -600,16 +529,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         })
         console.log(listImageSessionStorage)
       }
-      // const stageListImages = stageLocalSession.itens.filter((i) => {
-      //   if (i.values?.images) {
-      //     return (
-      //       i.rules.type !== 'visual_inspect' && i.values?.images?.length > 0
-      //     )
-      //   } else {
-      //     return false
-      //   }
-      // }) as ImageProps[] | []
-      // console.log(stageListImages)
+
       setListImage((prevState) => {
         if (Object.hasOwn(prevState, stageName)) {
           return {
@@ -624,28 +544,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     } else {
       console.log('não exists')
     }
-
-    // console.log(listImage)
-    // console.log(listImageSessionStorage)
-    // const stageListImages = stageItems.filter((i) => {
-    //   if (i.values?.images) {
-    //     return i.rules.type !== 'visual_inspect' && i.values?.images?.length > 0
-    //   } else {
-    //     return false
-    //   }
-    // }) as ImageProps[] | []
-    // console.log(stageListImages)
-    // setListImage((prevState) => {
-    //   if (Object.hasOwn(prevState, stageName)) {
-    //     return {
-    //       ...prevState,
-    //       [stageName]: stageListImages,
-    //     }
-    //   }
-    //   return {
-    //     [stageName]: stageListImages,
-    //   }
-    // })
   }, [])
 
   return (
@@ -777,6 +675,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         stageData={stageData}
         // @ts-ignore
         handleInspectionData={handleInspectionData}
+        ref={modalCarRef}
       />
       <ModalSignatures
         isOpen={openModalSignature}
