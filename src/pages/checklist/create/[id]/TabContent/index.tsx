@@ -7,6 +7,7 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 
 import TableRow from '@mui/material/TableRow'
+import { useRouter } from 'next/router'
 
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 
@@ -131,7 +132,7 @@ export type handleGetValuesFormReturnType = {
 
 interface RefType {
   handleOpenAlertDialog: (value: number) => void
-  handleGetValuesForm: () => Promise<handleGetValuesFormReturnType>
+  handleGetValuesForm: () => Promise<StagesDataProps>
 }
 
 const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
@@ -178,6 +179,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   })
 
   const [isAlteredForm, setIsAlteredForm] = useState(false)
+  const router = useRouter()
 
   const defaultValues = {
     [stageName]: stageData?.itens.map((item, index) => {
@@ -201,13 +203,14 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     register,
     handleSubmit,
     getValues,
+    setValue,
     formState: { isDirty },
   } = useForm({
     defaultValues,
   })
 
   // eslint-disable-next-line no-unused-vars
-  const { update } = useFieldArray({
+  const { update, fields } = useFieldArray({
     control,
     name: stageName,
   })
@@ -478,36 +481,51 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   }
 
   // useEffect(() => {
-  //   const sessionStorageData = sessionStorage.getItem(
-  //     `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-  //   )
-
-  //   const data = sessionStorageData ? JSON.parse(sessionStorageData) : null
-  //   if (data && Object.hasOwn(data, stageName)) {
-  //     data[stageName]?.formState?.forEach((item: any, index: number) => {
+  // const sessionStorageData = sessionStorage.getItem(
+  //   `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+  // )
+  // const dataSessionStorage: StagesDataProps[] = sessionStorageData
+  //   ? JSON.parse(sessionStorageData)
+  //   : null
+  // console.log(dataSessionStorage)
+  // if (dataSessionStorage) {
+  //   const stageLocalSession = dataSessionStorage.filter(
+  //     (data) => data.name === stageName,
+  //   )[0]
+  //   if (stageLocalSession) {
+  //     // console.log(stageLocalSession)
+  //     stageLocalSession.itens.forEach((item: any, index: number) => {
   //       update(index, { inputs: item.inputs, observation: item.observation })
   //     })
-  //     if (data[stageName]?.imagesList?.length > 0) {
-  //       setListImage((prevState) => {
-  //         const indexStageName = prevState.findIndex((item) =>
-  //           Object.hasOwn(item, stageName),
-  //         )
-  //         const newListImage = [...prevState]
-  //         if (indexStageName > -1) {
-  //           newListImage[indexStageName][stageName] = data[stageName].imagesList
-  //           return newListImage
-  //         } else {
-  //           return [
-  //             ...newListImage,
-  //             {
-  //               [stageName]: data[stageName].imagesList,
-  //             },
-  //           ]
-  //         }
-  //       })
-  //     }
   //   }
-  // }, [stageName])
+  // } else {
+  //   console.log('não exists')
+  // }
+  // if (data && Object.hasOwn(data, stageName)) {
+  //   data[stageName]?.formState?.forEach((item: any, index: number) => {
+  //     update(index, { inputs: item.inputs, observation: item.observation })
+  //   })
+  //   if (data[stageName]?.imagesList?.length > 0) {
+  //     setListImage((prevState) => {
+  //       const indexStageName = prevState.findIndex((item) =>
+  //         Object.hasOwn(item, stageName),
+  //       )
+  //       const newListImage = [...prevState]
+  //       if (indexStageName > -1) {
+  //         newListImage[indexStageName][stageName] = data[stageName].imagesList
+  //         return newListImage
+  //       } else {
+  //         return [
+  //           ...newListImage,
+  //           {
+  //             [stageName]: data[stageName].imagesList,
+  //           },
+  //         ]
+  //       }
+  //     })
+  //   }
+  // }
+  // }, [])
 
   // useEffect(() => {
   //   if (isDirty) {
@@ -540,27 +558,94 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   //     }
   //   }
   // }, [stageValuesWatch])
+  console.log(listImage)
 
   useEffect(() => {
-    const stageListImages = stageItems.filter((i) => {
-      if (i.values?.images) {
-        return i.rules.type !== 'visual_inspect' && i.values?.images?.length > 0
-      } else {
-        return false
-      }
-    }) as ImageProps[] | []
+    const sessionStorageData = sessionStorage.getItem(
+      `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+    )
 
-    setListImage((prevState) => {
-      if (Object.hasOwn(prevState, stageName)) {
-        return {
-          ...prevState,
-          [stageName]: stageListImages,
+    const dataSessionStorage: StagesDataProps[] = sessionStorageData
+      ? JSON.parse(sessionStorageData)
+      : null
+    // const listImageSessionStorage: ImageProps[] | [] = []
+    // const listImageSessionStorage = {
+    //   [stageName]: [],
+    // }
+    const listImageSessionStorage: ImageProps[] = []
+
+    if (dataSessionStorage) {
+      const stageLocalSession = dataSessionStorage.filter(
+        (data) => data.name === stageName,
+      )[0]
+      if (stageLocalSession) {
+        console.log(stageLocalSession)
+
+        stageLocalSession.itens.forEach((item, index) => {
+          // console.log(item)
+          const img = item.values.images === undefined ? [] : item.values.images
+          // @ts-ignore
+          listImageSessionStorage.push(...img)
+          const valueSelectedFormatted =
+            item.rules.type === 'select' && item.values.value === null
+              ? '-'
+              : item.values.value
+          setValue(
+            `${stageName}.${index}.inputs`,
+            item.rules.type === 'select'
+              ? valueSelectedFormatted
+              : item.values.value,
+          )
+          setValue(`${stageName}.${index}.observation`, item.comment)
+        })
+        console.log(listImageSessionStorage)
+      }
+      // const stageListImages = stageLocalSession.itens.filter((i) => {
+      //   if (i.values?.images) {
+      //     return (
+      //       i.rules.type !== 'visual_inspect' && i.values?.images?.length > 0
+      //     )
+      //   } else {
+      //     return false
+      //   }
+      // }) as ImageProps[] | []
+      // console.log(stageListImages)
+      setListImage((prevState) => {
+        if (Object.hasOwn(prevState, stageName)) {
+          return {
+            ...prevState,
+            [stageName]: listImageSessionStorage,
+          }
         }
-      }
-      return {
-        [stageName]: stageListImages,
-      }
-    })
+        return {
+          [stageName]: listImageSessionStorage,
+        }
+      })
+    } else {
+      console.log('não exists')
+    }
+
+    // console.log(listImage)
+    // console.log(listImageSessionStorage)
+    // const stageListImages = stageItems.filter((i) => {
+    //   if (i.values?.images) {
+    //     return i.rules.type !== 'visual_inspect' && i.values?.images?.length > 0
+    //   } else {
+    //     return false
+    //   }
+    // }) as ImageProps[] | []
+    // console.log(stageListImages)
+    // setListImage((prevState) => {
+    //   if (Object.hasOwn(prevState, stageName)) {
+    //     return {
+    //       ...prevState,
+    //       [stageName]: stageListImages,
+    //     }
+    //   }
+    //   return {
+    //     [stageName]: stageListImages,
+    //   }
+    // })
   }, [])
 
   return (
