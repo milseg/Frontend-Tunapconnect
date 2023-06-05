@@ -387,7 +387,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 
   async function handleGetValuesForm() {
     const inspectionCarValues = await getValueInspectionCar()
-
+    console.log(dataModals?.signatures)
     const data = getValues()
 
     const dataFormatted = {
@@ -509,9 +509,14 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       )[0]
       if (stageLocalSession) {
         console.log(stageLocalSession)
-
+        dataModals?.signatures.push()
+        setDataModals((prevState) => {
+          return {
+            ...prevState,
+            signatures: stageLocalSession.signatures as CheckListSignatures[],
+          }
+        })
         stageLocalSession.itens.forEach((item, index) => {
-          // console.log(item)
           const img = item.values.images === undefined ? [] : item.values.images
           // @ts-ignore
           listImageSessionStorage.push(...img)

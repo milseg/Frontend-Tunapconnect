@@ -226,8 +226,7 @@ export default function ChecklistCreateById() {
           const newStorageSessionFiltered = storageStage.filter(
             (item) => item.name !== result.name,
           )
-          // console.log(newStorageSessionFiltered)
-          // console.log(storageStage[storageStageActualIndex])
+
           sessionStorage.setItem(
             `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
             JSON.stringify([...newStorageSessionFiltered, result]),
