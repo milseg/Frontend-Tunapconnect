@@ -206,13 +206,18 @@ export default function ChecklistCreateById() {
   const handleChange = async (event: SyntheticEvent, newValue: number) => {
     // console.log(newValue)
     // if (data?.stages[value].status !== 'finalizado') setValue(newValue)
-    if (tabContentRef.current && tabContentRef.current.handleOpenAlertDialog) {
-      tabContentRef.current.handleOpenAlertDialog(newValue)
-    }
+    // if (tabContentRef.current && tabContentRef.current.handleOpenAlertDialog) {
+    //   tabContentRef.current.handleOpenAlertDialog(newValue)
+    // }
     if (tabContentRef.current && tabContentRef.current.handleGetValuesForm) {
       const result = await tabContentRef.current.handleGetValuesForm()
       console.log(result)
+      sessionStorage.setItem(
+        `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+        JSON.stringify(result),
+      )
     }
+    setPainelValue(newValue)
   }
 
   function handleChangeTabContent(newValue: number) {

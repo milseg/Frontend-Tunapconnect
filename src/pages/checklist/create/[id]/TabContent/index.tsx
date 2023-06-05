@@ -542,14 +542,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   // }, [stageValuesWatch])
 
   useEffect(() => {
-    // const stageListImages = stageItems
-    //   .map((i) => {
-    //     if (i.rules.type === 'visual_inspect') return null
-    //     if (i.values?.images) {
-    //       if (i.values?.images?.length > 0) return i.values.images
-    //     }
-    //     return null
-    //   })
     const stageListImages = stageItems.filter((i) => {
       if (i.values?.images) {
         return i.rules.type !== 'visual_inspect' && i.values?.images?.length > 0
@@ -557,10 +549,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         return false
       }
     }) as ImageProps[] | []
-
-    // const newList = prevState.filter(
-    //   (item) => !Object.hasOwn(item, stageName),
-    // )
 
     setListImage((prevState) => {
       if (Object.hasOwn(prevState, stageName)) {
