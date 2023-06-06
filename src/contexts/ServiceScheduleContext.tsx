@@ -61,7 +61,6 @@ export function ServiceScheduleProvider({
   }
 
   function setListServiceSchedule(list: ServiceScheduleType[] | []) {
-    console.log(list)
     dispatch({
       type: 'ADD_NEW_SERVICE_SCHEDULE_LIST',
       payload: list,
