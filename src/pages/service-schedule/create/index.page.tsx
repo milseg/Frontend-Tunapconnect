@@ -75,9 +75,10 @@ type updateData = {
   client_id: number | undefined
   client_vehicle_id: number | undefined
   company_id: string | undefined
-  chasis: string | undefined
+  // chasis: string | undefined
   plate: string | undefined
   claims_service: any[]
+  checklist_version_id: number | undefined
 }
 
 const HeaderBreadcrumbData: listBreadcrumb[] = [
@@ -156,24 +157,28 @@ export default function ServiceSchedulesCreate() {
     const dataFormatted: updateData = {
       code: null,
       promised_date: formatDateTimeTimezone(`${visitDate}`),
-      // promised_date: "2023-04-2",
       technical_consultant_id: technicalConsultant?.id,
       client_id: client?.id,
       client_vehicle_id: clientVehicle?.id,
       company_id: `${companySelected}`,
-      chasis: clientVehicle?.chassis,
       plate: clientVehicle?.plate,
       claims_service: [],
+      checklist_version_id: 14,
     }
+    console.log(dataFormatted)
     try {
-      const respUpdate: any = await api.update(
-        '/service-schedule/' + router.query.id,
+      const respCreate: any = await api.create(
+        '/service-schedule',
         dataFormatted,
       )
+      const idCreatedResponse = respCreate.data.data.id
+
+      router.push('/service-schedule/' + idCreatedResponse)
+
       setIsEditSelectedCard(null)
       setActionAlerts({
         isOpen: true,
-        title: `${respUpdate.data.msg ?? 'Salvo com sucesso!'}!`,
+        title: `${respCreate.data.msg ?? 'Salvo com sucesso!'}!`,
         type: 'success',
       })
     } catch (e: any) {
@@ -306,10 +311,11 @@ export default function ServiceSchedulesCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Cliente</TitleCard>
-                  <ButtonAdd aria-label="add to client">
-                    <AddCircleIcon
-                      onClick={() => setOpenModalClientSearch(true)}
-                    />
+                  <ButtonAdd
+                    aria-label="add to client"
+                    onClick={() => setOpenModalClientSearch(true)}
+                  >
+                    <AddCircleIcon />
                   </ButtonAdd>
                 </Stack>
                 <DividerCard />
