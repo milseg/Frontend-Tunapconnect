@@ -115,42 +115,50 @@ export default function ModalSearchClientVehicle({
               // subheader={<li />}
             >
               <li>
-                {clientVehicleList.map((item, index) => (
-                  <ListItemButton
-                    key={`${index}-${item.id}`}
-                    onClick={() => setClientVehicleSelected(item)}
-                    selected={item.id === clientVehicleSelected?.id}
-                    sx={{
-                      '&.Mui-selected': {
-                        background: '#1C4961',
-                        color: '#fff',
-                        '&:hover': {
+                {clientVehicleList.length > 0 &&
+                  clientVehicleList.map((item, index) => (
+                    <ListItemButton
+                      key={`${index}-${item.id}`}
+                      onClick={() => setClientVehicleSelected(item)}
+                      selected={item.id === clientVehicleSelected?.id}
+                      sx={{
+                        '&.Mui-selected': {
                           background: '#1C4961',
                           color: '#fff',
-                          opacity: 0.7,
+                          '&:hover': {
+                            background: '#1C4961',
+                            color: '#fff',
+                            opacity: 0.7,
+                          },
+                          '& span': {
+                            color: '#fff',
+                            '&:hover': {
+                              color: '#fff',
+                              opacity: 0.7,
+                            },
+                          },
                         },
-                      },
-                    }}
-                  >
-                    <ListItemText
-                      primary={`${item.vehicle.model.name}-${item.vehicle.name}`}
-                      secondary={
-                        <>
-                          <Typography
-                            sx={{ display: 'inline' }}
-                            component="span"
-                            variant="body2"
-                            color="text.primary"
-                          >
-                            {item.plate}
-                            {' - '}
-                          </Typography>
-                          {item.chasis}
-                        </>
-                      }
-                    />
-                  </ListItemButton>
-                ))}
+                      }}
+                    >
+                      <ListItemText
+                        primary={`${item.vehicle.model.name} - ${item.vehicle.name}`}
+                        secondary={
+                          <>
+                            <Typography
+                              sx={{ display: 'inline' }}
+                              component="span"
+                              variant="body2"
+                              color="text.primary"
+                            >
+                              {item.plate}
+                              {' - '}
+                            </Typography>
+                            <span>{item.chasis}</span>
+                          </>
+                        }
+                      />
+                    </ListItemButton>
+                  ))}
               </li>
             </List>
           </Box>
