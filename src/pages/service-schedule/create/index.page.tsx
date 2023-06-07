@@ -57,6 +57,7 @@ import { CompanyContext } from '@/contexts/CompanyContext'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import ModalSearchClientVehicle from './components/ModalSearchClientVehicle'
 import ModalSearchClient from './components/ModalSearchClient'
+import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle/type'
 
 const api = new ApiCore()
 
@@ -195,19 +196,19 @@ export default function ServiceSchedulesCreate() {
       address: client.address ?? ['Não informado'],
     })
   }
-  function handleAddClientVehicle(client_vehicle: ClientResponseType) {
+  function handleAddClientVehicle(client_vehicle: ClientVehicleResponseType) {
     setClientVehicle(null)
-    // setClientVehicle({
-    //   id: client_vehicle.id,
-    //   brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
-    //   chassis: client_vehicle?.chasis ?? 'Não informado',
-    //   vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
-    //   model:
-    //     `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
-    //     'Não informado',
-    //   color: client_vehicle?.color ?? 'Não informado',
-    //   plate: client_vehicle?.plate ?? 'Não informado',
-    // })
+    setClientVehicle({
+      id: client_vehicle.id,
+      brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
+      chassis: client_vehicle?.chasis ?? 'Não informado',
+      vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
+      model:
+        `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
+        'Não informado',
+      color: client_vehicle?.color ?? 'Não informado',
+      plate: client_vehicle?.plate ?? 'Não informado',
+    })
   }
 
   const {
