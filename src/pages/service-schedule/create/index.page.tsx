@@ -58,6 +58,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import ModalSearchClientVehicle from './components/ModalSearchClientVehicle'
 import ModalSearchClient from './components/ModalSearchClient'
 import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle/type'
+// import ModalSearchClaimService from './components/ModalSearchClaimService'
 
 const api = new ApiCore()
 
@@ -113,6 +114,8 @@ export default function ServiceSchedulesCreate() {
   const [openModalClientSearch, setOpenModalClientSearch] = useState(false)
   const [openModalClientVehicleSearch, setOpenModalClientVehicleSearch] =
     useState(false)
+  // const [openModalClaimServiceSearch, setOpenModalClaimServiceSearch] =
+  //   useState(false)
 
   const router = useRouter()
 
@@ -124,6 +127,9 @@ export default function ServiceSchedulesCreate() {
   function handleCloseModalClientVehicleSearch() {
     setOpenModalClientVehicleSearch(false)
   }
+  // function handleCloseModalClaimServiceVehicleSearch() {
+  //   setOpenModalClaimServiceSearch(false)
+  // }
 
   function handleIsEditSelectedCard(value: isEditSelectedCardType) {
     setIsEditSelectedCard(value)
@@ -215,6 +221,21 @@ export default function ServiceSchedulesCreate() {
       plate: client_vehicle?.plate ?? 'Não informado',
     })
   }
+  // function handleAddClainServiceVehicle(client_vehicle: any) {
+  //   console.log(client_vehicle)
+  // setClientVehicle(null)
+  // setClientVehicle({
+  //   id: client_vehicle.id,
+  //   brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
+  //   chassis: client_vehicle?.chasis ?? 'Não informado',
+  //   vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
+  //   model:
+  //     `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
+  //     'Não informado',
+  //   color: client_vehicle?.color ?? 'Não informado',
+  //   plate: client_vehicle?.plate ?? 'Não informado',
+  // })
+  // }
 
   const {
     data: dataTechnicalConsultantList,
@@ -459,25 +480,87 @@ export default function ServiceSchedulesCreate() {
                   </ListItemCard>
                 </List>
               </Paper>
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                {/* <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Serviços</TitleCard>
+                  <ButtonAdd
+                    aria-label="add to client"
+                    onClick={() => {
+                      setOpenModalClientVehicleSearch(true)
+                    }}
+                  >
+                    <AddCircleIcon />
+                  </ButtonAdd>
+                </Stack> */}
+                <DividerCard />
+                <List dense={false}>
+                  <ListItemCard>
+                    <InfoCardName>Marca:</InfoCardName>{' '}
+                    {clientVehicle?.brand ? (
+                      <InfoCardText>{clientVehicle?.brand}</InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Modelo:</InfoCardName>{' '}
+                    {clientVehicle?.model ? (
+                      <InfoCardText>{clientVehicle?.model}</InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Veículo:</InfoCardName>{' '}
+                    {clientVehicle?.vehicle ? (
+                      <InfoCardText>{clientVehicle?.vehicle}</InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Cor:</InfoCardName>{' '}
+                    {clientVehicle?.color ? (
+                      <InfoCardText>{clientVehicle?.color}</InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Chassi:</InfoCardName>{' '}
+                    {clientVehicle?.chassis ? (
+                      <InfoCardText>{clientVehicle?.chassis}</InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Placa:</InfoCardName>{' '}
+                    {clientVehicle?.plate ? (
+                      <InfoCardText>
+                        {formatPlate(clientVehicle?.plate)}
+                      </InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                </List>
+              </Paper>
             </Stack>
           </Grid>
 
           <Grid item xs={12} md={5} lg={5}>
             <Stack spacing={2}>
-              {/* <Stack
-              spacing={2}
-              direction="row"
-              display="flex"
-              justifyContent="center"
-            >
-              <ButtonLeft disabled>Listar Orçamentos</ButtonLeft>
-              <ButtonCenter disabled>
-                <PrintIcon />
-              </ButtonCenter>
-              <ButtonRight disabled startIcon={<AddCircleOutlineIcon />}>
-                Novo
-              </ButtonRight>
-            </Stack> */}
               {/* Agendamento */}
               <Paper
                 sx={{
@@ -650,6 +733,11 @@ export default function ServiceSchedulesCreate() {
         openMolal={openModalClientVehicleSearch}
         handleAddClientVehicle={handleAddClientVehicle}
       />
+      {/* <ModalSearchClaimService
+        handleClose={handleCloseModalClaimServiceVehicleSearch}
+        openMolal={openModalClaimServiceSearch}
+        handleAddClaimService={handleAddClainServiceVehicle}
+      /> */}
     </>
   )
 }
