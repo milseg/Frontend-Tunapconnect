@@ -480,14 +480,15 @@ export default function ServiceSchedulesCreate() {
                   </ListItemCard>
                 </List>
               </Paper>
-              <Paper
+              {/* Claim Service */}
+              {/* <Paper
                 sx={{
                   p: 2,
                   display: 'flex',
                   flexDirection: 'column',
                 }}
               >
-                {/* <Stack
+                <Stack
                   direction="row"
                   alignItems="center"
                   justifyContent="space-between"
@@ -501,7 +502,7 @@ export default function ServiceSchedulesCreate() {
                   >
                     <AddCircleIcon />
                   </ButtonAdd>
-                </Stack> */}
+                </Stack>
                 <DividerCard />
                 <List dense={false}>
                   <ListItemCard>
@@ -555,7 +556,7 @@ export default function ServiceSchedulesCreate() {
                     )}
                   </ListItemCard>
                 </List>
-              </Paper>
+              </Paper> */}
             </Stack>
           </Grid>
 

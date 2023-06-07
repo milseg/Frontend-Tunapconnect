@@ -270,10 +270,10 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     console.log(image)
     setListImage((prevState) => {
       const stageActual = prevState[stageName]
+
       const isImagesInList = stageActual.findIndex((img) => img.id === index)
 
       if (isImagesInList >= 0) {
-        console.log('entrou 0')
         const valueFormatted = {
           ...prevState,
           [stageName]: prevState[stageName].map((i) => {
@@ -315,7 +315,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         ],
       }
     })
-    setIsAlteredForm(true)
   }
 
   function handleRemoveImageInListImage(index: number, imageId: number) {
@@ -548,6 +547,10 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       })
     } else {
       console.log('não exists')
+      sessionStorage.setItem(
+        `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+        JSON.stringify([stageData]),
+      )
     }
   }, [])
 
