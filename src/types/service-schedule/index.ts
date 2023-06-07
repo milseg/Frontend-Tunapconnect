@@ -18,6 +18,18 @@ export interface ClientInfor {
   address: string[]
 }
 
+export interface ClientResponseType {
+  id: number
+  company_id: number
+  name: string
+  document: string
+  address: string[]
+  active: boolean
+  phone: any
+  email: any
+  fullName: string
+}
+
 export interface ClientVehicle {
   id: number
   brand: string

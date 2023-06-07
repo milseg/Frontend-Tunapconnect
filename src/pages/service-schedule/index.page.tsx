@@ -444,9 +444,9 @@ export default function ServiceSchedulesList() {
                   sx={{ alignSelf: 'flex-end' }}
                   startIcon={<AddCircleOutlineIcon />}
                   onClick={async () => {
-                    await router.push(`/service-schedules/create`)
+                    await router.push(`/service-schedule/create`)
                   }}
-                  disabled
+                  // disabled
                 >
                   Adicionar novo
                 </ButtonAdd>
