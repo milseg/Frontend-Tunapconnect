@@ -270,14 +270,23 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     console.log(image)
     setListImage((prevState) => {
       const stageActual = prevState[stageName]
-
+      if (!Object.hasOwn(prevState, stageName)) {
+        return {
+          ...prevState,
+          [stageName]: [
+            {
+              id: index,
+              images: [image],
+            },
+          ],
+        }
+      }
       const isImagesInList = stageActual.findIndex((img) => img.id === index)
 
       if (isImagesInList >= 0) {
         const valueFormatted = {
           ...prevState,
           [stageName]: prevState[stageName].map((i) => {
-            console.log([...i.images, image])
             if (index === i.id) {
               return {
                 id: index,
