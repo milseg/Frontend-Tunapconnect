@@ -6,18 +6,26 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import SearchIcon from '@mui/icons-material/Search'
 import DialogTitle from '@mui/material/DialogTitle'
-import { Box, List, ListItemButton, ListItemText, Stack } from '@mui/material'
+import {
+  Box,
+  List,
+  ListItemButton,
+  ListItemText,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { ButtonIcon, ButtonModalDialog } from '../../styles'
 import { ApiCore } from '@/lib/api'
 import { useContext, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
-import { ClientResponseType } from '@/types/service-schedule'
+
+import { ClientVehicleResponseType } from './type'
 
 interface ModalSearchClientVehicleProps {
   openMolal: boolean
   handleClose: () => void
-  handleAddClientVehicle: (data: ClientResponseType) => void
+  handleAddClientVehicle: (data: ClientVehicleResponseType) => void
 }
 
 type SearchFormProps = {
@@ -30,10 +38,10 @@ export default function ModalSearchClientVehicle({
   handleAddClientVehicle,
 }: ModalSearchClientVehicleProps) {
   const [clientVehicleList, setClientVehicleList] = useState<
-    ClientResponseType[] | []
+    ClientVehicleResponseType[] | []
   >([])
   const [clientVehicleSelected, setClientVehicleSelected] =
-    useState<ClientResponseType | null>(null)
+    useState<ClientVehicleResponseType | null>(null)
 
   const {
     register,
@@ -53,7 +61,7 @@ export default function ModalSearchClientVehicle({
     console.log(data)
     try {
       const result = await api.get(
-        `/client?company_id=${companySelected}&search=${data.search}`,
+        `/client-vehicle?company_id=${companySelected}&search=${data.search}`,
       )
       console.log(result.data.data)
       setClientVehicleList(result.data.data)
@@ -109,7 +117,7 @@ export default function ModalSearchClientVehicle({
               <li>
                 {clientVehicleList.map((item, index) => (
                   <ListItemButton
-                    key={`${index}-${item}`}
+                    key={`${index}-${item.id}`}
                     onClick={() => setClientVehicleSelected(item)}
                     selected={item.id === clientVehicleSelected?.id}
                     sx={{
@@ -124,7 +132,23 @@ export default function ModalSearchClientVehicle({
                       },
                     }}
                   >
-                    <ListItemText primary={`${item.name}`} />
+                    <ListItemText
+                      primary={`${item.vehicle.model.name}-${item.vehicle.name}`}
+                      secondary={
+                        <>
+                          <Typography
+                            sx={{ display: 'inline' }}
+                            component="span"
+                            variant="body2"
+                            color="text.primary"
+                          >
+                            {item.plate}
+                            {' - '}
+                          </Typography>
+                          {item.chasis}
+                        </>
+                      }
+                    />
                   </ListItemButton>
                 ))}
               </li>
