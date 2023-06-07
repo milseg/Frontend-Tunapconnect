@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import * as React from 'react'
 
 import TextField from '@mui/material/TextField'
@@ -6,39 +7,33 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import SearchIcon from '@mui/icons-material/Search'
 import DialogTitle from '@mui/material/DialogTitle'
-import {
-  Box,
-  List,
-  ListItemButton,
-  ListItemText,
-  Stack,
-  Typography,
-} from '@mui/material'
+import { Box, List, ListItemButton, ListItemText, Stack } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { ButtonIcon, ButtonModalDialog } from '../../styles'
 import { ApiCore } from '@/lib/api'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { ClientResponseType } from '@/types/service-schedule'
 
-interface ModalSearchClienteProps {
+interface ModalSearchClaimServiceProps {
   openMolal: boolean
   handleClose: () => void
-  handleAddClient: (data: ClientResponseType) => void
+  handleAddClaimService: (data: any) => void
 }
 
 type SearchFormProps = {
   search: string
 }
 
-export default function ModalSearchClient({
+export default function ModalSearchClaimService({
   openMolal,
   handleClose,
-  handleAddClient,
-}: ModalSearchClienteProps) {
-  const [clientList, setClientList] = useState<ClientResponseType[] | []>([])
-  const [clientSelected, setClientSelected] =
-    useState<ClientResponseType | null>(null)
+  handleAddClaimService,
+}: ModalSearchClaimServiceProps) {
+  const [ClaimServiceList, setClaimServiceList] = useState<any[] | []>([])
+  const [ClaimServiceSelected, setClaimServiceSelected] = useState<any | null>(
+    null,
+  )
 
   const {
     register,
@@ -58,19 +53,29 @@ export default function ModalSearchClient({
     console.log(data)
     try {
       const result = await api.get(
-        `/client?company_id=${companySelected}&search=${data.search}`,
+        `/claim-service=${companySelected}&search=${data.search}`,
       )
       console.log(result.data.data)
-      setClientList(result.data.data)
+      setClaimServiceList(result.data.data)
     } catch (error) {
       console.log(error)
     }
   }
 
+  // useEffect(() => {
+  //   try {
+  //     const result = await api.get(`/claim-service=${companySelected}`)
+  //     console.log(result.data.data)
+  //     setClaimServiceList(result.data.data)
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }, [])
+
   return (
     <div>
       <Dialog open={openMolal} onClose={handleClose}>
-        <DialogTitle>Buscar por cliente</DialogTitle>
+        <DialogTitle>Buscar por ClaimServicee</DialogTitle>
         <DialogContent>
           <Box
             component="form"
@@ -82,7 +87,7 @@ export default function ModalSearchClient({
               flexDirection: 'column',
             }}
           >
-            <Stack flexDirection="row" sx={{ marginY: 2 }}>
+            {/* <Stack flexDirection="row" sx={{ marginY: 2 }}>
               <TextField
                 id="outlined-size-small"
                 size="small"
@@ -98,7 +103,7 @@ export default function ModalSearchClient({
               >
                 <SearchIcon />
               </ButtonIcon>
-            </Stack>
+            </Stack> */}
             <List
               sx={{
                 width: '100%',
@@ -112,11 +117,11 @@ export default function ModalSearchClient({
               // subheader={<li />}
             >
               <li>
-                {clientList.map((item, index) => (
+                {ClaimServiceList.map((item, index) => (
                   <ListItemButton
                     key={`${index}-${item}`}
-                    onClick={() => setClientSelected(item)}
-                    selected={item.id === clientSelected?.id}
+                    onClick={() => setClaimServiceSelected(item)}
+                    selected={item.id === ClaimServiceSelected?.id}
                     sx={{
                       '&.Mui-selected': {
                         background: '#1C4961',
@@ -126,31 +131,10 @@ export default function ModalSearchClient({
                           color: '#fff',
                           opacity: 0.7,
                         },
-                        '& span': {
-                          color: '#fff',
-                          '&:hover': {
-                            color: '#fff',
-                            opacity: 0.7,
-                          },
-                        },
                       },
                     }}
                   >
-                    <ListItemText
-                      primary={`${item.name}`}
-                      secondary={
-                        <>
-                          <Typography
-                            sx={{ display: 'inline' }}
-                            component="span"
-                            variant="body2"
-                            color="text.primary"
-                          >
-                            CPF: {item.document}
-                          </Typography>
-                        </>
-                      }
-                    />
+                    <ListItemText primary={`${item.name}`} />
                   </ListItemButton>
                 ))}
               </li>
@@ -161,20 +145,20 @@ export default function ModalSearchClient({
           <ButtonModalDialog
             onClick={() => {
               handleClose()
-              setClientList([])
-              setClientSelected(null)
+              setClaimServiceList([])
+              setClaimServiceSelected(null)
             }}
           >
             Cancel
           </ButtonModalDialog>
           <ButtonModalDialog
-            // disabled={clientSelected === null}
+            // disabled={ClaimServiceSelected === null}
             onClick={() => {
-              if (clientSelected) {
-                handleAddClient(clientSelected)
+              if (ClaimServiceSelected) {
+                handleAddClaimService(ClaimServiceSelected)
                 handleClose()
-                setClientList([])
-                setClientSelected(null)
+                setClaimServiceList([])
+                setClaimServiceSelected(null)
               }
             }}
           >
