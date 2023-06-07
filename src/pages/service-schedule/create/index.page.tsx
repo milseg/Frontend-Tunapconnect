@@ -3,13 +3,13 @@ import * as React from 'react'
 import { useContext, useEffect, useState } from 'react'
 
 import Container from '@mui/material/Container'
-import { GetServerSideProps } from 'next/types'
 
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 
 import {
   ClientInfor,
+  ClientResponseType,
   ClientVehicle,
   // ServiceSchedulesListProps,
   TechnicalConsultant,
@@ -23,9 +23,7 @@ import List from '@mui/material/List'
 import Stack from '@mui/material/Stack'
 
 import {
-  ButtonCenter,
-  ButtonLeft,
-  ButtonRight,
+  ButtonAdd,
   ButtonSubmit,
   DividerCard,
   InfoCardName,
@@ -33,9 +31,6 @@ import {
   ListItemCard,
   TitleCard,
 } from './styles'
-import Skeleton from '@mui/material/Skeleton'
-import PrintIcon from '@mui/icons-material/Print'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 // import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
@@ -46,17 +41,22 @@ import MenuItem from '@mui/material/MenuItem'
 import { MoreOptionsButtonSelect } from '@/components/MoreOptionsButtonSelect'
 import TextField from '@mui/material/TextField'
 import Box from '@mui/material/Box'
-import { formatDateTime, formatDateTimeTimezone } from '@/ultis/formatDate'
+import { formatDateTimeTimezone } from '@/ultis/formatDate'
 import ActionAlerts from '@/components/ActionAlerts'
 import { DataTimeInput } from '@/components/DataTimeInput'
 import { ActionAlertsStateProps } from '@/components/ActionAlerts/ActionAlerts'
 import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
 import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
-import { TableModal } from './components/TableModal'
-import { parseCookies } from 'nookies'
+
+import { useQuery } from 'react-query'
 import { formatCPF } from '@/ultis/formatCPF'
+import { formatPlate } from '@/ultis/formatPlate'
 
 import { CompanyContext } from '@/contexts/CompanyContext'
+
+import AddCircleIcon from '@mui/icons-material/AddCircle'
+import ModalSearchClientVehicle from './components/ModalSearchClientVehicle'
+import ModalSearchClient from './components/ModalSearchClient'
 
 const api = new ApiCore()
 
@@ -90,34 +90,37 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
   },
 ]
 
-export default function ServiceSchedulesEdit() {
+export default function ServiceSchedulesCreate() {
   const [client, setClient] = useState<ClientInfor | null>()
   const [clientVehicle, setClientVehicle] = useState<ClientVehicle | null>()
-  const [visitDate, setVisitDate] = useState<Dayjs | null>(null)
+  const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
   const [technicalConsultant, setTechnicalConsultant] =
-    useState<TechnicalConsultant | null>(null)
+    useState<TechnicalConsultant | null>({
+      id: 0,
+      name: '-',
+    })
   const [technicalConsultantsList, setTechnicalConsultantsList] = useState<
     TechnicalConsultant[]
   >([])
   const [isEditSelectedCard, setIsEditSelectedCard] =
     useState<isEditSelectedCardType>(null)
   const [wasEdited, setWasEdited] = useState(false)
+
   const [actionAlerts, setActionAlerts] =
     useState<ActionAlertsStateProps | null>(null)
-
-  // const [rows, setRows] = useState<ServiceSchedulesListProps[]>([])
-
-  const [openChecklistModal, setOpenChecklistModal] = useState(false)
+  const [openModalClientSearch, setOpenModalClientSearch] = useState(false)
+  const [openModalClientVehicleSearch, setOpenModalClientVehicleSearch] =
+    useState(false)
 
   const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
 
-  // const handleDelete = (id: number) => {
-  //   setRows(rows.filter((row) => row.id !== id))
-  // }
-  const closeChecklistModal = () => {
-    setOpenChecklistModal(false)
+  function handleCloseModalClienteSearch() {
+    setOpenModalClientSearch(false)
+  }
+  function handleCloseModalClientVehicleSearch() {
+    setOpenModalClientVehicleSearch(false)
   }
 
   function handleIsEditSelectedCard(value: isEditSelectedCardType) {
@@ -181,453 +184,377 @@ export default function ServiceSchedulesEdit() {
     }
   }
 
+  function handleAddClient(client: ClientResponseType) {
+    console.log(client)
+    setClient({
+      id: client.id,
+      name: client.name ?? 'Não informado',
+      cpf: client.document ?? 'Não informado',
+      email: client.email ?? ['Não informado'],
+      telefone: client.phone ?? ['Não informado'],
+      address: client.address ?? ['Não informado'],
+    })
+  }
+  function handleAddClientVehicle(client_vehicle: ClientResponseType) {
+    setClientVehicle(null)
+    // setClientVehicle({
+    //   id: client_vehicle.id,
+    //   brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
+    //   chassis: client_vehicle?.chasis ?? 'Não informado',
+    //   vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
+    //   model:
+    //     `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
+    //     'Não informado',
+    //   color: client_vehicle?.color ?? 'Não informado',
+    //   plate: client_vehicle?.plate ?? 'Não informado',
+    // })
+  }
+
+  const {
+    data: dataTechnicalConsultantList,
+    status: dataTechnicalConsultantListStatus,
+  } = useQuery<TechnicalConsultant[]>(
+    [
+      'service_schedule',
+      'by_id',
+      'edit',
+      'technical-consultant-list',
+      'options',
+    ],
+    async () => {
+      const resp = await api.get(
+        `/technical-consultant?company_id=${companySelected}`,
+      )
+      return resp.data.data
+    },
+    { enabled: !!companySelected },
+  )
+
   useEffect(() => {
-    if (!wasEdited) {
-      const { id } = router.query
-      api
-        .get(`/service-schedule/${id}`)
-        .then((response) => {
-          const {
-            client,
-            client_vehicle,
-            technical_consultant,
-            promised_date,
-          } = response.data.data
-          setClient({
-            id: client.id,
-            name: client.name ?? 'Não informado',
-            cpf: client.document ?? 'Não informado',
-            email: client.email[0] ?? 'Não informado',
-            telefone: client.phone[0] ?? 'Não informado',
-            address: client.address ?? 'Não informado',
-          })
-
-          setClientVehicle({
-            id: client_vehicle.id,
-            brand:
-              client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
-            chassis: client_vehicle?.chasis ?? 'Não informado',
-            vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
-            model:
-              `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
-              'Não informado',
-            color: client_vehicle?.color ?? 'Não informado',
-            plate: client_vehicle?.plate ?? 'Não informado',
-          })
-          const promisedDate = dayjs(new Date(promised_date))
-          setVisitDate(promisedDate)
-
-          setTechnicalConsultant({
-            id: technical_consultant?.id ?? 'Não informado',
-            name: technical_consultant?.name ?? 'Não informado',
-          })
-        })
-        .catch((err) => {
-          setClient(null)
-          setClientVehicle(null)
-          setTechnicalConsultant(null)
-          setActionAlerts({
-            isOpen: true,
-            title: `${err.response.data.msg ?? 'Error inesperado'}!`,
-            type: 'error',
-            redirectTo: '/service-schedule',
-          })
-        })
-
-      if (companySelected) {
-        api
-          .get(`/technical-consultant?company_id=${companySelected}`)
-          .then((resp) => {
-            setTechnicalConsultantsList(
-              resp.data.data.map((item: TechnicalConsultant) => ({
-                id: item.id,
-                name: item.name,
-              })),
-            )
-          })
-          .catch((err) => {
-            console.log(err)
-          })
-      }
+    if (dataTechnicalConsultantListStatus === 'success') {
+      setTechnicalConsultantsList(
+        dataTechnicalConsultantList.map((item: TechnicalConsultant) => ({
+          id: item.id,
+          name: item.name,
+        })),
+      )
     }
-  }, [router.query, companySelected, wasEdited])
+  }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList])
+
+  // useEffect(() => {
+  //   if (dataServiceScheduleStatus === 'success') {
+  //     const { client, client_vehicle, technical_consultant, promised_date } =
+  //       dataServiceSchedule
+  //     setClient({
+  //       id: client.id,
+  //       name: client.name ?? 'Não informado',
+  //       cpf: client.document ?? 'Não informado',
+  //       email: client.email ?? 'Não informado',
+  //       telefone: client.phone ?? 'Não informado',
+  //       address: client.address ?? 'Não informado',
+  //     })
+
+  //     setClientVehicle({
+  //       id: client_vehicle.id,
+  //       brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
+  //       chassis: client_vehicle?.chasis ?? 'Não informado',
+  //       vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
+  //       model:
+  //         `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
+  //         'Não informado',
+  //       color: client_vehicle?.color ?? 'Não informado',
+  //       plate: client_vehicle?.plate ?? 'Não informado',
+  //     })
+  //     const promisedDate = dayjs(new Date(promised_date))
+  //     setVisitDate(promisedDate)
+
+  //     setTechnicalConsultant({
+  //       id: technical_consultant?.id ?? 'Não informado',
+  //       name: technical_consultant?.name ?? 'Não informado',
+  //     })
+  //   }
+  // }, [dataServiceScheduleStatus, dataServiceSchedule])
+
+  useEffect(() => {
+    localStorage.removeItem('service-schedule-list')
+  }, [])
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={12} lg={12}>
-          <HeaderBreadcrumb
-            data={HeaderBreadcrumbData}
-            title="Agenda de Serviços"
-          />
-        </Grid>
-        <Grid item xs={12} md={7} lg={7}>
-          <Stack spacing={3}>
-            {/* cliente */}
-            <Paper
-              sx={{
-                p: 2,
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
+    <>
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={12} lg={12}>
+            <HeaderBreadcrumb
+              data={HeaderBreadcrumbData}
+              title="Agenda de Serviços"
+            />
+          </Grid>
+          <Grid item xs={12} md={7} lg={7}>
+            <Stack spacing={3}>
+              {/* cliente */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
               >
-                <TitleCard>Cliente</TitleCard>
-                <MoreOptionsButtonSelect
-                  handleIsEditSelectedCard={handleIsEditSelectedCard}
-                  typeEdit="client"
-                  disabledButton={true}
-                />
-              </Stack>
-              <DividerCard />
-              <List dense={false}>
-                <ListItemCard>
-                  <InfoCardName>Nome:</InfoCardName>{' '}
-                  {client?.name ? (
-                    <InfoCardText>{client?.name}</InfoCardText>
-                  ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
-                  )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>CPF:</InfoCardName>{' '}
-                  {client?.cpf ? (
-                    <InfoCardText>{formatCPF(client?.cpf)}</InfoCardText>
-                  ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
-                  )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>Telefone:</InfoCardName>{' '}
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Cliente</TitleCard>
+                  <ButtonAdd aria-label="add to client">
+                    <AddCircleIcon
+                      onClick={() => setOpenModalClientSearch(true)}
+                    />
+                  </ButtonAdd>
+                </Stack>
+                <DividerCard />
+                <List dense={false}>
+                  <ListItemCard alignItems="flex-start">
+                    <InfoCardName>Nome:</InfoCardName>{' '}
+                    {client?.name && (
+                      <InfoCardText>{client?.name}</InfoCardText>
+                    )}
+                  </ListItemCard>
+                  <ListItemCard alignItems="flex-start">
+                    <InfoCardName>CPF:</InfoCardName>{' '}
+                    {client?.cpf && (
+                      <InfoCardText>{formatCPF(client?.cpf)}</InfoCardText>
+                    )}
+                  </ListItemCard>
                   {client?.telefone ? (
-                    <InfoCardText>{client?.telefone}</InfoCardText>
+                    client?.telefone.map((phone, index) => (
+                      <ListItemCard
+                        key={index + '-' + phone}
+                        alignItems="flex-start"
+                      >
+                        <InfoCardName>Telefone:</InfoCardName>{' '}
+                        <InfoCardText>{phone}</InfoCardText>
+                      </ListItemCard>
+                    ))
                   ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
+                    <ListItemCard>
+                      <InfoCardName>Telefone:</InfoCardName>{' '}
+                      <InfoCardText width="100%"></InfoCardText>
+                    </ListItemCard>
                   )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>E-mail:</InfoCardName>{' '}
                   {client?.email ? (
-                    <InfoCardText>{client?.email}</InfoCardText>
+                    client?.email.map((email, index) => (
+                      <ListItemCard
+                        key={index + '-' + email}
+                        alignItems="flex-start"
+                      >
+                        <InfoCardName>E-mail:</InfoCardName>{' '}
+                        <InfoCardText>{email}</InfoCardText>
+                      </ListItemCard>
+                    ))
                   ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>E-mail:</InfoCardName>{' '}
+                      <InfoCardText width="100%"></InfoCardText>
+                    </ListItemCard>
                   )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>Endereço:</InfoCardName>{' '}
                   {client?.address ? (
-                    <InfoCardText>{client?.address}</InfoCardText>
+                    client?.address.map((address, index) => (
+                      <ListItemCard
+                        key={index + '-' + address}
+                        alignItems="flex-start"
+                      >
+                        <InfoCardName>Endereço:</InfoCardName>{' '}
+                        <InfoCardText>{address}</InfoCardText>
+                      </ListItemCard>
+                    ))
                   ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Endereço:</InfoCardName>{' '}
+                      <InfoCardText width="100%"></InfoCardText>
+                    </ListItemCard>
                   )}
-                </ListItemCard>
-              </List>
-            </Paper>
-            {/* Veículo */}
-            <Paper
-              sx={{
-                p: 2,
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
+                </List>
+              </Paper>
+              {/* Veículo */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
               >
-                <TitleCard>Veículo</TitleCard>
-                <MoreOptionsButtonSelect
-                  handleIsEditSelectedCard={handleIsEditSelectedCard}
-                  typeEdit="clientVehicle"
-                  disabledButton={true}
-                />
-              </Stack>
-              <DividerCard />
-              <List dense={false}>
-                <ListItemCard>
-                  <InfoCardName>Marca:</InfoCardName>{' '}
-                  {clientVehicle?.brand ? (
-                    <InfoCardText>{clientVehicle?.brand}</InfoCardText>
-                  ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
-                  )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>Modelo:</InfoCardName>{' '}
-                  {clientVehicle?.model ? (
-                    <InfoCardText>{clientVehicle?.model}</InfoCardText>
-                  ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
-                  )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>Veículo:</InfoCardName>{' '}
-                  {clientVehicle?.vehicle ? (
-                    <InfoCardText>{clientVehicle?.vehicle}</InfoCardText>
-                  ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
-                  )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>Cor:</InfoCardName>{' '}
-                  {clientVehicle?.color ? (
-                    <InfoCardText>{clientVehicle?.color}</InfoCardText>
-                  ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
-                  )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>Chassi:</InfoCardName>{' '}
-                  {clientVehicle?.chassis ? (
-                    <InfoCardText>{clientVehicle?.chassis}</InfoCardText>
-                  ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
-                  )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>Placa:</InfoCardName>{' '}
-                  {clientVehicle?.plate ? (
-                    <InfoCardText>{clientVehicle?.plate}</InfoCardText>
-                  ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
-                  )}
-                </ListItemCard>
-              </List>
-            </Paper>
-          </Stack>
-        </Grid>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Veículo</TitleCard>
+                  <ButtonAdd
+                    aria-label="add to client"
+                    onClick={() => {
+                      setOpenModalClientVehicleSearch(true)
+                    }}
+                  >
+                    <AddCircleIcon />
+                  </ButtonAdd>
+                </Stack>
+                <DividerCard />
+                <List dense={false}>
+                  <ListItemCard>
+                    <InfoCardName>Marca:</InfoCardName>{' '}
+                    {clientVehicle?.brand ? (
+                      <InfoCardText>{clientVehicle?.brand}</InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Modelo:</InfoCardName>{' '}
+                    {clientVehicle?.model ? (
+                      <InfoCardText>{clientVehicle?.model}</InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Veículo:</InfoCardName>{' '}
+                    {clientVehicle?.vehicle ? (
+                      <InfoCardText>{clientVehicle?.vehicle}</InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Cor:</InfoCardName>{' '}
+                    {clientVehicle?.color ? (
+                      <InfoCardText>{clientVehicle?.color}</InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Chassi:</InfoCardName>{' '}
+                    {clientVehicle?.chassis ? (
+                      <InfoCardText>{clientVehicle?.chassis}</InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Placa:</InfoCardName>{' '}
+                    {clientVehicle?.plate ? (
+                      <InfoCardText>
+                        {formatPlate(clientVehicle?.plate)}
+                      </InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                </List>
+              </Paper>
+            </Stack>
+          </Grid>
 
-        <Grid item xs={12} md={5} lg={5}>
-          <Stack spacing={2}>
-            <Stack
+          <Grid item xs={12} md={5} lg={5}>
+            <Stack spacing={2}>
+              {/* <Stack
               spacing={2}
               direction="row"
               display="flex"
               justifyContent="center"
             >
-              <ButtonLeft onClick={() => setOpenChecklistModal(true)}>
-                Listar Checklists
-              </ButtonLeft>
-              <ButtonCenter>
+              <ButtonLeft disabled>Listar Orçamentos</ButtonLeft>
+              <ButtonCenter disabled>
                 <PrintIcon />
               </ButtonCenter>
-              <ButtonRight startIcon={<AddCircleOutlineIcon />}>
+              <ButtonRight disabled startIcon={<AddCircleOutlineIcon />}>
                 Novo
               </ButtonRight>
-            </Stack>
-            <Stack
-              spacing={2}
-              direction="row"
-              display="flex"
-              justifyContent="center"
-            >
-              <ButtonLeft>Listar Orçamentos</ButtonLeft>
-              <ButtonCenter>
-                <PrintIcon />
-              </ButtonCenter>
-              <ButtonRight startIcon={<AddCircleOutlineIcon />}>
-                Novo
-              </ButtonRight>
-            </Stack>
-            {/* Agendamento */}
-            <Paper
-              sx={{
-                p: 2,
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
+            </Stack> */}
+              {/* Agendamento */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
               >
-                <TitleCard>AGENDAMENTO</TitleCard>
-                <MoreOptionsButtonSelect
-                  handleIsEditSelectedCard={handleIsEditSelectedCard}
-                  typeEdit="schedule"
-                />
-              </Stack>
-              <DividerCard />
-              <List dense={false}>
-                <ListItemCard>
-                  <InfoCardName>Número do atendimento:</InfoCardName>{' '}
-                  {router.query.id ? (
-                    <InfoCardText>{router.query.id}</InfoCardText>
-                  ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
-                  )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>Data da visita:</InfoCardName>
-                  {isEditSelectedCard === 'schedule' && (
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>AGENDAMENTO</TitleCard>
+                  <MoreOptionsButtonSelect
+                    handleIsEditSelectedCard={handleIsEditSelectedCard}
+                    typeEdit="schedule"
+                  />
+                </Stack>
+                <DividerCard />
+                <List dense={false}>
+                  <ListItemCard>
+                    <InfoCardName>Data da visita:</InfoCardName>
+
                     <DataTimeInput
                       dateSchedule={visitDate}
                       handleDateSchedule={handleDateSchedule}
                     />
-                  )}
-                  {isEditSelectedCard !== 'schedule' && visitDate && (
-                    <InfoCardText>
-                      {formatDateTime(`${visitDate}`)}
-                    </InfoCardText>
-                  )}
-                  {!visitDate && (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
-                    </InfoCardText>
-                  )}
-                </ListItemCard>
-              </List>
-            </Paper>
-            {wasEdited && isEditSelectedCard === 'schedule' && (
-              <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
-                <Paper
-                  sx={{
-                    p: '0 2',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    background: 'transparent',
-                  }}
-                  elevation={0}
-                >
-                  <Stack direction="row" justifyContent="flex-end" spacing={2}>
-                    <ButtonSubmit
-                      variant="contained"
-                      size="small"
-                      onClick={() => onSave()}
+                  </ListItemCard>
+                </List>
+              </Paper>
+              {wasEdited && isEditSelectedCard === 'schedule' && (
+                <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
+                  <Paper
+                    sx={{
+                      p: '0 2',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      background: 'transparent',
+                    }}
+                    elevation={0}
+                  >
+                    <Stack
+                      direction="row"
+                      justifyContent="flex-end"
+                      spacing={2}
                     >
-                      save
-                    </ButtonSubmit>
-                    <ButtonSubmit
-                      variant="contained"
-                      size="small"
-                      onClick={() => handleCancelled()}
-                    >
-                      cancelar
-                    </ButtonSubmit>
-                  </Stack>
-                </Paper>
-              </Grid>
-            )}
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        onClick={() => onSave()}
+                      >
+                        save
+                      </ButtonSubmit>
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleCancelled()}
+                      >
+                        cancelar
+                      </ButtonSubmit>
+                    </Stack>
+                  </Paper>
+                </Grid>
+              )}
 
-            <Paper
-              sx={{
-                p: 2,
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
               >
-                <TitleCard>Consultor técnico</TitleCard>
-                <MoreOptionsButtonSelect
-                  handleIsEditSelectedCard={handleIsEditSelectedCard}
-                  typeEdit="technicalConsultant"
-                />
-              </Stack>
-              <DividerCard />
-              <List dense={false}>
-                <ListItemCard>
-                  <InfoCardName>Nome:</InfoCardName>{' '}
-                  {isEditSelectedCard !== 'technicalConsultant' &&
-                  technicalConsultant?.name ? (
-                    <InfoCardText>{technicalConsultant?.name}</InfoCardText>
-                  ) : (
-                    isEditSelectedCard !== 'technicalConsultant' && (
-                      <InfoCardText width="100%">
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                          width="100%"
-                        />
-                      </InfoCardText>
-                    )
-                  )}
-                  {isEditSelectedCard === 'technicalConsultant' && (
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Consultor técnico</TitleCard>
+                </Stack>
+                <DividerCard />
+                <List dense={false}>
+                  <ListItemCard>
+                    <InfoCardName>Nome:</InfoCardName>{' '}
                     <Box width="100%">
                       <TextField
                         id="standard-select-currency"
@@ -641,6 +568,9 @@ export default function ServiceSchedulesEdit() {
                           handleTechnicalConsultant(parseInt(e.target.value))
                         }
                       >
+                        <MenuItem value={technicalConsultant?.id}>
+                          {'Selecione um Consultor'}
+                        </MenuItem>
                         {technicalConsultantsList.map((option) => (
                           <MenuItem
                             key={option.id + option.name}
@@ -651,25 +581,18 @@ export default function ServiceSchedulesEdit() {
                         ))}
                       </TextField>
                     </Box>
-                  )}
-                </ListItemCard>
-                <ListItemCard>
-                  <InfoCardName>Código consultor:</InfoCardName>{' '}
-                  {technicalConsultant?.id ? (
-                    <InfoCardText>{technicalConsultant?.id}</InfoCardText>
-                  ) : (
-                    <InfoCardText width="100%">
-                      <Skeleton
-                        variant="text"
-                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
-                        width="100%"
-                      />
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Código consultor:</InfoCardName>{' '}
+                    <InfoCardText>
+                      {technicalConsultant?.id === 0
+                        ? null
+                        : technicalConsultant?.id}
                     </InfoCardText>
-                  )}
-                </ListItemCard>
-              </List>
-            </Paper>
-            {wasEdited && isEditSelectedCard === 'technicalConsultant' && (
+                  </ListItemCard>
+                </List>
+              </Paper>
+
               <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
                 <Paper
                   sx={{
@@ -686,7 +609,7 @@ export default function ServiceSchedulesEdit() {
                       size="small"
                       onClick={() => onSave()}
                     >
-                      save
+                      salvar
                     </ButtonSubmit>
                     <ButtonSubmit
                       variant="contained"
@@ -698,40 +621,30 @@ export default function ServiceSchedulesEdit() {
                   </Stack>
                 </Paper>
               </Grid>
-            )}
-          </Stack>
+            </Stack>
+          </Grid>
+          {actionAlerts !== null && (
+            <ActionAlerts
+              isOpen={actionAlerts.isOpen}
+              title={actionAlerts.title}
+              type={actionAlerts.type}
+              handleAlert={handleAlert}
+            />
+          )}
         </Grid>
-        {actionAlerts !== null && (
-          <ActionAlerts
-            isOpen={actionAlerts.isOpen}
-            title={actionAlerts.title}
-            type={actionAlerts.type}
-            handleAlert={handleAlert}
-          />
-        )}
-      </Grid>
-      <TableModal
-        isOpen={openChecklistModal}
-        title="Lista de checklists"
-        closeChecklistModal={closeChecklistModal}
+      </Container>
+      <ModalSearchClient
+        handleClose={handleCloseModalClienteSearch}
+        openMolal={openModalClientSearch}
+        handleAddClient={handleAddClient}
       />
-    </Container>
+      <ModalSearchClientVehicle
+        handleClose={handleCloseModalClientVehicleSearch}
+        openMolal={openModalClientVehicleSearch}
+        handleAddClientVehicle={handleAddClientVehicle}
+      />
+    </>
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { 'next-auth.session-token': token } = parseCookies(ctx)
-
-  if (!token) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    }
-  }
-
-  return {
-    props: {},
-  }
-}
+ServiceSchedulesCreate.auth = true

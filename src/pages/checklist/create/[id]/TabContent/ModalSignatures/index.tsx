@@ -98,7 +98,6 @@ export default function ModalSignatures({
         if (signaturesData[isOpen.id]?.image.length > 0) {
           setIsSignature(signaturesData[isOpen.id].image[0])
         } else {
-          console.log('signatures')
           if (stageData) {
             if (stageData?.length > 0) {
               if (stageData[isOpen.id].image.length > 0) {

@@ -7,7 +7,15 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 
 import TableRow from '@mui/material/TableRow'
-import { forwardRef, useImperativeHandle, useState } from 'react'
+import { useRouter } from 'next/router'
+
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react'
 
 import { useFieldArray, useForm } from 'react-hook-form'
 import { Itens, StagesDataProps } from '../../../types'
@@ -20,7 +28,9 @@ import {
 } from '../styles'
 import { genereteInput } from './GenereteInputs'
 import ModalImages from './ModalImages'
-import ModalInspectCar from './ModalInspectCar'
+import ModalInspectCar, {
+  getValuesInspectionReturnType,
+} from './ModalInspectCar'
 import ModalSignatures from './ModalSignatures'
 import {
   ButtonsFinalized,
@@ -29,17 +39,19 @@ import {
   MarginBottomHack,
 } from './styles'
 
-type ImageListProps = Array<{
-  [key: string]: {
+type ImageProps = {
+  id: number
+  images: {
     id: number
-    images: {
-      id: number
-      name: string
-      url: string
-      size: string
-    }[]
+    name: string
+    url: string
+    size: string
   }[]
-}>
+}
+
+type ImageListProps = {
+  [key: string]: ImageProps[] | []
+}
 
 type OpenModalImage = {
   id: number | null
@@ -111,8 +123,28 @@ type TabContentProps = {
   handleChangeTabContent: (newValue: number) => void
 }
 
+export type handleGetValuesFormReturnType = {
+  [x: string]:
+    | (
+        | {
+            inputs: string | boolean
+            observation: string | undefined
+          }
+        | {
+            observation: string | undefined
+            inputs?: undefined
+          }
+      )[]
+    | undefined
+}
+
 interface RefType {
   handleOpenAlertDialog: (value: number) => void
+  handleGetValuesForm: () => Promise<StagesDataProps>
+}
+
+interface modalInspectionCarRefType {
+  getValuesInspection: () => getValuesInspectionReturnType
 }
 
 const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
@@ -138,7 +170,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       id: null,
       open: false,
     })
-  const [listImage, setListImage] = useState<ImageListProps>([])
+  const [listImage, setListImage] = useState<ImageListProps>({})
   const [typeSubmitForm, setTypeSubmitForm] = useState<
     'salvo' | 'finalizado' | 'rascunho'
   >('rascunho')
@@ -159,6 +191,9 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   })
 
   const [isAlteredForm, setIsAlteredForm] = useState(false)
+  const router = useRouter()
+
+  const modalCarRef = useRef<modalInspectionCarRefType>(null)
 
   const defaultValues = {
     [stageName]: stageData?.itens.map((item, index) => {
@@ -182,19 +217,22 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     register,
     handleSubmit,
     getValues,
+    setValue,
     formState: { isDirty },
   } = useForm({
     defaultValues,
   })
 
   // eslint-disable-next-line no-unused-vars
-  const { update } = useFieldArray({
+  const { update, fields } = useFieldArray({
     control,
     name: stageName,
   })
 
   useImperativeHandle(ref, () => ({
     handleOpenAlertDialog,
+    // @ts-ignore
+    handleGetValuesForm, // arrumar
   }))
 
   function handleOpenModalInspectCar(value: boolean) {
@@ -204,20 +242,20 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     setOpenModalInspectCar(false)
   }
 
-  function getIndexStageNameInListImage() {
-    return listImage.findIndex((item) => Object.hasOwn(item, stageName))
-  }
+  // function getIndexStageNameInListImage() {
+  //   return listImage.findIndex((item) => Object.hasOwn(item, stageName))
+  // }
 
   function closeModalImage() {
     setOpenModalImage({ id: null, open: false })
   }
 
   function getBagdeAmountImages(index: number) {
-    const IndexStageNameInListImage = getIndexStageNameInListImage()
-    const imgs = listImage[IndexStageNameInListImage]?.[stageName].filter(
-      (image) => image.id === index,
-    )[0]
-    return imgs?.images.length ?? 0
+    if (Object.hasOwn(listImage, stageName)) {
+      const imgs = listImage[stageName].filter((image) => image.id === index)[0]
+      return imgs?.images.length ?? 0
+    }
+    return 0
   }
 
   function handleAddImageInListImage(
@@ -229,60 +267,75 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       size: string
     },
   ) {
+    console.log(image)
     setListImage((prevState) => {
-      const newListImage = [...prevState]
-      const indexStageName = newListImage.findIndex((item) =>
-        Object.hasOwn(item, stageName),
-      )
+      const stageActual = prevState[stageName]
+      const isImagesInList = stageActual.findIndex((img) => img.id === index)
 
-      if (indexStageName < 0) {
-        return [
-          {
+      if (isImagesInList >= 0) {
+        console.log('entrou 0')
+        const valueFormatted = {
+          ...prevState,
+          [stageName]: prevState[stageName].map((i) => {
+            console.log([...i.images, image])
+            if (index === i.id) {
+              return {
+                id: index,
+                images: [...i.images, image],
+              }
+            }
+            return i
+          }),
+        }
+        console.log(valueFormatted)
+        return valueFormatted
+      }
+
+      if (isImagesInList < 0) {
+        if (prevState[stageName].length !== 0) {
+          return {
+            ...prevState,
             [stageName]: [
+              ...prevState[stageName],
               {
                 id: index,
                 images: [{ ...image }],
               },
             ],
-          },
-        ]
+          }
+        }
       }
-      const indexImage = prevState[indexStageName][stageName].findIndex(
-        (item) => item.id === index,
-      )
-      console.log(indexImage)
-      if (indexImage >= 0) {
-        newListImage[indexStageName][stageName][indexStageName].images.push(
-          image,
-        )
-        return newListImage
-      } else {
-        newListImage[indexStageName][stageName].push({
-          id: index,
-          images: [{ ...image }],
-        })
-        return newListImage
+      return {
+        ...prevState,
+        [stageName]: [
+          {
+            id: index,
+            images: [{ ...image }],
+          },
+        ],
       }
     })
     setIsAlteredForm(true)
   }
 
   function handleRemoveImageInListImage(index: number, imageId: number) {
-    const indexStageName = listImage.findIndex((item) =>
-      Object.hasOwn(item, stageName),
-    )
-    const findIndexListImage = listImage[indexStageName][stageName].findIndex(
+    const findIndexListImage = listImage[stageName].findIndex(
       (item) => item.id === index,
     )
-    setListImage((prevState) => {
-      const newListImage = [...prevState]
-      newListImage[indexStageName][stageName][findIndexListImage].images =
-        newListImage[indexStageName][stageName][
-          findIndexListImage
-        ].images.filter((image) => image.id !== imageId)
 
-      return newListImage
+    setListImage((prevState) => {
+      const stageActual = prevState[stageName]
+      prevState[stageName][findIndexListImage].images = prevState[stageName][
+        findIndexListImage
+      ].images.filter((item) => item.id !== imageId)
+      console.log(stageActual)
+
+      return {
+        ...prevState,
+        [stageName]: stageActual,
+      }
     })
+
     setIsAlteredForm(true)
   }
 
@@ -294,7 +347,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   }
 
   function handleSaveSignatures(signatures: CheckListSignatures[]) {
-    console.log(signatures)
     setDataModals((prevState) => {
       return {
         ...prevState,
@@ -311,11 +363,13 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         inspection: data,
       }
     })
+    console.log(data)
     setIsAlteredForm(true)
   }
 
+  // console.log(listImage[stageName])
+
   async function handleOpenAlertDialog(value: number) {
-    console.log(isAlteredForm, isDirty)
     if (!isDirty && !isAlteredForm) {
       handleChangeTabContent(value)
     } else {
@@ -323,19 +377,65 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     }
   }
 
-  function handleOpenAlertDialogIsSave(isSave: boolean, newTap: null | number) {
-    if (isSave) {
-      const valuesActual = getValues(stageName)
-      setTypeSubmitForm('salvo')
-      // @ts-ignore
-      const valuesActualFormatted = { [stageName]: [...valuesActual] }
-      onSubmitData(valuesActualFormatted)
-      setIsAlteredForm(false)
-      if (newTap !== null) handleChangeTabContent(newTap)
-    } else {
-      setIsAlteredForm(false)
-      if (newTap !== null) handleChangeTabContent(newTap)
+  async function getValueInspectionCar() {
+    if (modalCarRef.current && modalCarRef.current.getValuesInspection) {
+      const result = await modalCarRef.current.getValuesInspection()
+      console.log(result)
+      return result
     }
+  }
+
+  async function handleGetValuesForm() {
+    const inspectionCarValues = await getValueInspectionCar()
+    console.log(dataModals?.signatures)
+    const data = getValues()
+
+    const dataFormatted = {
+      ...stageData,
+      status: 'Rascunho',
+      signatures:
+        dataModals?.signatures.length > 0
+          ? dataModals?.signatures
+          : stageData?.signatures,
+      itens: stageItems.map((item, index) => {
+        if (item.rules.type === 'visual_inspect') {
+          return {
+            ...item,
+            comment: data[stageName]?.[index]?.observation,
+            values: {
+              labels: inspectionCarValues,
+            },
+          }
+        }
+
+        return {
+          ...item,
+          comment: data[stageName]?.[index]?.observation,
+          values: {
+            ...item.values,
+            images: listImage[stageName].filter((i) => i.id === index),
+            value: data[stageName]?.[index]?.inputs,
+          },
+        }
+      }),
+    }
+    return dataFormatted
+  }
+
+  function handleOpenAlertDialogIsSave(isSave: boolean, newTap: null | number) {
+    // handleChangeTabContent(newTap)
+    // if (isSave) {
+    //   const valuesActual = getValues(stageName)
+    //   setTypeSubmitForm('salvo')
+    //   // @ts-ignore
+    //   const valuesActualFormatted = { [stageName]: [...valuesActual] }
+    //   onSubmitData(valuesActualFormatted)
+    //   setIsAlteredForm(false)
+    //   if (newTap !== null) handleChangeTabContent(newTap)
+    // } else {
+    //   setIsAlteredForm(false)
+    //   if (newTap !== null) handleChangeTabContent(newTap)
+    // }
   }
 
   function onSubmitData(data: OnSubmitData) {
@@ -375,12 +475,13 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
           comment: data[stageName]?.[index]?.observation,
           values: {
             ...item.values,
-            images: listImage[index]?.id ? listImage[index].images : [],
+            images: listImage[stageName].filter((i) => i.id === index),
             value: data[stageName]?.[index]?.inputs,
           },
         }
       }),
     }
+
     handleAddListCheckList(dataFormatted as StagesDataProps)
   }
 
@@ -390,6 +491,65 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       newTab: null,
     })
   }
+
+  useEffect(() => {
+    const sessionStorageData = sessionStorage.getItem(
+      `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+    )
+
+    const dataSessionStorage: StagesDataProps[] = sessionStorageData
+      ? JSON.parse(sessionStorageData)
+      : null
+
+    const listImageSessionStorage: ImageProps[] = []
+
+    if (dataSessionStorage) {
+      const stageLocalSession = dataSessionStorage.filter(
+        (data) => data.name === stageName,
+      )[0]
+      if (stageLocalSession) {
+        console.log(stageLocalSession)
+        dataModals?.signatures.push()
+        setDataModals((prevState) => {
+          return {
+            ...prevState,
+            signatures: stageLocalSession.signatures as CheckListSignatures[],
+          }
+        })
+        stageLocalSession.itens.forEach((item, index) => {
+          const img = item.values.images === undefined ? [] : item.values.images
+          // @ts-ignore
+          listImageSessionStorage.push(...img)
+          const valueSelectedFormatted =
+            item.rules.type === 'select' && item.values.value === null
+              ? '-'
+              : item.values.value
+          setValue(
+            `${stageName}.${index}.inputs`,
+            item.rules.type === 'select'
+              ? valueSelectedFormatted
+              : item.values.value,
+          )
+          setValue(`${stageName}.${index}.observation`, item.comment)
+        })
+        console.log(listImageSessionStorage)
+      }
+
+      setListImage((prevState) => {
+        if (Object.hasOwn(prevState, stageName)) {
+          return {
+            ...prevState,
+            [stageName]: listImageSessionStorage,
+          }
+        }
+        return {
+          [stageName]: listImageSessionStorage,
+        }
+      })
+    } else {
+      console.log('não exists')
+    }
+  }, [])
 
   return (
     <>
@@ -431,6 +591,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
                           size="small"
                           disabled={isClosed}
                           onClick={() => {
+                            console.log(index)
                             setOpenModalImage({
                               id: index,
                               open: true,
@@ -511,6 +672,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         handleRemoveImageInListImage={handleRemoveImageInListImage}
         listImage={listImage}
         stageName={stageName}
+        idModal={openModalImage.id}
       />
       <ModalInspectCar
         isOpen={openModalInspectCar}
@@ -518,6 +680,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         stageData={stageData}
         // @ts-ignore
         handleInspectionData={handleInspectionData}
+        ref={modalCarRef}
       />
       <ModalSignatures
         isOpen={openModalSignature}

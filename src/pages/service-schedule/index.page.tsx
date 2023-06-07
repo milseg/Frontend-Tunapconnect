@@ -34,6 +34,7 @@ import { useQuery } from 'react-query'
 import Skeleton from '@mui/material/Skeleton'
 import { formatDateTime } from '@/ultis/formatDate'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
+import ButtonFilterSelect from './components/ButtonFilterSelect'
 
 type SearchFormProps = {
   search: string
@@ -46,6 +47,13 @@ type DataFetchProps = {
     total_results: number
   }
   serviceSchedulesList: ServiceSchedulesListProps[] | []
+}
+
+type filterValuesProps = {
+  date: {
+    dateStart: string | null
+    dateEnd: string | null
+  }
 }
 
 const api = new ApiCore()
@@ -66,6 +74,7 @@ export default function ServiceSchedulesList() {
     next: boolean
     previous: boolean
   }>({ next: true, previous: true })
+  const [filterValues, setFilterValues] = useState<filterValuesProps>()
 
   const { companySelected } = useContext(CompanyContext)
   const { setListServiceSchedule } = useContext(ServiceScheduleContext)
@@ -113,6 +122,28 @@ export default function ServiceSchedulesList() {
     url += `&search=${router.query.search}`
   }
 
+  if (router.query.promised_date_min) {
+    url += `&promised_date_min=${filterValues?.date.dateStart}`
+  }
+  if (router.query.promised_date_max) {
+    url += `&promised_date_max=${filterValues?.date.dateEnd}`
+  }
+  if (router.query.orderby) {
+    url += '&orderby=promised_date'
+  }
+
+  async function handleFilterValues(values: filterValuesProps) {
+    setFilterValues(values)
+    if (values?.date.dateStart) {
+      url += `&promised_date_min=${values?.date.dateStart}`
+    }
+    if (values?.date.dateEnd) {
+      url += `&promised_date_max=${values?.date.dateEnd}`
+    }
+    url += '&orderby=promised_date'
+    console.log(url)
+    await router.push(url)
+  }
   const columns: GridColDef[] = useMemo(
     () => [
       {
@@ -241,6 +272,7 @@ export default function ServiceSchedulesList() {
     () =>
       api.get(url).then((response) => {
         setListServiceSchedule(response.data.data)
+        console.log(response)
         localStorage.setItem(
           'service-schedule-list',
           JSON.stringify(response.data.data),
@@ -279,7 +311,11 @@ export default function ServiceSchedulesList() {
         }
       }),
 
-    { enabled: !!companySelected, refetchOnWindowFocus: false },
+    {
+      // enabled: !!companySelected || !!url,
+      refetchOnWindowFocus: false,
+      refetchOnMount: true,
+    },
   )
 
   function handlePages(nextPage: any): void {
@@ -386,9 +422,9 @@ export default function ServiceSchedulesList() {
                     <SearchIcon />
                   </ButtonIcon>
                 </Box>
-                {/* <Box>
-                  <MultipleSelectCheckmarks checkNames={filterChecked} handleChecked={handleChecked} />
-                </Box> */}
+                <Box>
+                  <ButtonFilterSelect handleFilterValues={handleFilterValues} />
+                </Box>
               </Grid>
               <Grid
                 item
@@ -408,9 +444,9 @@ export default function ServiceSchedulesList() {
                   sx={{ alignSelf: 'flex-end' }}
                   startIcon={<AddCircleOutlineIcon />}
                   onClick={async () => {
-                    await router.push(`/service-schedules/create`)
+                    await router.push(`/service-schedule/create`)
                   }}
-                  disabled
+                  // disabled
                 >
                   Adicionar novo
                 </ButtonAdd>

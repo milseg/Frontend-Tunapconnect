@@ -1,4 +1,4 @@
-import { ReactNode, SyntheticEvent, useRef, useState } from 'react'
+import { ReactNode, SyntheticEvent, useEffect, useRef, useState } from 'react'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -62,6 +62,7 @@ interface TabPanelProps {
 
 interface RefTabContentRefType {
   handleOpenAlertDialog: (value: number) => void
+  handleGetValuesForm: () => Promise<StagesDataProps>
 }
 
 function a11yProps(index: number) {
@@ -205,15 +206,61 @@ export default function ChecklistCreateById() {
   const handleChange = async (event: SyntheticEvent, newValue: number) => {
     // console.log(newValue)
     // if (data?.stages[value].status !== 'finalizado') setValue(newValue)
-    if (tabContentRef.current && tabContentRef.current.handleOpenAlertDialog) {
-      tabContentRef.current.handleOpenAlertDialog(newValue)
+    // if (tabContentRef.current && tabContentRef.current.handleOpenAlertDialog) {
+    //   tabContentRef.current.handleOpenAlertDialog(newValue)
+    // }
+    if (tabContentRef.current && tabContentRef.current.handleGetValuesForm) {
+      const result = await tabContentRef.current.handleGetValuesForm()
+      console.log(result)
+      const sessionStorageData = sessionStorage.getItem(
+        `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+      )
+
+      if (sessionStorageData) {
+        const storageStage: StagesDataProps[] = JSON.parse(sessionStorageData)
+        const storageStageActualIndex = storageStage.findIndex(
+          (item: any) => item.name === result.name,
+        )
+
+        if (storageStageActualIndex >= 0) {
+          const newStorageSessionFiltered = storageStage.filter(
+            (item) => item.name !== result.name,
+          )
+
+          sessionStorage.setItem(
+            `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+            JSON.stringify([...newStorageSessionFiltered, result]),
+          )
+        } else {
+          sessionStorage.setItem(
+            `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+            JSON.stringify([...storageStage, result]),
+          )
+        }
+      } else {
+        sessionStorage.setItem(
+          `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+          JSON.stringify([result]),
+        )
+      }
     }
+    setPainelValue(newValue)
   }
 
   function handleChangeTabContent(newValue: number) {
     setPainelValue(newValue)
   }
-  console.log(data?.stages[1])
+  useEffect(() => {
+    console.log('rendering')
+    if (data?.stages) {
+      if (data?.stages.length > 0) {
+        sessionStorage.setItem(
+          `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+          JSON.stringify(data?.stages),
+        )
+      }
+    }
+  }, [])
   if (isLoading) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -228,7 +275,7 @@ export default function ChecklistCreateById() {
   }
 
   if (isSuccess) {
-    console.log(data)
+    // console.log(data)
     return (
       <>
         <Box sx={{ mt: 2, ml: 2 }}>

@@ -108,7 +108,6 @@ export function CompanyProvider({ children }: GeralProviderProps) {
 
   useEffect(() => {
     getSession().then((session) => {
-      console.log(session)
       localStorage.setItem('user', JSON.stringify(session?.user))
     })
 

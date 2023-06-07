@@ -140,7 +140,7 @@ function InputSelect({
             disabled={isClosed}
             {...field}
           >
-            <MenuItem value="-">{'-'}</MenuItem>
+            {/* <MenuItem value="-">{'-'}</MenuItem> */}
             {opts.map((option, index) => (
               <MenuItem key={Math.random() * 20000 + index} value={option}>
                 {option}
