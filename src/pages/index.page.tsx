@@ -1,26 +1,43 @@
-import { getServerSession } from 'next-auth/next'
-import { GetServerSideProps, GetServerSidePropsContext } from 'next'
-import { authOptions } from './api/auth/[...nextauth].api'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/router'
+import { GetServerSideProps } from 'next'
 
-export default function SignIn() {
-  const { data: session } = useSession()
-  const router = useRouter()
-  if (typeof window === 'undefined') return null
+import { getSession } from 'next-auth/react'
 
-  if (session) {
-    router.push('/company')
-  }
-
-  router.push('/auth/login')
+export default function Home() {
+  // const { data: session } = useSession()
+  // const router = useRouter()
+  // if (typeof window === 'undefined') return null
+  // console.log(session)
+  // if (session) {
+  //   router.push('/company')
+  // }
+  // router.push('/auth/login')
 }
-export const getServerSideProps: GetServerSideProps = async (
-  ctx: GetServerSidePropsContext,
-) => {
-  return {
-    props: {
-      session: await getServerSession(ctx.req, ctx.res, authOptions),
-    },
+// export const getServerSideProps: GetServerSideProps = async (
+//   ctx: GetServerSidePropsContext,
+// ) => {
+//   return {
+//     props: {
+//       session: await getServerSession(ctx.req, ctx.res, authOptions),
+//     },
+//   }
+// }
+export const getServerSideProps: GetServerSideProps = async (ctx: any) => {
+  // const { 'next-auth.session-token': token } = parseCookies(ctx)
+  const session = await getSession(ctx)
+  console.log(session)
+  if (session) {
+    return {
+      redirect: {
+        destination: '/company',
+        permanent: false,
+      },
+    }
+  } else {
+    return {
+      redirect: {
+        destination: '/auth/login',
+        permanent: false,
+      },
+    }
   }
 }
