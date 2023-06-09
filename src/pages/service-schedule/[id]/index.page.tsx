@@ -335,7 +335,11 @@ export default function ServiceSchedulesEdit() {
           return resp.data.data
         }
       },
-      enabled: !!router?.query?.id && !!companySelected && !wasEdited,
+      enabled:
+        !!router?.query?.id &&
+        !!companySelected &&
+        !wasEdited &&
+        !openChecklistModal,
     })
 
   useEffect(() => {

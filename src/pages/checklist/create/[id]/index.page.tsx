@@ -1,4 +1,11 @@
-import { ReactNode, SyntheticEvent, useEffect, useRef, useState } from 'react'
+import {
+  ReactNode,
+  SyntheticEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -17,6 +24,7 @@ import {
 import { useRouter } from 'next/router'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import ActionAlerts from '@/components/ActionAlerts'
+import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 
 // import { useForm } from 'react-hook-form'
 
@@ -109,6 +117,9 @@ export default function ChecklistCreateById() {
   const queryClient = useQueryClient()
   const api = new ApiCore()
   const router = useRouter()
+  const { serviceScheduleState, setCheckList } = useContext(
+    ServiceScheduleContext,
+  )
 
   const tabContentRef = useRef<RefTabContentRefType>(null)
 
@@ -147,12 +158,19 @@ export default function ChecklistCreateById() {
   const { data, isSuccess, isLoading, isFetching } =
     useQuery<ResponseGetCheckList>(
       ['checklist-createByID'],
-      () =>
-        api
-          .get(`/checklist/${router?.query?.id}?company_id=`)
-          .then((response) => {
-            return response.data.data
-          }),
+      async () => {
+        try {
+          console.log(serviceScheduleState.checklist)
+          if (serviceScheduleState.checklist) {
+            return serviceScheduleState.checklist
+          }
+          const resp = await api.get(`/checklist/${router?.query?.id}`)
+          setCheckList(resp.data.data)
+          return resp.data.data
+        } catch (error) {
+          console.log(error)
+        }
+      },
       {
         refetchOnWindowFocus: false,
         enabled: !!router?.query?.id,

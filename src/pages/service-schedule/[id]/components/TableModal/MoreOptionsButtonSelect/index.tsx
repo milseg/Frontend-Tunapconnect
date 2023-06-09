@@ -7,7 +7,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 // import { Settings } from "@mui/icons-material";
 import { MoreOptionsButtonSelectProps } from './types'
 import { MenuItemButton } from './styles'
-import { useRouter } from 'next/router'
+
 import { PrintInspectionModal } from '../../PrintInspectionModal'
 
 // const ITEM_HEIGHT = 38
@@ -17,6 +17,7 @@ export function MoreOptionsButtonSelect({
   checklistId,
   status,
   handleDeleteChecklist,
+  handleEditChecklist,
 }: MoreOptionsButtonSelectProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -26,7 +27,7 @@ export function MoreOptionsButtonSelect({
   }
   const [openPrintInspectionModal, setOpenPrintInspectionModal] =
     useState(false)
-  const router = useRouter()
+
   const closePrintInspectionModalModal = () => {
     setOpenPrintInspectionModal(false)
   }
@@ -34,27 +35,27 @@ export function MoreOptionsButtonSelect({
   const handleClose = () => {
     setAnchorEl(null)
   }
-  const handleClickEdit = () => {
-    try {
-      const checklistListLocalStorage = localStorage.getItem('checklist-list')
-      if (checklistListLocalStorage) {
-        const checklistListLocalStorageParse = JSON.parse(
-          checklistListLocalStorage,
-        )
-        const checklistFindOne = checklistListLocalStorageParse.filter(
-          (c: any) => c.id === Number(checklistId),
-        )
-        localStorage.setItem(
-          'checklist-edit-byId',
-          JSON.stringify(checklistFindOne),
-        )
-        router.push(`/checklist/create/${checklistId}`)
-      }
-    } catch (e) {
-      console.log(e)
-    }
-    // router.push(`/checklist/create/${checklistId}`)
-  }
+  // const handleClickEdit = () => {
+  //   try {
+  //     const checklistListLocalStorage = localStorage.getItem('checklist-list')
+  //     if (checklistListLocalStorage) {
+  //       const checklistListLocalStorageParse = JSON.parse(
+  //         checklistListLocalStorage,
+  //       )
+  //       const checklistFindOne = checklistListLocalStorageParse.filter(
+  //         (c: any) => c.id === Number(checklistId),
+  //       )
+  //       localStorage.setItem(
+  //         'checklist-edit-byId',
+  //         JSON.stringify(checklistFindOne),
+  //       )
+  //       router.push(`/checklist/create/${checklistId}`)
+  //     }
+  //   } catch (e) {
+  //     console.log(e)
+  //   }
+  //   // router.push(`/checklist/create/${checklistId}`)
+  // }
   const handleClickDelete = async () => {
     try {
       await handleDeleteChecklist(Number(checklistId))
@@ -64,8 +65,6 @@ export function MoreOptionsButtonSelect({
       alert(`Erro ao excluir Checklist - ${checklistId}`)
       console.log(e)
     }
-    // await handleDeleteChecklist(Number(100000))
-    // handleDeleteChecklist(Number(checklistId))
   }
   return (
     <div>
@@ -116,7 +115,11 @@ export function MoreOptionsButtonSelect({
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItemButton onClick={handleClickEdit}>Editar</MenuItemButton>
+        <MenuItemButton
+          onClick={() => handleEditChecklist(Number(checklistId))}
+        >
+          Editar
+        </MenuItemButton>
         {/* <MenuItemButton onClick={() => {}}>Visualizar</MenuItemButton> */}
         {status !== 'Finalizado' && (
           <MenuItemButton onClick={handleClickDelete}>Excluir</MenuItemButton>
