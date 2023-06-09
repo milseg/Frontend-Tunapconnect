@@ -59,7 +59,7 @@ import { formatCPF } from '@/ultis/formatCPF'
 import { formatPlate } from '@/ultis/formatPlate'
 
 import { CompanyContext } from '@/contexts/CompanyContext'
-import { ChecklistProps } from '@/pages/checklist/types'
+// import { ChecklistProps } from '@/pages/checklist/types'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 
 const api = new ApiCore()
@@ -106,9 +106,9 @@ export default function ServiceSchedulesEdit() {
   const [isEditSelectedCard, setIsEditSelectedCard] =
     useState<isEditSelectedCardType>(null)
   const [wasEdited, setWasEdited] = useState(false)
-  const [defaultCheckListPrint, setDefaultCheckListPrint] = useState<
-    number | null
-  >(null)
+  // const [defaultCheckListPrint, setDefaultCheckListPrint] = useState<
+  //   number | null
+  // >(null)
   const [actionAlerts, setActionAlerts] =
     useState<ActionAlertsStateProps | null>(null)
 
@@ -389,32 +389,32 @@ export default function ServiceSchedulesEdit() {
     }
   }, [dataServiceScheduleStatus, dataServiceSchedule])
 
-  const { data: serviceScheduleDefault, status: serviceScheduleDefaultStatus } =
-    useQuery<ChecklistProps>(
-      [
-        'service_schedule',
-        'by_id',
-        'edit',
-        'openModal',
-        'default',
-        companySelected,
-        router.query.id,
-      ],
-      async () => {
-        const resp = await api.get(
-          `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc&limit=1`,
-        )
-        if (resp.data.data.length > 0) {
-          setDefaultCheckListPrint(resp.data.data[0].id)
-        } else {
-          setDefaultCheckListPrint(null)
-        }
-        return resp.data.data
-      },
-      {
-        enabled: openPrintInspectionModal,
-      },
-    )
+  // const { data: serviceScheduleDefault, status: serviceScheduleDefaultStatus } =
+  //   useQuery<ChecklistProps>(
+  //     [
+  //       'service_schedule',
+  //       'by_id',
+  //       'edit',
+  //       'openModal',
+  //       'default',
+  //       companySelected,
+  //       router.query.id,
+  //     ],
+  //     async () => {
+  //       const resp = await api.get(
+  //         `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc&limit=1`,
+  //       )
+  //       if (resp.data.data.length > 0) {
+  //         setDefaultCheckListPrint(resp.data.data[0].id)
+  //       } else {
+  //         setDefaultCheckListPrint(null)
+  //       }
+  //       return resp.data.data
+  //     },
+  //     {
+  //       enabled: openPrintInspectionModal,
+  //     },
+  //   )
 
   function handleCloseModalPrintInspectionDefault() {
     setOpenPrintInspectionModal(false)
