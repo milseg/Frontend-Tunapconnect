@@ -16,7 +16,7 @@ type User = {
 
 type AuthContextType = {
   isAuthenticated: boolean
-  signIn: (data: SignInData) => Promise<void> | Promise<string>
+  signIn: (data: SignInData) => Promise<string | undefined>
   user: User | null
 }
 
@@ -56,7 +56,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!resp?.ok && resp?.status === 401) {
       return 'Usuário ou senha incorreto!'
     }
-    return 'Falha ao realizar o login!'
   }
 
   useEffect(() => {

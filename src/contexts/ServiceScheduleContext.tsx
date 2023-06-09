@@ -1,17 +1,17 @@
 // import { ApiCore } from '@/lib/api'
+import { ChecklistProps } from '@/pages/checklist/types'
 import { ServiceScheduleType } from '@/types/service-schedule'
-import { createContext, ReactNode, useReducer } from 'react'
+import { createContext, ReactNode, useEffect, useReducer } from 'react'
 
 type StateType = {
-  list: ServiceScheduleType[]
-  selectedActual: ServiceScheduleType | null
+  serviceSchedule: ServiceScheduleType | null
+  checklist: ChecklistProps | null
 }
 
 type ServiceScheduleContextProps = {
-  setListServiceSchedule: (list: ServiceScheduleType[] | []) => void
-  getServiceScheduleById: (id: number) => ServiceScheduleType | null
-  setServiceScheduleSelectedById: (id: number) => void
   serviceScheduleState: StateType
+  setServiceSchedule: (data: ServiceScheduleType) => void
+  setCheckList: (data: ChecklistProps) => void
 }
 type ServiceScheduleProviderProps = {
   children: ReactNode
@@ -27,8 +27,8 @@ export function ServiceScheduleProvider({
   const [serviceScheduleState, dispatch] = useReducer(
     serviceScheduleListReducer,
     {
-      list: [],
-      selectedActual: null,
+      serviceSchedule: null,
+      checklist: null,
     },
   )
 
@@ -40,79 +40,47 @@ export function ServiceScheduleProvider({
   ): StateType {
     const { type, payload } = action
     switch (type) {
-      case 'ADD_NEW_SERVICE_SCHEDULE_LIST':
+      case 'ADD_NEW_SERVICE_SCHEDULE':
         return {
           ...state,
-          list: payload,
+          serviceSchedule: payload,
         }
-      case 'ADD_NEW_SELECTED':
+      case 'ADD_NEW_CHECKLIST':
         return {
           ...state,
-          selectedActual: payload,
+          checklist: payload,
         }
       case 'DELETE_BY_ID':
         return {
           ...state,
-          selectedActual: payload,
+          serviceSchedule: payload,
         }
       default:
         return state
     }
   }
 
-  function setListServiceSchedule(list: ServiceScheduleType[] | []) {
+  function setServiceSchedule(data: ServiceScheduleType) {
     dispatch({
-      type: 'ADD_NEW_SERVICE_SCHEDULE_LIST',
-      payload: list,
+      type: 'ADD_NEW_SERVICE_SCHEDULE',
+      payload: data,
     })
   }
 
-  function getServiceScheduleById(id: number): ServiceScheduleType | null {
-    const isExistsServiceSchedule = serviceScheduleState.list.filter(
-      (s) => s.id === id,
-    )
-    if (isExistsServiceSchedule.length > 0) {
-      return isExistsServiceSchedule[0]
-    }
-    return null
+  function setCheckList(data: ChecklistProps) {
+    dispatch({
+      type: 'ADD_NEW_CHECKLIST',
+      payload: data,
+    })
   }
 
-  function setServiceScheduleSelectedById(id: number) {
-    const isExistsServiceSchedule = serviceScheduleState.list.filter(
-      (s) => s.id === id,
-    )
-    if (isExistsServiceSchedule.length > 0) {
-      dispatch({
-        type: 'ADD_NEW_SELECTED',
-        payload: isExistsServiceSchedule[0],
-      })
-    }
-  }
-
-  // async function deleteServiceScheduleById(id: number): boolean {
-  //   const resp = api.delete('')
-
-  //   const isExistsServiceSchedule = serviceScheduleState.list.filter(
-  //     (s) => s.id !== id,
-  //   )
-  //   if (isExistsServiceSchedule.length > 0) {
-  //     dispatch({
-  //       type: 'DELETE_BY_ID',
-  //       payload: isExistsServiceSchedule,
-  //     })
-  //   }
-  // }
-
-  // function createServiceSchedule(data: any) {}
-
-  // function updateServiceScheduleById() {}
+  useEffect(() => {}, [])
 
   return (
     <ServiceScheduleContext.Provider
       value={{
-        setListServiceSchedule,
-        setServiceScheduleSelectedById,
-        getServiceScheduleById,
+        setServiceSchedule,
+        setCheckList,
         serviceScheduleState,
       }}
     >

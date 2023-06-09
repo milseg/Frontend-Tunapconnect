@@ -17,7 +17,10 @@ import TextField from '@mui/material/TextField'
 import SearchIcon from '@mui/icons-material/Search'
 
 import { ButtonAdd, ButtonIcon } from './style'
-import { ServiceSchedulesListProps } from '@/types/service-schedule'
+import {
+  ServiceSchedulesListProps,
+  ServiceScheduleType,
+} from '@/types/service-schedule'
 import { ApiCore } from '@/lib/api'
 import IconButton from '@mui/material/IconButton'
 import { Delete } from '@mui/icons-material'
@@ -47,6 +50,7 @@ type DataFetchProps = {
     total_results: number
   }
   serviceSchedulesList: ServiceSchedulesListProps[] | []
+  serviceSchedulesListAllData: ServiceScheduleType[]
 }
 
 type filterValuesProps = {
@@ -77,7 +81,7 @@ export default function ServiceSchedulesList() {
   const [filterValues, setFilterValues] = useState<filterValuesProps>()
 
   const { companySelected } = useContext(CompanyContext)
-  const { setListServiceSchedule } = useContext(ServiceScheduleContext)
+  const { setServiceSchedule } = useContext(ServiceScheduleContext)
 
   const router = useRouter()
 
@@ -271,7 +275,6 @@ export default function ServiceSchedulesList() {
     ['service-scheduler-list', companySelected],
     () =>
       api.get(url).then((response) => {
-        setListServiceSchedule(response.data.data)
         console.log(response)
         localStorage.setItem(
           'service-schedule-list',
@@ -308,6 +311,7 @@ export default function ServiceSchedulesList() {
             total_results: response.data.total_results,
           },
           serviceSchedulesList: resp,
+          serviceSchedulesListAllData: response.data.data,
         }
       }),
 
@@ -349,6 +353,20 @@ export default function ServiceSchedulesList() {
 
     router.push(newUrlPagination)
   }
+
+  async function handleSetServiceSchedule(idSelected: number) {
+    console.log(idSelected)
+    const filterSelected = rows?.serviceSchedulesListAllData.filter(
+      (i) => i.id === idSelected,
+    )[0]
+
+    console.log(filterSelected)
+    if (filterSelected) {
+      setServiceSchedule(filterSelected)
+    }
+    await router.push(`/service-schedule/${idSelected}`)
+  }
+
   useEffect(() => {
     async function refetchUrl() {
       if (router.query.search) {
@@ -470,6 +488,7 @@ export default function ServiceSchedulesList() {
               pages={pages}
               loading={isFetching}
               companyId={companySelected}
+              handleSetServiceSchedule={handleSetServiceSchedule}
             />
           ) : (
             <Skeleton variant="rounded" sx={{ width: '100%' }} height={150} />

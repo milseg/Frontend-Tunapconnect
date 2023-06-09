@@ -8,7 +8,6 @@ import Paper from '@mui/material/Paper'
 
 import { ServiceSchedulesListProps } from '@/types/service-schedule'
 
-import { useRouter } from 'next/router'
 import { TableDataGrid } from './styles'
 import { CustomNoRowsOverlay } from './NoRows'
 import { CustomFooterStatusComponent } from './FooterPaginate'
@@ -21,6 +20,7 @@ interface TableAppProps {
   pages: { next: boolean; previous: boolean }
   loading: boolean
   companyId: number | null | undefined
+  handleSetServiceSchedule: (id: number) => void
 }
 
 declare module '@mui/x-data-grid' {
@@ -39,10 +39,9 @@ export function TableApp({
   pages,
   loading,
   companyId,
+  handleSetServiceSchedule,
 }: TableAppProps) {
   const [rows, setRows] = useState<ServiceSchedulesListProps[]>([])
-
-  const router = useRouter()
 
   const apiRef = useGridApiRef()
 
@@ -94,7 +93,7 @@ export function TableApp({
                       'service-schedule-by-id',
                       JSON.stringify(item),
                     )
-                    router.push(`/service-schedule/${id.id}`)
+                    handleSetServiceSchedule(Number(id.id))
                   }
                 } catch (e) {
                   console.log(e)

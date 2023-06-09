@@ -20,6 +20,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, req) {
         if (!credentials?.username && !credentials?.password) {
+          console.log('====== sem dados ======')
           throw new Error('error')
         }
 

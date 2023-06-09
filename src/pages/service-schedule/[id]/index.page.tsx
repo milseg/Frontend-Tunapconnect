@@ -60,6 +60,7 @@ import { formatPlate } from '@/ultis/formatPlate'
 
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { ChecklistProps } from '@/pages/checklist/types'
+import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 
 const api = new ApiCore()
 
@@ -120,6 +121,9 @@ export default function ServiceSchedulesEdit() {
   const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
+  const { serviceScheduleState, setServiceSchedule } = useContext(
+    ServiceScheduleContext,
+  )
 
   // const handleDelete = (id: number) => {
   //   setRows(rows.filter((row) => row.id !== id))
@@ -322,9 +326,14 @@ export default function ServiceSchedulesEdit() {
       queryKey: ['service_schedule', 'by_id', 'edit'],
       queryFn: async () => {
         const { id } = router.query
-        const resp = await api.get(`/service-schedule/${id}`)
-
-        return resp.data.data
+        console.log(serviceScheduleState.serviceSchedule)
+        if (serviceScheduleState.serviceSchedule) {
+          return serviceScheduleState.serviceSchedule
+        } else {
+          const resp = await api.get(`/service-schedule/${id}`)
+          setServiceSchedule(resp.data.data)
+          return resp.data.data
+        }
       },
       enabled: !!router?.query?.id && !!companySelected && !wasEdited,
     })
