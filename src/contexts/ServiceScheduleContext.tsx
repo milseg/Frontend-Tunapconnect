@@ -1,11 +1,12 @@
 // import { ApiCore } from '@/lib/api'
 import { ChecklistProps } from '@/pages/checklist/types'
+import { ChecklistReturnType } from '@/types/checklist'
 import { ServiceScheduleType } from '@/types/service-schedule'
 import { createContext, ReactNode, useEffect, useReducer } from 'react'
 
 type StateType = {
   serviceSchedule: ServiceScheduleType | null
-  checklist: ChecklistProps | null
+  checklist: ChecklistReturnType | null
 }
 
 type ServiceScheduleContextProps = {

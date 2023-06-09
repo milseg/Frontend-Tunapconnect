@@ -414,7 +414,9 @@ export default function ServiceSchedulesEdit() {
       },
     )
 
-  console.log(serviceScheduleDefaultStatus)
+  function handleCloseModalPrintInspectionDefault() {
+    setOpenPrintInspectionModal(false)
+  }
 
   useEffect(() => {
     localStorage.removeItem('service-schedule-list')
@@ -925,6 +927,9 @@ export default function ServiceSchedulesEdit() {
             closeModal={closePrintInspectionModalModal}
             checkListIdForModal={defaultCheckListPrint}
             checkListData={serviceScheduleDefault as ChecklistProps}
+            handleCloseModalPrintInspectionDefault={
+              handleCloseModalPrintInspectionDefault
+            }
           />
         )}
     </Container>

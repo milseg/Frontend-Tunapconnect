@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useRef } from 'react'
 
 import { BoxContainer } from './styles'
 
@@ -13,39 +13,26 @@ import ReactToPrint from 'react-to-print'
 import PrintIcon from '@mui/icons-material/Print'
 import { Button } from '@mui/material'
 
-import { CompanyContext } from '@/contexts/CompanyContext'
-import { ChecklistProps } from '@/pages/checklist/types'
+import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
+import { ChecklistReturnType } from '@/types/checklist'
 
 interface PrintInspectionModalProps {
   isOpen: boolean
-  closeModal: () => void
-  checkListIdForModal: number
-  checkListData?: ChecklistProps
+  checkListData: ChecklistReturnType
+  handleCloseModalPrintInspectionDefault: () => void
 }
 
 export function PrintInspectionModal({
   isOpen,
-  closeModal,
-  checkListIdForModal,
+  handleCloseModalPrintInspectionDefault,
 }: PrintInspectionModalProps) {
-  const [open, setOpen] = useState(false)
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
 
-  const { companySelected } = useContext(CompanyContext)
+  const { serviceScheduleState } = useContext(ServiceScheduleContext)
 
   const printInspectionRef = useRef(null)
-
-  const handleClose = () => {
-    setOpen(false)
-    closeModal()
-  }
-
-  useEffect(() => {
-    if (isOpen) {
-      setOpen(true)
-    }
-  }, [isOpen, companySelected])
+  console.log(serviceScheduleState)
 
   return (
     <>
@@ -53,8 +40,8 @@ export function PrintInspectionModal({
         // fullScreen={fullScreen}
         fullScreen={fullScreen}
         maxWidth="lg"
-        open={open}
-        onClose={handleClose}
+        open={isOpen}
+        onClose={handleCloseModalPrintInspectionDefault}
         aria-labelledby="responsive-dialog-title"
       >
         {/* <DialogTitle id="responsive-dialog-title">{title}</DialogTitle> */}
@@ -66,10 +53,10 @@ export function PrintInspectionModal({
           <BoxContainer>
             <PrintInspection
               refPrint={printInspectionRef}
-              checklistId={checkListIdForModal}
-              type="service-schedule"
-              companyId={companySelected}
-              id={1}
+              // type="service-schedule"
+              checklistData={
+                serviceScheduleState.checklist as ChecklistReturnType
+              }
             />
           </BoxContainer>
         </DialogContent>
