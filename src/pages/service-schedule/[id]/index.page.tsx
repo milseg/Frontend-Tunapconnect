@@ -128,12 +128,14 @@ export default function ServiceSchedulesEdit() {
   // const handleDelete = (id: number) => {
   //   setRows(rows.filter((row) => row.id !== id))
   // }
+
   const closeChecklistModal = () => {
     setOpenChecklistModal(false)
   }
-  const closePrintInspectionModalModal = () => {
-    setOpenPrintInspectionModal(false)
-  }
+
+  // const closePrintInspectionModalModal = () => {
+  //   setOpenPrintInspectionModal(false)
+  // }
 
   function handleIsEditSelectedCard(value: isEditSelectedCardType) {
     setIsEditSelectedCard(value)
@@ -920,18 +922,18 @@ export default function ServiceSchedulesEdit() {
         serviceScheduleId={router?.query?.id as string}
         closeChecklistModal={closeChecklistModal}
       />
-      {serviceScheduleDefaultStatus === 'success' &&
+      <PrintInspectionModal
+        isOpen={openPrintInspectionModal}
+        handleCloseModal={handleCloseModalPrintInspectionDefault}
+      />
+
+      {/* {serviceScheduleDefaultStatus === 'success' &&
         defaultCheckListPrint !== null && (
           <PrintInspectionModal
             isOpen={openPrintInspectionModal}
-            closeModal={closePrintInspectionModalModal}
-            checkListIdForModal={defaultCheckListPrint}
-            checkListData={serviceScheduleDefault as ChecklistProps}
-            handleCloseModalPrintInspectionDefault={
-              handleCloseModalPrintInspectionDefault
-            }
+            handleCloseModal={handleCloseModalPrintInspectionDefault}
           />
-        )}
+        )} */}
     </Container>
   )
 }

@@ -177,12 +177,13 @@ export function TableModal({
               status={params.row.status}
               handleDeleteChecklist={handleDeleteChecklist}
               handleEditChecklist={handleEditChecklist}
+              handlePrintChecklist={handlePrintChecklist}
             />
           )
         },
       },
     ],
-    [isOpen, handleEditChecklist],
+    [isOpen, handleEditChecklist, handlePrintChecklist],
   )
 
   // const router = useRouter()
@@ -252,6 +253,16 @@ export function TableModal({
     if (checklistFiltered) {
       setCheckList(checklistFiltered)
       await router.push(`/checklist/create/${idChecklistSelected}`)
+    }
+  }
+  async function handlePrintChecklist(idChecklistSelected: number) {
+    console.log(idChecklistSelected)
+    console.log(dataCheckList)
+    const checklistFiltered = dataCheckList?.checklistAllData.filter(
+      (c: any) => c.id === idChecklistSelected,
+    )[0]
+    if (checklistFiltered) {
+      setCheckList(checklistFiltered)
     }
   }
 

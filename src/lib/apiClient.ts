@@ -13,6 +13,7 @@ export class apiCoreClient {
   private token: JWT | string
   constructor(accessToken: JWT | string | undefined) {
     this.token = accessToken || ''
+    api.defaults.timeout = 5000
     api.interceptors.request.use(
       async function (config) {
         config.headers.Authorization = accessToken

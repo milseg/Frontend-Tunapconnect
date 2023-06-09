@@ -18,6 +18,7 @@ export function MoreOptionsButtonSelect({
   status,
   handleDeleteChecklist,
   handleEditChecklist,
+  handlePrintChecklist,
 }: MoreOptionsButtonSelectProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -35,27 +36,7 @@ export function MoreOptionsButtonSelect({
   const handleClose = () => {
     setAnchorEl(null)
   }
-  // const handleClickEdit = () => {
-  //   try {
-  //     const checklistListLocalStorage = localStorage.getItem('checklist-list')
-  //     if (checklistListLocalStorage) {
-  //       const checklistListLocalStorageParse = JSON.parse(
-  //         checklistListLocalStorage,
-  //       )
-  //       const checklistFindOne = checklistListLocalStorageParse.filter(
-  //         (c: any) => c.id === Number(checklistId),
-  //       )
-  //       localStorage.setItem(
-  //         'checklist-edit-byId',
-  //         JSON.stringify(checklistFindOne),
-  //       )
-  //       router.push(`/checklist/create/${checklistId}`)
-  //     }
-  //   } catch (e) {
-  //     console.log(e)
-  //   }
-  //   // router.push(`/checklist/create/${checklistId}`)
-  // }
+
   const handleClickDelete = async () => {
     try {
       await handleDeleteChecklist(Number(checklistId))
@@ -126,14 +107,19 @@ export function MoreOptionsButtonSelect({
         )}
         {/* <MenuItemButton onClick={() => {}}>Enviar</MenuItemButton> */}
         {/* <MenuItemButton onClick={() => {}}>Duplicar</MenuItemButton> */}
-        <MenuItemButton onClick={() => setOpenPrintInspectionModal(true)}>
+        <MenuItemButton
+          onClick={() => {
+            console.log(checklistId)
+            handlePrintChecklist(Number(checklistId))
+            setOpenPrintInspectionModal(true)
+          }}
+        >
           Imprimir
         </MenuItemButton>
       </Menu>
       <PrintInspectionModal
         isOpen={openPrintInspectionModal}
-        closeModal={closePrintInspectionModalModal}
-        checkListIdForModal={checklistId as number}
+        handleCloseModal={closePrintInspectionModalModal}
       />
     </div>
   )

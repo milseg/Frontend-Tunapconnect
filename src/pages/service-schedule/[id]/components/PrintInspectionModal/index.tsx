@@ -18,13 +18,12 @@ import { ChecklistReturnType } from '@/types/checklist'
 
 interface PrintInspectionModalProps {
   isOpen: boolean
-  checkListData: ChecklistReturnType
-  handleCloseModalPrintInspectionDefault: () => void
+  handleCloseModal: () => void
 }
 
 export function PrintInspectionModal({
   isOpen,
-  handleCloseModalPrintInspectionDefault,
+  handleCloseModal,
 }: PrintInspectionModalProps) {
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
@@ -32,7 +31,6 @@ export function PrintInspectionModal({
   const { serviceScheduleState } = useContext(ServiceScheduleContext)
 
   const printInspectionRef = useRef(null)
-  console.log(serviceScheduleState)
 
   return (
     <>
@@ -41,7 +39,7 @@ export function PrintInspectionModal({
         fullScreen={fullScreen}
         maxWidth="lg"
         open={isOpen}
-        onClose={handleCloseModalPrintInspectionDefault}
+        onClose={handleCloseModal}
         aria-labelledby="responsive-dialog-title"
       >
         {/* <DialogTitle id="responsive-dialog-title">{title}</DialogTitle> */}
