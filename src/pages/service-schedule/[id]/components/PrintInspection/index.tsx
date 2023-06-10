@@ -153,6 +153,8 @@ export function PrintInspection({
     }
   }
 
+  console.log(checklistData)
+
   return (
     <div ref={refPrint}>
       <div className={classNames(style.page)}>
@@ -251,7 +253,8 @@ export function PrintInspection({
                 <div className={style.col}>
                   <div className={classNames(style['form-slot'], style.placa)}>
                     {/* @ts-ignore */}
-                    <label>Placa:</label> {checklistData?.vehicleclient?.plate}
+                    <label>Placa:</label>{' '}
+                    {checklistData?.vehicleclient[0]?.plate}
                   </div>
                   <div className={style['blue-slots']}>
                     <div>Cliente acompanha inspeção?</div>
@@ -880,7 +883,7 @@ export function PrintInspection({
                   </div>
                   <div
                     className={style['col-5']}
-                    style={{ marginTop: '-28px' }}
+                    style={{ marginTop: '-34px' }}
                   >
                     <table
                       className={classNames(

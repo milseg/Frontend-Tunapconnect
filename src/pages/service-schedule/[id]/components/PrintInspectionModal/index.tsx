@@ -1,6 +1,6 @@
 import { useContext, useRef } from 'react'
 
-import { BoxContainer } from './styles'
+import { BoxContainer, ButtonFooter } from './styles'
 
 import { useTheme } from '@mui/material/styles'
 import Dialog from '@mui/material/Dialog'
@@ -11,7 +11,6 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { PrintInspection } from '../PrintInspection'
 import ReactToPrint from 'react-to-print'
 import PrintIcon from '@mui/icons-material/Print'
-import { Button } from '@mui/material'
 
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 import { ChecklistReturnType } from '@/types/checklist'
@@ -62,14 +61,15 @@ export function PrintInspectionModal({
           {/* <Button autoFocus onClick={handleClose}>
             Disagree
           </Button>
-          <Button onClick={handleClose} autoFocus>
-            Agree
-          </Button> */}
+          // <Button onClick={handleClose} autoFocus>
+          //   Agree
+          // </Button> */}
+          <ButtonFooter onClick={handleCloseModal}>Cancelar</ButtonFooter>
           <ReactToPrint
             trigger={() => (
-              <Button>
-                <PrintIcon />
-              </Button>
+              <ButtonFooter>
+                <PrintIcon /> Imprimir
+              </ButtonFooter>
             )}
             content={() => printInspectionRef.current}
           />

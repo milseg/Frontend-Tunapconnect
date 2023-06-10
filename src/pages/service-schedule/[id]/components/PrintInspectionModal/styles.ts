@@ -3,7 +3,7 @@ import { DataGrid, gridClasses } from '@mui/x-data-grid'
 import { alpha, styled } from '@mui/material/styles'
 import { grey } from '@mui/material/colors'
 import IconButton from '@mui/material/IconButton'
-import { Box } from '@mui/material'
+import { Box, Button } from '@mui/material'
 
 // import Dialog from '@mui/material/Dialog';
 // import DialogActions from '@mui/material/DialogActions';
@@ -95,5 +95,18 @@ export const ButtonIcon = styled(IconButton)(({ theme }) => ({
   borderRadius: 3,
   '&:hover': {
     background: grey[400],
+  },
+}))
+
+export const ButtonFooter = styled(Button)(({ theme }) => ({
+  color: 'white',
+  background: '#0E948B',
+  borderRadius: 4,
+  // borderTopRightRadius: 0,
+  // borderBottomRightRadius: 0,
+  // padding: '5px 16px',
+  textTransform: 'none',
+  '&:hover': {
+    background: '#1ACABA',
   },
 }))
