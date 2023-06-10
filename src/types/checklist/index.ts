@@ -136,3 +136,14 @@ export interface ChecklistReturnType {
   checklistmodels: Checklistmodels
   serviceschedule: Serviceschedule
 }
+
+export interface ChecklistModelType {
+  id: number
+  name: string
+  description: string
+  active: boolean
+  stages: StagesDataProps[]
+  created_at: string
+  updated_at: string
+  status: any
+}

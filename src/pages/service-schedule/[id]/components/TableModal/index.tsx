@@ -205,7 +205,7 @@ export function TableModal({
   const {
     data: dataCheckList,
     isLoading,
-    isSuccess,
+    status: dataCheckListStatus,
     refetch,
   } = useQuery({
     queryKey: [
@@ -221,8 +221,6 @@ export function TableModal({
         const resp = await api.get(
           `/checklist/list?company_id=${companySelected}&service_schedule_id=${serviceScheduleId}&orderby=updated_at desc`,
         )
-
-        console.log(resp)
 
         const rowFormatted = resp.data.data.map((row: any) => {
           return {
@@ -271,7 +269,7 @@ export function TableModal({
       <Dialog
         // fullScreen={fullScreen}
         maxWidth="lg"
-        open={isOpen}
+        open={isOpen && dataCheckListStatus === 'success'}
         onClose={closeChecklistModal}
         aria-labelledby="responsive-dialog-title"
       >
@@ -283,7 +281,12 @@ export function TableModal({
         >
           <BoxContainer>
             <TableDataGrid
-              rows={isSuccess ? dataCheckList?.checklistRows : []}
+              rows={
+                dataCheckListStatus === 'success' &&
+                dataCheckList?.checklistRows.length > 0
+                  ? dataCheckList?.checklistRows
+                  : []
+              }
               columns={columns}
               autoHeight
               columnHeaderHeight={70}

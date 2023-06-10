@@ -62,6 +62,9 @@ import { CompanyContext } from '@/contexts/CompanyContext'
 // import { ChecklistProps } from '@/pages/checklist/types'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 
+import { ChecklistProps } from '@/pages/checklist/types'
+import { CheckListModelListModal } from './components/CheckListModelListModal'
+
 const api = new ApiCore()
 
 type isEditSelectedCardType =
@@ -106,9 +109,8 @@ export default function ServiceSchedulesEdit() {
   const [isEditSelectedCard, setIsEditSelectedCard] =
     useState<isEditSelectedCardType>(null)
   const [wasEdited, setWasEdited] = useState(false)
-  // const [defaultCheckListPrint, setDefaultCheckListPrint] = useState<
-  //   number | null
-  // >(null)
+  // const [defaultCheckListPrint, setDefaultCheckListPrint] =
+  //   useState<ChecklistProps | null>(null)
   const [actionAlerts, setActionAlerts] =
     useState<ActionAlertsStateProps | null>(null)
 
@@ -117,11 +119,13 @@ export default function ServiceSchedulesEdit() {
   const [openChecklistModal, setOpenChecklistModal] = useState(false)
   const [openPrintInspectionModal, setOpenPrintInspectionModal] =
     useState(false)
+  const [openCheckListModelListModal, setOpenCheckListModelListModal] =
+    useState(false)
 
   const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
-  const { serviceScheduleState, setServiceSchedule } = useContext(
+  const { serviceScheduleState, setServiceSchedule, setCheckList } = useContext(
     ServiceScheduleContext,
   )
 
@@ -270,38 +274,38 @@ export default function ServiceSchedulesEdit() {
   //   }
   // }, [router.query, companyId, wasEdited])
 
-  async function createCheckListBase() {
-    try {
-      const modelChecklist = await api.get('/checklist_model/list')
-      const dataCreateChecklist = {
-        company_id: companySelected,
-        brand_id:
-          dataServiceSchedule?.client_vehicle?.vehicle?.brand_id ?? null,
-        vehicle_id: dataServiceSchedule?.client_vehicle?.vehicle?.id ?? null,
-        model_id:
-          dataServiceSchedule?.client_vehicle?.vehicle?.model?.id ?? null,
-        vehicle_client_id: clientVehicle?.id ?? null,
-        km: dataServiceSchedule?.client_vehicle?.mileage ?? null,
-        fuel: null,
-        client_id: client?.id,
-        service_schedule_id: router?.query?.id
-          ? parseInt(router?.query?.id as string)
-          : null,
-        checklist_model: 1,
-        status: 'rascunho', // finalizado // pendente // rascunho
-        stages: modelChecklist.data.data[0].stages,
-      }
-      if (modelChecklist.data.data.length > 0) {
-        const createdDefault = await api.create(
-          '/checklist',
-          dataCreateChecklist,
-        )
-        router.replace(`/checklist/create/${createdDefault?.data?.data?.id}`)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  // async function createCheckListBase() {
+  //   try {
+  //     const modelChecklist = await api.get('/checklist_model/list')
+  //     const dataCreateChecklist = {
+  //       company_id: companySelected,
+  //       brand_id:
+  //         dataServiceSchedule?.client_vehicle?.vehicle?.brand_id ?? null,
+  //       vehicle_id: dataServiceSchedule?.client_vehicle?.vehicle?.id ?? null,
+  //       model_id:
+  //         dataServiceSchedule?.client_vehicle?.vehicle?.model?.id ?? null,
+  //       vehicle_client_id: clientVehicle?.id ?? null,
+  //       km: dataServiceSchedule?.client_vehicle?.mileage ?? null,
+  //       fuel: null,
+  //       client_id: client?.id,
+  //       service_schedule_id: router?.query?.id
+  //         ? parseInt(router?.query?.id as string)
+  //         : null,
+  //       checklist_model: 1,
+  //       status: 'rascunho', // finalizado // pendente // rascunho
+  //       stages: modelChecklist.data.data[0].stages,
+  //     }
+  //     if (modelChecklist.data.data.length > 0) {
+  //       const createdDefault = await api.create(
+  //         '/checklist',
+  //         dataCreateChecklist,
+  //       )
+  //       router.replace(`/checklist/create/${createdDefault?.data?.data?.id}`)
+  //     }
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
 
   const {
     data: dataTechnicalConsultantList,
@@ -328,7 +332,7 @@ export default function ServiceSchedulesEdit() {
       queryKey: ['service_schedule', 'by_id', 'edit'],
       queryFn: async () => {
         const { id } = router.query
-        console.log(serviceScheduleState.serviceSchedule)
+
         if (serviceScheduleState.serviceSchedule) {
           return serviceScheduleState.serviceSchedule
         } else {
@@ -389,35 +393,80 @@ export default function ServiceSchedulesEdit() {
     }
   }, [dataServiceScheduleStatus, dataServiceSchedule])
 
-  // const { data: serviceScheduleDefault, status: serviceScheduleDefaultStatus } =
-  //   useQuery<ChecklistProps>(
-  //     [
-  //       'service_schedule',
-  //       'by_id',
-  //       'edit',
-  //       'openModal',
-  //       'default',
-  //       companySelected,
-  //       router.query.id,
-  //     ],
-  //     async () => {
+  const { data: checklistDefault, status: checklistDefaultStatus } =
+    useQuery<ChecklistProps>(
+      [
+        'service_schedule',
+        'checklist-list',
+        'by_id',
+        'edit',
+        'forModal',
+        companySelected,
+        router.query.id,
+      ],
+      async () => {
+        try {
+          const resp = await api.get(
+            `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc&limit=1`,
+          )
+
+          return resp.data.data[0]
+        } catch (err) {
+          console.error(err)
+        }
+      },
+      // {
+      //   enabled: openPrintInspectionModal,
+      // },
+    )
+
+  // const {
+  //   data: dataCheckList,
+  //   isLoading,
+  //   isSuccess,
+  //   refetch,
+  // } = useQuery({
+  //   queryKey: [
+  //     'checklist',
+  //     'service_schedule',
+  //     'by_id',
+  //     'modal',
+  //     companySelected,
+  //     router.query.id,
+  //   ],
+  //   queryFn: async () => {
+  //     try {
   //       const resp = await api.get(
-  //         `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc&limit=1`,
+  //         `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc`,
   //       )
-  //       if (resp.data.data.length > 0) {
-  //         setDefaultCheckListPrint(resp.data.data[0].id)
-  //       } else {
-  //         setDefaultCheckListPrint(null)
+
+  //       console.log(resp)
+
+  //       const rowFormatted = resp.data.data.map((row: any) => {
+  //         return {
+  //           id: row?.id,
+  //           createAt: row?.created_at,
+  //           status: `${row?.status[0].toUpperCase()}${row?.status.substring(
+  //             1,
+  //           )}`,
+  //         }
+  //       })
+  //       return {
+  //         checklistAllData: resp.data.data,
+  //         checklistRows: rowFormatted,
   //       }
-  //       return resp.data.data
-  //     },
-  //     {
-  //       enabled: openPrintInspectionModal,
-  //     },
-  //   )
+  //     } catch (err) {
+  //       console.log(err)
+  //     }
+  //   },
+  //   // enabled: isOpen,
+  // })
 
   function handleCloseModalPrintInspectionDefault() {
     setOpenPrintInspectionModal(false)
+  }
+  function handleCheckListModelListModal() {
+    setOpenCheckListModelListModal(false)
   }
 
   useEffect(() => {
@@ -680,14 +729,20 @@ export default function ServiceSchedulesEdit() {
               <ButtonCenter
                 // disabled={defaultCheckListPrint === null}
                 onClick={() => {
-                  setOpenPrintInspectionModal(true)
+                  if (checklistDefaultStatus === 'success') {
+                    setCheckList(checklistDefault as ChecklistProps)
+
+                    setOpenPrintInspectionModal(true)
+                  }
                 }}
               >
                 <PrintIcon />
               </ButtonCenter>
               <ButtonRight
                 startIcon={<AddCircleOutlineIcon />}
-                onClick={createCheckListBase}
+                onClick={() => {
+                  setOpenCheckListModelListModal(true)
+                }}
               >
                 Novo
               </ButtonRight>
@@ -926,14 +981,10 @@ export default function ServiceSchedulesEdit() {
         isOpen={openPrintInspectionModal}
         handleCloseModal={handleCloseModalPrintInspectionDefault}
       />
-
-      {/* {serviceScheduleDefaultStatus === 'success' &&
-        defaultCheckListPrint !== null && (
-          <PrintInspectionModal
-            isOpen={openPrintInspectionModal}
-            handleCloseModal={handleCloseModalPrintInspectionDefault}
-          />
-        )} */}
+      <CheckListModelListModal
+        isOpen={openCheckListModelListModal}
+        handleClose={handleCheckListModelListModal}
+      />
     </Container>
   )
 }
