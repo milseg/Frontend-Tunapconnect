@@ -82,7 +82,7 @@ export interface Rules {
 export interface Signature {
   name: string
   rules: Rules
-  image: any[]
+  image: string
 }
 
 export interface StagesDataProps {

@@ -243,14 +243,14 @@ export function TableModal({
   })
 
   async function handleEditChecklist(idChecklistSelected: number) {
-    console.log(idChecklistSelected)
-    console.log(dataCheckList)
     const checklistFiltered = dataCheckList?.checklistAllData.filter(
       (c: any) => c.id === idChecklistSelected,
     )[0]
+    console.log(checklistFiltered)
     if (checklistFiltered) {
       setCheckList(checklistFiltered)
-      await router.push(`/checklist/create/${idChecklistSelected}`)
+
+      await router.push(`/checklist/${idChecklistSelected}`)
     }
   }
   async function handlePrintChecklist(idChecklistSelected: number) {

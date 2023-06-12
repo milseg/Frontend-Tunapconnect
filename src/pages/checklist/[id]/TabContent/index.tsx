@@ -186,9 +186,9 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   // const router = useRouter()
 
   const { serviceScheduleState } = useContext(ServiceScheduleContext)
-  const { checklistModel } = serviceScheduleState
+  const { checklist } = serviceScheduleState
 
-  const stageActual = checklistModel?.stages.filter(
+  const stageActual = checklist?.stages.filter(
     (stage) => stage.name === stageName,
   )[0] as StagesDataProps
 
@@ -374,7 +374,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 
   async function handleGetValuesForm() {
     const inspectionCarValues = await getValueInspectionCar()
-    console.log(dataModals?.signatures)
     const data = getValues()
 
     const dataFormatted = {
@@ -411,54 +410,59 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     return dataFormatted
   }
 
-  function onSubmitData(data: OnSubmitData) {
-    const isAlreadyInspections = stageData?.itens.filter(
-      (item) => item.rules.type === 'visual_inspect',
-    )
+  async function onSubmitData(data: OnSubmitData) {
+    // const isAlreadyInspections = stageData?.itens.filter(
+    //   (item) => item.rules.type === 'visual_inspect',
+    // )
 
-    let defaultLabel: any
+    // let defaultLabel: any
 
-    if (isAlreadyInspections) {
-      defaultLabel = isAlreadyInspections[0].values
-        .labels as InspectionCarData[]
-    }
+    // if (isAlreadyInspections) {
+    //   defaultLabel = isAlreadyInspections[0].values
+    //     .labels as InspectionCarData[]
+    // }
 
-    const dataFormatted = {
-      ...stageData,
+    // const dataFormatted = {
+    //   ...stageData,
+    //   status: typeSubmitForm,
+    //   signatures:
+    //     dataModals?.signatures.length > 0
+    //       ? dataModals?.signatures
+    //       : stageData?.signatures,
+    //   itens: stageItems.map((item, index) => {
+    //     if (item.rules.type === 'visual_inspect') {
+    //       return {
+    //         ...item,
+    //         comment: data[stageName]?.[index]?.observation,
+    //         values: {
+    //           labels:
+    //             dataModals?.inspection.length > 0
+    //               ? dataModals?.inspection
+    //               : defaultLabel,
+    //         },
+    //       }
+    //     }
+
+    //     return {
+    //       ...item,
+    //       comment: data[stageName]?.[index]?.observation,
+    //       values: {
+    //         ...item.values,
+    //         images: listImage[stageName]
+    //           ? listImage[stageName].filter((i) => i.id === index)
+    //           : [],
+    //         value: data[stageName]?.[index]?.inputs,
+    //       },
+    //     }
+    //   }),
+    // }
+    const dataActual = await handleGetValuesForm()
+    console.log(dataActual)
+
+    handleAddListCheckList({
+      ...dataActual,
       status: typeSubmitForm,
-      signatures:
-        dataModals?.signatures.length > 0
-          ? dataModals?.signatures
-          : stageData?.signatures,
-      itens: stageItems.map((item, index) => {
-        if (item.rules.type === 'visual_inspect') {
-          return {
-            ...item,
-            comment: data[stageName]?.[index]?.observation,
-            values: {
-              labels:
-                dataModals?.inspection.length > 0
-                  ? dataModals?.inspection
-                  : defaultLabel,
-            },
-          }
-        }
-
-        return {
-          ...item,
-          comment: data[stageName]?.[index]?.observation,
-          values: {
-            ...item.values,
-            images: listImage[stageName]
-              ? listImage[stageName].filter((i) => i.id === index)
-              : [],
-            value: data[stageName]?.[index]?.inputs,
-          },
-        }
-      }),
-    }
-
-    handleAddListCheckList(dataFormatted as StagesDataProps)
+    } as StagesDataProps)
   }
 
   useEffect(() => {
