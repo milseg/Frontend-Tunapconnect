@@ -6,7 +6,7 @@ import {
 } from 'react-hook-form'
 
 import { MenuItem, Select, Switch, TextField } from '@mui/material'
-import { Value } from '../../../../types'
+import { Value } from '../../../types'
 
 import { ButtonItemChecklist } from './styles'
 

@@ -8,6 +8,9 @@ import { useQuery } from 'react-query'
 import { ButtonCancel, ButtonModelChecklist } from './style'
 import { Stack } from '@mui/material'
 import { ChecklistModelType } from '@/types/checklist'
+import { useContext } from 'react'
+import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
+import { useRouter } from 'next/router'
 
 interface ModalSelectModelChecklistProps {
   isOpen: boolean
@@ -19,6 +22,12 @@ export function CheckListModelListModal({
   handleClose,
 }: ModalSelectModelChecklistProps) {
   const api = new ApiCore()
+
+  const router = useRouter()
+
+  const { setCheckListModel, serviceScheduleState } = useContext(
+    ServiceScheduleContext,
+  )
 
   const { data: dataChecklistModelList, status: dataChecklistModelListStatus } =
     useQuery<ChecklistModelType[]>({
@@ -36,6 +45,14 @@ export function CheckListModelListModal({
       // enabled: isOpen,
     })
 
+  async function handleChecklistModelCreate(data: ChecklistModelType) {
+    console.log(data)
+    setCheckListModel(data)
+    await router.push(
+      `/checklist/create?checklist_model_id=${data.id}&service_schedule_id=${serviceScheduleState?.serviceSchedule?.id}`,
+    )
+  }
+
   return (
     <>
       <Dialog
@@ -48,7 +65,10 @@ export function CheckListModelListModal({
             {dataChecklistModelList &&
               dataChecklistModelList.map((item, index) => {
                 return (
-                  <ButtonModelChecklist key={index}>
+                  <ButtonModelChecklist
+                    key={index}
+                    onClick={() => handleChecklistModelCreate(item)}
+                  >
                     {' '}
                     {item.name}
                   </ButtonModelChecklist>

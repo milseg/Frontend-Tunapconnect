@@ -10,6 +10,7 @@ import {
 import { alpha, styled } from '@mui/material/styles'
 import Badge, { BadgeProps } from '@mui/material/Badge'
 import CropOriginalIcon from '@mui/icons-material/CropOriginal'
+import Link from 'next/link'
 
 export const TabItem = styled(Tab)(({ theme }) => ({
   color: '#1ACABA',
@@ -83,3 +84,46 @@ export const InputLabelRow = styled(Typography)(({ theme }) => ({
 export const InputText = styled(OutlinedInput)(({ theme }) => ({
   flex: 1,
 }))
+
+export const MyButton = styled(Button)(({ theme }) => ({
+  color: 'white',
+  background: '#0E948B',
+  borderRadius: 4,
+  // borderTopRightRadius: 0,
+  // borderBottomRightRadius: 0,
+  // padding: '5px 16px',
+  flex: 1,
+  textTransform: 'none',
+  '&:hover': {
+    background: '#1ACABA',
+  },
+}))
+
+export const ButtonDialog = styled(Button)(({ theme }) => ({
+  color: 'white',
+  background: '#0E948B',
+  borderRadius: 4,
+  // borderTopRightRadius: 0,
+  // borderBottomRightRadius: 0,
+  // padding: '5px 16px',
+  // flex: 1,
+  textTransform: 'none',
+  '&:hover': {
+    background: '#1ACABA',
+  },
+}))
+export const LinkNext = styled(Link)`
+  text-decoration: none;
+`
+
+export const Title = styled(Typography)`
+  color: #004d40;
+  font-weight: bold;
+  margin: 0;
+  &:hover {
+    color: #1acaba;
+    & span {
+      color: #1acaba;
+    }
+  }
+`

@@ -1,18 +1,20 @@
 // import { ApiCore } from '@/lib/api'
 import { ChecklistProps } from '@/pages/checklist/types'
-import { ChecklistReturnType } from '@/types/checklist'
+import { ChecklistModelType, ChecklistReturnType } from '@/types/checklist'
 import { ServiceScheduleType } from '@/types/service-schedule'
 import { createContext, ReactNode, useEffect, useReducer } from 'react'
 
 type StateType = {
   serviceSchedule: ServiceScheduleType | null
   checklist: ChecklistReturnType | null
+  checklistModel: ChecklistModelType | null
 }
 
 type ServiceScheduleContextProps = {
   serviceScheduleState: StateType
   setServiceSchedule: (data: ServiceScheduleType) => void
   setCheckList: (data: ChecklistProps) => void
+  setCheckListModel: (data: ChecklistModelType) => void
 }
 type ServiceScheduleProviderProps = {
   children: ReactNode
@@ -30,6 +32,7 @@ export function ServiceScheduleProvider({
     {
       serviceSchedule: null,
       checklist: null,
+      checklistModel: null,
     },
   )
 
@@ -50,6 +53,11 @@ export function ServiceScheduleProvider({
         return {
           ...state,
           checklist: payload,
+        }
+      case 'ADD_NEW_CHECKLIST_MODEL':
+        return {
+          ...state,
+          checklistModel: payload,
         }
       case 'DELETE_BY_ID':
         return {
@@ -74,6 +82,12 @@ export function ServiceScheduleProvider({
       payload: data,
     })
   }
+  function setCheckListModel(data: ChecklistModelType) {
+    dispatch({
+      type: 'ADD_NEW_CHECKLIST_MODEL',
+      payload: data,
+    })
+  }
 
   useEffect(() => {}, [])
 
@@ -83,6 +97,7 @@ export function ServiceScheduleProvider({
         setServiceSchedule,
         setCheckList,
         serviceScheduleState,
+        setCheckListModel,
       }}
     >
       {children}
