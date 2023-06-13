@@ -199,7 +199,7 @@ export default function ModalCreateNewClient({
                 <Controller
                   render={({ field }) => (
                     <InputNewClient
-                      label="E-MAIL"
+                      label="Endereço"
                       variant="filled"
                       style={{ marginTop: 11 }}
                       fullWidth
