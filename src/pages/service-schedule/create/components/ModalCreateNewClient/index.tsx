@@ -12,8 +12,9 @@ import {
   ButtonModalActions,
   InputNewClient,
 } from '../../styles'
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import { ApiCore } from '@/lib/api'
+import { CompanyContext } from '@/contexts/CompanyContext'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
@@ -25,6 +26,7 @@ export default function ModalCreateNewClient({
   handleClose,
 }: ModalCreateNewClientProps) {
   const api = new ApiCore()
+  const { companySelected } = useContext(CompanyContext)
 
   const { register, handleSubmit, control, reset } = useForm({
     defaultValues: {
@@ -64,7 +66,7 @@ export default function ModalCreateNewClient({
   async function onSubmit(data: any) {
     try {
       const dataFormatted = {
-        company_id: 5,
+        company_id: companySelected,
         active: true,
         name: data.name,
         document: data.document,
