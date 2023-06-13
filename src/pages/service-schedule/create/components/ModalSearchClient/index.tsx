@@ -6,20 +6,14 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import SearchIcon from '@mui/icons-material/Search'
 import DialogTitle from '@mui/material/DialogTitle'
-import {
-  Box,
-  List,
-  ListItemButton,
-  ListItemText,
-  Stack,
-  Typography,
-} from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { ButtonIcon, ButtonModalDialog } from '../../styles'
 import { ApiCore } from '@/lib/api'
 import { useContext, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { ClientResponseType } from '@/types/service-schedule'
+import ClientsTable from './Components/Table'
 
 interface ModalSearchClienteProps {
   openMolal: boolean
@@ -43,6 +37,7 @@ export default function ModalSearchClient({
   const {
     register,
     handleSubmit,
+    setValue,
     // formState: { errors },
   } = useForm({
     defaultValues: {
@@ -60,7 +55,6 @@ export default function ModalSearchClient({
       const result = await api.get(
         `/client?company_id=${companySelected}&search=${data.search}`,
       )
-      console.log(result.data.data)
       setClientList(result.data.data)
     } catch (error) {
       console.log(error)
@@ -99,7 +93,7 @@ export default function ModalSearchClient({
                 <SearchIcon />
               </ButtonIcon>
             </Stack>
-            <List
+            {/* <List
               sx={{
                 width: '100%',
                 maxWidth: 360,
@@ -154,7 +148,8 @@ export default function ModalSearchClient({
                   </ListItemButton>
                 ))}
               </li>
-            </List>
+            </List> */}
+            <ClientsTable data={clientList} />
           </Box>
         </DialogContent>
         <DialogActions sx={{ pr: 3, pb: 2 }}>
@@ -175,6 +170,7 @@ export default function ModalSearchClient({
                 handleClose()
                 setClientList([])
                 setClientSelected(null)
+                setValue('search', '')
               }
             }}
           >

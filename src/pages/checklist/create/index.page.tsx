@@ -104,6 +104,7 @@ export default function ChecklistCreateById() {
     title: '',
     type: 'success',
   })
+  const [loading, setLoading] = useState(false)
   const queryClient = useQueryClient()
   const api = new ApiCore()
   const router = useRouter()
@@ -114,7 +115,11 @@ export default function ChecklistCreateById() {
 
   const updateChecklistMutations = useMutation(
     (newDataChecklist: ChecklistProps) => {
+      setLoading(true)
       return api.create(`/checklist`, newDataChecklist).then((resp) => {
+        setTimeout(() => {
+          setLoading(false)
+        }, 3000)
         return resp.data.data[0]
       })
     },
@@ -381,7 +386,7 @@ export default function ChecklistCreateById() {
 
         <Backdrop
           sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={isFetching}
+          open={loading}
           onClick={() => {}}
         >
           <CircularProgress color="inherit" />
