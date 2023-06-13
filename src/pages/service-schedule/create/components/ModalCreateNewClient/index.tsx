@@ -13,6 +13,7 @@ import {
   InputNewClient,
 } from '../../styles'
 import { useEffect } from 'react'
+import { ApiCore } from '@/lib/api'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
@@ -23,6 +24,8 @@ export default function ModalCreateNewClient({
   isOpen,
   handleClose,
 }: ModalCreateNewClientProps) {
+  const api = new ApiCore()
+
   const { register, handleSubmit, control, reset } = useForm({
     defaultValues: {
       name: '',
@@ -58,8 +61,23 @@ export default function ModalCreateNewClient({
     name: 'address',
   })
 
-  function onSubmit(data: any) {
-    console.log(data)
+  async function onSubmit(data: any) {
+    try {
+      const dataFormatted = {
+        company_id: 5,
+        active: true,
+        name: data.name,
+        document: data.document,
+        phone: data.phone.map((item: any) => item.phone),
+        email: data.email.map((item: any) => item.email),
+        address: data.address.map((item: any) => item.address),
+      }
+      console.log(dataFormatted)
+      const resp = await api.create('/client', dataFormatted)
+      console.log(resp)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   useEffect(() => {

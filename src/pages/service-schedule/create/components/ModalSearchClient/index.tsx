@@ -68,6 +68,11 @@ export default function ModalSearchClient({
     handleClose()
   }
 
+  function handleSelectedClient(client: ClientResponseType) {
+    console.log(client)
+    setClientSelected(client)
+  }
+
   return (
     <div>
       <Dialog open={openMolal} onClose={handleClose}>
@@ -159,6 +164,7 @@ export default function ModalSearchClient({
             <ClientsTable
               data={clientList}
               handleModalNewClient={handleClientModal}
+              handleSelectedClient={handleSelectedClient}
             />
           </Box>
         </DialogContent>

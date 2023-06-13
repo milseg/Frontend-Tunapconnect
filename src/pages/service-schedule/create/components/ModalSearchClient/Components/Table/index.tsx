@@ -14,16 +14,20 @@ import {
   TableRowSNoData,
 } from './style'
 import { Stack } from '@mui/system'
+import { useState } from 'react'
 
 interface ClientsTableProps {
   handleModalNewClient: () => void
+  handleSelectedClient: (client: ClientResponseType) => void
   data: ClientResponseType[]
 }
 
 export default function ClientsTable({
   data,
   handleModalNewClient,
+  handleSelectedClient,
 }: ClientsTableProps) {
+  const [clientSelected, setClientSelected] = useState<number | null>(null)
   return (
     <>
       <TableContainer component={Paper}>
@@ -43,8 +47,15 @@ export default function ClientsTable({
               data.map((row) => (
                 <TableRowSBody
                   key={row.id}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  onClick={() => console.log(row)}
+                  sx={{
+                    '&:last-child td, &:last-child th': { border: 0 },
+                    background: clientSelected === row.id ? '#1ACABA' : '',
+                  }}
+                  onClick={() => {
+                    handleSelectedClient(row)
+                    console.log(row)
+                    setClientSelected(row.id)
+                  }}
                 >
                   <TableCell scope="row">{row.name}</TableCell>
                   <TableCell align="right">{row.document}</TableCell>
