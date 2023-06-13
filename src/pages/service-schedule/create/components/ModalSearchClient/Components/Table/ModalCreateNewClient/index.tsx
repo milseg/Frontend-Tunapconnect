@@ -20,13 +20,6 @@ export default function ModalCreateNewClient({
   isOpen,
   handleClose,
 }: ModalCreateNewClientProps) {
-  const defaultValue = {
-    name: '',
-    document: '',
-    phone: [{ phone: '' }],
-    email: '',
-    address: '',
-  }
   const { register, handleSubmit, control } = useForm({
     defaultValues: {
       name: '',
@@ -36,13 +29,12 @@ export default function ModalCreateNewClient({
       address: '',
     },
   })
-  const { fields, append, prepend, remove, swap, move, insert, replace } =
-    useFieldArray({
-      control,
-      name: 'phone',
-    })
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'phone',
+  })
 
-  function onSubmit(data) {
+  function onSubmit(data: any) {
     console.log(data)
   }
 
