@@ -100,7 +100,10 @@ export const ButtonIcon = styled(IconButton)(({ theme }) => ({
   background: '#1C4961',
   borderRadius: 4,
   '&:hover': {
-    background: alpha('#1C4961', 0.7),
+    background: '#1ACABA',
+  },
+  '&:disabled': {
+    background: '#e0f2f1',
   },
 }))
 

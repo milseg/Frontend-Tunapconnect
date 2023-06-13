@@ -15,17 +15,20 @@ import {
 } from './style'
 import { Stack } from '@mui/system'
 import { useState } from 'react'
+import { Box, CircularProgress } from '@mui/material'
 
 interface ClientsTableProps {
   handleModalNewClient: () => void
   handleSelectedClient: (client: ClientResponseType) => void
   data: ClientResponseType[]
+  isLoading: boolean
 }
 
 export default function ClientsTable({
   data,
   handleModalNewClient,
   handleSelectedClient,
+  isLoading,
 }: ClientsTableProps) {
   const [clientSelected, setClientSelected] = useState<number | null>(null)
   return (
@@ -65,12 +68,20 @@ export default function ClientsTable({
               <TableRowSNoData>
                 <TableCell scope="row" colSpan={2} align="center">
                   <Stack gap={1} alignItems="center" justifyContent="center">
-                    <p>Nenhuma cliente encontrado</p>
-                    <ButtonModalNewClient
-                      onClick={() => handleModalNewClient()}
-                    >
-                      Adicionar
-                    </ButtonModalNewClient>
+                    {isLoading ? (
+                      <Box sx={{ display: 'flex' }}>
+                        <CircularProgress />
+                      </Box>
+                    ) : (
+                      <>
+                        <p>Nenhuma cliente encontrado</p>
+                        <ButtonModalNewClient
+                          onClick={() => handleModalNewClient()}
+                        >
+                          adicionar novo
+                        </ButtonModalNewClient>
+                      </>
+                    )}
                   </Stack>
                 </TableCell>
               </TableRowSNoData>

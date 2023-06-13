@@ -6,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import SearchIcon from '@mui/icons-material/Search'
 import DialogTitle from '@mui/material/DialogTitle'
-import { Box, Stack } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { ButtonIcon, ButtonModalDialog } from '../../styles'
 import { ApiCore } from '@/lib/api'
@@ -35,6 +35,7 @@ export default function ModalSearchClient({
   const [clientList, setClientList] = useState<ClientResponseType[] | []>([])
   const [clientSelected, setClientSelected] =
     useState<ClientResponseType | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     register,
@@ -53,6 +54,8 @@ export default function ModalSearchClient({
   const { companySelected } = useContext(CompanyContext)
 
   async function onSubmitSearch(data: SearchFormProps) {
+    setIsLoading(true)
+    setClientList([])
     console.log(data)
     try {
       const result = await api.get(
@@ -61,6 +64,8 @@ export default function ModalSearchClient({
       setClientList(result.data.data)
     } catch (error) {
       console.log(error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -79,13 +84,28 @@ export default function ModalSearchClient({
       reset({
         search: '',
       })
+      setClientList([])
     }
   }, [openMolal])
 
   return (
     <div>
       <Dialog open={openMolal} onClose={handleClose}>
-        <DialogTitle>Buscar por cliente</DialogTitle>
+        <DialogTitle>
+          <Stack
+            justifyContent="space-between"
+            alignItems="center"
+            direction="row"
+          >
+            {' '}
+            <Typography variant="h6">Buscar por cliente</Typography>
+            {clientList.length > 0 && (
+              <ButtonModalDialog onClick={handleClientModal}>
+                adicionar novo
+              </ButtonModalDialog>
+            )}
+          </Stack>
+        </DialogTitle>
         <DialogContent>
           <Box
             component="form"
@@ -110,70 +130,17 @@ export default function ModalSearchClient({
                 aria-label="search"
                 color="primary"
                 sx={{ marginLeft: 1 }}
+                disabled={isLoading}
               >
                 <SearchIcon />
               </ButtonIcon>
             </Stack>
-            {/* <List
-              sx={{
-                width: '100%',
-                maxWidth: 360,
-                bgcolor: 'background.paper',
-                position: 'relative',
-                overflow: 'auto',
-                maxHeight: 300,
-                '& ul': { padding: 0 },
-              }}
-              // subheader={<li />}
-            >
-              <li>
-                {clientList.map((item, index) => (
-                  <ListItemButton
-                    key={`${index}-${item}`}
-                    onClick={() => setClientSelected(item)}
-                    selected={item.id === clientSelected?.id}
-                    sx={{
-                      '&.Mui-selected': {
-                        background: '#1C4961',
-                        color: '#fff',
-                        '&:hover': {
-                          background: '#1C4961',
-                          color: '#fff',
-                          opacity: 0.7,
-                        },
-                        '& span': {
-                          color: '#fff',
-                          '&:hover': {
-                            color: '#fff',
-                            opacity: 0.7,
-                          },
-                        },
-                      },
-                    }}
-                  >
-                    <ListItemText
-                      primary={`${item.name}`}
-                      secondary={
-                        <>
-                          <Typography
-                            sx={{ display: 'inline' }}
-                            component="span"
-                            variant="body2"
-                            color="text.primary"
-                          >
-                            CPF: {item.document}
-                          </Typography>
-                        </>
-                      }
-                    />
-                  </ListItemButton>
-                ))}
-              </li>
-            </List> */}
+
             <ClientsTable
               data={clientList}
               handleModalNewClient={handleClientModal}
               handleSelectedClient={handleSelectedClient}
+              isLoading={isLoading}
             />
           </Box>
         </DialogContent>

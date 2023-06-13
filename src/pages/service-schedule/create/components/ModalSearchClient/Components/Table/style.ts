@@ -49,7 +49,7 @@ export const ButtonModalNewClient = styled(Button)(({ theme }) => ({
   // borderBottomLeftRadius: 0,
   padding: '5px 10px',
   textTransform: 'uppercase',
-  maxWidth: 100,
+  maxWidth: 150,
   '&:hover': {
     background: '#1ACABA',
   },
