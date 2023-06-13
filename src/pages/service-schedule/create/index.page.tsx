@@ -58,6 +58,8 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import ModalSearchClientVehicle from './components/ModalSearchClientVehicle'
 import ModalSearchClient from './components/ModalSearchClient'
 import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle/type'
+import ModalCreateNewClient from './components/ModalCreateNewClient'
+
 // import ModalSearchClaimService from './components/ModalSearchClaimService'
 
 const api = new ApiCore()
@@ -116,7 +118,7 @@ export default function ServiceSchedulesCreate() {
     useState(false)
   // const [openModalClaimServiceSearch, setOpenModalClaimServiceSearch] =
   //   useState(false)
-
+  const [openModalNewClient, setOpenModalNewClient] = useState(false)
   const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
@@ -130,6 +132,13 @@ export default function ServiceSchedulesCreate() {
   // function handleCloseModalClaimServiceVehicleSearch() {
   //   setOpenModalClaimServiceSearch(false)
   // }
+
+  function handleOpenModalNewClient() {
+    setOpenModalNewClient(true)
+  }
+  function handleCloseModalNewClient() {
+    setOpenModalNewClient(false)
+  }
 
   function handleIsEditSelectedCard(value: isEditSelectedCardType) {
     setIsEditSelectedCard(value)
@@ -728,6 +737,7 @@ export default function ServiceSchedulesCreate() {
         handleClose={handleCloseModalClienteSearch}
         openMolal={openModalClientSearch}
         handleAddClient={handleAddClient}
+        handleOpenModalNewClient={handleOpenModalNewClient}
       />
       <ModalSearchClientVehicle
         handleClose={handleCloseModalClientVehicleSearch}
@@ -739,6 +749,10 @@ export default function ServiceSchedulesCreate() {
         openMolal={openModalClaimServiceSearch}
         handleAddClaimService={handleAddClainServiceVehicle}
       /> */}
+      <ModalCreateNewClient
+        isOpen={openModalNewClient}
+        handleClose={handleCloseModalNewClient}
+      />
     </>
   )
 }

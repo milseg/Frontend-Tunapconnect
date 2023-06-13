@@ -14,20 +14,16 @@ import {
   TableRowSNoData,
 } from './style'
 import { Stack } from '@mui/system'
-import { useState } from 'react'
-import ModalCreateNewClient from './ModalCreateNewClient'
 
 interface ClientsTableProps {
+  handleModalNewClient: () => void
   data: ClientResponseType[]
 }
 
-export default function ClientsTable({ data }: ClientsTableProps) {
-  const [openModalNewClient, setOpenModalNewClient] = useState(false)
-
-  function handleCloseModalNewClient() {
-    setOpenModalNewClient(false)
-  }
-
+export default function ClientsTable({
+  data,
+  handleModalNewClient,
+}: ClientsTableProps) {
   return (
     <>
       <TableContainer component={Paper}>
@@ -60,7 +56,7 @@ export default function ClientsTable({ data }: ClientsTableProps) {
                   <Stack gap={1} alignItems="center" justifyContent="center">
                     <p>Nenhuma cliente encontrado</p>
                     <ButtonModalNewClient
-                      onClick={() => setOpenModalNewClient(true)}
+                      onClick={() => handleModalNewClient()}
                     >
                       Adicionar
                     </ButtonModalNewClient>
@@ -71,10 +67,6 @@ export default function ClientsTable({ data }: ClientsTableProps) {
           </TableBody>
         </Table>
       </TableContainer>
-      <ModalCreateNewClient
-        isOpen={openModalNewClient}
-        handleClose={handleCloseModalNewClient}
-      />
     </>
   )
 }

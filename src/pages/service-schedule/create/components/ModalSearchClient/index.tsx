@@ -18,6 +18,7 @@ import ClientsTable from './Components/Table'
 interface ModalSearchClienteProps {
   openMolal: boolean
   handleClose: () => void
+  handleOpenModalNewClient: () => void
   handleAddClient: (data: ClientResponseType) => void
 }
 
@@ -29,6 +30,7 @@ export default function ModalSearchClient({
   openMolal,
   handleClose,
   handleAddClient,
+  handleOpenModalNewClient,
 }: ModalSearchClienteProps) {
   const [clientList, setClientList] = useState<ClientResponseType[] | []>([])
   const [clientSelected, setClientSelected] =
@@ -59,6 +61,11 @@ export default function ModalSearchClient({
     } catch (error) {
       console.log(error)
     }
+  }
+
+  function handleClientModal() {
+    handleOpenModalNewClient()
+    handleClose()
   }
 
   return (
@@ -149,7 +156,10 @@ export default function ModalSearchClient({
                 ))}
               </li>
             </List> */}
-            <ClientsTable data={clientList} />
+            <ClientsTable
+              data={clientList}
+              handleModalNewClient={handleClientModal}
+            />
           </Box>
         </DialogContent>
         <DialogActions sx={{ pr: 3, pb: 2 }}>
