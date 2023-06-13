@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import Dialog from '@mui/material/Dialog'
 
 import DialogContent from '@mui/material/DialogContent'
@@ -14,6 +12,7 @@ import {
   ButtonModalActions,
   InputNewClient,
 } from '../../styles'
+import { useEffect } from 'react'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
@@ -24,7 +23,7 @@ export default function ModalCreateNewClient({
   isOpen,
   handleClose,
 }: ModalCreateNewClientProps) {
-  const { register, handleSubmit, control } = useForm({
+  const { register, handleSubmit, control, reset } = useForm({
     defaultValues: {
       name: '',
       document: '',
@@ -62,6 +61,18 @@ export default function ModalCreateNewClient({
   function onSubmit(data: any) {
     console.log(data)
   }
+
+  useEffect(() => {
+    if (isOpen) {
+      reset({
+        name: '',
+        document: '',
+        phone: [{ phone: '' }],
+        email: [{ email: '' }],
+        address: [{ address: '' }],
+      })
+    }
+  }, [isOpen])
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
