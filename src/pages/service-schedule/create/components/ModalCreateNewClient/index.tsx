@@ -64,15 +64,27 @@ export default function ModalCreateNewClient({
   })
 
   async function onSubmit(data: any) {
+    const listPhone = data.phone
+      .map((item: any) => item.phone)
+      .filter((item: any) => item !== '')
+
+    const listEmail = data.email
+      .map((item: any) => item.email)
+      .filter((item: any) => item !== '')
+
+    const listAddress = data.address
+      .map((item: any) => item.address)
+      .filter((item: any) => item !== '')
+
     try {
       const dataFormatted = {
         company_id: companySelected,
         active: true,
         name: data.name,
         document: data.document,
-        phone: data.phone.map((item: any) => item.phone),
-        email: data.email.map((item: any) => item.email),
-        address: data.address.map((item: any) => item.address),
+        phone: listPhone,
+        email: listEmail,
+        address: listAddress,
       }
       console.log(dataFormatted)
       const resp = await api.create('/client', dataFormatted)

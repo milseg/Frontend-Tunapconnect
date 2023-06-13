@@ -10,7 +10,7 @@ import { Box, Stack } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { ButtonIcon, ButtonModalDialog } from '../../styles'
 import { ApiCore } from '@/lib/api'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { ClientResponseType } from '@/types/service-schedule'
 import ClientsTable from './Components/Table'
@@ -40,6 +40,7 @@ export default function ModalSearchClient({
     register,
     handleSubmit,
     setValue,
+    reset,
     // formState: { errors },
   } = useForm({
     defaultValues: {
@@ -72,6 +73,14 @@ export default function ModalSearchClient({
     console.log(client)
     setClientSelected(client)
   }
+
+  useEffect(() => {
+    if (openMolal) {
+      reset({
+        search: '',
+      })
+    }
+  }, [openMolal])
 
   return (
     <div>
