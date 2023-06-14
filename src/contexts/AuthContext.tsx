@@ -30,8 +30,8 @@ type AuthContextType = {
   isAuthenticated: boolean
   signIn: (data: SignInData) => Promise<string | undefined>
   user: User | null
-  addCompaniesList: (company: companyProps[]) => void
-  listCompanies: companyProps[]
+  addCompaniesList: (company: companyProps[] | null) => void
+  listCompanies: companyProps[] | null
 }
 
 type AuthProviderProps = {
@@ -44,7 +44,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const { status } = useSession()
 
   const [user, setUser] = useState<User | null>(null)
-  const [listCompanies, setListCompanies] = useState<companyProps[] | []>([])
+  const [listCompanies, setListCompanies] = useState<companyProps[] | null>(
+    null,
+  )
   const isAuthenticated = !!user
 
   async function signIn(data: SignInData) {
@@ -71,7 +73,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  function addCompaniesList(company: companyProps[]) {
+  function addCompaniesList(company: companyProps[] | null) {
     setListCompanies(company)
   }
 

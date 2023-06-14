@@ -34,7 +34,7 @@ export default function CompanyList() {
     ['company-page-list-company'],
     async () => {
       try {
-        if (listCompanies.length > 0) {
+        if (listCompanies) {
           return listCompanies
         } else {
           const resp = await api.get('/user/companies')
@@ -48,6 +48,10 @@ export default function CompanyList() {
     {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
+      onSuccess: (data) => {
+        addCompaniesList(null)
+        return data
+      },
     },
   )
 

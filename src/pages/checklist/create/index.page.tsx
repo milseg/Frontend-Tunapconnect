@@ -268,18 +268,7 @@ export default function ChecklistCreateById() {
   function handleChangeTabContent(newValue: number) {
     setPainelValue(newValue)
   }
-  // useEffect(() => {
-  //   console.log(router.query)
 
-  //   if (data?.stages) {
-  //     if (data?.stages.length > 0) {
-  //       sessionStorage.setItem(
-  //         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-  //         JSON.stringify(data?.stages),
-  //       )
-  //     }
-  //   }
-  // }, [])
   if (isLoading) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
