@@ -175,3 +175,23 @@ export const InputNewClient = styled(TextField)(({ theme }) => ({
     },
   },
 }))
+
+export const ButtonPaginate = styled(IconButton)(({ theme }) => ({
+  height: 32,
+  width: 40,
+  // maxWidth: 100,
+  background: '#1C4961',
+  color: '#fff',
+  borderRadius: 5,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '2px 10px',
+  '&:hover': {
+    background: '#1ACABA',
+    color: 'white',
+  },
+  '&:disabled': {
+    background: '#e0f2f1',
+  },
+}))

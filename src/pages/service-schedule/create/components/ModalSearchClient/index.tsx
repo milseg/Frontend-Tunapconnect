@@ -8,12 +8,15 @@ import SearchIcon from '@mui/icons-material/Search'
 import DialogTitle from '@mui/material/DialogTitle'
 import { Box, Stack, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form'
-import { ButtonIcon, ButtonModalDialog } from '../../styles'
+import { ButtonIcon, ButtonModalDialog, ButtonPaginate } from '../../styles'
 import { ApiCore } from '@/lib/api'
 import { useContext, useEffect, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { ClientResponseType } from '@/types/service-schedule'
 import ClientsTable from './Components/Table'
+
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 
 interface ModalSearchClienteProps {
   openMolal: boolean
@@ -26,6 +29,15 @@ type SearchFormProps = {
   search: string
 }
 
+type paginationProps = {
+  actual: number
+  total: number
+  disabled: {
+    next: boolean
+    previous: boolean
+  }
+}
+
 export default function ModalSearchClient({
   openMolal,
   handleClose,
@@ -36,6 +48,7 @@ export default function ModalSearchClient({
   const [clientSelected, setClientSelected] =
     useState<ClientResponseType | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [pagination, setPagination] = useState<paginationProps | null>(null)
 
   const {
     register,
@@ -56,12 +69,27 @@ export default function ModalSearchClient({
   async function onSubmitSearch(data: SearchFormProps) {
     setIsLoading(true)
     setClientList([])
-    console.log(data)
+    console.log(pagination)
     try {
       const result = await api.get(
-        `/client?company_id=${companySelected}&search=${data.search}`,
+        `/client?company_id=${companySelected}&search=${data.search}&limit=10${
+          pagination ? '&current_page=' + pagination.actual : ''
+        }`,
       )
+      console.log(result.data)
       setClientList(result.data.data)
+      if (!pagination) {
+        setPagination((prevState) => {
+          return {
+            actual: 1,
+            total: result.data.total_pages,
+            disabled: {
+              next: false,
+              previous: true,
+            },
+          }
+        })
+      }
     } catch (error) {
       console.log(error)
     } finally {
@@ -77,6 +105,45 @@ export default function ModalSearchClient({
   function handleSelectedClient(client: ClientResponseType) {
     console.log(client)
     setClientSelected(client)
+  }
+
+  function handlePaginateNext() {
+    setPagination((prevState) => {
+      if (prevState) {
+        if (prevState.actual < prevState.total) {
+          return {
+            ...prevState,
+            actual: prevState.actual + 1,
+            disabled: {
+              next: prevState.actual >= prevState.total,
+              previous: prevState.actual > 1,
+            },
+          }
+        } else {
+          return prevState
+        }
+      }
+      return prevState
+    })
+  }
+  function handlePaginatePrevious() {
+    setPagination((prevState) => {
+      if (prevState) {
+        if (prevState.actual > 1) {
+          return {
+            ...prevState,
+            actual: prevState.actual - 1,
+            disabled: {
+              next: prevState.actual >= prevState.total,
+              previous: prevState.actual <= 1,
+            },
+          }
+        } else {
+          return prevState
+        }
+      }
+      return prevState
+    })
   }
 
   useEffect(() => {
@@ -131,6 +198,7 @@ export default function ModalSearchClient({
                 color="primary"
                 sx={{ marginLeft: 1 }}
                 disabled={isLoading}
+                onClick={() => setPagination(null)}
               >
                 <SearchIcon />
               </ButtonIcon>
@@ -142,6 +210,30 @@ export default function ModalSearchClient({
               handleSelectedClient={handleSelectedClient}
               isLoading={isLoading}
             />
+
+            {clientList.length > 0 && (
+              <Stack
+                direction="row"
+                justifyContent="center"
+                gap={1}
+                marginTop={2}
+              >
+                <ButtonPaginate
+                  type="submit"
+                  onClick={handlePaginatePrevious}
+                  disabled={pagination ? pagination.disabled.previous : false}
+                >
+                  <ArrowBackIosNewIcon />
+                </ButtonPaginate>
+                <ButtonPaginate
+                  type="submit"
+                  onClick={handlePaginateNext}
+                  disabled={pagination ? pagination.disabled.next : false}
+                >
+                  <ArrowForwardIosIcon />
+                </ButtonPaginate>
+              </Stack>
+            )}
           </Box>
         </DialogContent>
         <DialogActions sx={{ pr: 3, pb: 2 }}>
