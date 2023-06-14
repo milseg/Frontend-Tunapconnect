@@ -17,7 +17,6 @@ import ClientsTable from './Components/Table'
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import next from 'next'
 
 interface ModalSearchClienteProps {
   openMolal: boolean
@@ -34,10 +33,6 @@ type paginationProps = {
   actual: number
   total: number
 }
-type disableButtonProps = {
-  next: boolean
-  previous: boolean
-}
 
 export default function ModalSearchClient({
   openMolal,
@@ -50,7 +45,6 @@ export default function ModalSearchClient({
     useState<ClientResponseType | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [pagination, setPagination] = useState<paginationProps | null>(null)
-  const [disabledButton, setDisabledButton] = useState<disableButtonProps>()
 
   const {
     register,
@@ -81,10 +75,6 @@ export default function ModalSearchClient({
       console.log(result.data)
       setClientList(result.data.data)
       if (!pagination) {
-        setDisabledButton({
-          next: result.data.total_pages > 1,
-          previous: true,
-        })
         setPagination((prevState) => {
           return {
             actual: 1,
