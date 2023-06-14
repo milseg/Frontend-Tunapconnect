@@ -12,17 +12,12 @@ interface companyProps {
   active?: boolean | null
 }
 
-type CompanyProps = {
-  company: companyProps
-  companySelected: string
-} | null
-
 type cookieCompany = {
   companySelected: string
 }
 
 type CompanyContextType = {
-  companyData: CompanyProps | null
+  companyData: companyProps | null
   companySelected: number | null
   createCompany: (value: companyProps, isRedirect: boolean) => void
   handleCompanySelected: (value: companyProps) => void
@@ -35,7 +30,7 @@ type GeralProviderProps = {
 export const CompanyContext = createContext({} as CompanyContextType)
 
 export function CompanyProvider({ children }: GeralProviderProps) {
-  const [companyData, setCompanyData] = useState<CompanyProps | null>(null)
+  const [companyData, setCompanyData] = useState<companyProps | null>(null)
   const [companySelected, setCompanySelected] = useState<number | null>(null)
 
   const router = useRouter()
@@ -46,7 +41,7 @@ export function CompanyProvider({ children }: GeralProviderProps) {
       cnpj: company.cnpj,
       cpf: company.cpf,
     }
-    // @ts-ignore
+
     setCompanyData(newCompany)
 
     setCompanySelected(company.id)
@@ -69,7 +64,7 @@ export function CompanyProvider({ children }: GeralProviderProps) {
     await createCompany(company, true)
   }
 
-  async function verifiyCompany(company_id: string) {
+  async function verifyCompany(company_id: string) {
     const getSessionData = await getSession()
 
     if (getSessionData?.user.companies) {
@@ -88,7 +83,10 @@ export function CompanyProvider({ children }: GeralProviderProps) {
           const companySelectedCookie: cookieCompany = JSON.parse(
             cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string],
           )
-          if (`${companySelectedCookie.companySelected}` !== company_id) {
+          if (
+            `${companySelectedCookie.companySelected}` !== company_id ||
+            companyData === null
+          ) {
             createCompany(
               {
                 id: isExistCompany[0]?.id,
@@ -106,10 +104,6 @@ export function CompanyProvider({ children }: GeralProviderProps) {
   }
 
   useEffect(() => {
-    // getSession().then((session) => {
-    //   localStorage.setItem('user', JSON.stringify(session?.user))
-    // })
-
     if (companySelected === null) {
       const cookies = parseCookies()
       if (cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string]) {
@@ -122,11 +116,14 @@ export function CompanyProvider({ children }: GeralProviderProps) {
         router.push('/company')
       }
     }
+    if (companyData === null) {
+      console.log(companySelected)
+    }
   }, [])
 
   useEffect(() => {
     if (router.query.company_id) {
-      verifiyCompany(router.query.company_id as string)
+      verifyCompany(router.query.company_id as string)
     }
   }, [router.query])
 
