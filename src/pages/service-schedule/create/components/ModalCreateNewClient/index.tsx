@@ -17,7 +17,6 @@ import { ApiCore } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { Backdrop, CircularProgress } from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
-import { AxiosResponse } from 'axios'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
