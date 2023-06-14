@@ -125,9 +125,9 @@ export default function ChecklistCreateById() {
             title: 'Salvo com sucesso',
             type: 'success',
           })
-          setTimeout(() => {
-            setLoading(false)
-          }, 3000)
+          // setTimeout(() => {
+          //   setLoading(false)
+          // }, 3000)
           return resp.data.data[0]
         })
     },
@@ -203,6 +203,7 @@ export default function ChecklistCreateById() {
     },
     {
       refetchOnWindowFocus: false,
+      refetchOnMount: false,
       enabled: !!router?.query?.id,
     },
   )

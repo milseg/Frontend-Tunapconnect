@@ -188,6 +188,7 @@ export default function ChecklistCreateById() {
       },
       {
         refetchOnWindowFocus: false,
+        refetchOnMount: false,
         enabled:
           !!router?.query?.checklist_model_id &&
           !!router?.query?.service_schedule_id,

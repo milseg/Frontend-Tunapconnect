@@ -19,14 +19,16 @@ import { Backdrop, CircularProgress } from '@mui/material'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
+  handleSaveNewClient: () => void
   isOpen: boolean
 }
 
 export default function ModalCreateNewClient({
   isOpen,
   handleClose,
+  handleSaveNewClient,
 }: ModalCreateNewClientProps) {
-  const [isLoading, setIsloading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const api = new ApiCore()
   const { companySelected } = useContext(CompanyContext)
@@ -67,7 +69,7 @@ export default function ModalCreateNewClient({
   })
 
   async function onSubmit(data: any) {
-    setIsloading(true)
+    setIsLoading(true)
     const listPhone = data.phone
       .map((item: any) => item.phone)
       .filter((item: any) => item !== '')
@@ -93,10 +95,11 @@ export default function ModalCreateNewClient({
 
       const resp = await api.create('/client', dataFormatted)
       console.log(resp)
+      handleSaveNewClient()
     } catch (error) {
       console.log(error)
     } finally {
-      setIsloading(false)
+      setIsLoading(false)
     }
   }
 

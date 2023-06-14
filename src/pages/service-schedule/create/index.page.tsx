@@ -140,6 +140,11 @@ export default function ServiceSchedulesCreate() {
     setOpenModalNewClient(false)
   }
 
+  function handleSaveNewClient() {
+    setOpenModalNewClient(false)
+    setOpenModalClientSearch(true)
+  }
+
   function handleIsEditSelectedCard(value: isEditSelectedCardType) {
     setIsEditSelectedCard(value)
     setWasEdited(true)
@@ -263,7 +268,11 @@ export default function ServiceSchedulesCreate() {
       )
       return resp.data.data
     },
-    { enabled: !!companySelected },
+    {
+      // enabled: !!companySelected,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    },
   )
 
   useEffect(() => {
@@ -310,10 +319,6 @@ export default function ServiceSchedulesCreate() {
   //     })
   //   }
   // }, [dataServiceScheduleStatus, dataServiceSchedule])
-
-  useEffect(() => {
-    localStorage.removeItem('service-schedule-list')
-  }, [])
 
   return (
     <>
@@ -752,6 +757,7 @@ export default function ServiceSchedulesCreate() {
       <ModalCreateNewClient
         isOpen={openModalNewClient}
         handleClose={handleCloseModalNewClient}
+        handleSaveNewClient={handleSaveNewClient}
       />
     </>
   )

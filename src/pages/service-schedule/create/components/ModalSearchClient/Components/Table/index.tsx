@@ -52,13 +52,13 @@ export default function ClientsTable({
                   key={row.id}
                   sx={{
                     '&:last-child td, &:last-child th': { border: 0 },
-                    background: clientSelected === row.id ? '#1ACABA' : '',
                   }}
                   onClick={() => {
                     handleSelectedClient(row)
                     console.log(row)
                     setClientSelected(row.id)
                   }}
+                  selected={clientSelected === row.id}
                 >
                   <TableCell scope="row">{row.name}</TableCell>
                   <TableCell align="right">{row.document}</TableCell>
