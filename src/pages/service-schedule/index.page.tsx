@@ -316,9 +316,9 @@ export default function ServiceSchedulesList() {
       }),
 
     {
-      // enabled: !!companySelected || !!url,
+      enabled: !!companySelected || !!url,
       refetchOnWindowFocus: false,
-      refetchOnMount: true,
+      refetchOnMount: false,
     },
   )
 
