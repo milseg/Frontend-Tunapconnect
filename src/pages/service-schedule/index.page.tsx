@@ -100,10 +100,6 @@ export default function ServiceSchedulesList() {
     router.push(
       `/service-schedule?company_id=${companySelected}${
         data.search ? '&search=' + data.search : ''
-      }${
-        router.query.current_page
-          ? '&current_page=' + router.query.current_page
-          : ''
       }`,
     )
   }
