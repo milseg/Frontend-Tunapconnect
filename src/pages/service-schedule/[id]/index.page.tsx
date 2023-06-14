@@ -469,10 +469,6 @@ export default function ServiceSchedulesEdit() {
     setOpenCheckListModelListModal(false)
   }
 
-  useEffect(() => {
-    localStorage.removeItem('service-schedule-list')
-  }, [])
-
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={3}>

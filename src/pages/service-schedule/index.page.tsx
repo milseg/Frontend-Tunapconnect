@@ -276,10 +276,6 @@ export default function ServiceSchedulesList() {
     () =>
       api.get(url).then((response) => {
         console.log(response)
-        localStorage.setItem(
-          'service-schedule-list',
-          JSON.stringify(response.data.data),
-        )
         const resp = response.data.data.map((data: any) => {
           return {
             id: data?.id ?? 'Não informado',

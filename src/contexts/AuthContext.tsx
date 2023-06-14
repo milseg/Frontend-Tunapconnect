@@ -1,5 +1,9 @@
 import { createContext, ReactNode, useEffect, useState } from 'react'
-import { signIn as signInRequest, useSession } from 'next-auth/react'
+import {
+  getSession,
+  signIn as signInRequest,
+  useSession,
+} from 'next-auth/react'
 
 import Router from 'next/router'
 
@@ -14,10 +18,20 @@ type User = {
   privilege: string | undefined
 }
 
+interface companyProps {
+  id: number
+  name: string | null
+  cnpj: string | null
+  cpf: string | null
+  active?: boolean | null
+}
+
 type AuthContextType = {
   isAuthenticated: boolean
   signIn: (data: SignInData) => Promise<string | undefined>
   user: User | null
+  addCompaniesList: (company: companyProps[]) => void
+  listCompanies: companyProps[]
 }
 
 type AuthProviderProps = {
@@ -27,8 +41,10 @@ type AuthProviderProps = {
 export const AuthContext = createContext({} as AuthContextType)
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { status, data: session } = useSession()
+  const { status } = useSession()
+
   const [user, setUser] = useState<User | null>(null)
+  const [listCompanies, setListCompanies] = useState<companyProps[] | []>([])
   const isAuthenticated = !!user
 
   async function signIn(data: SignInData) {
@@ -37,19 +53,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       username: data.username,
       password: data.password,
     })
-    console.log(resp)
-    localStorage.setItem(
-      process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME as string,
-      JSON.stringify('resp'),
-    )
 
-    console.log(resp)
     if (resp?.ok && resp?.status === 200) {
+      const session = await getSession()
       setUser({
         id: session?.user.id,
         name: session?.user.name,
         privilege: session?.user.privilege,
       })
+      setListCompanies(session?.user.companies as companyProps[])
+      console.log(session)
       Router.push('/company')
     }
 
@@ -58,12 +71,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  function addCompaniesList(company: companyProps[]) {
+    setListCompanies(company)
+  }
+
   useEffect(() => {
     if (status === 'unauthenticated') Router.replace('/')
   }, [status])
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, signIn, user }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, signIn, user, addCompaniesList, listCompanies }}
+    >
       {children}
     </AuthContext.Provider>
   )

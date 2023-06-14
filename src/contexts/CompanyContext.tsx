@@ -66,7 +66,6 @@ export function CompanyProvider({ children }: GeralProviderProps) {
   }
 
   function handleCompanySelected(company: companyProps) {
-    localStorage.setItem('company', JSON.stringify(company))
     createCompany(company, true)
   }
 
@@ -107,9 +106,9 @@ export function CompanyProvider({ children }: GeralProviderProps) {
   }
 
   useEffect(() => {
-    getSession().then((session) => {
-      localStorage.setItem('user', JSON.stringify(session?.user))
-    })
+    // getSession().then((session) => {
+    //   localStorage.setItem('user', JSON.stringify(session?.user))
+    // })
 
     if (companySelected === null) {
       const cookies = parseCookies()
