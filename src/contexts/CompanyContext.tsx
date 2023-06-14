@@ -65,8 +65,8 @@ export function CompanyProvider({ children }: GeralProviderProps) {
       (await router.push(`/service-schedule?company_id=${company.id}`))
   }
 
-  function handleCompanySelected(company: companyProps) {
-    createCompany(company, true)
+  async function handleCompanySelected(company: companyProps) {
+    await createCompany(company, true)
   }
 
   async function verifiyCompany(company_id: string) {

@@ -16,11 +16,19 @@ import { useContext, useEffect, useState } from 'react'
 import { ApiCore } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { Backdrop, CircularProgress } from '@mui/material'
+import ActionAlerts from '@/components/ActionAlerts'
+import { AxiosResponse } from 'axios'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
   handleSaveNewClient: () => void
   isOpen: boolean
+}
+
+interface actionAlertsProps {
+  isOpen: boolean
+  title: string
+  type: 'success' | 'error' | 'warning'
 }
 
 export default function ModalCreateNewClient({
@@ -29,6 +37,11 @@ export default function ModalCreateNewClient({
   handleSaveNewClient,
 }: ModalCreateNewClientProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
+    isOpen: false,
+    title: '',
+    type: 'success',
+  })
 
   const api = new ApiCore()
   const { companySelected } = useContext(CompanyContext)
@@ -96,11 +109,31 @@ export default function ModalCreateNewClient({
       const resp = await api.create('/client', dataFormatted)
       console.log(resp)
       handleSaveNewClient()
-    } catch (error) {
+      handleActiveAlert(true, 'success', resp.data.msg)
+    } catch (error: any) {
+      handleActiveAlert(true, 'error', error.message)
       console.log(error)
     } finally {
       setIsLoading(false)
     }
+  }
+
+  function handleCloseAlert(isOpen: boolean) {
+    setActionAlerts((prevState) => ({
+      ...prevState,
+      isOpen,
+    }))
+  }
+  function handleActiveAlert(
+    isOpen: boolean,
+    type: 'success' | 'error' | 'warning',
+    title: string,
+  ) {
+    setActionAlerts({
+      isOpen,
+      title,
+      type,
+    })
   }
 
   useEffect(() => {
@@ -268,6 +301,12 @@ export default function ModalCreateNewClient({
           </Backdrop>
         </DialogContent>
       </Dialog>
+      <ActionAlerts
+        isOpen={actionAlerts.isOpen}
+        title={actionAlerts.title}
+        type={actionAlerts.type}
+        handleAlert={handleCloseAlert}
+      />
     </>
   )
 }
