@@ -19,11 +19,12 @@ interface companyProps {
   active?: boolean
 }
 export default function CompanyList() {
-  const { handleCompanySelected } = useContext(CompanyContext)
+  const { handleCompanySelected, companyData } = useContext(CompanyContext)
 
   function handleSelectCompany(newCompany: companyProps) {
     handleCompanySelected(newCompany)
   }
+  console.log(companyData)
 
   const { data, isSuccess, isLoading } = useQuery<companyProps[] | []>(
     ['company-page-list-company'],

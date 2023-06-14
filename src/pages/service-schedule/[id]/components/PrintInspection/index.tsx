@@ -1,17 +1,12 @@
 // import { ApiCore } from '@/lib/api'
 import classNames from 'classnames'
 import style from '@/sass/styles/printInspection.module.scss'
-import { ApiCore } from '@/lib/api'
-import { useRouter } from 'next/router'
-import {
-  Itens,
-  ResponseGetCheckList,
-  StagesDataProps,
-} from '@/pages/checklist/types'
-import { useQuery } from 'react-query'
-import { useState } from 'react'
+
+import { Itens, StagesDataProps } from '@/pages/checklist/types'
+
 import { Paper, Stack, Typography } from '@mui/material'
 import Image from 'next/image'
+import { ChecklistReturnType } from '@/types/checklist'
 
 const SquareCheck = ({ type = 'success', checked = false }) => (
   <div className={classNames(style['square-check'], style[`bg-${type}`])}>
@@ -32,58 +27,91 @@ const TripleSquareCheck = ({
 )
 
 interface PrintInspectionProps {
-  companyId: number | null
-  id: number
-  type: string
-  checklistId: number
   refPrint: any
+  checklistData: ChecklistReturnType
 }
 
 export function PrintInspection({
-  companyId,
-  id,
-  type,
-  checklistId,
+  checklistData,
   refPrint,
 }: PrintInspectionProps) {
-  const api = new ApiCore()
-  const router = useRouter()
-  console.log(checklistId)
-  const [receptionStage, setReceptionStage] = useState<StagesDataProps>()
-  const [deliveryStage, setDeliveryStage] = useState<StagesDataProps>()
+  // const [receptionStage, setReceptionStage] = useState<StagesDataProps>()
+  // const [deliveryStage, setDeliveryStage] = useState<StagesDataProps>()
 
-  const { data } = useQuery<ResponseGetCheckList>(
-    ['checklist-createByID-print', router?.query?.id, checklistId, companyId],
-    () =>
-      api
-        .get(`/checklist/${checklistId}?company_id=${companyId}`)
-        .then((response) => {
-          const reception = response.data.data.stages.filter(
-            (st: any) => st.name === 'Recepção',
-          )
-          const delivery = response.data.data.stages.filter(
-            (st: any) => st.name === 'Entrega',
-          )
-          // console.log(reception[0])
-          setReceptionStage(reception[0])
-          setDeliveryStage(delivery[0])
-          return response.data.data
-        }),
-    {
-      refetchOnWindowFocus: false,
-      // enabled: !!checklistId && !!router?.query?.id,
-    },
+  // const { serviceScheduleState, setCheckList } = useContext(
+  //   ServiceScheduleContext,
+  // )
+
+  const isExistReceptionStage = checklistData?.stages.filter(
+    (st: any) => st.name === 'Recepção',
+  )[0]
+  // const receptionStage = checklistData.stages.filter(
+  //   (st: any) => st.name === 'Recepção',
+  // )
+
+  let receptionStage: StagesDataProps
+  if (isExistReceptionStage) {
+    receptionStage = isExistReceptionStage
+  }
+
+  const isExistDeliveryStage = checklistData?.stages.filter(
+    (st: any) => st.name === 'Entrega',
   )
+
+  let deliveryStage: StagesDataProps
+  if (isExistDeliveryStage) {
+    receptionStage = isExistReceptionStage
+  }
+
+  // const { data } = useQuery<ResponseGetCheckList>(
+  //   ['checklist-createByID-print', router?.query?.id, checklistId, companyId],
+  //   async () => {
+  //     if (serviceScheduleState.checklist) {
+  //       const reception = serviceScheduleState.checklist.stages.filter(
+  //         (st: any) => st.name === 'Recepção',
+  //       )
+  //       const delivery = serviceScheduleState.checklist.stages.filter(
+  //         (st: any) => st.name === 'Entrega',
+  //       )
+  //       setReceptionStage(reception[0])
+  //       setDeliveryStage(delivery[0])
+  //       return serviceScheduleState.checklist
+  //     } else {
+  //       try {
+  //         const resp = await api.get(
+  //           `/checklist/${checklistId}?company_id=${companyId}`,
+  //         )
+  //         setCheckList(resp.data.data)
+  //         const reception = resp.data.data.stages.filter(
+  //           (st: any) => st.name === 'Recepção',
+  //         )
+  //         const delivery = resp.data.data.stages.filter(
+  //           (st: any) => st.name === 'Entrega',
+  //         )
+  //         setReceptionStage(reception[0])
+  //         setDeliveryStage(delivery[0])
+  //         return resp.data.data
+  //       } catch (err) {
+  //         console.log(err)
+  //         return console.log(err)
+  //       }
+  //     }
+  //   },
+  //   {
+  //     refetchOnWindowFocus: false,
+  //     // enabled: !!checklistId && !!router?.query?.id,
+  //   },
+  // )
 
   // console.log(data)
-  const recepcaoInspecao = data?.stages[0].itens.filter(
+  const recepcaoInspecao = checklistData?.stages[0].itens.filter(
     (item) => item.rules.type === 'visual_inspect',
   )
-  const entregaInspecao = data?.stages[1].itens.filter(
+  const entregaInspecao = checklistData?.stages[1].itens.filter(
     (item) => item.rules.type === 'visual_inspect',
   )
 
-  console.log(data)
+  console.log(checklistData)
 
   function getCodeReceptionStage(code: string): Itens {
     const result = receptionStage?.itens.filter((it) => it.Code === code)
@@ -124,6 +152,8 @@ export function PrintInspection({
       values: { value: false, images: [] },
     }
   }
+
+  console.log(checklistData)
 
   return (
     <div ref={refPrint}>
@@ -211,7 +241,7 @@ export function PrintInspection({
               style={{ alignSelf: 'start' }}
             >
               <div className={classNames(style['form-slot'], style['me-2'])}>
-                <label>Cliente:</label> {data?.client.name}
+                <label>Cliente:</label> {checklistData?.client.name}
               </div>
               <div
                 className={classNames(
@@ -223,7 +253,8 @@ export function PrintInspection({
                 <div className={style.col}>
                   <div className={classNames(style['form-slot'], style.placa)}>
                     {/* @ts-ignore */}
-                    <label>Placa:</label> {data?.vehicleclient?.plate}
+                    <label>Placa:</label>{' '}
+                    {checklistData?.vehicleclient[0]?.plate}
                   </div>
                   <div className={style['blue-slots']}>
                     <div>Cliente acompanha inspeção?</div>
@@ -443,7 +474,7 @@ export function PrintInspection({
                         className={style['form-slot']}
                         style={{ color: 'black' }}
                       >
-                        {data?.km}
+                        {checklistData?.km}
                       </div>
                     </div>
                   </div>
@@ -658,7 +689,7 @@ export function PrintInspection({
                         className={style['form-slot']}
                         style={{ color: 'black' }}
                       >
-                        {data?.km}
+                        {checklistData?.km}
                       </div>
                     </div>
                   </div>
@@ -852,7 +883,7 @@ export function PrintInspection({
                   </div>
                   <div
                     className={style['col-5']}
-                    style={{ marginTop: '-28px' }}
+                    style={{ marginTop: '-34px' }}
                   >
                     <table
                       className={classNames(
@@ -1756,11 +1787,11 @@ export function PrintInspection({
             spacing={10}
           >
             {/* @ts-ignore */}
-            {data?.stages[0]?.signatures[0].image.length > 0 ||
+            {checklistData?.stages[0]?.signatures[0].image.length > 0 ||
             // @ts-ignore
-            data?.stages[0]?.signatures[1].image.length > 0
+            checklistData?.stages[0]?.signatures[1].image.length > 0
               ? // @ts-ignore
-                data?.stages[0]?.signatures.map((signature) => {
+                checklistData?.stages[0]?.signatures.map((signature) => {
                   if (signature.image.length === 0) {
                     return null
                   }
@@ -1836,9 +1867,9 @@ export function PrintInspection({
               })}
           </Stack>
           {/* @ts-ignore */}
-          {data?.stages[1]?.signatures[0].image.length > 0 ||
+          {checklistData?.stages[1]?.signatures[0].image.length > 0 ||
           // @ts-ignore
-          data?.stages[1]?.signatures[1].image.length > 0 ? (
+          checklistData?.stages[1]?.signatures[1].image.length > 0 ? (
             <Stack
               direction="row"
               marginTop={10}
@@ -1846,9 +1877,9 @@ export function PrintInspection({
               alignItems="center"
               spacing={10}
             >
-              {data &&
+              {checklistData &&
                 // @ts-ignore
-                data?.stages[1]?.signatures.map((signature) => {
+                checklistData?.stages[1]?.signatures.map((signature) => {
                   if (signature.image.length === 0) {
                     return null
                   }

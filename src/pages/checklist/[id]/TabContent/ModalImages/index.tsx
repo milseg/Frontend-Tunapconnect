@@ -67,7 +67,7 @@ export default function ModalImages({
       handleAddImageInListImage(isOpen.id, imageData)
     }
   }
-  console.log(listImage)
+
   const indexImageFind = listImage[stageName]?.findIndex((item) => {
     return item.id === idModal
   })

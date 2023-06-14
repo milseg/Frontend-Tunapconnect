@@ -1,4 +1,4 @@
-import { ReactNode, SyntheticEvent, useEffect, useRef, useState } from 'react'
+import { ReactNode, SyntheticEvent, useContext, useRef, useState } from 'react'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -8,15 +8,12 @@ import { LinkNext, TabItem, TabsContainer, Title } from './styles'
 import TabContent from './TabContent'
 import { ApiCore } from '@/lib/api'
 import { Backdrop, CircularProgress, Skeleton } from '@mui/material'
-import {
-  ChecklistProps,
-  ResponseGetCheckList,
-  StagesDataProps,
-} from '../../types'
+import { ChecklistProps, StagesDataProps } from '../types'
 
 import { useRouter } from 'next/router'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import ActionAlerts from '@/components/ActionAlerts'
+import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 
 // import { useForm } from 'react-hook-form'
 
@@ -106,17 +103,31 @@ export default function ChecklistCreateById() {
     title: '',
     type: 'success',
   })
+  const [loading, setLoading] = useState(false)
   const queryClient = useQueryClient()
   const api = new ApiCore()
   const router = useRouter()
+  const { serviceScheduleState, setCheckList } = useContext(
+    ServiceScheduleContext,
+  )
 
   const tabContentRef = useRef<RefTabContentRefType>(null)
 
-  const updateChecklistmutations = useMutation(
+  const updateChecklistMutations = useMutation(
     (newDataChecklist: ChecklistProps) => {
+      setLoading(true)
       return api
-        .update(`/checklist/${router?.query?.id}`, newDataChecklist)
+        .update(`/checklist/${newDataChecklist.id}`, newDataChecklist)
         .then((resp) => {
+          console.log(resp)
+          setActionAlerts({
+            isOpen: true,
+            title: 'Salvo com sucesso',
+            type: 'success',
+          })
+          setTimeout(() => {
+            setLoading(false)
+          }, 3000)
           return resp.data.data[0]
         })
     },
@@ -125,12 +136,13 @@ export default function ChecklistCreateById() {
       onSuccess: (data) => {
         // queryClient.invalidateQueries({ queryKey: ['checklist-createByID'] })
         // queryClient.setQueryData(['checklist-createByID'], data)
-        setActionAlerts({
-          isOpen: true,
-          title: 'Salvo com sucesso',
-          type: 'success',
-        })
+        // setActionAlerts({
+        //   isOpen: true,
+        //   title: 'Salvo com sucesso',
+        //   type: 'success',
+        // })
         queryClient.invalidateQueries('checklist-createByID')
+        // setLoading(false)
         return data
       },
       onError: (err: any) => {
@@ -144,20 +156,57 @@ export default function ChecklistCreateById() {
     },
   )
 
-  const { data, isSuccess, isLoading, isFetching } =
-    useQuery<ResponseGetCheckList>(
-      ['checklist-createByID'],
-      () =>
-        api
-          .get(`/checklist/${router?.query?.id}?company_id=`)
-          .then((response) => {
-            return response.data.data
-          }),
-      {
-        refetchOnWindowFocus: false,
-        enabled: !!router?.query?.id,
-      },
-    )
+  const { data, isSuccess, isLoading, isFetching } = useQuery<ChecklistProps>(
+    ['checklist-createByID'],
+    async () => {
+      try {
+        if (serviceScheduleState.checklist) {
+          console.log('aqui')
+          return serviceScheduleState.checklist
+        } else {
+          console.log('não tem')
+          const resp = await api.get(`/checklist/${router?.query?.id}`)
+          console.log(resp.data.data)
+          // const resp = await api.get(
+          //   `/service-schedule/${resp.data.data.service_schedule_id}`,
+          // )
+          setCheckList(resp.data.data)
+          // set
+          return resp.data.data
+        }
+        // if (serviceScheduleState.checklistModel) {
+        //   return serviceScheduleState.checklistModel
+        // } else {
+        //   const resp = await api.get(`/checklist_model/list`)
+        //   if (resp.data.data.length > 0) {
+        //     const isExistChecklistModel = resp.data.data.filter(
+        //       (item: any) =>
+        //         item.id === Number(router.query.checklist_model_id),
+        //     )[0]
+        //     if (isExistChecklistModel) {
+        //       setCheckListModel(isExistChecklistModel)
+        //       return isExistChecklistModel
+        //     }
+        //   }
+        // }
+        // setCheckList
+        // console.log({ company_id: '5', service_schedule_id: '2301' })
+        // if (serviceScheduleState.checklist) {
+        //   return serviceScheduleState.checklist
+        // }
+
+        // const resp = await api.get(`/checklist/${router?.query?.checklist_model_id}`)
+        // setCheckList(resp.data.data)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    {
+      refetchOnWindowFocus: false,
+      enabled: !!router?.query?.id,
+    },
+  )
+  const { checklist } = serviceScheduleState
 
   function handleAlert(isOpen: boolean) {
     setActionAlerts((previState) => ({
@@ -167,7 +216,7 @@ export default function ChecklistCreateById() {
   }
 
   async function handleAddListCheckList(stageData: StagesDataProps) {
-    const isFinalizedArray = data?.stages.map((item) => {
+    const isFinalizedArray = checklist?.stages.map((item) => {
       if (item.name === stageData.name) {
         return stageData.status
       }
@@ -175,32 +224,37 @@ export default function ChecklistCreateById() {
       return item.status
     })
     const isFinalized = isFinalizedArray?.every((item) => item === 'finalizado')
+
     const dataForPost = {
-      company_id: data?.company_id,
-      brand_id: data?.brand_id,
-      vehicle_id: data?.vehicle_id,
-      model_id: data?.vehicle, // verificar
-      vehicle_client_id: data?.vehicle_client_id,
-      km: data?.km,
-      fuel: data?.fuel,
-      client_id: data?.client_id,
-      service_schedule_id: data?.service_schedule_id,
-      checklist_model: data?.checklist_model,
+      ...checklist,
       status: isFinalized ? 'finalizado' : 'pendente',
-      stages: data?.stages.map((item) => {
+      // company_id: serviceSchedule?.company_id,
+      // brand_id: serviceSchedule?.client_vehicle.vehicle.brand_id,
+      // vehicle_id: serviceSchedule?.client_vehicle.vehicle.id,
+      // model_id: serviceSchedule?.client_vehicle.vehicle.model_id, // verificar
+      // vehicle_client_id: serviceSchedule?.client_vehicle.id,
+      // km: serviceSchedule?.client_vehicle.mileage,
+      // fuel: null,
+      // client_id: serviceSchedule?.client_id,
+      // service_schedule_id: serviceSchedule?.id,
+      // checklist_model: checklistModel?.id,
+      // status: isFinalized ? 'finalizado' : 'pendente',
+      stages: checklist?.stages.map((item) => {
         // if (item.name === stageData.name) {
         //   return {
         //     ...stageData,
         //     status: typeSubmitForm,
         //   }
         // }
-
+        console.log(item.name === stageData.name)
         return item.name === stageData.name ? stageData : item
       }),
     }
 
     // @ts-ignore
-    updateChecklistmutations.mutate(dataForPost)
+    setCheckList(dataForPost as ChecklistProps)
+    // @ts-ignore
+    updateChecklistMutations.mutate(dataForPost)
   }
 
   const handleChange = async (event: SyntheticEvent, newValue: number) => {
@@ -211,56 +265,38 @@ export default function ChecklistCreateById() {
     // }
     if (tabContentRef.current && tabContentRef.current.handleGetValuesForm) {
       const result = await tabContentRef.current.handleGetValuesForm()
-      console.log(result)
-      const sessionStorageData = sessionStorage.getItem(
-        `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+
+      // @ts-ignore
+      const removedStageActual: ChecklistProps[] = checklist?.stages.filter(
+        (item) => item.name !== result.name,
       )
 
-      if (sessionStorageData) {
-        const storageStage: StagesDataProps[] = JSON.parse(sessionStorageData)
-        const storageStageActualIndex = storageStage.findIndex(
-          (item: any) => item.name === result.name,
-        )
-
-        if (storageStageActualIndex >= 0) {
-          const newStorageSessionFiltered = storageStage.filter(
-            (item) => item.name !== result.name,
-          )
-
-          sessionStorage.setItem(
-            `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-            JSON.stringify([...newStorageSessionFiltered, result]),
-          )
-        } else {
-          sessionStorage.setItem(
-            `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-            JSON.stringify([...storageStage, result]),
-          )
-        }
-      } else {
-        sessionStorage.setItem(
-          `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-          JSON.stringify([result]),
-        )
+      const newChecklist = {
+        ...checklist,
+        stages: [...removedStageActual, result],
       }
+      // @ts-ignore
+      setCheckList(newChecklist as ChecklistProps)
     }
+    // console.log(data)
     setPainelValue(newValue)
   }
 
   function handleChangeTabContent(newValue: number) {
     setPainelValue(newValue)
   }
-  useEffect(() => {
-    console.log('rendering')
-    if (data?.stages) {
-      if (data?.stages.length > 0) {
-        sessionStorage.setItem(
-          `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-          JSON.stringify(data?.stages),
-        )
-      }
-    }
-  }, [])
+  // useEffect(() => {
+  //   console.log(router.query)
+
+  //   if (data?.stages) {
+  //     if (data?.stages.length > 0) {
+  //       sessionStorage.setItem(
+  //         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+  //         JSON.stringify(data?.stages),
+  //       )
+  //     }
+  //   }
+  // }, [])
   if (isLoading) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -279,9 +315,12 @@ export default function ChecklistCreateById() {
     return (
       <>
         <Box sx={{ mt: 2, ml: 2 }}>
-          <LinkNext href={`/service-schedule/${data.service_schedule_id}`}>
+          <LinkNext
+            href={`/service-schedule/${checklist?.service_schedule_id}`}
+          >
             <Title variant="h6">
-              Agenda:{router.query.id} - {data?.client?.name ?? 'Não informado'}
+              Agenda:{checklist?.service_schedule_id} -{' '}
+              {checklist?.client?.name ?? 'Não informado'}
             </Title>
           </LinkNext>
         </Box>
@@ -309,42 +348,44 @@ export default function ChecklistCreateById() {
                     scrollButtons="auto"
                     aria-label="scrollable auto tabs example"
                   >
-                    {data?.stages?.length > 0 &&
-                      data.stages.map((stage, index) => {
-                        // const isDisabled = stage.status === 'finalizado'
-                        return (
-                          <TabItem
-                            key={stage.name + Math.random() * 2000}
-                            label={stage.name}
-                            {...a11yProps(index)}
-                            // disabled={isDisabled}
-                          />
-                        )
-                      })}
+                    {data && data?.stages?.length > 0
+                      ? data.stages.map((stage, index) => {
+                          // const isDisabled = stage.status === 'finalizado'
+                          return (
+                            <TabItem
+                              key={stage.name + Math.random() * 2000}
+                              label={stage.name}
+                              {...a11yProps(index)}
+                              // disabled={isDisabled}
+                            />
+                          )
+                        })
+                      : null}
                   </TabsContainer>
                 </Box>
-                {data?.stages?.length > 0 &&
-                  data.stages.map((stage, index) => {
-                    return (
-                      <TabPanel
-                        key={`${Math.random() * 2000}-${stage.name}-${index}`}
-                        value={painelValue}
-                        index={index}
-                      >
-                        <TabContent
-                          stageItems={stage.itens}
-                          stageData={stage}
-                          ref={tabContentRef}
-                          // checklistModel={data}
-                          stageName={stage.name}
-                          formIDSubmit={`form-${stage.name}-${index}`}
-                          handleAddListCheckList={handleAddListCheckList}
-                          isClosed={stage.status === 'finalizado'}
-                          handleChangeTabContent={handleChangeTabContent}
-                        />
-                      </TabPanel>
-                    )
-                  })}
+                {data && data?.stages?.length > 0
+                  ? data.stages.map((stage, index) => {
+                      return (
+                        <TabPanel
+                          key={`${Math.random() * 2000}-${stage.name}-${index}`}
+                          value={painelValue}
+                          index={index}
+                        >
+                          <TabContent
+                            stageItems={stage.itens}
+                            stageData={stage}
+                            ref={tabContentRef}
+                            // checklistModel={data}
+                            stageName={stage.name}
+                            formIDSubmit={`form-${stage.name}-${index}`}
+                            handleAddListCheckList={handleAddListCheckList}
+                            isClosed={stage.status === 'finalizado'}
+                            handleChangeTabContent={handleChangeTabContent}
+                          />
+                        </TabPanel>
+                      )
+                    })
+                  : null}
               </Paper>
               <Grid
                 item
@@ -363,7 +404,7 @@ export default function ChecklistCreateById() {
 
         <Backdrop
           sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={isFetching}
+          open={loading}
           onClick={() => {}}
         >
           <CircularProgress color="inherit" />

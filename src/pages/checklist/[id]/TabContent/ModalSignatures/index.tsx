@@ -10,7 +10,7 @@ interface Signature {
   rules: {
     required: boolean
   }
-  image: any[]
+  image: string
 }
 
 interface ModalInspectCarProps {
@@ -55,7 +55,7 @@ export default function ModalSignatures({
             if (isOpen.id === index) {
               return {
                 ...item,
-                image: [signature],
+                image: signature,
               }
             }
             return item
@@ -67,7 +67,7 @@ export default function ModalSignatures({
               if (isOpen.id === index) {
                 return {
                   ...item,
-                  image: [signature],
+                  image: signature,
                 }
               }
               return item
@@ -81,7 +81,7 @@ export default function ModalSignatures({
             if (isOpen.id === index) {
               return {
                 ...item,
-                image: [signature],
+                image: signature,
               }
             }
             return item
@@ -93,16 +93,17 @@ export default function ModalSignatures({
   }
 
   useEffect(() => {
+    console.log(stageData)
     if (isOpen?.id !== null) {
       if (signaturesData) {
         if (signaturesData[isOpen.id]?.image.length > 0) {
-          setIsSignature(signaturesData[isOpen.id].image[0])
+          setIsSignature(signaturesData[isOpen.id].image)
         } else {
           if (stageData) {
             if (stageData?.length > 0) {
               if (stageData[isOpen.id].image.length > 0) {
-                console.log(stageData[isOpen.id].image[0])
-                setIsSignature(stageData[isOpen.id].image[0])
+                console.log(stageData[isOpen.id].image)
+                setIsSignature(stageData[isOpen.id].image)
               }
             } else {
               setIsSignature(null)
@@ -113,10 +114,11 @@ export default function ModalSignatures({
     }
   }, [isOpen?.id])
   useEffect(() => {
+    console.log(stageData)
     if (isOpen?.id) {
       if (stageData && !signaturesData) {
-        if (stageData[isOpen.id].image[0])
-          setIsSignature(stageData[isOpen.id].image[0])
+        if (stageData[isOpen.id].image)
+          setIsSignature(stageData[isOpen.id].image)
       }
     }
   }, [])

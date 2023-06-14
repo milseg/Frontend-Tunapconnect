@@ -43,7 +43,7 @@ import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded'
 import dayjs from 'dayjs'
 import { StagesDataProps } from '@/pages/checklist/types'
 import { toPng } from 'html-to-image'
-import { useRouter } from 'next/router'
+
 // import { ApiCore } from '@/lib/api'
 
 // import carroFrenteImg from '@/assets/images/inspection/carro-frente.svg'
@@ -242,9 +242,6 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
       teto: '',
     })
 
-    const router = useRouter()
-
-    // const api = new ApiCore()
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
     const isMobile = useMediaQuery('(max-width:600px)')
 
@@ -632,34 +629,11 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
     }, [tabsValue])
 
     useEffect(() => {
-      let positonsCarData
-
-      // StagesDataProps[]
-
-      const sessionStorageData = sessionStorage.getItem(
-        `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
+      const positonsCarData = stageData?.itens.filter(
+        (itens) => itens.rules.type === 'visual_inspect',
       )
 
-      if (sessionStorageData) {
-        const sessionStorageStage: StagesDataProps[] =
-          JSON.parse(sessionStorageData)
-        const sessionStorageStageActual = sessionStorageStage.filter(
-          (item) => item.name === stageData?.name,
-        )[0]
-        if (sessionStorageStageActual) {
-          positonsCarData = sessionStorageStageActual.itens.filter(
-            (itens) => itens.rules.type === 'visual_inspect',
-          )
-        } else {
-          positonsCarData = stageData?.itens.filter(
-            (itens) => itens.rules.type === 'visual_inspect',
-          )
-        }
-      } else {
-        positonsCarData = stageData?.itens.filter(
-          (itens) => itens.rules.type === 'visual_inspect',
-        )
-      }
+      console.log(positonsCarData)
 
       const newPositionsUrl = {
         frente: '',

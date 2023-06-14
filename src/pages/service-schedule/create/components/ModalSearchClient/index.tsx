@@ -6,24 +6,19 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import SearchIcon from '@mui/icons-material/Search'
 import DialogTitle from '@mui/material/DialogTitle'
-import {
-  Box,
-  List,
-  ListItemButton,
-  ListItemText,
-  Stack,
-  Typography,
-} from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { ButtonIcon, ButtonModalDialog } from '../../styles'
 import { ApiCore } from '@/lib/api'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { ClientResponseType } from '@/types/service-schedule'
+import ClientsTable from './Components/Table'
 
 interface ModalSearchClienteProps {
   openMolal: boolean
   handleClose: () => void
+  handleOpenModalNewClient: () => void
   handleAddClient: (data: ClientResponseType) => void
 }
 
@@ -35,14 +30,18 @@ export default function ModalSearchClient({
   openMolal,
   handleClose,
   handleAddClient,
+  handleOpenModalNewClient,
 }: ModalSearchClienteProps) {
   const [clientList, setClientList] = useState<ClientResponseType[] | []>([])
   const [clientSelected, setClientSelected] =
     useState<ClientResponseType | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     register,
     handleSubmit,
+    setValue,
+    reset,
     // formState: { errors },
   } = useForm({
     defaultValues: {
@@ -55,22 +54,58 @@ export default function ModalSearchClient({
   const { companySelected } = useContext(CompanyContext)
 
   async function onSubmitSearch(data: SearchFormProps) {
+    setIsLoading(true)
+    setClientList([])
     console.log(data)
     try {
       const result = await api.get(
         `/client?company_id=${companySelected}&search=${data.search}`,
       )
-      console.log(result.data.data)
       setClientList(result.data.data)
     } catch (error) {
       console.log(error)
+    } finally {
+      setIsLoading(false)
     }
   }
+
+  function handleClientModal() {
+    handleOpenModalNewClient()
+    handleClose()
+  }
+
+  function handleSelectedClient(client: ClientResponseType) {
+    console.log(client)
+    setClientSelected(client)
+  }
+
+  useEffect(() => {
+    if (openMolal) {
+      reset({
+        search: '',
+      })
+      setClientList([])
+    }
+  }, [openMolal])
 
   return (
     <div>
       <Dialog open={openMolal} onClose={handleClose}>
-        <DialogTitle>Buscar por cliente</DialogTitle>
+        <DialogTitle>
+          <Stack
+            justifyContent="space-between"
+            alignItems="center"
+            direction="row"
+          >
+            {' '}
+            <Typography variant="h6">Buscar por cliente</Typography>
+            {clientList.length > 0 && (
+              <ButtonModalDialog onClick={handleClientModal}>
+                adicionar novo
+              </ButtonModalDialog>
+            )}
+          </Stack>
+        </DialogTitle>
         <DialogContent>
           <Box
             component="form"
@@ -95,66 +130,18 @@ export default function ModalSearchClient({
                 aria-label="search"
                 color="primary"
                 sx={{ marginLeft: 1 }}
+                disabled={isLoading}
               >
                 <SearchIcon />
               </ButtonIcon>
             </Stack>
-            <List
-              sx={{
-                width: '100%',
-                maxWidth: 360,
-                bgcolor: 'background.paper',
-                position: 'relative',
-                overflow: 'auto',
-                maxHeight: 300,
-                '& ul': { padding: 0 },
-              }}
-              // subheader={<li />}
-            >
-              <li>
-                {clientList.map((item, index) => (
-                  <ListItemButton
-                    key={`${index}-${item}`}
-                    onClick={() => setClientSelected(item)}
-                    selected={item.id === clientSelected?.id}
-                    sx={{
-                      '&.Mui-selected': {
-                        background: '#1C4961',
-                        color: '#fff',
-                        '&:hover': {
-                          background: '#1C4961',
-                          color: '#fff',
-                          opacity: 0.7,
-                        },
-                        '& span': {
-                          color: '#fff',
-                          '&:hover': {
-                            color: '#fff',
-                            opacity: 0.7,
-                          },
-                        },
-                      },
-                    }}
-                  >
-                    <ListItemText
-                      primary={`${item.name}`}
-                      secondary={
-                        <>
-                          <Typography
-                            sx={{ display: 'inline' }}
-                            component="span"
-                            variant="body2"
-                            color="text.primary"
-                          >
-                            CPF: {item.document}
-                          </Typography>
-                        </>
-                      }
-                    />
-                  </ListItemButton>
-                ))}
-              </li>
-            </List>
+
+            <ClientsTable
+              data={clientList}
+              handleModalNewClient={handleClientModal}
+              handleSelectedClient={handleSelectedClient}
+              isLoading={isLoading}
+            />
           </Box>
         </DialogContent>
         <DialogActions sx={{ pr: 3, pb: 2 }}>
@@ -175,6 +162,7 @@ export default function ModalSearchClient({
                 handleClose()
                 setClientList([])
                 setClientSelected(null)
+                setValue('search', '')
               }
             }}
           >

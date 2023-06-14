@@ -25,6 +25,9 @@ import { useQuery } from 'react-query'
 import { formatDateTime } from '@/ultis/formatDate'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { Box } from '@mui/material'
+import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
+
+import { useRouter } from 'next/router'
 
 interface TableAppProps {
   // columns: GridColDef[]
@@ -50,11 +53,14 @@ declare module '@mui/x-data-grid' {
 
 const api = new ApiCore()
 
-type RowsProps = {
-  id: number
-  checklistModel: string
-  createAt: string
-}
+// type RowsProps = {
+//   checklistAllData: ChecklistProps[]
+//   checklistRows: {
+//     id: number
+//     checklistModel: string
+//     createAt: string
+//   }[]
+// }
 
 function CustomNoRowsOverlay() {
   return (
@@ -111,8 +117,11 @@ export function TableModal({
 }: TableAppProps) {
   // const theme = useTheme()
   // const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
+  // const [list, setList] = useState()
 
   const { companySelected } = useContext(CompanyContext)
+  const { setCheckList } = useContext(ServiceScheduleContext)
+  const router = useRouter()
 
   const columns: GridColDef[] = useMemo(
     () => [
@@ -167,12 +176,14 @@ export function TableModal({
               checklistId={idCell as number}
               status={params.row.status}
               handleDeleteChecklist={handleDeleteChecklist}
+              handleEditChecklist={handleEditChecklist}
+              handlePrintChecklist={handlePrintChecklist}
             />
           )
         },
       },
     ],
-    [],
+    [isOpen, handleEditChecklist, handlePrintChecklist],
   )
 
   // const router = useRouter()
@@ -194,38 +205,71 @@ export function TableModal({
   const {
     data: dataCheckList,
     isLoading,
-    isSuccess,
+    status: dataCheckListStatus,
     refetch,
-  } = useQuery<RowsProps[]>(
-    ['checklist', 'service_schedule', 'by_id', 'modal'],
-    () => {
-      return api
-        .get(
+  } = useQuery({
+    queryKey: [
+      'checklist',
+      'service_schedule',
+      'by_id',
+      'modal',
+      companySelected,
+      serviceScheduleId,
+    ],
+    queryFn: async () => {
+      try {
+        const resp = await api.get(
           `/checklist/list?company_id=${companySelected}&service_schedule_id=${serviceScheduleId}&orderby=updated_at desc`,
         )
-        .then((response) => {
-          const { data } = response.data
-          localStorage.setItem('checklist-list', JSON.stringify(data))
-          return data.map((item: any) => {
-            return {
-              id: item?.id,
-              createAt: item?.created_at,
-              status: `${item?.status[0].toUpperCase()}${item?.status.substring(
-                1,
-              )}`,
-            }
-          })
+
+        const rowFormatted = resp.data.data.map((row: any) => {
+          return {
+            id: row?.id,
+            createAt: row?.created_at,
+            status: `${row?.status[0].toUpperCase()}${row?.status.substring(
+              1,
+            )}`,
+          }
         })
+        return {
+          checklistAllData: resp.data.data,
+          checklistRows: rowFormatted,
+        }
+      } catch (err) {
+        console.log(err)
+      }
     },
-    { enabled: isOpen && !!companySelected },
-  )
+    // enabled: isOpen,
+  })
+
+  async function handleEditChecklist(idChecklistSelected: number) {
+    const checklistFiltered = dataCheckList?.checklistAllData.filter(
+      (c: any) => c.id === idChecklistSelected,
+    )[0]
+    console.log(checklistFiltered)
+    if (checklistFiltered) {
+      setCheckList(checklistFiltered)
+
+      await router.push(`/checklist/${idChecklistSelected}`)
+    }
+  }
+  async function handlePrintChecklist(idChecklistSelected: number) {
+    console.log(idChecklistSelected)
+    console.log(dataCheckList)
+    const checklistFiltered = dataCheckList?.checklistAllData.filter(
+      (c: any) => c.id === idChecklistSelected,
+    )[0]
+    if (checklistFiltered) {
+      setCheckList(checklistFiltered)
+    }
+  }
 
   return (
     <>
       <Dialog
         // fullScreen={fullScreen}
         maxWidth="lg"
-        open={isOpen}
+        open={isOpen && dataCheckListStatus === 'success'}
         onClose={closeChecklistModal}
         aria-labelledby="responsive-dialog-title"
       >
@@ -237,7 +281,12 @@ export function TableModal({
         >
           <BoxContainer>
             <TableDataGrid
-              rows={isSuccess ? dataCheckList : []}
+              rows={
+                dataCheckListStatus === 'success' &&
+                dataCheckList?.checklistRows.length > 0
+                  ? dataCheckList?.checklistRows
+                  : []
+              }
               columns={columns}
               autoHeight
               columnHeaderHeight={70}

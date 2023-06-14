@@ -10,4 +10,6 @@ export type MoreOptionsButtonSelectProps = {
   checklistId?: number | undefined
   status: string
   handleDeleteChecklist: (id: number) => Promise<void>
+  handleEditChecklist: (id: number) => Promise<void>
+  handlePrintChecklist: (id: number) => Promise<void>
 }
