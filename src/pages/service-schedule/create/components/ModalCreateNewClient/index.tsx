@@ -17,11 +17,13 @@ import { ApiCore } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { Backdrop, CircularProgress } from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
+import { ClientResponseType } from '@/types/service-schedule'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
   handleSaveNewClient: () => void
   isOpen: boolean
+  handleAddClient: (client: ClientResponseType) => void
 }
 
 interface actionAlertsProps {
@@ -34,6 +36,7 @@ export default function ModalCreateNewClient({
   isOpen,
   handleClose,
   handleSaveNewClient,
+  handleAddClient,
 }: ModalCreateNewClientProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
@@ -82,6 +85,7 @@ export default function ModalCreateNewClient({
 
   async function onSubmit(data: any) {
     setIsLoading(true)
+    console.log(data)
     const listPhone = data.phone
       .map((item: any) => item.phone)
       .filter((item: any) => item !== '')
@@ -104,9 +108,10 @@ export default function ModalCreateNewClient({
         email: listEmail,
         address: listAddress,
       }
-
+      console.log(dataFormatted)
       const resp = await api.create('/client', dataFormatted)
-      console.log(resp)
+      console.log(resp.data.data)
+      handleAddClient(resp.data.data[0])
       handleSaveNewClient()
       handleActiveAlert(true, 'success', resp.data.msg)
     } catch (error: any) {
@@ -167,14 +172,15 @@ export default function ModalCreateNewClient({
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...(register('name'), { required: true })}
+              // {...(register('name'),
+              {...register('name', { required: true })}
             />
             <InputNewClient
               label="CPF"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...(register('document'), { required: true })}
+              {...register('document', { required: true })}
             />
             {fieldsPhone.map((item, index) => {
               return (

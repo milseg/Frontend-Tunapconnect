@@ -49,7 +49,7 @@ import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
 import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
 
 import { useQuery } from 'react-query'
-import { formatCPF } from '@/ultis/formatCPF'
+// import { formatCPF } from '@/ultis/formatCPF'
 import { formatPlate } from '@/ultis/formatPlate'
 
 import { CompanyContext } from '@/contexts/CompanyContext'
@@ -142,7 +142,7 @@ export default function ServiceSchedulesCreate() {
 
   function handleSaveNewClient() {
     setOpenModalNewClient(false)
-    setOpenModalClientSearch(true)
+    // setOpenModalClientSearch(true)
   }
 
   function handleIsEditSelectedCard(value: isEditSelectedCardType) {
@@ -235,7 +235,7 @@ export default function ServiceSchedulesCreate() {
       plate: client_vehicle?.plate ?? 'Não informado',
     })
   }
-  // function handleAddClainServiceVehicle(client_vehicle: any) {
+  // function handleAddClaimServiceVehicle(client_vehicle: any) {
   //   console.log(client_vehicle)
   // setClientVehicle(null)
   // setClientVehicle({
@@ -363,9 +363,7 @@ export default function ServiceSchedulesCreate() {
                   </ListItemCard>
                   <ListItemCard alignItems="flex-start">
                     <InfoCardName>CPF:</InfoCardName>{' '}
-                    {client?.cpf && (
-                      <InfoCardText>{formatCPF(client?.cpf)}</InfoCardText>
-                    )}
+                    {client?.cpf && <InfoCardText>{client?.cpf}</InfoCardText>}
                   </ListItemCard>
                   {client?.telefone ? (
                     client?.telefone.map((phone, index) => (
@@ -752,12 +750,13 @@ export default function ServiceSchedulesCreate() {
       {/* <ModalSearchClaimService
         handleClose={handleCloseModalClaimServiceVehicleSearch}
         openMolal={openModalClaimServiceSearch}
-        handleAddClaimService={handleAddClainServiceVehicle}
+        handleAddClaimService={handleAddClaimServiceVehicle}
       /> */}
       <ModalCreateNewClient
         isOpen={openModalNewClient}
         handleClose={handleCloseModalNewClient}
         handleSaveNewClient={handleSaveNewClient}
+        handleAddClient={handleAddClient}
       />
     </>
   )
