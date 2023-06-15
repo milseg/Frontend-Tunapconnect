@@ -140,7 +140,7 @@ export default function ModalSearchClient({
   }, [openMolal])
 
   const DisableButtonNext = pagination
-    ? pagination?.actual > pagination?.total
+    ? pagination?.actual >= pagination?.total
     : false
   const DisableButtonPrevious = pagination ? pagination?.actual <= 1 : false
 

@@ -415,9 +415,11 @@ export default function ServiceSchedulesEdit() {
           console.error(err)
         }
       },
-      // {
-      //   enabled: openPrintInspectionModal,
-      // },
+      {
+        // enabled: openPrintInspectionModal,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+      },
     )
 
   // const {

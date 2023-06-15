@@ -271,7 +271,7 @@ export default function ServiceSchedulesList() {
     ['service-scheduler-list', companySelected],
     () =>
       api.get(url).then((response) => {
-        console.log(response)
+        console.log(response.data)
         const resp = response.data.data.map((data: any) => {
           return {
             id: data?.id ?? 'Não informado',

@@ -247,7 +247,7 @@ export function TableModal({
     const checklistFiltered = dataCheckList?.checklistAllData.filter(
       (c: any) => c.id === idChecklistSelected,
     )[0]
-    console.log(checklistFiltered)
+
     if (checklistFiltered) {
       setCheckList(checklistFiltered)
 
