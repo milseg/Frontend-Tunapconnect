@@ -7,12 +7,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import { ClientResponseType } from '@/types/service-schedule'
-import {
-  ButtonModalNewClient,
-  TableCellHeader,
-  TableRowSBody,
-  TableRowSNoData,
-} from './style'
+import { TableCellHeader, TableRowSBody, TableRowSNoData } from './style'
 import { Stack } from '@mui/system'
 import { useState } from 'react'
 import { Box, CircularProgress } from '@mui/material'
@@ -75,11 +70,11 @@ export default function ClientsTable({
                     ) : (
                       <>
                         <p>Nenhuma cliente encontrado</p>
-                        <ButtonModalNewClient
+                        {/* <ButtonModalNewClient
                           onClick={() => handleModalNewClient()}
                         >
                           adicionar novo
-                        </ButtonModalNewClient>
+                        </ButtonModalNewClient> */}
                       </>
                     )}
                   </Stack>

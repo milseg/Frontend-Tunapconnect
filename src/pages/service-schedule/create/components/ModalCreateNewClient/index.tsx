@@ -110,7 +110,11 @@ export default function ModalCreateNewClient({
       handleSaveNewClient()
       handleActiveAlert(true, 'success', resp.data.msg)
     } catch (error: any) {
-      handleActiveAlert(true, 'error', error.message)
+      if (error.response.status === 400) {
+        handleActiveAlert(true, 'error', error.response.data.msg)
+      } else {
+        handleActiveAlert(true, 'error', 'Erro inesperado!')
+      }
       console.log(error)
     } finally {
       setIsLoading(false)
@@ -163,14 +167,14 @@ export default function ModalCreateNewClient({
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('name')}
+              {...(register('name'), { required: true })}
             />
             <InputNewClient
               label="CPF"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('document')}
+              {...(register('document'), { required: true })}
             />
             {fieldsPhone.map((item, index) => {
               return (

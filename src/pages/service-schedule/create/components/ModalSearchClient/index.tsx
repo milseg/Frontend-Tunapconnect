@@ -139,12 +139,10 @@ export default function ModalSearchClient({
     }
   }, [openMolal])
 
-  const DisableButtonNext = pagination
-    ? pagination?.actual >= pagination?.total
-    : false
-  const DisableButtonPrevious = pagination ? pagination?.actual <= 1 : false
-
-  console.log(DisableButtonPrevious)
+  // const DisableButtonNext = pagination
+  //   ? pagination?.actual >= pagination?.total
+  //   : false
+  // const DisableButtonPrevious = pagination ? pagination?.actual <= 1 : false
 
   return (
     <div>
@@ -157,11 +155,11 @@ export default function ModalSearchClient({
           >
             {' '}
             <Typography variant="h6">Buscar por cliente</Typography>
-            {clientList.length > 0 && (
-              <ButtonModalDialog onClick={handleClientModal}>
-                adicionar novo
-              </ButtonModalDialog>
-            )}
+            {/* {clientList.length > 0 && ( */}
+            <ButtonModalDialog onClick={handleClientModal}>
+              adicionar novo
+            </ButtonModalDialog>
+            {/* )} */}
           </Stack>
         </DialogTitle>
         <DialogContent>
@@ -212,14 +210,14 @@ export default function ModalSearchClient({
                 <ButtonPaginate
                   type="submit"
                   onClick={handlePaginatePrevious}
-                  disabled={DisableButtonPrevious}
+                  // disabled={DisableButtonPrevious}
                 >
                   <ArrowBackIosNewIcon />
                 </ButtonPaginate>
                 <ButtonPaginate
                   type="submit"
                   onClick={handlePaginateNext}
-                  disabled={DisableButtonNext}
+                  // disabled={DisableButtonNext}
                 >
                   <ArrowForwardIosIcon />
                 </ButtonPaginate>
@@ -249,7 +247,7 @@ export default function ModalSearchClient({
               }
             }}
           >
-            Adicionar
+            Selecionar
           </ButtonModalDialog>
         </DialogActions>
       </Dialog>
