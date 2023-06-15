@@ -16,13 +16,11 @@ interface ModalSelectModelChecklistProps {
   isOpen: boolean
   handleClose: () => void
 }
-
+const api = new ApiCore()
 export function CheckListModelListModal({
   isOpen,
   handleClose,
 }: ModalSelectModelChecklistProps) {
-  const api = new ApiCore()
-
   const router = useRouter()
 
   const { setCheckListModel, serviceScheduleState } = useContext(

@@ -19,11 +19,12 @@ interface companyProps {
   cpf: string
   active?: boolean
 }
+
+const api = new ApiCore()
+
 export default function CompanyList() {
   const { handleCompanySelected, companyData } = useContext(CompanyContext)
   const { listCompanies, addCompaniesList } = useContext(AuthContext)
-
-  const api = new ApiCore()
 
   function handleSelectCompany(newCompany: companyProps) {
     handleCompanySelected(newCompany)

@@ -54,10 +54,9 @@ interface MyDropzoneProps {
 //   } catch (error: any) {
 //   }
 // }
+const api = new ApiCore()
 
 export function MyDropzone({ handleAddImageUrlList }: MyDropzoneProps) {
-  const api = new ApiCore()
-
   const onDrop = useCallback(async (acceptedFiles: any) => {
     const formData = new FormData()
     // eslint-disable-next-line no-unused-vars

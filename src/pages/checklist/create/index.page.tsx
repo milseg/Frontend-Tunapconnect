@@ -92,7 +92,7 @@ function TabPanel(props: TabPanelProps) {
     </div>
   )
 }
-
+const api = new ApiCore()
 export default function ChecklistCreateById() {
   const [painelValue, setPainelValue] = useState(0)
   // const [typeSubmitForm, setTypeSubmitForm] = useState<
@@ -106,7 +106,7 @@ export default function ChecklistCreateById() {
   })
   const [loading, setLoading] = useState(false)
   const queryClient = useQueryClient()
-  const api = new ApiCore()
+
   const router = useRouter()
   const { serviceScheduleState, setCheckListModel, setServiceSchedule } =
     useContext(ServiceScheduleContext)

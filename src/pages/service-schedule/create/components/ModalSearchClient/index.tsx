@@ -33,7 +33,7 @@ type paginationProps = {
   actual: number
   total: number
 }
-
+const api = new ApiCore()
 export default function ModalSearchClient({
   openMolal,
   handleClose,
@@ -57,8 +57,6 @@ export default function ModalSearchClient({
       search: '',
     },
   })
-
-  const api = new ApiCore()
 
   const { companySelected } = useContext(CompanyContext)
 

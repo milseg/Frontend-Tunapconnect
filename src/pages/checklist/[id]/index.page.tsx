@@ -68,6 +68,7 @@ function a11yProps(index: number) {
     'aria-controls': `simple-tabpanel-${index}`,
   }
 }
+const api = new ApiCore()
 
 export type ActionAlertsStateProps = {
   isOpen: boolean
@@ -105,7 +106,7 @@ export default function ChecklistCreateById() {
   })
   const [loading, setLoading] = useState(false)
   const queryClient = useQueryClient()
-  const api = new ApiCore()
+
   const router = useRouter()
   const { serviceScheduleState, setCheckList } = useContext(
     ServiceScheduleContext,

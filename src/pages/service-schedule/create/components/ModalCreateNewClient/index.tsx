@@ -31,7 +31,7 @@ interface actionAlertsProps {
   title: string
   type: 'success' | 'error' | 'warning'
 }
-
+const api = new ApiCore()
 export default function ModalCreateNewClient({
   isOpen,
   handleClose,
@@ -45,7 +45,6 @@ export default function ModalCreateNewClient({
     type: 'success',
   })
 
-  const api = new ApiCore()
   const { companySelected } = useContext(CompanyContext)
 
   const { register, handleSubmit, control, reset } = useForm({

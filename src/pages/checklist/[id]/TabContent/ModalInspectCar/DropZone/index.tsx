@@ -85,13 +85,12 @@ interface MyDropzoneProps {
 //   } catch (error: any) {
 //   }
 // }
-
+const api = new ApiCore()
 export function InspectionDropzone({
   handleAddImageUrlList,
   listImagesUpload,
   positionsCar,
 }: MyDropzoneProps) {
-  const api = new ApiCore()
   const [list, setList] = useState<imageData[] | []>([])
   const [listProgress, setListProgress] = useState<
     Array<'loading' | 'complete'> | []

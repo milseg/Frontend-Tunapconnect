@@ -24,7 +24,7 @@ interface ModalSearchClaimServiceProps {
 type SearchFormProps = {
   search: string
 }
-
+const api = new ApiCore()
 export default function ModalSearchClaimService({
   openMolal,
   handleClose,
@@ -44,8 +44,6 @@ export default function ModalSearchClaimService({
       search: '',
     },
   })
-
-  const api = new ApiCore()
 
   const { companySelected } = useContext(CompanyContext)
 
