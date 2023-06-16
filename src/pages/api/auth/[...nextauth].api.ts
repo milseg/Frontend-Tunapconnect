@@ -20,7 +20,6 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, req) {
         if (!credentials?.username && !credentials?.password) {
-          console.log('====== sem dados ======')
           throw new Error('error')
         }
 
@@ -35,9 +34,7 @@ export const authOptions: NextAuthOptions = {
             }),
             headers: { 'Content-Type': 'application/json;charset=UTF-8' },
           })
-        } catch (error) {
-          console.log('erro', error)
-        }
+        } catch (error) {}
         const user = await res?.json()
         if (res?.ok && user) {
           return user

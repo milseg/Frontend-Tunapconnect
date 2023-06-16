@@ -64,7 +64,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         privilege: session?.user.privilege,
       })
       setListCompanies(session?.user.companies as companyProps[])
-      console.log(session)
       Router.push('/company')
     }
 

@@ -183,8 +183,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     inspection: [],
   })
 
-  // const router = useRouter()
-
   const { serviceScheduleState } = useContext(ServiceScheduleContext)
   const { checklist } = serviceScheduleState
 
@@ -222,7 +220,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   })
 
   useImperativeHandle(ref, () => ({
-    // handleOpenAlertDialog,
     // @ts-ignore
     handleGetValuesForm, // arrumar
   }))
@@ -233,10 +230,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   function closeModalInspectCar() {
     setOpenModalInspectCar(false)
   }
-
-  // function getIndexStageNameInListImage() {
-  //   return listImage.findIndex((item) => Object.hasOwn(item, stageName))
-  // }
 
   function closeModalImage() {
     setOpenModalImage({ id: null, open: false })
@@ -259,7 +252,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       size: string
     },
   ) {
-    console.log(image)
     setListImage((prevState) => {
       const stageActual = prevState[stageName]
       if (!Object.hasOwn(prevState, stageName)) {
@@ -288,7 +280,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
             return i
           }),
         }
-        console.log(valueFormatted)
+
         return valueFormatted
       }
 
@@ -328,7 +320,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       prevState[stageName][findIndexListImage].images = prevState[stageName][
         findIndexListImage
       ].images.filter((item) => item.id !== imageId)
-      console.log(stageActual)
 
       return {
         ...prevState,
@@ -345,7 +336,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   }
 
   function handleSaveSignatures(signatures: CheckListSignatures[]) {
-    console.log(signatures)
     setDataModals((prevState) => {
       return {
         ...prevState,
@@ -361,13 +351,11 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         inspection: data,
       }
     })
-    console.log(data)
   }
 
   async function getValueInspectionCar() {
     if (modalCarRef.current && modalCarRef.current.getValuesInspection) {
       const result = await modalCarRef.current.getValuesInspection()
-      console.log(result)
       return result
     }
   }
@@ -411,53 +399,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   }
 
   async function onSubmitData(data: OnSubmitData) {
-    // const isAlreadyInspections = stageData?.itens.filter(
-    //   (item) => item.rules.type === 'visual_inspect',
-    // )
-
-    // let defaultLabel: any
-
-    // if (isAlreadyInspections) {
-    //   defaultLabel = isAlreadyInspections[0].values
-    //     .labels as InspectionCarData[]
-    // }
-
-    // const dataFormatted = {
-    //   ...stageData,
-    //   status: typeSubmitForm,
-    //   signatures:
-    //     dataModals?.signatures.length > 0
-    //       ? dataModals?.signatures
-    //       : stageData?.signatures,
-    //   itens: stageItems.map((item, index) => {
-    //     if (item.rules.type === 'visual_inspect') {
-    //       return {
-    //         ...item,
-    //         comment: data[stageName]?.[index]?.observation,
-    //         values: {
-    //           labels:
-    //             dataModals?.inspection.length > 0
-    //               ? dataModals?.inspection
-    //               : defaultLabel,
-    //         },
-    //       }
-    //     }
-
-    //     return {
-    //       ...item,
-    //       comment: data[stageName]?.[index]?.observation,
-    //       values: {
-    //         ...item.values,
-    //         images: listImage[stageName]
-    //           ? listImage[stageName].filter((i) => i.id === index)
-    //           : [],
-    //         value: data[stageName]?.[index]?.inputs,
-    //       },
-    //     }
-    //   }),
-    // }
     const dataActual = await handleGetValuesForm()
-    console.log(dataActual)
 
     handleAddListCheckList({
       ...dataActual,
@@ -472,20 +414,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       // @ts-ignore
       listImagesStage.push(...img)
     })
-
-    // console.log(inspection.values)
-
-    // const dataMoldalFormatted = {
-    //   signatures:{ stageActual.signatures},
-    //   inspection: inspection.values.labels,
-    // }
-
-    // setDataModals(prevState => {
-    //   const newSignitures = prevState.signatures.map(item => )
-    //   return  {
-    //     signatures: prevState.signatures]
-    //   }
-    // })
 
     setListImage((prevState) => {
       if (Object.hasOwn(prevState, stageName)) {
@@ -540,7 +468,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
                           size="small"
                           disabled={isClosed}
                           onClick={() => {
-                            console.log(index)
                             setOpenModalImage({
                               id: index,
                               open: true,

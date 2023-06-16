@@ -1,32 +1,11 @@
 import { DataGrid, gridClasses } from '@mui/x-data-grid'
-// import Button from '@mui/material/Button'
+
 import { alpha, styled } from '@mui/material/styles'
 import { grey } from '@mui/material/colors'
 import IconButton from '@mui/material/IconButton'
 import { Box } from '@mui/material'
 
-// import Dialog from '@mui/material/Dialog';
-// import DialogActions from '@mui/material/DialogActions';
-// import DialogContent from '@mui/material/DialogContent';
-// import DialogContentText from '@mui/material/DialogContentText';
-// import DialogTitle from '@mui/material/DialogTitle';
-// import useMediaQuery from '@mui/material/useMediaQuery';
-
 const ODD_OPACITY = 0.2
-
-// {
-//   const style = {
-//     position: 'absolute' as 'absolute',
-//     top: '50%',
-//     left: '50%',
-//     transform: 'translate(-50%, -50%)',
-//     width: 400,
-//     bgcolor: 'background.paper',
-//     border: '2px solid #000',
-//     boxShadow: 24,
-//     p: 4,
-//   }
-// }
 
 export const BoxContainer = styled(Box)(({ theme }) => ({
   '& .super-app-theme--header': {
@@ -46,8 +25,6 @@ export const TableDataGrid = styled(DataGrid)(({ theme }) => ({
     },
   },
   '& .MuiDataGrid-columnHeaders': {
-    // display: "none",
-    // marginBottom: 40,
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 5,
   },

@@ -46,13 +46,7 @@ export default function ModalSearchClient({
   const [isLoading, setIsLoading] = useState(false)
   const [pagination, setPagination] = useState<paginationProps | null>(null)
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    // formState: { errors },
-  } = useForm({
+  const { register, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
       search: '',
     },
@@ -63,14 +57,14 @@ export default function ModalSearchClient({
   async function onSubmitSearch(data: SearchFormProps) {
     setIsLoading(true)
     setClientList([])
-    console.log(pagination)
+
     try {
       const result = await api.get(
         `/client?company_id=${companySelected}&search=${data.search}&limit=10${
           pagination ? '&current_page=' + pagination.actual : ''
         }`,
       )
-      console.log(result.data)
+
       setClientList(result.data.data)
       if (!pagination) {
         setPagination((prevState) => {
@@ -93,7 +87,6 @@ export default function ModalSearchClient({
   }
 
   function handleSelectedClient(client: ClientResponseType) {
-    console.log(client)
     setClientSelected(client)
   }
 

@@ -1,5 +1,5 @@
 import * as React from 'react'
-// import { useForm, SubmitHandler } from 'react-hook-form'
+
 import { useContext, useEffect, useState } from 'react'
 
 import Container from '@mui/material/Container'
@@ -11,7 +11,6 @@ import {
   ClientInfor,
   ClientResponseType,
   ClientVehicle,
-  // ServiceSchedulesListProps,
   TechnicalConsultant,
 } from '@/types/service-schedule'
 import { api } from '@/lib/api'
@@ -32,10 +31,7 @@ import {
   TitleCard,
 } from './styles'
 
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import dayjs, { Dayjs } from 'dayjs'
-// import * as locale from 'date-fns/locale/pt-BR';
 
 import MenuItem from '@mui/material/MenuItem'
 import { MoreOptionsButtonSelect } from '@/components/MoreOptionsButtonSelect'
@@ -49,7 +45,7 @@ import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
 import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
 
 import { useQuery } from 'react-query'
-// import { formatCPF } from '@/ultis/formatCPF'
+
 import { formatPlate } from '@/ultis/formatPlate'
 
 import { CompanyContext } from '@/contexts/CompanyContext'
@@ -59,8 +55,6 @@ import ModalSearchClientVehicle from './components/ModalSearchClientVehicle'
 import ModalSearchClient from './components/ModalSearchClient'
 import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle/type'
 import ModalCreateNewClient from './components/ModalCreateNewClient'
-
-// import ModalSearchClaimService from './components/ModalSearchClaimService'
 
 type isEditSelectedCardType =
   | 'client'
@@ -183,7 +177,7 @@ export default function ServiceSchedulesCreate() {
       claims_service: [],
       checklist_version_id: 14,
     }
-    console.log(dataFormatted)
+
     try {
       const respCreate: any = await api.post('/service-schedule', dataFormatted)
       const idCreatedResponse = respCreate.data.data.id
@@ -206,7 +200,6 @@ export default function ServiceSchedulesCreate() {
   }
 
   function handleAddClient(client: ClientResponseType) {
-    console.log(client)
     setClient({
       id: client.id,
       name: client.name ?? 'Não informado',
@@ -230,21 +223,6 @@ export default function ServiceSchedulesCreate() {
       plate: client_vehicle?.plate ?? 'Não informado',
     })
   }
-  // function handleAddClaimServiceVehicle(client_vehicle: any) {
-  //   console.log(client_vehicle)
-  // setClientVehicle(null)
-  // setClientVehicle({
-  //   id: client_vehicle.id,
-  //   brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
-  //   chassis: client_vehicle?.chasis ?? 'Não informado',
-  //   vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
-  //   model:
-  //     `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
-  //     'Não informado',
-  //   color: client_vehicle?.color ?? 'Não informado',
-  //   plate: client_vehicle?.plate ?? 'Não informado',
-  // })
-  // }
 
   const {
     data: dataTechnicalConsultantList,
@@ -264,7 +242,6 @@ export default function ServiceSchedulesCreate() {
       return resp.data.data
     },
     {
-      // enabled: !!companySelected,
       refetchOnWindowFocus: false,
       refetchOnMount: false,
     },
@@ -280,40 +257,6 @@ export default function ServiceSchedulesCreate() {
       )
     }
   }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList])
-
-  // useEffect(() => {
-  //   if (dataServiceScheduleStatus === 'success') {
-  //     const { client, client_vehicle, technical_consultant, promised_date } =
-  //       dataServiceSchedule
-  //     setClient({
-  //       id: client.id,
-  //       name: client.name ?? 'Não informado',
-  //       cpf: client.document ?? 'Não informado',
-  //       email: client.email ?? 'Não informado',
-  //       telefone: client.phone ?? 'Não informado',
-  //       address: client.address ?? 'Não informado',
-  //     })
-
-  //     setClientVehicle({
-  //       id: client_vehicle.id,
-  //       brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
-  //       chassis: client_vehicle?.chasis ?? 'Não informado',
-  //       vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
-  //       model:
-  //         `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
-  //         'Não informado',
-  //       color: client_vehicle?.color ?? 'Não informado',
-  //       plate: client_vehicle?.plate ?? 'Não informado',
-  //     })
-  //     const promisedDate = dayjs(new Date(promised_date))
-  //     setVisitDate(promisedDate)
-
-  //     setTechnicalConsultant({
-  //       id: technical_consultant?.id ?? 'Não informado',
-  //       name: technical_consultant?.name ?? 'Não informado',
-  //     })
-  //   }
-  // }, [dataServiceScheduleStatus, dataServiceSchedule])
 
   return (
     <>
@@ -477,6 +420,16 @@ export default function ServiceSchedulesCreate() {
                   </ListItemCard>
                   <ListItemCard>
                     <InfoCardName>Placa:</InfoCardName>{' '}
+                    {clientVehicle?.plate ? (
+                      <InfoCardText>
+                        {formatPlate(clientVehicle?.plate)}
+                      </InfoCardText>
+                    ) : (
+                      <InfoCardText width="100%"></InfoCardText>
+                    )}
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>KM:</InfoCardName>{' '}
                     {clientVehicle?.plate ? (
                       <InfoCardText>
                         {formatPlate(clientVehicle?.plate)}

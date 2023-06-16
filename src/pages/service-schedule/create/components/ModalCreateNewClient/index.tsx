@@ -84,7 +84,6 @@ export default function ModalCreateNewClient({
 
   async function onSubmit(data: any) {
     setIsLoading(true)
-    console.log(data)
     const listPhone = data.phone
       .map((item: any) => item.phone)
       .filter((item: any) => item !== '')
@@ -107,9 +106,9 @@ export default function ModalCreateNewClient({
         email: listEmail,
         address: listAddress,
       }
-      console.log(dataFormatted)
+
       const resp = await api.post('/client', dataFormatted)
-      console.log(resp.data.data)
+
       handleAddClient(resp.data.data[0])
       handleSaveNewClient()
       handleActiveAlert(true, 'success', resp.data.msg)
@@ -171,7 +170,6 @@ export default function ModalCreateNewClient({
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              // {...(register('name'),
               {...register('name', { required: true })}
             />
             <InputNewClient

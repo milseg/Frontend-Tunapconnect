@@ -81,7 +81,6 @@ const MyApp = (props: CustomAppProps) => {
 export default MyApp
 
 function Auth({ children }: { children: ReactNode }) {
-  // if `{ required: true }` is supplied, `status` can only be "loading" or "authenticated"
   const { status } = useSession({
     required: true,
     onUnauthenticated() {

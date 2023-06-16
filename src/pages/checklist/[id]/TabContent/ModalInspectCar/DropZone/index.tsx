@@ -3,12 +3,9 @@ import { useDropzone } from 'react-dropzone'
 import PhotoSizeSelectActualOutlinedIcon from '@mui/icons-material/PhotoSizeSelectActualOutlined'
 
 import { LinearProgress, Stack } from '@mui/material'
-// import axios from 'axios'
+
 import { api } from '@/lib/api'
 import Image from 'next/image'
-// import { GetServerSideProps } from 'next/types'
-// import path from 'path'
-// import fs from 'fs/promises'
 
 import { ContainerImages } from './style'
 

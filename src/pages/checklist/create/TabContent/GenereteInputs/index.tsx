@@ -72,20 +72,7 @@ function InputSwitch({
     />
   )
 }
-// function InputSwitch({
-//   register,
-//   nameRegister,
-//   indexRegister,
-//   isClosed,
-// }: registerInputProps) {
-//   return (
-//     <Switch
-//       defaultChecked={false}
-//       disabled={isClosed}
-//       {...register(`${nameRegister}.${indexRegister}.inputs`)}
-//     />
-//   )
-// }
+
 function InputText({
   register,
   nameRegister,

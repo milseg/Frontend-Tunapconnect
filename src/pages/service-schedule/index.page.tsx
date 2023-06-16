@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { useContext, useState, useMemo, useEffect, useCallback } from 'react'
+import { useContext, useState, useMemo, useEffect } from 'react'
 
 import Container from '@mui/material/Container'
 
@@ -83,12 +83,7 @@ export default function ServiceSchedulesList() {
 
   const router = useRouter()
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    // formState: { errors },
-  } = useForm({
+  const { register, handleSubmit, setValue } = useForm({
     defaultValues: {
       search: '',
     },
@@ -139,7 +134,7 @@ export default function ServiceSchedulesList() {
       url += `&promised_date_max=${values?.date.dateEnd}`
     }
     url += '&orderby=promised_date'
-    console.log(url)
+
     await router.push(url)
   }
   const columns: GridColDef[] = useMemo(
@@ -206,28 +201,7 @@ export default function ServiceSchedulesList() {
         width: 160,
         sortable: false,
       },
-      // {
-      //   field: 'totalDiscount',
-      //   headerName: 'Tipo Desconto',
-      //   headerClassName: 'super-app-theme--header',
-      //   // type: 'number',
-      //   width: 110,
-      //   align: 'center',
-      //   sortable: false,
-      // valueGetter: (params: GridValueGetterParams) =>
-      //   `${formatMoneyPtBR(params.row.totalDiscount) || ''}`,
-      // },
-      // {
-      //   field: 'total',
-      //   headerName: 'Total Geral',
-      //   headerClassName: 'super-app-theme--header',
-      //   // type: 'number',
-      //   width: 110,
-      //   align: 'center',
-      //   sortable: false,
-      //   valueGetter: (params: GridValueGetterParams) =>
-      //     `${formatMoneyPtBR(params.row.total) || ''}`,
-      // },
+
       {
         field: 'action',
         headerName: 'Ação',
@@ -257,45 +231,6 @@ export default function ServiceSchedulesList() {
     [],
   )
 
-  const getData = useCallback(async (newUrl: string) => {
-    return api.get(newUrl).then((response) => {
-      console.log(response.data)
-      const resp = response.data.data.map((data: any) => {
-        return {
-          id: data?.id ?? 'Não informado',
-          promised_date: data?.promised_date ?? 'Não informado',
-          client: data?.client?.name ?? 'Não informado',
-          plate: data?.client_vehicle?.plate ?? 'Não informado',
-          chassis: data?.client_vehicle?.chasis ?? 'Não informado',
-          technical_consultant:
-            data?.technical_consultant?.name ?? 'Não informado',
-          vehicle: data?.client_vehicle?.vehicle?.name ?? 'não definido',
-        }
-      })
-
-      if (response.data.total_pages === 1)
-        setPages({
-          next: false,
-          previous: false,
-        })
-      if (!router.query.current_page) {
-        if (response.data.current_page === 1) {
-          setPages((prevState) => ({ ...prevState, previous: false }))
-        }
-      }
-
-      return {
-        paginate: {
-          current_page: response.data.current_page,
-          total_pages: response.data.total_pages,
-          total_results: response.data.total_results,
-        },
-        serviceSchedulesList: resp,
-        serviceSchedulesListAllData: response.data.data,
-      }
-    })
-  }, [])
-
   const {
     data: rows,
     isSuccess,
@@ -307,44 +242,41 @@ export default function ServiceSchedulesList() {
   } = useQuery<DataFetchProps>(
     ['service-scheduler-list', companySelected],
     () => {
-      // api.get(url).then((response) => {
-      //   console.log(response.data)
-      //   const resp = response.data.data.map((data: any) => {
-      //     return {
-      //       id: data?.id ?? 'Não informado',
-      //       promised_date: data?.promised_date ?? 'Não informado',
-      //       client: data?.client?.name ?? 'Não informado',
-      //       plate: data?.client_vehicle?.plate ?? 'Não informado',
-      //       chassis: data?.client_vehicle?.chasis ?? 'Não informado',
-      //       technical_consultant:
-      //         data?.technical_consultant?.name ?? 'Não informado',
-      //       vehicle: data?.client_vehicle?.vehicle?.name ?? 'não definido',
-      //     }
-      //   })
+      return api.get(url).then((response) => {
+        const resp = response.data.data.map((data: any) => {
+          return {
+            id: data?.id ?? 'Não informado',
+            promised_date: data?.promised_date ?? 'Não informado',
+            client: data?.client?.name ?? 'Não informado',
+            plate: data?.client_vehicle?.plate ?? 'Não informado',
+            chassis: data?.client_vehicle?.chasis ?? 'Não informado',
+            technical_consultant:
+              data?.technical_consultant?.name ?? 'Não informado',
+            vehicle: data?.client_vehicle?.vehicle?.name ?? 'não definido',
+          }
+        })
 
-      //   if (response.data.total_pages === 1)
-      //     setPages({
-      //       next: false,
-      //       previous: false,
-      //     })
-      //   if (!router.query.current_page) {
-      //     if (response.data.current_page === 1) {
-      //       setPages((prevState) => ({ ...prevState, previous: false }))
-      //     }
-      //   }
+        if (response.data.total_pages === 1)
+          setPages({
+            next: false,
+            previous: false,
+          })
+        if (!router.query.current_page) {
+          if (response.data.current_page === 1) {
+            setPages((prevState) => ({ ...prevState, previous: false }))
+          }
+        }
 
-      //   return {
-      //     paginate: {
-      //       current_page: response.data.current_page,
-      //       total_pages: response.data.total_pages,
-      //       total_results: response.data.total_results,
-      //     },
-      //     serviceSchedulesList: resp,
-      //     serviceSchedulesListAllData: response.data.data,
-      //   }
-      // })
-      console.log('React query')
-      return getData(url)
+        return {
+          paginate: {
+            current_page: response.data.current_page,
+            total_pages: response.data.total_pages,
+            total_results: response.data.total_results,
+          },
+          serviceSchedulesList: resp,
+          serviceSchedulesListAllData: response.data.data,
+        }
+      })
     },
 
     {
@@ -387,12 +319,10 @@ export default function ServiceSchedulesList() {
   }
 
   async function handleSetServiceSchedule(idSelected: number) {
-    console.log(idSelected)
     const filterSelected = rows?.serviceSchedulesListAllData.filter(
       (i) => i.id === idSelected,
     )[0]
 
-    console.log(filterSelected)
     if (filterSelected) {
       setServiceSchedule(filterSelected)
     }

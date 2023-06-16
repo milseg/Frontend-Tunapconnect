@@ -11,10 +11,7 @@ interface LabelButtonMarkupTypeProps {
 interface ClickableAreaProps {
   urlImg?: string
 }
-// interface ButtonMarkupProps {
-//   topmarkup: number
-//   leftmarkup: number
-// }
+
 interface ButtonMarkupProps {
   mobile: {
     top: number

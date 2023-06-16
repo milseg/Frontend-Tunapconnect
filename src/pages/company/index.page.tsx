@@ -21,13 +21,12 @@ interface companyProps {
 }
 
 export default function CompanyList() {
-  const { handleCompanySelected, companyData } = useContext(CompanyContext)
+  const { handleCompanySelected } = useContext(CompanyContext)
   const { listCompanies, addCompaniesList } = useContext(AuthContext)
 
   function handleSelectCompany(newCompany: companyProps) {
     handleCompanySelected(newCompany)
   }
-  console.log(companyData)
 
   const { data, isSuccess, isLoading } = useQuery<companyProps[] | []>(
     ['company-page-list-company'],

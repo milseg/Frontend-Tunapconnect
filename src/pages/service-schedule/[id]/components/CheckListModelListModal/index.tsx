@@ -33,18 +33,17 @@ export function CheckListModelListModal({
       queryFn: async () => {
         try {
           const resp = await api.get('/checklist_model/list')
-          console.log(resp.data.data)
           return resp.data.data
         } catch (err) {
           console.log(err)
           return []
         }
       },
-      // enabled: isOpen,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
     })
 
   async function handleChecklistModelCreate(data: ChecklistModelType) {
-    console.log(data)
     setCheckListModel(data)
     await router.push(
       `/checklist/create?checklist_model_id=${data.id}&service_schedule_id=${serviceScheduleState?.serviceSchedule?.id}`,

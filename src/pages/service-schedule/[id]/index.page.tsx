@@ -1,5 +1,5 @@
 import * as React from 'react'
-// import { useForm, SubmitHandler } from 'react-hook-form'
+
 import { useContext, useEffect, useState } from 'react'
 
 import Container from '@mui/material/Container'
@@ -10,7 +10,6 @@ import Paper from '@mui/material/Paper'
 import {
   ClientInfor,
   ClientVehicle,
-  // ServiceSchedulesListProps,
   TechnicalConsultant,
 } from '@/types/service-schedule'
 import { api } from '@/lib/api'
@@ -36,10 +35,7 @@ import Skeleton from '@mui/material/Skeleton'
 import PrintIcon from '@mui/icons-material/Print'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import dayjs, { Dayjs } from 'dayjs'
-// import * as locale from 'date-fns/locale/pt-BR';
 
 import MenuItem from '@mui/material/MenuItem'
 import { MoreOptionsButtonSelect } from '@/components/MoreOptionsButtonSelect'
@@ -59,7 +55,7 @@ import { formatCPF } from '@/ultis/formatCPF'
 import { formatPlate } from '@/ultis/formatPlate'
 
 import { CompanyContext } from '@/contexts/CompanyContext'
-// import { ChecklistProps } from '@/pages/checklist/types'
+
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 
 import { ChecklistProps } from '@/pages/checklist/types'
@@ -107,12 +103,9 @@ export default function ServiceSchedulesEdit() {
   const [isEditSelectedCard, setIsEditSelectedCard] =
     useState<isEditSelectedCardType>(null)
   const [wasEdited, setWasEdited] = useState(false)
-  // const [defaultCheckListPrint, setDefaultCheckListPrint] =
-  //   useState<ChecklistProps | null>(null)
+
   const [actionAlerts, setActionAlerts] =
     useState<ActionAlertsStateProps | null>(null)
-
-  // const [rows, setRows] = useState<ServiceSchedulesListProps[]>([])
 
   const [openChecklistModal, setOpenChecklistModal] = useState(false)
   const [openPrintInspectionModal, setOpenPrintInspectionModal] =
@@ -127,17 +120,9 @@ export default function ServiceSchedulesEdit() {
     ServiceScheduleContext,
   )
 
-  // const handleDelete = (id: number) => {
-  //   setRows(rows.filter((row) => row.id !== id))
-  // }
-
   const closeChecklistModal = () => {
     setOpenChecklistModal(false)
   }
-
-  // const closePrintInspectionModalModal = () => {
-  //   setOpenPrintInspectionModal(false)
-  // }
 
   function handleIsEditSelectedCard(value: isEditSelectedCardType) {
     setIsEditSelectedCard(value)
@@ -199,111 +184,6 @@ export default function ServiceSchedulesEdit() {
       })
     }
   }
-
-  // useEffect(() => {
-  //   if (!wasEdited) {
-  //     const { id } = router.query
-  //     api
-  //       .get(`/service-schedule/${id}`)
-  //       .then((response) => {
-  //         const {
-  //           client,
-  //           client_vehicle,
-  //           technical_consultant,
-  //           promised_date,
-  //         } = response.data.data
-  //         setClient({
-  //           id: client.id,
-  //           name: client.name ?? 'Não informado',
-  //           cpf: client.document ?? 'Não informado',
-  //           email: client.email ?? 'Não informado',
-  //           telefone: client.phone ?? 'Não informado',
-  //           address: client.address ?? 'Não informado',
-  //         })
-
-  //         setClientVehicle({
-  //           id: client_vehicle.id,
-  //           brand:
-  //             client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
-  //           chassis: client_vehicle?.chasis ?? 'Não informado',
-  //           vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
-  //           model:
-  //             `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
-  //             'Não informado',
-  //           color: client_vehicle?.color ?? 'Não informado',
-  //           plate: client_vehicle?.plate ?? 'Não informado',
-  //         })
-  //         const promisedDate = dayjs(new Date(promised_date))
-  //         setVisitDate(promisedDate)
-
-  //         setTechnicalConsultant({
-  //           id: technical_consultant?.id ?? 'Não informado',
-  //           name: technical_consultant?.name ?? 'Não informado',
-  //         })
-  //       })
-  //       .catch((err) => {
-  //         console.log(err)
-  //         setClient(null)
-  //         setClientVehicle(null)
-  //         setTechnicalConsultant(null)
-  //         setActionAlerts({
-  //           isOpen: true,
-  //           title: `${err.response?.data?.msg ?? 'Error inesperado'}!`,
-  //           type: 'error',
-  //           redirectTo: '/service-schedules/list',
-  //         })
-  //       })
-
-  //     if (companyId) {
-  //       api
-  //         .get(`/technical-consultant?company_id=${router.query?.companyId}`)
-  //         .then((resp) => {
-  //           setTechnicalConsultantsList(
-  //             resp.data.data.map((item: TechnicalConsultant) => ({
-  //               id: item.id,
-  //               name: item.name,
-  //             })),
-  //           )
-  //         })
-  //         .catch((err) => {
-  //           console.log(err)
-  //         })
-  //     }
-  //   }
-  // }, [router.query, companyId, wasEdited])
-
-  // async function createCheckListBase() {
-  //   try {
-  //     const modelChecklist = await api.get('/checklist_model/list')
-  //     const dataCreateChecklist = {
-  //       company_id: companySelected,
-  //       brand_id:
-  //         dataServiceSchedule?.client_vehicle?.vehicle?.brand_id ?? null,
-  //       vehicle_id: dataServiceSchedule?.client_vehicle?.vehicle?.id ?? null,
-  //       model_id:
-  //         dataServiceSchedule?.client_vehicle?.vehicle?.model?.id ?? null,
-  //       vehicle_client_id: clientVehicle?.id ?? null,
-  //       km: dataServiceSchedule?.client_vehicle?.mileage ?? null,
-  //       fuel: null,
-  //       client_id: client?.id,
-  //       service_schedule_id: router?.query?.id
-  //         ? parseInt(router?.query?.id as string)
-  //         : null,
-  //       checklist_model: 1,
-  //       status: 'rascunho', // finalizado // pendente // rascunho
-  //       stages: modelChecklist.data.data[0].stages,
-  //     }
-  //     if (modelChecklist.data.data.length > 0) {
-  //       const createdDefault = await api.create(
-  //         '/checklist',
-  //         dataCreateChecklist,
-  //       )
-  //       router.replace(`/checklist/create/${createdDefault?.data?.data?.id}`)
-  //     }
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
 
   const {
     data: dataTechnicalConsultantList,
@@ -419,48 +299,6 @@ export default function ServiceSchedulesEdit() {
         refetchOnWindowFocus: false,
       },
     )
-
-  // const {
-  //   data: dataCheckList,
-  //   isLoading,
-  //   isSuccess,
-  //   refetch,
-  // } = useQuery({
-  //   queryKey: [
-  //     'checklist',
-  //     'service_schedule',
-  //     'by_id',
-  //     'modal',
-  //     companySelected,
-  //     router.query.id,
-  //   ],
-  //   queryFn: async () => {
-  //     try {
-  //       const resp = await api.get(
-  //         `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc`,
-  //       )
-
-  //       console.log(resp)
-
-  //       const rowFormatted = resp.data.data.map((row: any) => {
-  //         return {
-  //           id: row?.id,
-  //           createAt: row?.created_at,
-  //           status: `${row?.status[0].toUpperCase()}${row?.status.substring(
-  //             1,
-  //           )}`,
-  //         }
-  //       })
-  //       return {
-  //         checklistAllData: resp.data.data,
-  //         checklistRows: rowFormatted,
-  //       }
-  //     } catch (err) {
-  //       console.log(err)
-  //     }
-  //   },
-  //   // enabled: isOpen,
-  // })
 
   function handleCloseModalPrintInspectionDefault() {
     setOpenPrintInspectionModal(false)

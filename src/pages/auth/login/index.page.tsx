@@ -48,7 +48,6 @@ export default function SignIn() {
         message: errorMsg,
       })
     }
-    console.log(errorMsg)
   }
   const ButtonAdd = styled(Button)(({ theme }) => ({
     color: 'white',

@@ -14,12 +14,6 @@ export const TableCellHeader = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
   },
 }))
-// export const TableCellBody = styled(TableCell)(({ theme }) => ({
-//   '&: hover': {
-//     background: '#1ACABA',
-//     color: '#FFF',
-//   },
-// }))
 
 export const TableRowSBody = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {

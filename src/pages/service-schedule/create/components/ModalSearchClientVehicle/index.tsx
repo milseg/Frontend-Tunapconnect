@@ -43,11 +43,7 @@ export default function ModalSearchClientVehicle({
   const [clientVehicleSelected, setClientVehicleSelected] =
     useState<ClientVehicleResponseType | null>(null)
 
-  const {
-    register,
-    handleSubmit,
-    // formState: { errors },
-  } = useForm({
+  const { register, handleSubmit } = useForm({
     defaultValues: {
       search: '',
     },
@@ -56,12 +52,11 @@ export default function ModalSearchClientVehicle({
   const { companySelected } = useContext(CompanyContext)
 
   async function onSubmitSearch(data: SearchFormProps) {
-    console.log(data)
     try {
       const result = await api.get(
         `/client-vehicle?company_id=${companySelected}&search=${data.search}`,
       )
-      console.log(result.data.data)
+
       setClientVehicleList(result.data.data)
     } catch (error) {
       console.log(error)
@@ -110,7 +105,6 @@ export default function ModalSearchClientVehicle({
                 maxHeight: 300,
                 '& ul': { padding: 0 },
               }}
-              // subheader={<li />}
             >
               <li>
                 {clientVehicleList.length > 0 &&
@@ -172,7 +166,6 @@ export default function ModalSearchClientVehicle({
             Cancel
           </ButtonModalDialog>
           <ButtonModalDialog
-            // disabled={ClientVehicleSelected === null}
             onClick={() => {
               if (clientVehicleSelected) {
                 handleAddClientVehicle(clientVehicleSelected)

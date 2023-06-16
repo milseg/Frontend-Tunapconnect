@@ -116,7 +116,6 @@ export function CompanyProvider({ children }: GeralProviderProps) {
 
   useEffect(() => {
     if (companySelected === null) {
-      console.log('render companySelected')
       const cookies = parseCookies()
       if (cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string]) {
         const companySelectedCookie: cookieCompany = JSON.parse(
@@ -133,7 +132,6 @@ export function CompanyProvider({ children }: GeralProviderProps) {
 
   useEffect(() => {
     if (router.query.company_id) {
-      console.log('render router.query.company_id')
       verifyCompany(router.query.company_id as string)
     }
   }, [router.query])
