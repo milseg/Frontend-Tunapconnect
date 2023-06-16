@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
-// import MenuItem from '@mui/material/MenuItem'
+
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-// import Divider from "@mui/material/Divider";
-// import { Settings } from "@mui/icons-material";
+
 import { MoreOptionsButtonSelectProps } from './types'
 import { MenuItemButton } from './styles'
 
@@ -44,7 +43,6 @@ export function MoreOptionsButtonSelect({
       alert(`Checklist${checklistId} excluído com sucesso`)
     } catch (e) {
       alert(`Erro ao excluir Checklist - ${checklistId}`)
-      console.log(e)
     }
   }
   return (
@@ -109,7 +107,6 @@ export function MoreOptionsButtonSelect({
         {/* <MenuItemButton onClick={() => {}}>Duplicar</MenuItemButton> */}
         <MenuItemButton
           onClick={() => {
-            console.log(checklistId)
             handlePrintChecklist(Number(checklistId))
             setOpenPrintInspectionModal(true)
           }}

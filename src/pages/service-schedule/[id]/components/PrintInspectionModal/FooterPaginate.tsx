@@ -6,12 +6,6 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import Stack from '@mui/material/Stack'
 import { ButtonIcon } from './styles'
 
-// declare module '@mui/x-data-grid' {
-//   interface FooterPropsOverrides {
-//     status: FooterStatus;
-//   }
-// }
-
 export function CustomFooterStatusComponent(
   props: NonNullable<GridSlotsComponentsProps['footer']>,
 ) {

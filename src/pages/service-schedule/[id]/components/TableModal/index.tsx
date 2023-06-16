@@ -9,18 +9,15 @@ import {
 } from '@mui/x-data-grid'
 
 import { BoxContainer, StyledGridOverlay, TableDataGrid } from './styles'
-// import { CustomNoRowsOverlay } from './NoRows'
-// import { CustomFooterStatusComponent } from './FooterPaginate'
 
-// import { useTheme } from '@mui/material/styles'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 
 import DialogTitle from '@mui/material/DialogTitle'
-// import useMediaQuery from '@mui/material/useMediaQuery'
+
 import { MoreOptionsButtonSelect } from './MoreOptionsButtonSelect'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { useQuery } from 'react-query'
 import { formatDateTime } from '@/ultis/formatDate'
 import { CompanyContext } from '@/contexts/CompanyContext'
@@ -30,11 +27,6 @@ import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 import { useRouter } from 'next/router'
 
 interface TableAppProps {
-  // columns: GridColDef[]
-  // rowsData: ServiceSchedulesListProps[]
-  // handlePages?: (nextPage: string) => void
-  // pages?: { current: number, next: boolean, previous: boolean }
-  // loading: boolean
   isOpen: boolean
   title: string
   serviceScheduleId: string
@@ -50,17 +42,6 @@ declare module '@mui/x-data-grid' {
     previousPage: boolean
   }
 }
-
-const api = new ApiCore()
-
-// type RowsProps = {
-//   checklistAllData: ChecklistProps[]
-//   checklistRows: {
-//     id: number
-//     checklistModel: string
-//     createAt: string
-//   }[]
-// }
 
 function CustomNoRowsOverlay() {
   return (
@@ -166,10 +147,6 @@ export function TableModal({
         width: 80,
         align: 'left',
         renderCell: (params: GridRenderCellParams) => {
-          // const onClick = (e:React.MouseEvent<HTMLElement>) => {
-          //   e.stopPropagation();
-          //   const id = params.id;
-          // }
           const idCell = params.id
           return (
             <MoreOptionsButtonSelect
@@ -191,7 +168,6 @@ export function TableModal({
   const apiRef = useGridApiRef()
 
   async function handleDeleteChecklist(checklistId: number) {
-    console.log(checklistId)
     try {
       await api.delete('/checklist/' + checklistId)
       refetch()
@@ -239,14 +215,15 @@ export function TableModal({
         console.log(err)
       }
     },
-    // enabled: isOpen,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   })
 
   async function handleEditChecklist(idChecklistSelected: number) {
     const checklistFiltered = dataCheckList?.checklistAllData.filter(
       (c: any) => c.id === idChecklistSelected,
     )[0]
-    console.log(checklistFiltered)
+
     if (checklistFiltered) {
       setCheckList(checklistFiltered)
 
@@ -254,8 +231,6 @@ export function TableModal({
     }
   }
   async function handlePrintChecklist(idChecklistSelected: number) {
-    console.log(idChecklistSelected)
-    console.log(dataCheckList)
     const checklistFiltered = dataCheckList?.checklistAllData.filter(
       (c: any) => c.id === idChecklistSelected,
     )[0]

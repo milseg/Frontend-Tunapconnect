@@ -1,4 +1,4 @@
-import { Button } from '@mui/material'
+import { alpha, Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 import TableCell, { tableCellClasses } from '@mui/material/TableCell'
@@ -14,12 +14,6 @@ export const TableCellHeader = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
   },
 }))
-// export const TableCellBody = styled(TableCell)(({ theme }) => ({
-//   '&: hover': {
-//     background: '#1ACABA',
-//     color: '#FFF',
-//   },
-// }))
 
 export const TableRowSBody = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
@@ -36,6 +30,20 @@ export const TableRowSBody = styled(TableRow)(({ theme }) => ({
       color: '#FFF',
     },
   },
+  '&.Mui-selected': {
+    background: '#1ACABA',
+    color: '#FFF',
+    '& td': {
+      color: '#FFF',
+    },
+    '&: hover': {
+      background: alpha('#1ACABA', 0.5),
+      color: '#FFF',
+      '& td': {
+        color: '#FFF',
+      },
+    },
+  },
 }))
 export const TableRowSNoData = styled(TableRow)(({ theme }) => ({
   height: 100,
@@ -49,7 +57,6 @@ export const ButtonModalNewClient = styled(Button)(({ theme }) => ({
   // borderBottomLeftRadius: 0,
   padding: '5px 10px',
   textTransform: 'uppercase',
-  maxWidth: 150,
   '&:hover': {
     background: '#1ACABA',
   },

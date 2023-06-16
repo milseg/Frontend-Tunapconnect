@@ -81,23 +81,7 @@ export function TableApp({
               apiRef={apiRef}
               loading={loading}
               onRowClick={(id) => {
-                try {
-                  const listSession = localStorage.getItem(
-                    'service-schedule-list',
-                  )
-                  if (listSession) {
-                    const items = JSON.parse(listSession)
-                    console.log(items)
-                    const item = items.filter((i: any) => i.id === id.id)
-                    localStorage.setItem(
-                      'service-schedule-by-id',
-                      JSON.stringify(item),
-                    )
-                    handleSetServiceSchedule(Number(id.id))
-                  }
-                } catch (e) {
-                  console.log(e)
-                }
+                handleSetServiceSchedule(Number(id.id))
               }}
               pageSizeOptions={[7]}
               // disableRowSelectionOnClick

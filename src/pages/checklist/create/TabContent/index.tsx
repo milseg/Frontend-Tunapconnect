@@ -259,7 +259,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       size: string
     },
   ) {
-    console.log(image)
     setListImage((prevState) => {
       const stageActual = prevState[stageName]
       if (!Object.hasOwn(prevState, stageName)) {
@@ -288,7 +287,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
             return i
           }),
         }
-        console.log(valueFormatted)
+
         return valueFormatted
       }
 
@@ -328,7 +327,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       prevState[stageName][findIndexListImage].images = prevState[stageName][
         findIndexListImage
       ].images.filter((item) => item.id !== imageId)
-      console.log(stageActual)
 
       return {
         ...prevState,
@@ -345,7 +343,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
   }
 
   function handleSaveSignatures(signatures: CheckListSignatures[]) {
-    console.log(signatures)
     setDataModals((prevState) => {
       return {
         ...prevState,
@@ -361,20 +358,17 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         inspection: data,
       }
     })
-    console.log(data)
   }
 
   async function getValueInspectionCar() {
     if (modalCarRef.current && modalCarRef.current.getValuesInspection) {
       const result = await modalCarRef.current.getValuesInspection()
-      console.log(result)
       return result
     }
   }
 
   async function handleGetValuesForm() {
     const inspectionCarValues = await getValueInspectionCar()
-    console.log(dataModals?.signatures)
     const data = getValues()
 
     const dataFormatted = {
@@ -469,20 +463,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       listImagesStage.push(...img)
     })
 
-    // console.log(inspection.values)
-
-    // const dataMoldalFormatted = {
-    //   signatures:{ stageActual.signatures},
-    //   inspection: inspection.values.labels,
-    // }
-
-    // setDataModals(prevState => {
-    //   const newSignitures = prevState.signatures.map(item => )
-    //   return  {
-    //     signatures: prevState.signatures]
-    //   }
-    // })
-
     setListImage((prevState) => {
       if (Object.hasOwn(prevState, stageName)) {
         return {
@@ -536,7 +516,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
                           size="small"
                           disabled={isClosed}
                           onClick={() => {
-                            console.log(index)
                             setOpenModalImage({
                               id: index,
                               open: true,

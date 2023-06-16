@@ -1,4 +1,3 @@
-// import { ApiCore } from '@/lib/api'
 import classNames from 'classnames'
 import style from '@/sass/styles/printInspection.module.scss'
 
@@ -35,19 +34,9 @@ export function PrintInspection({
   checklistData,
   refPrint,
 }: PrintInspectionProps) {
-  // const [receptionStage, setReceptionStage] = useState<StagesDataProps>()
-  // const [deliveryStage, setDeliveryStage] = useState<StagesDataProps>()
-
-  // const { serviceScheduleState, setCheckList } = useContext(
-  //   ServiceScheduleContext,
-  // )
-
   const isExistReceptionStage = checklistData?.stages.filter(
     (st: any) => st.name === 'Recepção',
   )[0]
-  // const receptionStage = checklistData.stages.filter(
-  //   (st: any) => st.name === 'Recepção',
-  // )
 
   let receptionStage: StagesDataProps
   if (isExistReceptionStage) {
@@ -63,55 +52,12 @@ export function PrintInspection({
     receptionStage = isExistReceptionStage
   }
 
-  // const { data } = useQuery<ResponseGetCheckList>(
-  //   ['checklist-createByID-print', router?.query?.id, checklistId, companyId],
-  //   async () => {
-  //     if (serviceScheduleState.checklist) {
-  //       const reception = serviceScheduleState.checklist.stages.filter(
-  //         (st: any) => st.name === 'Recepção',
-  //       )
-  //       const delivery = serviceScheduleState.checklist.stages.filter(
-  //         (st: any) => st.name === 'Entrega',
-  //       )
-  //       setReceptionStage(reception[0])
-  //       setDeliveryStage(delivery[0])
-  //       return serviceScheduleState.checklist
-  //     } else {
-  //       try {
-  //         const resp = await api.get(
-  //           `/checklist/${checklistId}?company_id=${companyId}`,
-  //         )
-  //         setCheckList(resp.data.data)
-  //         const reception = resp.data.data.stages.filter(
-  //           (st: any) => st.name === 'Recepção',
-  //         )
-  //         const delivery = resp.data.data.stages.filter(
-  //           (st: any) => st.name === 'Entrega',
-  //         )
-  //         setReceptionStage(reception[0])
-  //         setDeliveryStage(delivery[0])
-  //         return resp.data.data
-  //       } catch (err) {
-  //         console.log(err)
-  //         return console.log(err)
-  //       }
-  //     }
-  //   },
-  //   {
-  //     refetchOnWindowFocus: false,
-  //     // enabled: !!checklistId && !!router?.query?.id,
-  //   },
-  // )
-
-  // console.log(data)
   const recepcaoInspecao = checklistData?.stages[0].itens.filter(
     (item) => item.rules.type === 'visual_inspect',
   )
   const entregaInspecao = checklistData?.stages[1].itens.filter(
     (item) => item.rules.type === 'visual_inspect',
   )
-
-  console.log(checklistData)
 
   function getCodeReceptionStage(code: string): Itens {
     const result = receptionStage?.itens.filter((it) => it.Code === code)
@@ -152,8 +98,6 @@ export function PrintInspection({
       values: { value: false, images: [] },
     }
   }
-
-  console.log(checklistData)
 
   return (
     <div ref={refPrint}>

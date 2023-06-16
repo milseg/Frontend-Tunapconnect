@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from 'react'
-// import Image from 'next/image'
+
 import {
   AppBar,
   Box,
@@ -38,15 +38,11 @@ import {
   Title,
 } from './styles'
 import { InspectionDropzone } from './DropZone'
-// import PhotoSizeSelectActualOutlinedIcon from '@mui/icons-material/PhotoSizeSelectActualOutlined'
+
 import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded'
 import dayjs from 'dayjs'
 import { StagesDataProps } from '@/pages/checklist/types'
 import { toPng } from 'html-to-image'
-
-// import { ApiCore } from '@/lib/api'
-
-// import carroFrenteImg from '@/assets/images/inspection/carro-frente.svg'
 
 type markupTypesEnum = 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
 
@@ -347,25 +343,6 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
     )
 
     const handleChange = async (event: SyntheticEvent, newValue: number) => {
-      // const result = await screenShotToPng(tabsValue)
-      // console.log(result)
-      // const img = new Image()
-      // img.src = result
-      // console.log(img)
-      // const link = document.createElement('a')
-      // link.download = 'my-image-name.png'
-      // link.href = result
-      // link.click()
-      // if (result) {
-      //   setScreenShots((prevState) => ({
-      //     frente: tabsValue === 0 ? result : prevState.frente,
-      //     lateralEsquerdo: tabsValue === 1 ? result : prevState.lateralEsquerdo,
-      //     lateralDireito: tabsValue === 2 ? result : prevState.lateralDireito,
-      //     traseira: tabsValue === 3 ? result : prevState.traseira,
-      //     teto: tabsValue === 4 ? result : prevState.teto,
-      //   }))
-      // }
-
       setTabsValue(newValue)
     }
 
@@ -632,8 +609,6 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
       const positonsCarData = stageData?.itens.filter(
         (itens) => itens.rules.type === 'visual_inspect',
       )
-
-      console.log(positonsCarData)
 
       const newPositionsUrl = {
         frente: '',

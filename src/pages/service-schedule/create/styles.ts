@@ -71,9 +71,7 @@ export const ButtonSubmit = styled(Button)(({ theme }) => ({
   color: 'white',
   background: '#0E948B',
   borderRadius: 4,
-  // borderTopRightRadius: 0,
-  // borderBottomRightRadius: 0,
-  // padding: '5px 16px',
+
   flex: 1,
   textTransform: 'none',
   '&:hover': {
@@ -84,11 +82,6 @@ export const ButtonSubmit = styled(Button)(({ theme }) => ({
 export const ButtonAdd = styled(IconButton)(({ theme }) => ({
   color: '#0E948B',
 
-  // borderRadius: 4,
-  // borderTopLeftRadius: 0,
-  // borderBottomLeftRadius: 0,
-  // padding: '10px 20px',
-  // textTransform: 'none',
   '&:hover': {
     color: 'rgba(	26, 202, 186,1)',
     // opacity: 0.3,
@@ -111,9 +104,7 @@ export const ButtonModalDialog = styled(Button)(({ theme }) => ({
   color: 'white',
   background: '#0E948B',
   borderRadius: 4,
-  // borderTopLeftRadius: 0,
-  // borderBottomLeftRadius: 0,
-  // padding: '10px 20px',
+
   textTransform: 'uppercase',
   '&:hover': {
     background: '#1ACABA',
@@ -126,7 +117,7 @@ export const ButtonModalDialog = styled(Button)(({ theme }) => ({
 export const ButtonAddInputs = styled(IconButton)(({ theme }) => ({
   height: 55,
   width: 55,
-  // maxWidth: 100,
+
   color: '#0E948B',
   '&:hover': {
     background: '#1ACABA',
@@ -141,8 +132,7 @@ export const ButtonModalActions = styled(Button)(({ theme }) => ({
   color: 'white',
   background: '#0E948B',
   borderRadius: 4,
-  // borderTopLeftRadius: 0,
-  // borderBottomLeftRadius: 0,
+
   padding: '5px 10px',
   textTransform: 'uppercase',
   maxWidth: 100,
@@ -173,5 +163,25 @@ export const InputNewClient = styled(TextField)(({ theme }) => ({
       boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 2px`,
       borderColor: theme.palette.primary.main,
     },
+  },
+}))
+
+export const ButtonPaginate = styled(IconButton)(({ theme }) => ({
+  height: 32,
+  width: 40,
+  // maxWidth: 100,
+  background: '#1C4961',
+  color: '#fff',
+  borderRadius: 5,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '2px 10px',
+  '&:hover': {
+    background: '#1ACABA',
+    color: 'white',
+  },
+  '&:disabled': {
+    background: '#e0f2f1',
   },
 }))

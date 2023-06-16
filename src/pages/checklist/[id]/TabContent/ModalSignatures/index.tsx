@@ -93,7 +93,6 @@ export default function ModalSignatures({
   }
 
   useEffect(() => {
-    console.log(stageData)
     if (isOpen?.id !== null) {
       if (signaturesData) {
         if (signaturesData[isOpen.id]?.image.length > 0) {
@@ -102,7 +101,6 @@ export default function ModalSignatures({
           if (stageData) {
             if (stageData?.length > 0) {
               if (stageData[isOpen.id].image.length > 0) {
-                console.log(stageData[isOpen.id].image)
                 setIsSignature(stageData[isOpen.id].image)
               }
             } else {
@@ -114,7 +112,6 @@ export default function ModalSignatures({
     }
   }, [isOpen?.id])
   useEffect(() => {
-    console.log(stageData)
     if (isOpen?.id) {
       if (stageData && !signaturesData) {
         if (stageData[isOpen.id].image)

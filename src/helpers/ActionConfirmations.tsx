@@ -1,10 +1,8 @@
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
 const MySwal = withReactContent(Swal)
-
-const api = new ApiCore()
 
 export function ActionDeleteConfirmations(
   id: number,

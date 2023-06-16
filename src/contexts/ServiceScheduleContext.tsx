@@ -1,4 +1,3 @@
-// import { ApiCore } from '@/lib/api'
 import { ChecklistProps } from '@/pages/checklist/types'
 import { ChecklistModelType, ChecklistReturnType } from '@/types/checklist'
 import { ServiceScheduleType } from '@/types/service-schedule'
@@ -35,8 +34,6 @@ export function ServiceScheduleProvider({
       checklistModel: null,
     },
   )
-
-  // const api = new ApiCore()
 
   function serviceScheduleListReducer(
     state: StateType,

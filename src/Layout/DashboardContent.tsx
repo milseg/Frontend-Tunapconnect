@@ -14,7 +14,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo } from 'react'
 
 import { MainListItems, secondaryListItems } from './ListItems'
 import { CompanyContext } from '@/contexts/CompanyContext'
@@ -75,22 +75,17 @@ interface DashboardContentProps {
   children: React.ReactNode
 }
 
-type CompanyProps = {
-  id: string
-  name: string
-  cnpj: string | null
-  cpf: string | null
-}
-
 export function DashboardContent({ children }: DashboardContentProps) {
   const [open, setOpen] = React.useState(true)
-  const [companyName, setCompanyName] = useState<CompanyProps>()
+
   const toggleDrawer = () => {
     setOpen(!open)
   }
   const theme = useTheme()
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
   const { companyData } = useContext(CompanyContext)
+
+  const company = useMemo(() => companyData, [companyData])
 
   useEffect(() => {
     if (!isWeb) {
@@ -103,13 +98,6 @@ export function DashboardContent({ children }: DashboardContentProps) {
       }
     }
   }, [isWeb])
-
-  useEffect(() => {
-    if (companyData) {
-      // @ts-ignore
-      setCompanyName(companyData)
-    }
-  }, [companyData])
 
   return (
     <>
@@ -141,7 +129,7 @@ export function DashboardContent({ children }: DashboardContentProps) {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              {companyName && `${companyName?.name ?? 'Não informado'}`}
+              {company && `${company?.name ?? 'Não informado'}`}
             </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">

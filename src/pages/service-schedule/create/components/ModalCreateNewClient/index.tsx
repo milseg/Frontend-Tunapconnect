@@ -13,22 +13,38 @@ import {
   InputNewClient,
 } from '../../styles'
 import { useContext, useEffect, useState } from 'react'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { Backdrop, CircularProgress } from '@mui/material'
+import ActionAlerts from '@/components/ActionAlerts'
+import { ClientResponseType } from '@/types/service-schedule'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
+  handleSaveNewClient: () => void
   isOpen: boolean
+  handleAddClient: (client: ClientResponseType) => void
+}
+
+interface actionAlertsProps {
+  isOpen: boolean
+  title: string
+  type: 'success' | 'error' | 'warning'
 }
 
 export default function ModalCreateNewClient({
   isOpen,
   handleClose,
+  handleSaveNewClient,
+  handleAddClient,
 }: ModalCreateNewClientProps) {
-  const [isLoading, setIsloading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
+    isOpen: false,
+    title: '',
+    type: 'success',
+  })
 
-  const api = new ApiCore()
   const { companySelected } = useContext(CompanyContext)
 
   const { register, handleSubmit, control, reset } = useForm({
@@ -67,7 +83,7 @@ export default function ModalCreateNewClient({
   })
 
   async function onSubmit(data: any) {
-    setIsloading(true)
+    setIsLoading(true)
     const listPhone = data.phone
       .map((item: any) => item.phone)
       .filter((item: any) => item !== '')
@@ -91,13 +107,39 @@ export default function ModalCreateNewClient({
         address: listAddress,
       }
 
-      const resp = await api.create('/client', dataFormatted)
-      console.log(resp)
-    } catch (error) {
+      const resp = await api.post('/client', dataFormatted)
+
+      handleAddClient(resp.data.data[0])
+      handleSaveNewClient()
+      handleActiveAlert(true, 'success', resp.data.msg)
+    } catch (error: any) {
+      if (error.response.status === 400) {
+        handleActiveAlert(true, 'error', error.response.data.msg)
+      } else {
+        handleActiveAlert(true, 'error', 'Erro inesperado!')
+      }
       console.log(error)
     } finally {
-      setIsloading(false)
+      setIsLoading(false)
     }
+  }
+
+  function handleCloseAlert(isOpen: boolean) {
+    setActionAlerts((prevState) => ({
+      ...prevState,
+      isOpen,
+    }))
+  }
+  function handleActiveAlert(
+    isOpen: boolean,
+    type: 'success' | 'error' | 'warning',
+    title: string,
+  ) {
+    setActionAlerts({
+      isOpen,
+      title,
+      type,
+    })
   }
 
   useEffect(() => {
@@ -128,14 +170,14 @@ export default function ModalCreateNewClient({
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('name')}
+              {...register('name', { required: true })}
             />
             <InputNewClient
               label="CPF"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('document')}
+              {...register('document', { required: true })}
             />
             {fieldsPhone.map((item, index) => {
               return (
@@ -265,6 +307,12 @@ export default function ModalCreateNewClient({
           </Backdrop>
         </DialogContent>
       </Dialog>
+      <ActionAlerts
+        isOpen={actionAlerts.isOpen}
+        title={actionAlerts.title}
+        type={actionAlerts.type}
+        handleAlert={handleCloseAlert}
+      />
     </>
   )
 }

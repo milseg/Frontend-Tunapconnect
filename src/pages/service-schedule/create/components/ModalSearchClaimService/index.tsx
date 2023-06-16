@@ -10,7 +10,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { Box, List, ListItemButton, ListItemText, Stack } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { ButtonIcon, ButtonModalDialog } from '../../styles'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { useContext, useEffect, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { ClientResponseType } from '@/types/service-schedule'
@@ -45,32 +45,18 @@ export default function ModalSearchClaimService({
     },
   })
 
-  const api = new ApiCore()
-
   const { companySelected } = useContext(CompanyContext)
 
   async function onSubmitSearch(data: SearchFormProps) {
-    console.log(data)
     try {
       const result = await api.get(
         `/claim-service=${companySelected}&search=${data.search}`,
       )
-      console.log(result.data.data)
       setClaimServiceList(result.data.data)
     } catch (error) {
       console.log(error)
     }
   }
-
-  // useEffect(() => {
-  //   try {
-  //     const result = await api.get(`/claim-service=${companySelected}`)
-  //     console.log(result.data.data)
-  //     setClaimServiceList(result.data.data)
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }, [])
 
   return (
     <div>
@@ -114,7 +100,6 @@ export default function ModalSearchClaimService({
                 maxHeight: 300,
                 '& ul': { padding: 0 },
               }}
-              // subheader={<li />}
             >
               <li>
                 {ClaimServiceList.map((item, index) => (

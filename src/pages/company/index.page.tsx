@@ -7,9 +7,10 @@ import { Skeleton, Typography } from '@mui/material'
 import Title from '@/components/Title'
 import { ContainerItem } from './styles'
 
-import { getSession } from 'next-auth/react'
 import { useQuery } from 'react-query'
 import { CompanyContext } from '@/contexts/CompanyContext'
+import { AuthContext } from '@/contexts/AuthContext'
+import { api } from '@/lib/api'
 
 interface companyProps {
   id: number
@@ -18,20 +19,37 @@ interface companyProps {
   cpf: string
   active?: boolean
 }
+
 export default function CompanyList() {
-  const { handleCompanySelected, companyData } = useContext(CompanyContext)
+  const { handleCompanySelected } = useContext(CompanyContext)
+  const { listCompanies, addCompaniesList } = useContext(AuthContext)
 
   function handleSelectCompany(newCompany: companyProps) {
     handleCompanySelected(newCompany)
   }
-  console.log(companyData)
 
   const { data, isSuccess, isLoading } = useQuery<companyProps[] | []>(
     ['company-page-list-company'],
-    () => getSession().then((resp) => resp?.user.companies as companyProps[]),
+    async () => {
+      try {
+        if (listCompanies) {
+          return listCompanies
+        } else {
+          const resp = await api.get('/user/companies')
+          addCompaniesList(resp.data.data)
+          return resp.data.data
+        }
+      } catch (err) {
+        return []
+      }
+    },
     {
       refetchOnWindowFocus: false,
-      retry: false,
+      refetchOnMount: false,
+      onSuccess: (data) => {
+        addCompaniesList(null)
+        return data
+      },
     },
   )
 

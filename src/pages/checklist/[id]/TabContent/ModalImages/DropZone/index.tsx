@@ -1,11 +1,8 @@
 import { useCallback, useMemo } from 'react'
 import { useDropzone } from 'react-dropzone'
 import PhotoSizeSelectActualOutlinedIcon from '@mui/icons-material/PhotoSizeSelectActualOutlined'
-// import axios from 'axios'
-import { ApiCore } from '@/lib/api'
-// import { GetServerSideProps } from 'next/types'
-// import path from 'path'
-// import fs from 'fs/promises'
+
+import { api } from '@/lib/api'
 
 const baseStyle = {
   flex: 1,
@@ -56,8 +53,6 @@ interface MyDropzoneProps {
 // }
 
 export function MyDropzone({ handleAddImageUrlList }: MyDropzoneProps) {
-  const api = new ApiCore()
-
   const onDrop = useCallback(async (acceptedFiles: any) => {
     const formData = new FormData()
     // eslint-disable-next-line no-unused-vars
@@ -67,11 +62,10 @@ export function MyDropzone({ handleAddImageUrlList }: MyDropzoneProps) {
     })
 
     api
-      .create('/uploads', formData, {
+      .post('/uploads', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then((response) => {
-        console.log(response)
         handleAddImageUrlList({
           id: response.data.data.id,
           name: response.data.data.original_name,
@@ -82,24 +76,6 @@ export function MyDropzone({ handleAddImageUrlList }: MyDropzoneProps) {
       .catch((error) => console.error(error))
   }, [])
 
-  // async function postUploadFile(data: any) {
-  //   const session = await getSession()
-  //   const token = session?.user.token
-  //   console.log(token)
-  //   try {
-  //     const response = await axios({
-  //       method: 'post',
-  //       url: '/file-upload/image',
-  //       data,
-  //       headers: {
-  //         'Content-Type': 'multipart/form-data',
-  //         Authorization: 'Bearer ' + token,
-  //       },
-  //     })
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
     useDropzone({
       onDrop,
@@ -129,16 +105,3 @@ export function MyDropzone({ handleAddImageUrlList }: MyDropzoneProps) {
     </div>
   )
 }
-
-// export const getServerSideProps: GetServerSideProps = async () => {
-//   const props = { dirs: [] }
-//   try {
-//     const dirs = await fs.readdir(
-//       path.join(process.cwd(), '/public/temp/images'),
-//     )
-//     props.dirs = dirs as any
-//     return { props }
-//   } catch (error) {
-//     return { props }
-//   }
-// }

@@ -3,7 +3,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 
 import DialogTitle from '@mui/material/DialogTitle'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { useQuery } from 'react-query'
 import { ButtonCancel, ButtonModelChecklist } from './style'
 import { Stack } from '@mui/material'
@@ -21,8 +21,6 @@ export function CheckListModelListModal({
   isOpen,
   handleClose,
 }: ModalSelectModelChecklistProps) {
-  const api = new ApiCore()
-
   const router = useRouter()
 
   const { setCheckListModel, serviceScheduleState } = useContext(
@@ -35,18 +33,17 @@ export function CheckListModelListModal({
       queryFn: async () => {
         try {
           const resp = await api.get('/checklist_model/list')
-          console.log(resp.data.data)
           return resp.data.data
         } catch (err) {
           console.log(err)
           return []
         }
       },
-      // enabled: isOpen,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
     })
 
   async function handleChecklistModelCreate(data: ChecklistModelType) {
-    console.log(data)
     setCheckListModel(data)
     await router.push(
       `/checklist/create?checklist_model_id=${data.id}&service_schedule_id=${serviceScheduleState?.serviceSchedule?.id}`,

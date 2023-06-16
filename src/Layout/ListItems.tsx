@@ -3,7 +3,6 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import ListSubheader from '@mui/material/ListSubheader'
 
-// import AccessTimeFilledOutlinedIcon from '@mui/icons-material/AccessTimeFilledOutlined'
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined'
 import { signOut } from 'next-auth/react'
 import { useRouter } from 'next/router'
@@ -23,32 +22,11 @@ type memuListProps = Array<{
   title: string
 }>
 
-// const memuList: memuListProps = [
-//   {
-//     path: '/company',
-//     href: '/company',
-//     component: <AccountBalanceIcon />,
-//     title: 'Empresas',
-//   },
-//   {
-//     path: '/service-schedule',
-//     href: '/service-schedule?company=:companyId',
-//     component: <CalendarMonthIcon />,
-//     title: 'Agendamento',
-//   },
-//   {
-//     path: '/checklist',
-//     href: '/checklist',
-//     component: <AccessTimeFilledOutlinedIcon />,
-//     title: 'Checklist',
-//   },
-// ]
-
 export const MainListItems = ({ opended }: { opended: boolean }) => {
   const [routeActual, setRouteActual] = useState('')
   const router = useRouter()
   const { companySelected } = useContext(CompanyContext)
-  // console.log('aberto',opended)
+
   const memuList: memuListProps = useMemo(
     () => [
       {

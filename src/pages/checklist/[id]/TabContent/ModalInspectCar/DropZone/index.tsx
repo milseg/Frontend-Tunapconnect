@@ -3,12 +3,9 @@ import { useDropzone } from 'react-dropzone'
 import PhotoSizeSelectActualOutlinedIcon from '@mui/icons-material/PhotoSizeSelectActualOutlined'
 
 import { LinearProgress, Stack } from '@mui/material'
-// import axios from 'axios'
-import { ApiCore } from '@/lib/api'
+
+import { api } from '@/lib/api'
 import Image from 'next/image'
-// import { GetServerSideProps } from 'next/types'
-// import path from 'path'
-// import fs from 'fs/promises'
 
 import { ContainerImages } from './style'
 
@@ -91,7 +88,6 @@ export function InspectionDropzone({
   listImagesUpload,
   positionsCar,
 }: MyDropzoneProps) {
-  const api = new ApiCore()
   const [list, setList] = useState<imageData[] | []>([])
   const [listProgress, setListProgress] = useState<
     Array<'loading' | 'complete'> | []
@@ -102,7 +98,7 @@ export function InspectionDropzone({
     formData.append('file', file)
 
     return api
-      .create('/uploads', formData, {
+      .post('/uploads', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then((response) => {

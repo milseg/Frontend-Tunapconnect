@@ -21,7 +21,7 @@ import {
   ServiceSchedulesListProps,
   ServiceScheduleType,
 } from '@/types/service-schedule'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import IconButton from '@mui/material/IconButton'
 import { Delete } from '@mui/icons-material'
 
@@ -60,8 +60,6 @@ type filterValuesProps = {
   }
 }
 
-const api = new ApiCore()
-
 const HeaderBreadcrumbData: listBreadcrumb[] = [
   {
     label: 'Tunap',
@@ -85,12 +83,7 @@ export default function ServiceSchedulesList() {
 
   const router = useRouter()
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    // formState: { errors },
-  } = useForm({
+  const { register, handleSubmit, setValue } = useForm({
     defaultValues: {
       search: '',
     },
@@ -100,10 +93,6 @@ export default function ServiceSchedulesList() {
     router.push(
       `/service-schedule?company_id=${companySelected}${
         data.search ? '&search=' + data.search : ''
-      }${
-        router.query.current_page
-          ? '&current_page=' + router.query.current_page
-          : ''
       }`,
     )
   }
@@ -145,7 +134,7 @@ export default function ServiceSchedulesList() {
       url += `&promised_date_max=${values?.date.dateEnd}`
     }
     url += '&orderby=promised_date'
-    console.log(url)
+
     await router.push(url)
   }
   const columns: GridColDef[] = useMemo(
@@ -212,28 +201,7 @@ export default function ServiceSchedulesList() {
         width: 160,
         sortable: false,
       },
-      // {
-      //   field: 'totalDiscount',
-      //   headerName: 'Tipo Desconto',
-      //   headerClassName: 'super-app-theme--header',
-      //   // type: 'number',
-      //   width: 110,
-      //   align: 'center',
-      //   sortable: false,
-      // valueGetter: (params: GridValueGetterParams) =>
-      //   `${formatMoneyPtBR(params.row.totalDiscount) || ''}`,
-      // },
-      // {
-      //   field: 'total',
-      //   headerName: 'Total Geral',
-      //   headerClassName: 'super-app-theme--header',
-      //   // type: 'number',
-      //   width: 110,
-      //   align: 'center',
-      //   sortable: false,
-      //   valueGetter: (params: GridValueGetterParams) =>
-      //     `${formatMoneyPtBR(params.row.total) || ''}`,
-      // },
+
       {
         field: 'action',
         headerName: 'Ação',
@@ -273,13 +241,8 @@ export default function ServiceSchedulesList() {
     isFetching,
   } = useQuery<DataFetchProps>(
     ['service-scheduler-list', companySelected],
-    () =>
-      api.get(url).then((response) => {
-        console.log(response)
-        localStorage.setItem(
-          'service-schedule-list',
-          JSON.stringify(response.data.data),
-        )
+    () => {
+      return api.get(url).then((response) => {
         const resp = response.data.data.map((data: any) => {
           return {
             id: data?.id ?? 'Não informado',
@@ -313,12 +276,13 @@ export default function ServiceSchedulesList() {
           serviceSchedulesList: resp,
           serviceSchedulesListAllData: response.data.data,
         }
-      }),
+      })
+    },
 
     {
-      // enabled: !!companySelected || !!url,
+      enabled: !!companySelected || !!url,
       refetchOnWindowFocus: false,
-      refetchOnMount: true,
+      refetchOnMount: false,
     },
   )
 
@@ -355,12 +319,10 @@ export default function ServiceSchedulesList() {
   }
 
   async function handleSetServiceSchedule(idSelected: number) {
-    console.log(idSelected)
     const filterSelected = rows?.serviceSchedulesListAllData.filter(
       (i) => i.id === idSelected,
     )[0]
 
-    console.log(filterSelected)
     if (filterSelected) {
       setServiceSchedule(filterSelected)
     }

@@ -6,7 +6,7 @@ import Box from '@mui/material/Box'
 
 import { LinkNext, TabItem, TabsContainer, Title } from './styles'
 import TabContent from './TabContent'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { Backdrop, CircularProgress, Skeleton } from '@mui/material'
 import { ChecklistProps, StagesDataProps } from '../types'
 
@@ -14,42 +14,6 @@ import { useRouter } from 'next/router'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
-
-// import { useForm } from 'react-hook-form'
-
-// type InspectionCarDataType = {
-//   name: string
-//   url_image: string
-//   value: {
-//     id: number
-//     type: 'amassado' | 'riscado' | 'quebrado' | 'faltando' | 'none'
-//     positions: {
-//       web: {
-//         top: number
-//         left: number
-//       }
-//       mobile: {
-//         top: number
-//         left: number
-//       }
-//     }
-//   }[]
-//   comment: string
-//   images: {
-//     id: number
-//     name: string
-//     url: string
-//     size: string
-//   }[]
-// }
-
-// type CheckListSignatures = {
-//   name: string
-//   rules: {
-//     required: boolean
-//   }
-//   image: string[]
-// }
 
 interface TabPanelProps {
   children?: ReactNode
@@ -94,9 +58,6 @@ function TabPanel(props: TabPanelProps) {
 
 export default function ChecklistCreateById() {
   const [painelValue, setPainelValue] = useState(0)
-  // const [typeSubmitForm, setTypeSubmitForm] = useState<
-  //   'salvo' | 'finalizado' | 'rascunho'
-  // >('rascunho')
 
   const [actionAlerts, setActionAlerts] = useState<ActionAlertsStateProps>({
     isOpen: false,
@@ -105,7 +66,7 @@ export default function ChecklistCreateById() {
   })
   const [loading, setLoading] = useState(false)
   const queryClient = useQueryClient()
-  const api = new ApiCore()
+
   const router = useRouter()
   const { serviceScheduleState, setCheckList } = useContext(
     ServiceScheduleContext,
@@ -117,41 +78,29 @@ export default function ChecklistCreateById() {
     (newDataChecklist: ChecklistProps) => {
       setLoading(true)
       return api
-        .update(`/checklist/${newDataChecklist.id}`, newDataChecklist)
+        .put(`/checklist/${newDataChecklist.id}`, newDataChecklist)
         .then((resp) => {
-          console.log(resp)
           setActionAlerts({
             isOpen: true,
             title: 'Salvo com sucesso',
             type: 'success',
           })
-          setTimeout(() => {
-            setLoading(false)
-          }, 3000)
           return resp.data.data[0]
         })
     },
 
     {
       onSuccess: (data) => {
-        // queryClient.invalidateQueries({ queryKey: ['checklist-createByID'] })
-        // queryClient.setQueryData(['checklist-createByID'], data)
-        // setActionAlerts({
-        //   isOpen: true,
-        //   title: 'Salvo com sucesso',
-        //   type: 'success',
-        // })
         queryClient.invalidateQueries('checklist-createByID')
-        // setLoading(false)
+        setLoading(false)
         return data
       },
-      onError: (err: any) => {
+      onError: () => {
         setActionAlerts({
           isOpen: true,
           title: 'Salvo com sucesso',
           type: 'error',
         })
-        console.log(err)
       },
     },
   )
@@ -161,48 +110,21 @@ export default function ChecklistCreateById() {
     async () => {
       try {
         if (serviceScheduleState.checklist) {
-          console.log('aqui')
           return serviceScheduleState.checklist
         } else {
-          console.log('não tem')
           const resp = await api.get(`/checklist/${router?.query?.id}`)
-          console.log(resp.data.data)
-          // const resp = await api.get(
-          //   `/service-schedule/${resp.data.data.service_schedule_id}`,
-          // )
+
           setCheckList(resp.data.data)
-          // set
+
           return resp.data.data
         }
-        // if (serviceScheduleState.checklistModel) {
-        //   return serviceScheduleState.checklistModel
-        // } else {
-        //   const resp = await api.get(`/checklist_model/list`)
-        //   if (resp.data.data.length > 0) {
-        //     const isExistChecklistModel = resp.data.data.filter(
-        //       (item: any) =>
-        //         item.id === Number(router.query.checklist_model_id),
-        //     )[0]
-        //     if (isExistChecklistModel) {
-        //       setCheckListModel(isExistChecklistModel)
-        //       return isExistChecklistModel
-        //     }
-        //   }
-        // }
-        // setCheckList
-        // console.log({ company_id: '5', service_schedule_id: '2301' })
-        // if (serviceScheduleState.checklist) {
-        //   return serviceScheduleState.checklist
-        // }
-
-        // const resp = await api.get(`/checklist/${router?.query?.checklist_model_id}`)
-        // setCheckList(resp.data.data)
       } catch (error) {
         console.log(error)
       }
     },
     {
       refetchOnWindowFocus: false,
+      refetchOnMount: false,
       enabled: !!router?.query?.id,
     },
   )
@@ -228,25 +150,8 @@ export default function ChecklistCreateById() {
     const dataForPost = {
       ...checklist,
       status: isFinalized ? 'finalizado' : 'pendente',
-      // company_id: serviceSchedule?.company_id,
-      // brand_id: serviceSchedule?.client_vehicle.vehicle.brand_id,
-      // vehicle_id: serviceSchedule?.client_vehicle.vehicle.id,
-      // model_id: serviceSchedule?.client_vehicle.vehicle.model_id, // verificar
-      // vehicle_client_id: serviceSchedule?.client_vehicle.id,
-      // km: serviceSchedule?.client_vehicle.mileage,
-      // fuel: null,
-      // client_id: serviceSchedule?.client_id,
-      // service_schedule_id: serviceSchedule?.id,
-      // checklist_model: checklistModel?.id,
-      // status: isFinalized ? 'finalizado' : 'pendente',
+
       stages: checklist?.stages.map((item) => {
-        // if (item.name === stageData.name) {
-        //   return {
-        //     ...stageData,
-        //     status: typeSubmitForm,
-        //   }
-        // }
-        console.log(item.name === stageData.name)
         return item.name === stageData.name ? stageData : item
       }),
     }
@@ -258,11 +163,6 @@ export default function ChecklistCreateById() {
   }
 
   const handleChange = async (event: SyntheticEvent, newValue: number) => {
-    // console.log(newValue)
-    // if (data?.stages[value].status !== 'finalizado') setValue(newValue)
-    // if (tabContentRef.current && tabContentRef.current.handleOpenAlertDialog) {
-    //   tabContentRef.current.handleOpenAlertDialog(newValue)
-    // }
     if (tabContentRef.current && tabContentRef.current.handleGetValuesForm) {
       const result = await tabContentRef.current.handleGetValuesForm()
 
@@ -278,25 +178,14 @@ export default function ChecklistCreateById() {
       // @ts-ignore
       setCheckList(newChecklist as ChecklistProps)
     }
-    // console.log(data)
+
     setPainelValue(newValue)
   }
 
   function handleChangeTabContent(newValue: number) {
     setPainelValue(newValue)
   }
-  // useEffect(() => {
-  //   console.log(router.query)
 
-  //   if (data?.stages) {
-  //     if (data?.stages.length > 0) {
-  //       sessionStorage.setItem(
-  //         `${process.env.NEXT_PUBLIC_APP_SESSION_STORAGE_NAME}-${router.query.id}`,
-  //         JSON.stringify(data?.stages),
-  //       )
-  //     }
-  //   }
-  // }, [])
   if (isLoading) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -311,7 +200,6 @@ export default function ChecklistCreateById() {
   }
 
   if (isSuccess) {
-    // console.log(data)
     return (
       <>
         <Box sx={{ mt: 2, ml: 2 }}>
