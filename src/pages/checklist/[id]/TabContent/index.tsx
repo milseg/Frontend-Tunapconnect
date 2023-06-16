@@ -644,5 +644,3 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 })
 
 export default TabContent
-
-// export default TabContent

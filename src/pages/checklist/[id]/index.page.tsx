@@ -142,7 +142,7 @@ export default function ChecklistCreateById() {
         //   type: 'success',
         // })
         queryClient.invalidateQueries('checklist-createByID')
-        // setLoading(false)
+        setLoading(false)
         return data
       },
       onError: (err: any) => {
