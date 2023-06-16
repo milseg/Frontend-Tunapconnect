@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
-import { useContext, useState, useMemo, useEffect } from 'react'
+import { useContext, useState, useMemo, useEffect, useCallback } from 'react'
 
 import Container from '@mui/material/Container'
 
@@ -21,7 +21,7 @@ import {
   ServiceSchedulesListProps,
   ServiceScheduleType,
 } from '@/types/service-schedule'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import IconButton from '@mui/material/IconButton'
 import { Delete } from '@mui/icons-material'
 
@@ -59,8 +59,6 @@ type filterValuesProps = {
     dateEnd: string | null
   }
 }
-
-const api = new ApiCore()
 
 const HeaderBreadcrumbData: listBreadcrumb[] = [
   {
@@ -259,6 +257,45 @@ export default function ServiceSchedulesList() {
     [],
   )
 
+  const getData = useCallback(async (newUrl: string) => {
+    return api.get(newUrl).then((response) => {
+      console.log(response.data)
+      const resp = response.data.data.map((data: any) => {
+        return {
+          id: data?.id ?? 'Não informado',
+          promised_date: data?.promised_date ?? 'Não informado',
+          client: data?.client?.name ?? 'Não informado',
+          plate: data?.client_vehicle?.plate ?? 'Não informado',
+          chassis: data?.client_vehicle?.chasis ?? 'Não informado',
+          technical_consultant:
+            data?.technical_consultant?.name ?? 'Não informado',
+          vehicle: data?.client_vehicle?.vehicle?.name ?? 'não definido',
+        }
+      })
+
+      if (response.data.total_pages === 1)
+        setPages({
+          next: false,
+          previous: false,
+        })
+      if (!router.query.current_page) {
+        if (response.data.current_page === 1) {
+          setPages((prevState) => ({ ...prevState, previous: false }))
+        }
+      }
+
+      return {
+        paginate: {
+          current_page: response.data.current_page,
+          total_pages: response.data.total_pages,
+          total_results: response.data.total_results,
+        },
+        serviceSchedulesList: resp,
+        serviceSchedulesListAllData: response.data.data,
+      }
+    })
+  }, [])
+
   const {
     data: rows,
     isSuccess,
@@ -269,43 +306,46 @@ export default function ServiceSchedulesList() {
     isFetching,
   } = useQuery<DataFetchProps>(
     ['service-scheduler-list', companySelected],
-    () =>
-      api.get(url).then((response) => {
-        console.log(response.data)
-        const resp = response.data.data.map((data: any) => {
-          return {
-            id: data?.id ?? 'Não informado',
-            promised_date: data?.promised_date ?? 'Não informado',
-            client: data?.client?.name ?? 'Não informado',
-            plate: data?.client_vehicle?.plate ?? 'Não informado',
-            chassis: data?.client_vehicle?.chasis ?? 'Não informado',
-            technical_consultant:
-              data?.technical_consultant?.name ?? 'Não informado',
-            vehicle: data?.client_vehicle?.vehicle?.name ?? 'não definido',
-          }
-        })
+    () => {
+      // api.get(url).then((response) => {
+      //   console.log(response.data)
+      //   const resp = response.data.data.map((data: any) => {
+      //     return {
+      //       id: data?.id ?? 'Não informado',
+      //       promised_date: data?.promised_date ?? 'Não informado',
+      //       client: data?.client?.name ?? 'Não informado',
+      //       plate: data?.client_vehicle?.plate ?? 'Não informado',
+      //       chassis: data?.client_vehicle?.chasis ?? 'Não informado',
+      //       technical_consultant:
+      //         data?.technical_consultant?.name ?? 'Não informado',
+      //       vehicle: data?.client_vehicle?.vehicle?.name ?? 'não definido',
+      //     }
+      //   })
 
-        if (response.data.total_pages === 1)
-          setPages({
-            next: false,
-            previous: false,
-          })
-        if (!router.query.current_page) {
-          if (response.data.current_page === 1) {
-            setPages((prevState) => ({ ...prevState, previous: false }))
-          }
-        }
+      //   if (response.data.total_pages === 1)
+      //     setPages({
+      //       next: false,
+      //       previous: false,
+      //     })
+      //   if (!router.query.current_page) {
+      //     if (response.data.current_page === 1) {
+      //       setPages((prevState) => ({ ...prevState, previous: false }))
+      //     }
+      //   }
 
-        return {
-          paginate: {
-            current_page: response.data.current_page,
-            total_pages: response.data.total_pages,
-            total_results: response.data.total_results,
-          },
-          serviceSchedulesList: resp,
-          serviceSchedulesListAllData: response.data.data,
-        }
-      }),
+      //   return {
+      //     paginate: {
+      //       current_page: response.data.current_page,
+      //       total_pages: response.data.total_pages,
+      //       total_results: response.data.total_results,
+      //     },
+      //     serviceSchedulesList: resp,
+      //     serviceSchedulesListAllData: response.data.data,
+      //   }
+      // })
+      console.log('React query')
+      return getData(url)
+    },
 
     {
       enabled: !!companySelected || !!url,

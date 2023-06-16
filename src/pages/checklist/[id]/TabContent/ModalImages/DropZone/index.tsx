@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { useDropzone } from 'react-dropzone'
 import PhotoSizeSelectActualOutlinedIcon from '@mui/icons-material/PhotoSizeSelectActualOutlined'
 // import axios from 'axios'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 // import { GetServerSideProps } from 'next/types'
 // import path from 'path'
 // import fs from 'fs/promises'
@@ -55,8 +55,6 @@ interface MyDropzoneProps {
 //   }
 // }
 
-const api = new ApiCore()
-
 export function MyDropzone({ handleAddImageUrlList }: MyDropzoneProps) {
   const onDrop = useCallback(async (acceptedFiles: any) => {
     const formData = new FormData()
@@ -67,7 +65,7 @@ export function MyDropzone({ handleAddImageUrlList }: MyDropzoneProps) {
     })
 
     api
-      .create('/uploads', formData, {
+      .post('/uploads', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then((response) => {

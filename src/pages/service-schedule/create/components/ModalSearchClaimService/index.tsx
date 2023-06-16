@@ -10,7 +10,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { Box, List, ListItemButton, ListItemText, Stack } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { ButtonIcon, ButtonModalDialog } from '../../styles'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { useContext, useEffect, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { ClientResponseType } from '@/types/service-schedule'
@@ -24,7 +24,7 @@ interface ModalSearchClaimServiceProps {
 type SearchFormProps = {
   search: string
 }
-const api = new ApiCore()
+
 export default function ModalSearchClaimService({
   openMolal,
   handleClose,

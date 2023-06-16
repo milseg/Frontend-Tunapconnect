@@ -6,7 +6,7 @@ import Box from '@mui/material/Box'
 
 import { LinkNext, TabItem, TabsContainer, Title } from './styles'
 import TabContent from './TabContent'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { Backdrop, CircularProgress, Skeleton } from '@mui/material'
 import { ChecklistProps, StagesDataProps } from '../types'
 
@@ -68,7 +68,6 @@ function a11yProps(index: number) {
     'aria-controls': `simple-tabpanel-${index}`,
   }
 }
-const api = new ApiCore()
 
 export type ActionAlertsStateProps = {
   isOpen: boolean
@@ -118,7 +117,7 @@ export default function ChecklistCreateById() {
     (newDataChecklist: ChecklistProps) => {
       setLoading(true)
       return api
-        .update(`/checklist/${newDataChecklist.id}`, newDataChecklist)
+        .put(`/checklist/${newDataChecklist.id}`, newDataChecklist)
         .then((resp) => {
           console.log(resp)
           setActionAlerts({

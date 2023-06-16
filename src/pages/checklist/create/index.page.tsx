@@ -6,7 +6,7 @@ import Box from '@mui/material/Box'
 
 import { LinkNext, TabItem, TabsContainer, Title } from './styles'
 import TabContent from './TabContent'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { Backdrop, CircularProgress, Skeleton } from '@mui/material'
 import { ChecklistProps, StagesDataProps } from '../types'
 
@@ -92,7 +92,7 @@ function TabPanel(props: TabPanelProps) {
     </div>
   )
 }
-const api = new ApiCore()
+
 export default function ChecklistCreateById() {
   const [painelValue, setPainelValue] = useState(0)
   // const [typeSubmitForm, setTypeSubmitForm] = useState<
@@ -116,7 +116,7 @@ export default function ChecklistCreateById() {
   const updateChecklistMutations = useMutation(
     (newDataChecklist: ChecklistProps) => {
       setLoading(true)
-      return api.create(`/checklist`, newDataChecklist).then((resp) => {
+      return api.post(`/checklist`, newDataChecklist).then((resp) => {
         setTimeout(() => {
           setLoading(false)
         }, 3000)

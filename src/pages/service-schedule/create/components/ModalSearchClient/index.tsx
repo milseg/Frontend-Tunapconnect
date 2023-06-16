@@ -9,7 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { Box, Stack, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { ButtonIcon, ButtonModalDialog, ButtonPaginate } from '../../styles'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { useContext, useEffect, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { ClientResponseType } from '@/types/service-schedule'
@@ -33,7 +33,7 @@ type paginationProps = {
   actual: number
   total: number
 }
-const api = new ApiCore()
+
 export default function ModalSearchClient({
   openMolal,
   handleClose,

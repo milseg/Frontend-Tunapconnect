@@ -14,7 +14,7 @@ import {
   // ServiceSchedulesListProps,
   TechnicalConsultant,
 } from '@/types/service-schedule'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 
 import { useRouter } from 'next/router'
 
@@ -61,8 +61,6 @@ import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle
 import ModalCreateNewClient from './components/ModalCreateNewClient'
 
 // import ModalSearchClaimService from './components/ModalSearchClaimService'
-
-const api = new ApiCore()
 
 type isEditSelectedCardType =
   | 'client'
@@ -187,10 +185,7 @@ export default function ServiceSchedulesCreate() {
     }
     console.log(dataFormatted)
     try {
-      const respCreate: any = await api.create(
-        '/service-schedule',
-        dataFormatted,
-      )
+      const respCreate: any = await api.post('/service-schedule', dataFormatted)
       const idCreatedResponse = respCreate.data.data.id
 
       router.push('/service-schedule/' + idCreatedResponse)

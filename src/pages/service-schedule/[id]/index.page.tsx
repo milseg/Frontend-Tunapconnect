@@ -13,7 +13,7 @@ import {
   // ServiceSchedulesListProps,
   TechnicalConsultant,
 } from '@/types/service-schedule'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 
 import { useRouter } from 'next/router'
 
@@ -64,8 +64,6 @@ import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 
 import { ChecklistProps } from '@/pages/checklist/types'
 import { CheckListModelListModal } from './components/CheckListModelListModal'
-
-const api = new ApiCore()
 
 type isEditSelectedCardType =
   | 'client'
@@ -183,7 +181,7 @@ export default function ServiceSchedulesEdit() {
       claims_service: [],
     }
     try {
-      const respUpdate: any = await api.update(
+      const respUpdate: any = await api.put(
         '/service-schedule/' + router.query.id,
         dataFormatted,
       )

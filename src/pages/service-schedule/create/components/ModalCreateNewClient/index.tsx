@@ -13,7 +13,7 @@ import {
   InputNewClient,
 } from '../../styles'
 import { useContext, useEffect, useState } from 'react'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { Backdrop, CircularProgress } from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
@@ -31,7 +31,7 @@ interface actionAlertsProps {
   title: string
   type: 'success' | 'error' | 'warning'
 }
-const api = new ApiCore()
+
 export default function ModalCreateNewClient({
   isOpen,
   handleClose,
@@ -108,7 +108,7 @@ export default function ModalCreateNewClient({
         address: listAddress,
       }
       console.log(dataFormatted)
-      const resp = await api.create('/client', dataFormatted)
+      const resp = await api.post('/client', dataFormatted)
       console.log(resp.data.data)
       handleAddClient(resp.data.data[0])
       handleSaveNewClient()

@@ -4,7 +4,7 @@ import PhotoSizeSelectActualOutlinedIcon from '@mui/icons-material/PhotoSizeSele
 
 import { LinearProgress, Stack } from '@mui/material'
 // import axios from 'axios'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import Image from 'next/image'
 // import { GetServerSideProps } from 'next/types'
 // import path from 'path'
@@ -85,7 +85,6 @@ interface MyDropzoneProps {
 //   } catch (error: any) {
 //   }
 // }
-const api = new ApiCore()
 
 export function InspectionDropzone({
   handleAddImageUrlList,
@@ -102,7 +101,7 @@ export function InspectionDropzone({
     formData.append('file', file)
 
     return api
-      .create('/uploads', formData, {
+      .post('/uploads', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then((response) => {

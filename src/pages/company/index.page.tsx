@@ -10,7 +10,7 @@ import { ContainerItem } from './styles'
 import { useQuery } from 'react-query'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { AuthContext } from '@/contexts/AuthContext'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 
 interface companyProps {
   id: number
@@ -19,8 +19,6 @@ interface companyProps {
   cpf: string
   active?: boolean
 }
-
-const api = new ApiCore()
 
 export default function CompanyList() {
   const { handleCompanySelected, companyData } = useContext(CompanyContext)

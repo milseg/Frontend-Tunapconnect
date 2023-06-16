@@ -20,7 +20,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 // import useMediaQuery from '@mui/material/useMediaQuery'
 import { MoreOptionsButtonSelect } from './MoreOptionsButtonSelect'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { useQuery } from 'react-query'
 import { formatDateTime } from '@/ultis/formatDate'
 import { CompanyContext } from '@/contexts/CompanyContext'
@@ -50,8 +50,6 @@ declare module '@mui/x-data-grid' {
     previousPage: boolean
   }
 }
-
-const api = new ApiCore()
 
 // type RowsProps = {
 //   checklistAllData: ChecklistProps[]

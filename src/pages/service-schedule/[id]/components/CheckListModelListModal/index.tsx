@@ -3,7 +3,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 
 import DialogTitle from '@mui/material/DialogTitle'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { useQuery } from 'react-query'
 import { ButtonCancel, ButtonModelChecklist } from './style'
 import { Stack } from '@mui/material'
@@ -16,7 +16,7 @@ interface ModalSelectModelChecklistProps {
   isOpen: boolean
   handleClose: () => void
 }
-const api = new ApiCore()
+
 export function CheckListModelListModal({
   isOpen,
   handleClose,

@@ -16,7 +16,7 @@ import {
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { ButtonIcon, ButtonModalDialog } from '../../styles'
-import { ApiCore } from '@/lib/api'
+import { api } from '@/lib/api'
 import { useContext, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
 
@@ -52,8 +52,6 @@ export default function ModalSearchClientVehicle({
       search: '',
     },
   })
-
-  const api = new ApiCore()
 
   const { companySelected } = useContext(CompanyContext)
 

@@ -39,18 +39,22 @@ const MyApp = (props: CustomAppProps) => {
   const [queryClient] = React.useState(() => new QueryClient())
 
   return (
-    <CacheProvider value={emotionCache}>
-      <Head>
-        <meta name="viewport" content="initial-scale=1, width=device-width" />
-      </Head>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <GlobalStyles styles={globals} />
-        <SessionProvider session={session} refetchInterval={60 * 5}>
-          <QueryClientProvider client={queryClient}>
-            <AuthProvider>
-              <CompanyProvider>
-                <ServiceScheduleProvider>
+    <SessionProvider session={session} refetchInterval={60 * 5}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <CompanyProvider>
+            <ServiceScheduleProvider>
+              <CacheProvider value={emotionCache}>
+                <Head>
+                  <meta
+                    name="viewport"
+                    content="initial-scale=1, width=device-width"
+                  />
+                </Head>
+                <ThemeProvider theme={theme}>
+                  <CssBaseline />
+                  <GlobalStyles styles={globals} />
+
                   {Component.auth ? (
                     // @ts-ignore
                     <Auth>
@@ -64,13 +68,13 @@ const MyApp = (props: CustomAppProps) => {
 
                   {/* <Component {...pageProps} /> */}
                   <ReactQueryDevtools initialIsOpen={false} />
-                </ServiceScheduleProvider>
-              </CompanyProvider>
-            </AuthProvider>
-          </QueryClientProvider>
-        </SessionProvider>
-      </ThemeProvider>
-    </CacheProvider>
+                </ThemeProvider>
+              </CacheProvider>
+            </ServiceScheduleProvider>
+          </CompanyProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </SessionProvider>
   )
 }
 
