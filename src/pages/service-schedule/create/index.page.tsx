@@ -54,6 +54,8 @@ import ModalCreateNewClient from './components/ModalCreateNewClient'
 import ModalCreateNewClientVehicle from './components/ModalCreateNewClientVehicle'
 import { MoreOptionsServiceScheduleCreate } from './components/MoreOptionsServiceScheduleCreate'
 import ModalEditClient from './components/ModalEditClient'
+import { Typography } from '@mui/material'
+import ModalCreateEditClientVehicle from './components/ModalCreateEditClientVehicle'
 
 type updateData = {
   code: null
@@ -104,6 +106,8 @@ export default function ServiceSchedulesCreate() {
   const [openModalEditClient, setOpenModalEditClient] = useState(false)
   const [openModalNewClientVehicle, setOpenModalNewClientVehicle] =
     useState(false)
+  const [openModalEditClientVehicle, setOpenModalEditClientVehicle] =
+    useState(false)
   const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
@@ -131,11 +135,24 @@ export default function ServiceSchedulesCreate() {
     setOpenModalEditClient(false)
   }
   function handleOpenModalEditClient() {
-    console.log('Open modal')
     setOpenModalEditClient(true)
   }
+  function handleOpenModalEditClientVehicle() {
+    setOpenModalEditClientVehicle(true)
+  }
+
+  function handleOpenModalClientSearch() {
+    setOpenModalClientSearch(true)
+  }
+  function handleOpenModalClientVehicleSearch() {
+    setOpenModalClientVehicleSearch(true)
+  }
+
   function handleCloseModalNewClientVehicle() {
     setOpenModalNewClientVehicle(false)
+  }
+  function handleCloseModalEditClientVehicle() {
+    setOpenModalEditClientVehicle(false)
   }
 
   function handleSaveNewClient() {
@@ -146,8 +163,14 @@ export default function ServiceSchedulesCreate() {
     setOpenModalNewClient(false)
     // setOpenModalClientSearch(true)
   }
+
   function handleSaveNewClientVehicle() {
     setOpenModalNewClientVehicle(false)
+    // setOpenModalClientSearch(true)
+  }
+
+  function handleSaveEditClientVehicle() {
+    setOpenModalEditClientVehicle(false)
     // setOpenModalClientSearch(true)
   }
 
@@ -216,7 +239,8 @@ export default function ServiceSchedulesCreate() {
     // }
   }
   function handleAddClientVehicle(client_vehicle: ClientVehicleResponseType) {
-    setClientVehicle(null)
+    // setClientVehicle(null)
+    console.log(client_vehicle)
     setClientVehicle(client_vehicle)
   }
 
@@ -281,11 +305,15 @@ export default function ServiceSchedulesCreate() {
                 >
                   <TitleCard>Cliente</TitleCard>
                   <MoreOptionsServiceScheduleCreate
-                    aria-label="add to client"
+                    aria-label="options to client"
                     buttons={[
                       {
-                        label: 'editar',
+                        label: 'Editar',
                         action: handleOpenModalEditClient,
+                      },
+                      {
+                        label: 'Pesquisar',
+                        action: handleOpenModalClientSearch,
                       },
                     ]}
                   />
@@ -370,13 +398,14 @@ export default function ServiceSchedulesCreate() {
                       display: 'flex',
                     }}
                   >
-                    <ButtonOpenModalSearch
+                    <Typography variant="h6">Adicione um cliente</Typography>
+                    {/* <ButtonOpenModalSearch
                       aria-label="options to client"
                       onClick={() => setOpenModalClientSearch(true)}
                       endIcon={<SearchIcon />}
                     >
                       buscar
-                    </ButtonOpenModalSearch>
+                    </ButtonOpenModalSearch> */}
                   </Box>
                 )}
               </Paper>
@@ -394,7 +423,19 @@ export default function ServiceSchedulesCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Veículo</TitleCard>
-                  <MoreOptionsServiceScheduleCreate aria-label="options to vehicle" />
+                  <MoreOptionsServiceScheduleCreate
+                    aria-label="options to vehicle"
+                    buttons={[
+                      {
+                        label: 'Editar',
+                        action: handleOpenModalEditClientVehicle,
+                      },
+                      {
+                        label: 'Pesquisar',
+                        action: handleOpenModalClientVehicleSearch,
+                      },
+                    ]}
+                  />
                 </Stack>
                 <DividerCard />
                 {clientVehicle ? (
@@ -454,13 +495,14 @@ export default function ServiceSchedulesCreate() {
                       display: 'flex',
                     }}
                   >
-                    <ButtonOpenModalSearch
+                    <Typography variant="h6">Adicione um Veículo</Typography>
+                    {/* <ButtonOpenModalSearch
                       aria-label="add to client"
                       onClick={() => setOpenModalClientVehicleSearch(true)}
                       endIcon={<SearchIcon />}
                     >
                       buscar
-                    </ButtonOpenModalSearch>
+                    </ButtonOpenModalSearch> */}
                   </Box>
                 )}
               </Paper>
@@ -720,6 +762,13 @@ export default function ServiceSchedulesCreate() {
         handleClose={handleCloseModalNewClientVehicle}
         handleSaveNewClientVehicle={handleSaveNewClientVehicle}
         handleAddClientVehicle={handleAddClientVehicle}
+      />
+      <ModalCreateEditClientVehicle
+        isOpen={openModalEditClientVehicle}
+        handleClose={handleCloseModalEditClientVehicle}
+        handleSaveEditClientVehicle={handleSaveEditClientVehicle}
+        handleAddClientVehicle={handleAddClientVehicle}
+        vehicleData={clientVehicle}
       />
     </>
   )
