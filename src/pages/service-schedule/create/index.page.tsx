@@ -396,7 +396,7 @@ export default function ServiceSchedulesCreate() {
                       display: 'flex',
                     }}
                   >
-                    <Typography variant="h6">Adicione um cliente</Typography>
+                    <Typography variant="h6">Adicione um Cliente</Typography>
                     {/* <ButtonOpenModalSearch
                       aria-label="options to client"
                       onClick={() => setOpenModalClientSearch(true)}
