@@ -100,6 +100,20 @@ export const ButtonIcon = styled(IconButton)(({ theme }) => ({
   },
 }))
 
+export const ButtonOpenModalSearch = styled(Button)(({ theme }) => ({
+  color: 'white',
+  background: '#0E948B',
+  borderRadius: 4,
+
+  textTransform: 'uppercase',
+  '&:hover': {
+    background: '#1ACABA',
+  },
+  '&:disabled': {
+    background: '#e0f2f1',
+  },
+}))
+
 export const ButtonModalDialog = styled(Button)(({ theme }) => ({
   color: 'white',
   background: '#0E948B',

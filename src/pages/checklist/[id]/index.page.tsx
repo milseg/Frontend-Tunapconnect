@@ -58,6 +58,9 @@ function TabPanel(props: TabPanelProps) {
 
 export default function ChecklistCreateById() {
   const [painelValue, setPainelValue] = useState(0)
+  // const [typeSubmitForm, setTypeSubmitForm] = useState<
+  //   'salvo' | 'finalizado' | 'rascunho'
+  // >('rascunho')
 
   const [actionAlerts, setActionAlerts] = useState<ActionAlertsStateProps>({
     isOpen: false,
