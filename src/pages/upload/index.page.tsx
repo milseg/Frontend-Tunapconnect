@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import * as React from "react";
 import Paper from "@mui/material/Paper";
-import { SearchButton } from "./styles";
+import { BootstrapButton } from "./styles";
 
 export default function Upload() {
   const currencies = [
@@ -66,9 +66,9 @@ export default function Upload() {
                     type: "search",
                   }}
                 />
-                <SearchButton variant="contained" disableRipple>
+                <BootstrapButton variant="contained" disableRipple>
                   <SearchIcon />
-                </SearchButton>
+                </BootstrapButton>
                 <FormControl>
                   <InputLabel id="demo-simple-select-label">Filtros</InputLabel>
                   <Select id="outlined-select-currency" label="Filtros">
