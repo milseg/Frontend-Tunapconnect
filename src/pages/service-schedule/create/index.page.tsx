@@ -9,9 +9,7 @@ import Paper from '@mui/material/Paper'
 import SearchIcon from '@mui/icons-material/Search'
 
 import {
-  ClientInfor,
   ClientResponseType,
-  ClientVehicle,
   TechnicalConsultant,
 } from '@/types/service-schedule'
 import { api } from '@/lib/api'
@@ -46,8 +44,6 @@ import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
 import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
 
 import { useQuery } from 'react-query'
-
-import { formatPlate } from '@/ultis/formatPlate'
 
 import { CompanyContext } from '@/contexts/CompanyContext'
 
@@ -84,8 +80,9 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
 ]
 
 export default function ServiceSchedulesCreate() {
-  const [client, setClient] = useState<ClientInfor | null>()
-  const [clientVehicle, setClientVehicle] = useState<ClientVehicle | null>()
+  const [client, setClient] = useState<ClientResponseType | null>(null)
+  const [clientVehicle, setClientVehicle] =
+    useState<ClientVehicleResponseType | null>()
   const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
   const [technicalConsultant, setTechnicalConsultant] =
     useState<TechnicalConsultant | null>({
@@ -104,6 +101,7 @@ export default function ServiceSchedulesCreate() {
   // const [openModalClaimServiceSearch, setOpenModalClaimServiceSearch] =
   //   useState(false)
   const [openModalNewClient, setOpenModalNewClient] = useState(false)
+  const [openModalEditClient, setOpenModalEditClient] = useState(false)
   const [openModalNewClientVehicle, setOpenModalNewClientVehicle] =
     useState(false)
   const router = useRouter()
@@ -129,11 +127,22 @@ export default function ServiceSchedulesCreate() {
   function handleCloseModalNewClient() {
     setOpenModalNewClient(false)
   }
+  function handleCloseModalEditClient() {
+    setOpenModalEditClient(false)
+  }
+  function handleOpenModalEditClient() {
+    console.log('Open modal')
+    setOpenModalEditClient(true)
+  }
   function handleCloseModalNewClientVehicle() {
     setOpenModalNewClientVehicle(false)
   }
 
   function handleSaveNewClient() {
+    setOpenModalNewClient(false)
+    // setOpenModalClientSearch(true)
+  }
+  function handleEditClient() {
     setOpenModalNewClient(false)
     // setOpenModalClientSearch(true)
   }
@@ -196,28 +205,19 @@ export default function ServiceSchedulesCreate() {
   }
 
   function handleAddClient(client: ClientResponseType) {
-    setClient({
-      id: client.id,
-      name: client.name ?? 'Não informado',
-      cpf: client.document ?? 'Não informado',
-      email: client.email ?? ['Não informado'],
-      telefone: client.phone ?? ['Não informado'],
-      address: client.address ?? ['Não informado'],
-    })
+    setClient(client)
+    // {
+    //   id: client.id,
+    //   name: client.name ?? 'Não informado',
+    //   cpf: client.document ?? 'Não informado',
+    //   email: client.email ?? ['Não informado'],
+    //   telefone: client.phone ?? ['Não informado'],
+    //   address: client.address ?? ['Não informado'],
+    // }
   }
   function handleAddClientVehicle(client_vehicle: ClientVehicleResponseType) {
     setClientVehicle(null)
-    setClientVehicle({
-      id: client_vehicle.id,
-      brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
-      chassis: client_vehicle?.chasis ?? 'Não informado',
-      vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
-      model:
-        `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
-        'Não informado',
-      color: client_vehicle?.color ?? 'Não informado',
-      plate: client_vehicle?.plate ?? 'Não informado',
-    })
+    setClientVehicle(client_vehicle)
   }
 
   const {
@@ -280,25 +280,33 @@ export default function ServiceSchedulesCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Cliente</TitleCard>
-                  <MoreOptionsServiceScheduleCreate aria-label="add to client" />
+                  <MoreOptionsServiceScheduleCreate
+                    aria-label="add to client"
+                    buttons={[
+                      {
+                        label: 'editar',
+                        action: handleOpenModalEditClient,
+                      },
+                    ]}
+                  />
                 </Stack>
                 <DividerCard />
                 {client ? (
                   <List dense={false}>
                     <ListItemCard alignItems="flex-start">
                       <InfoCardName>Nome:</InfoCardName>{' '}
-                      {client?.name && (
-                        <InfoCardText>{client?.name}</InfoCardText>
-                      )}
+                      <InfoCardText>
+                        {client?.name ?? 'Não informado'}
+                      </InfoCardText>
                     </ListItemCard>
                     <ListItemCard alignItems="flex-start">
                       <InfoCardName>CPF:</InfoCardName>{' '}
-                      {client?.cpf && (
-                        <InfoCardText>{client?.cpf}</InfoCardText>
-                      )}
+                      <InfoCardText>
+                        {client?.document ?? 'Não informado'}
+                      </InfoCardText>
                     </ListItemCard>
-                    {client?.telefone ? (
-                      client?.telefone.map((phone, index) => (
+                    {client?.phone && client?.phone.length > 0 ? (
+                      client?.phone.map((phone: string, index: number) => (
                         <ListItemCard
                           key={index + '-' + phone}
                           alignItems="flex-start"
@@ -310,11 +318,13 @@ export default function ServiceSchedulesCreate() {
                     ) : (
                       <ListItemCard>
                         <InfoCardName>Telefone:</InfoCardName>{' '}
-                        <InfoCardText width="100%"></InfoCardText>
+                        <InfoCardText width="100%">
+                          {'Não informado'}
+                        </InfoCardText>
                       </ListItemCard>
                     )}
-                    {client?.email ? (
-                      client?.email.map((email, index) => (
+                    {client?.email && client.email.length ? (
+                      client?.email.map((email: string, index: number) => (
                         <ListItemCard
                           key={index + '-' + email}
                           alignItems="flex-start"
@@ -326,10 +336,12 @@ export default function ServiceSchedulesCreate() {
                     ) : (
                       <ListItemCard alignItems="flex-start">
                         <InfoCardName>E-mail:</InfoCardName>{' '}
-                        <InfoCardText width="100%"></InfoCardText>
+                        <InfoCardText width="100%">
+                          {'Não informado'}
+                        </InfoCardText>
                       </ListItemCard>
                     )}
-                    {client?.address ? (
+                    {client?.address && client?.address.length ? (
                       client?.address.map((address, index) => (
                         <ListItemCard
                           key={index + '-' + address}
@@ -342,7 +354,9 @@ export default function ServiceSchedulesCreate() {
                     ) : (
                       <ListItemCard alignItems="flex-start">
                         <InfoCardName>Endereço:</InfoCardName>{' '}
-                        <InfoCardText width="100%"></InfoCardText>
+                        <InfoCardText width="100%">
+                          {'Não informado'}
+                        </InfoCardText>
                       </ListItemCard>
                     )}
                   </List>
@@ -387,63 +401,47 @@ export default function ServiceSchedulesCreate() {
                   <List dense={false}>
                     <ListItemCard>
                       <InfoCardName>Marca:</InfoCardName>{' '}
-                      {clientVehicle?.brand ? (
-                        <InfoCardText>{clientVehicle?.brand}</InfoCardText>
-                      ) : (
-                        <InfoCardText width="100%"></InfoCardText>
-                      )}
+                      <InfoCardText>
+                        {clientVehicle?.vehicle?.model?.brand?.name ??
+                          'Não informado'}
+                      </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Modelo:</InfoCardName>{' '}
-                      {clientVehicle?.model ? (
-                        <InfoCardText>{clientVehicle?.model}</InfoCardText>
-                      ) : (
-                        <InfoCardText width="100%"></InfoCardText>
-                      )}
+                      <InfoCardText>
+                        {clientVehicle?.vehicle?.model?.name ?? 'Não informado'}{' '}
+                        -{clientVehicle.vehicle.model_year ?? 'Não informado'}
+                      </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Veículo:</InfoCardName>{' '}
-                      {clientVehicle?.vehicle ? (
-                        <InfoCardText>{clientVehicle?.vehicle}</InfoCardText>
-                      ) : (
-                        <InfoCardText width="100%"></InfoCardText>
-                      )}
+                      <InfoCardText>
+                        {clientVehicle?.vehicle?.name ?? 'Não informado'}
+                      </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Cor:</InfoCardName>{' '}
-                      {clientVehicle?.color ? (
-                        <InfoCardText>{clientVehicle?.color}</InfoCardText>
-                      ) : (
-                        <InfoCardText width="100%"></InfoCardText>
-                      )}
+                      <InfoCardText>
+                        {clientVehicle?.color ?? 'Não informado'}
+                      </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Chassi:</InfoCardName>{' '}
-                      {clientVehicle?.chassis ? (
-                        <InfoCardText>{clientVehicle?.chassis}</InfoCardText>
-                      ) : (
-                        <InfoCardText width="100%"></InfoCardText>
-                      )}
+                      <InfoCardText>
+                        {clientVehicle?.chasis ?? 'Não informado'}
+                      </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Placa:</InfoCardName>{' '}
-                      {clientVehicle?.plate ? (
-                        <InfoCardText>
-                          {formatPlate(clientVehicle?.plate)}
-                        </InfoCardText>
-                      ) : (
-                        <InfoCardText width="100%"></InfoCardText>
-                      )}
+                      <InfoCardText>
+                        {clientVehicle?.plate ?? 'Não informado'}
+                      </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>KM:</InfoCardName>{' '}
-                      {clientVehicle?.plate ? (
-                        <InfoCardText>
-                          {formatPlate(clientVehicle?.plate)}
-                        </InfoCardText>
-                      ) : (
-                        <InfoCardText width="100%"></InfoCardText>
-                      )}
+                      <InfoCardText>
+                        {clientVehicle?.mileage ?? 'Não informado'}
+                      </InfoCardText>
                     </ListItemCard>
                   </List>
                 ) : (
@@ -711,11 +709,11 @@ export default function ServiceSchedulesCreate() {
         handleAddClient={handleAddClient}
       />
       <ModalEditClient
-        isOpen={openModalNewClient}
-        handleClose={handleCloseModalNewClient}
-        handleSaveNewClient={handleSaveNewClient}
+        isOpen={openModalEditClient && !!client}
+        handleClose={handleCloseModalEditClient}
+        handleEditClient={handleEditClient}
         handleAddClient={handleAddClient}
-        // data={}
+        data={client}
       />
       <ModalCreateNewClientVehicle
         isOpen={openModalNewClientVehicle}

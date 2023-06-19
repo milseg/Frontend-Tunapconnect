@@ -29,9 +29,7 @@ export function MoreOptionsServiceScheduleCreate({
   const handleClose = () => {
     setAnchorEl(null)
   }
-  const handleButtonEdit = () => {
-    setAnchorEl(null)
-  }
+
   return (
     <div>
       <IconButton
@@ -81,22 +79,29 @@ export function MoreOptionsServiceScheduleCreate({
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {/* {buttons && buttons.map(button => {
-          return (
-            <MenuItem onClick={handleClose} key={button.label + typeEdit}>
-              <ListItemIcon>
-                <Settings fontSize="small" />
-              </ListItemIcon>
-              Editar
-            </MenuItem>
-          )
-        })} */}
-        <MenuItemButton onClick={handleButtonEdit}>
-          {/* <ListItemIcon>
+        {buttons &&
+          buttons.map((button) => {
+            return (
+              <MenuItemButton
+                onClick={() => {
+                  setAnchorEl(null)
+                  if (button.action) button?.action()
+                }}
+                key={button.label}
+              >
+                {/* <ListItemIcon>
+                  <Settings fontSize="small" />
+                </ListItemIcon> */}
+                {button.label}
+              </MenuItemButton>
+            )
+          })}
+        {/* <MenuItemButton onClick={handleButtonEdit}>
+          <ListItemIcon>
             <Settings fontSize="small" />
-          </ListItemIcon> */}
+          </ListItemIcon>
           Editar
-        </MenuItemButton>
+        </MenuItemButton> */}
       </Menu>
     </div>
   )

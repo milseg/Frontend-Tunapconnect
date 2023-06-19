@@ -21,9 +21,10 @@ import { ClientResponseType } from '@/types/service-schedule'
 
 interface ModalEditClientProps {
   handleClose: () => void
-  handleSaveNewClient: () => void
+  handleEditClient: () => void
   isOpen: boolean
   handleAddClient: (client: ClientResponseType) => void
+  data: ClientResponseType | null
 }
 
 interface actionAlertsProps {
@@ -35,8 +36,9 @@ interface actionAlertsProps {
 export default function ModalEditClient({
   isOpen,
   handleClose,
-  handleSaveNewClient,
+  handleEditClient,
   handleAddClient,
+  data,
 }: ModalEditClientProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
@@ -47,7 +49,7 @@ export default function ModalEditClient({
 
   const { companySelected } = useContext(CompanyContext)
 
-  const { register, handleSubmit, control, reset } = useForm({
+  const { register, handleSubmit, control, setValue } = useForm({
     defaultValues: {
       name: '',
       document: '',
@@ -60,6 +62,7 @@ export default function ModalEditClient({
     fields: fieldsPhone,
     append: appendPhone,
     remove: removePhone,
+    update: updatePhone,
   } = useFieldArray({
     control,
     name: 'phone',
@@ -69,6 +72,7 @@ export default function ModalEditClient({
     fields: fieldsEmail,
     append: appendEmail,
     remove: removeEmail,
+    update: updateEmail,
   } = useFieldArray({
     control,
     name: 'email',
@@ -77,22 +81,23 @@ export default function ModalEditClient({
     fields: fieldsAddress,
     append: appendAddress,
     remove: removeAddress,
+    update: updateAddress,
   } = useFieldArray({
     control,
     name: 'address',
   })
 
-  async function onSubmit(data: any) {
+  async function onSubmit(formData: any) {
     setIsLoading(true)
-    const listPhone = data.phone
+    const listPhone = formData.phone
       .map((item: any) => item.phone)
       .filter((item: any) => item !== '')
 
-    const listEmail = data.email
+    const listEmail = formData.email
       .map((item: any) => item.email)
       .filter((item: any) => item !== '')
 
-    const listAddress = data.address
+    const listAddress = formData.address
       .map((item: any) => item.address)
       .filter((item: any) => item !== '')
 
@@ -100,17 +105,17 @@ export default function ModalEditClient({
       const dataFormatted = {
         company_id: companySelected,
         active: true,
-        name: data.name,
-        document: data.document,
-        phone: listPhone,
-        email: listEmail,
-        address: listAddress,
+        name: formData.name,
+        document: formData.document,
+        phone: listPhone.length > 0 ? listPhone : null,
+        email: listEmail.length > 0 ? listEmail : null,
+        address: listAddress.length > 0 ? listAddress : null,
       }
+      console.log(dataFormatted)
+      const resp = await api.put('/client/' + data?.id, dataFormatted)
 
-      const resp = await api.post('/client', dataFormatted)
-
-      handleAddClient(resp.data.data[0])
-      handleSaveNewClient()
+      // handleAddClient(resp.data.data[0])
+      // handleEditClient()
       handleActiveAlert(true, 'success', resp.data.msg)
     } catch (error: any) {
       if (error.response.status === 400) {
@@ -143,21 +148,34 @@ export default function ModalEditClient({
   }
 
   useEffect(() => {
-    if (isOpen) {
-      reset({
-        name: '',
-        document: '',
-        phone: [{ phone: '' }],
-        email: [{ email: '' }],
-        address: [{ address: '' }],
-      })
+    if (data) {
+      setValue('name', data?.name)
+      setValue('document', data?.document)
+      data?.phone &&
+        data?.phone.length > 0 &&
+        data?.phone.forEach((item: any, index: number) => {
+          // console.log(`phone.${index}.phone`)
+          updatePhone(index, { phone: item })
+        })
+      data?.email &&
+        data?.email.length > 0 &&
+        data?.email.forEach((item: any, index: number) => {
+          // console.log(`phone.${index}.phone`)
+          updateEmail(index, { email: item })
+        })
+      data?.address &&
+        data?.address.length > 0 &&
+        data?.address.forEach((item: any, index: number) => {
+          // console.log(`phone.${index}.phone`)
+          updateAddress(index, { address: item })
+        })
     }
   }, [isOpen])
 
   return (
     <>
       <Dialog open={isOpen} onClose={handleClose}>
-        <DialogTitle>Criação de cliente </DialogTitle>
+        <DialogTitle>Edição de cliente </DialogTitle>
         <DialogContent>
           <Stack
             width={400}

@@ -146,19 +146,22 @@ export default function ModalCreateNewClientVehicle({
   async function onSubmit(data: any) {
     console.log(data)
     try {
-      // const dataFormatted = {
-      //   company_id: companySelected,
-      //   active: true,
-      //   name: data.name,
-      //   document: data.document,
-      //   phone: listPhone,
-      //   email: listEmail,
-      //   address: listAddress,
-      // }
-      // const resp = await api.post('/client', dataFormatted)
+      const dataFormatted = {
+        chasis: data.chasis,
+        vehicle_id: data.vehicle,
+        color: data.cor,
+        plate: data.plate,
+        mileage: data.km,
+      }
+      const resp = await api.post(
+        `/client-vehicle?company_id=${companySelected}`,
+        dataFormatted,
+      )
+      console.log(resp)
       // handleAddClientVehicle(resp.data.data[0])
-      handleSaveNewClientVehicle()
-      // handleActiveAlert(true, 'success', resp.data.msg)
+      // handleSaveNewClientVehicle()
+      handleActiveAlert(true, 'success', resp.data.msg)
+      console.log(dataFormatted)
     } catch (error: any) {
       if (error.response.status === 400) {
         handleActiveAlert(true, 'error', error.response.data.msg)
@@ -274,9 +277,7 @@ export default function ModalCreateNewClientVehicle({
                         field.onChange(event)
                       }}
                     >
-                      <MenuItem value={'none'}>
-                        {'Selecione um Consultor'}
-                      </MenuItem>
+                      <MenuItem value={'none'}>{'Selecione...'}</MenuItem>
                       {dataVehicleModelsList &&
                         dataVehicleModelsList.map((option) => (
                           <MenuItem
@@ -301,25 +302,26 @@ export default function ModalCreateNewClientVehicle({
                       id="outlined-select-currency"
                       select
                       label="Veículo"
-                      placeholder="Selecione um Consultor"
+                      placeholder="Selecione..."
                       sx={{
                         marginTop: 2,
                         width: '100%',
                       }}
                       {...field}
                     >
-                      <MenuItem value={'none'}>
-                        {'Selecione um Consultor'}
-                      </MenuItem>
+                      <MenuItem value={'none'}>{'Selecione...'}</MenuItem>
                       {dataVehicleList &&
-                        dataVehicleList.map((option) => (
-                          <MenuItem
-                            key={option.id + option.name}
-                            value={option.id}
-                          >
-                            {option.name}
-                          </MenuItem>
-                        ))}
+                        dataVehicleList.map((option) => {
+                          console.log(option)
+                          return (
+                            <MenuItem
+                              key={option.id + option.name}
+                              value={option.id}
+                            >
+                              {option.name} - {option.model_year}
+                            </MenuItem>
+                          )
+                        })}
                     </TextField>
                   )
                 }}
