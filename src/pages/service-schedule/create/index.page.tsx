@@ -6,7 +6,6 @@ import Container from '@mui/material/Container'
 
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
-import SearchIcon from '@mui/icons-material/Search'
 
 import {
   ClientResponseType,
@@ -21,7 +20,6 @@ import List from '@mui/material/List'
 import Stack from '@mui/material/Stack'
 
 import {
-  ButtonOpenModalSearch,
   ButtonSubmit,
   DividerCard,
   InfoCardName,
@@ -602,10 +600,7 @@ export default function ServiceSchedulesCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>AGENDAMENTO</TitleCard>
-                  {/* <MoreOptionsButtonSelect
-                    handleIsEditSelectedCard={handleIsEditSelectedCard}
-                    typeEdit="schedule"
-                  /> */}
+                  <MoreOptionsServiceScheduleCreate disabledButton />
                 </Stack>
                 <DividerCard />
                 <List dense={false}>
@@ -644,6 +639,7 @@ export default function ServiceSchedulesCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Consultor técnico</TitleCard>
+                  <MoreOptionsServiceScheduleCreate disabledButton />
                 </Stack>
                 <DividerCard />
                 <List dense={false}>
