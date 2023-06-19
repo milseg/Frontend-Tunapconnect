@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
+import UploadFileIcon from '@mui/icons-material/UploadFile'
 
 import Link from 'next/link'
 import { useContext, useEffect, useMemo, useState } from 'react'
@@ -51,6 +52,12 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
           title: 'Agendamento',
         })
       }
+      ret.push({
+          path: '/upload',
+          href: `/upload`,
+          component: <UploadFileIcon />,
+          title: 'Upload',
+        })
       return ret
     },
     [companySelected],
