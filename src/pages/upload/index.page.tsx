@@ -1,25 +1,37 @@
-import { Title } from "@mui/icons-material";
+import SearchIcon from "@mui/icons-material/Search";
 import {
-  Autocomplete,
   Container,
+  FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import * as React from "react";
-import { ContainerItem } from "./styles";
 import Paper from "@mui/material/Paper";
+import { SearchButton } from "./styles";
 
 export default function Upload() {
-  const top100Films = [
-    { title: "The Shawshank Redemption", year: 1994 },
-    { title: "The Godfather", year: 1972 },
-    { title: "The Godfather: Part II", year: 1974 },
-    { title: "The Dark Knight", year: 2008 },
-    { title: "12 Angry Men", year: 1957 },
-    { title: "Schindler's List", year: 1993 },
-    { title: "Pulp Fiction", year: 1994 },
+  const currencies = [
+    {
+      value: "USD",
+      label: "$",
+    },
+    {
+      value: "EUR",
+      label: "€",
+    },
+    {
+      value: "BTC",
+      label: "฿",
+    },
+    {
+      value: "JPY",
+      label: "¥",
+    },
   ];
   return (
     <>
@@ -32,8 +44,12 @@ export default function Upload() {
               justifyContent="space-between"
               alignItems="center"
             >
-              <Typography variant="h5" component="h2">{"Orçamentos"}</Typography>
-              <Typography>{"Lista de orçamentos"}</Typography>
+              <Typography variant="h5" component="h2">
+                {"Orçamentos"}
+              </Typography>
+              <Typography>
+                {"TUNAP Connect > Empresa > Oficina >Lista de orçamentos"}
+              </Typography>
             </Grid>
             <Paper
               sx={{
@@ -43,23 +59,27 @@ export default function Upload() {
                 height: "fit-content",
               }}
             >
-              <Autocomplete
-                sx={{ width: "100%" }}
-                freeSolo
-                id="free-solo-2-demo"
-                disableClearable
-                options={top100Films.map((option) => option.title)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Search input"
-                    InputProps={{
-                      ...params.InputProps,
-                      type: "search",
-                    }}
-                  />
-                )}
-              />
+              <Stack spacing={2} direction="row" sx={{ width: "100%" }}>
+                <TextField
+                  label="Pesquisar"
+                  InputProps={{
+                    type: "search",
+                  }}
+                />
+                <SearchButton variant="contained" disableRipple>
+                  <SearchIcon />
+                </SearchButton>
+                <FormControl>
+                  <InputLabel id="demo-simple-select-label">Filtros</InputLabel>
+                  <Select id="outlined-select-currency" label="Filtros">
+                    {currencies.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Stack>
             </Paper>
           </Stack>
           <Grid
@@ -68,7 +88,9 @@ export default function Upload() {
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography variant="h5" component="h2">{"Lista de orçamentos"}</Typography>
+            <Typography variant="h5" component="h2">
+              {"Lista de orçamentos"}
+            </Typography>
           </Grid>
         </Stack>
       </Container>
