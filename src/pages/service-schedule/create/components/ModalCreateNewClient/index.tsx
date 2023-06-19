@@ -107,13 +107,11 @@ export default function ModalCreateNewClient({
         address: listAddress,
       }
 
-      console.log(data)
+      const resp = await api.post('/client', dataFormatted)
 
-      // const resp = await api.post('/client', dataFormatted)
-
-      // handleAddClient(resp.data.data[0])
-      // handleSaveNewClient()
-      // handleActiveAlert(true, 'success', resp.data.msg)
+      handleAddClient(resp.data.data[0])
+      handleSaveNewClient()
+      handleActiveAlert(true, 'success', resp.data.msg)
     } catch (error: any) {
       if (error.response.status === 400) {
         handleActiveAlert(true, 'error', error.response.data.msg)

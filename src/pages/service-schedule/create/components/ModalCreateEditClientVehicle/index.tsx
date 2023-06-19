@@ -76,7 +76,6 @@ export default function ModalCreateEditClientVehicle({
           const resp = await api.get(
             `/vehicle-brand?company_id=${companySelected}`,
           )
-          console.log(resp)
           return resp.data.data
         } catch (err) {}
       },
@@ -104,7 +103,7 @@ export default function ModalCreateEditClientVehicle({
         )
 
         // setValue('model', 'none')
-        console.log(resp)
+
         return resp.data.data
       } catch (err) {}
     },
@@ -147,7 +146,6 @@ export default function ModalCreateEditClientVehicle({
   )
 
   async function onSubmit(data: any) {
-    console.log(data)
     try {
       const dataFormatted = {
         chasis: data.chasis,
@@ -160,9 +158,9 @@ export default function ModalCreateEditClientVehicle({
         `/client-vehicle?company_id=${companySelected}`,
         dataFormatted,
       )
-      console.log(resp)
-      // handleAddClientVehicle(resp.data.data[0])
-      // handleSaveNewClientVehicle()
+
+      handleAddClientVehicle(resp.data.data[0])
+      handleSaveEditClientVehicle()
       handleActiveAlert(true, 'success', resp.data.msg)
       console.log(dataFormatted)
     } catch (error: any) {

@@ -126,12 +126,11 @@ export default function ModalCreateNewClientVehicle({
     ],
     async () => {
       try {
-        // reset({ vehicle: 'none' })
         const resp = await api.get(
           `/vehicle/active-vehicles?model_id=${watch('model')}`,
         )
 
-        // setValue('vehicle', 'none')
+        setValue('vehicle', 'none')
 
         return resp.data.data
       } catch (err) {}
@@ -157,11 +156,10 @@ export default function ModalCreateNewClientVehicle({
         `/client-vehicle?company_id=${companySelected}`,
         dataFormatted,
       )
-      console.log(resp)
-      // handleAddClientVehicle(resp.data.data[0])
-      // handleSaveNewClientVehicle()
+
+      handleAddClientVehicle(resp.data.data[0])
+      handleSaveNewClientVehicle()
       handleActiveAlert(true, 'success', resp.data.msg)
-      console.log(dataFormatted)
     } catch (error: any) {
       if (error.response.status === 400) {
         handleActiveAlert(true, 'error', error.response.data.msg)

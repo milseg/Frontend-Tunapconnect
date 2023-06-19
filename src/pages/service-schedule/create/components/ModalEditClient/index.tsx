@@ -111,11 +111,11 @@ export default function ModalEditClient({
         email: listEmail.length > 0 ? listEmail : null,
         address: listAddress.length > 0 ? listAddress : null,
       }
-      console.log(dataFormatted)
+
       const resp = await api.put('/client/' + data?.id, dataFormatted)
 
-      // handleAddClient(resp.data.data[0])
-      // handleEditClient()
+      handleAddClient(resp.data.data[0])
+      handleEditClient()
       handleActiveAlert(true, 'success', resp.data.msg)
     } catch (error: any) {
       if (error.response.status === 400) {
@@ -154,19 +154,16 @@ export default function ModalEditClient({
       data?.phone &&
         data?.phone.length > 0 &&
         data?.phone.forEach((item: any, index: number) => {
-          // console.log(`phone.${index}.phone`)
           updatePhone(index, { phone: item })
         })
       data?.email &&
         data?.email.length > 0 &&
         data?.email.forEach((item: any, index: number) => {
-          // console.log(`phone.${index}.phone`)
           updateEmail(index, { email: item })
         })
       data?.address &&
         data?.address.length > 0 &&
         data?.address.forEach((item: any, index: number) => {
-          // console.log(`phone.${index}.phone`)
           updateAddress(index, { address: item })
         })
     }
