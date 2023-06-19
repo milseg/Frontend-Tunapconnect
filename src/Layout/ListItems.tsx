@@ -28,26 +28,31 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
   const { companySelected } = useContext(CompanyContext)
 
   const memuList: memuListProps = useMemo(
-    () => [
-      {
-        path: '/company',
-        href: '/company',
-        component: <AccountBalanceIcon />,
-        title: 'Empresas',
-      },
-      {
-        path: '/service-schedule',
-        href: `/service-schedule?company_id=${companySelected}`,
-        component: <CalendarMonthIcon />,
-        title: 'Agendamento',
-      },
-      // {
-      //   path: '/checklist',
-      //   href: '/checklist',
-      //   component: <AccessTimeFilledOutlinedIcon />,
-      //   title: 'Checklist',
-      // },
-    ],
+    () => {
+      let ret = [
+        {
+          path: '/company',
+          href: '/company',
+          component: <AccountBalanceIcon />,
+          title: 'Empresas',
+        }
+        // {
+        //   path: '/checklist',
+        //   href: '/checklist',
+        //   component: <AccessTimeFilledOutlinedIcon />,
+        //   title: 'Checklist',
+        // },
+      ]
+      if(companySelected) {
+        ret.push({
+          path: '/service-schedule',
+          href: `/service-schedule?company_id=${companySelected}`,
+          component: <CalendarMonthIcon />,
+          title: 'Agendamento',
+        })
+      }
+      return ret
+    },
     [companySelected],
   )
 
