@@ -3,16 +3,27 @@ import { Container, Grid, Stack, TextField, Typography } from "@mui/material";
 import * as React from "react";
 import Paper from "@mui/material/Paper";
 import { SearchButton, TableTitles } from "./styles";
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useState } from "react";
+import { UpdateFiles } from "@/types/upload-file";
 export default function Upload() {
-  const uploads = [
+  const [uploadContent, setUploadContent] = useState<UpdateFiles[]>([
     {
       data: "19/06/2023 08:00",
       status: "Incluído",
       name: "arquivoteste.xlsx",
       id: 1,
     },
-  ];
+  ]);
+
+  const handleRemove = (selectId: number) => {
+    const newUploadContent = uploadContent.filter(
+      (fileUp) => fileUp.id !== selectId
+    );
+    console.log(newUploadContent);
+    setUploadContent(newUploadContent);
+  };
+
   return (
     <>
       <Container maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
@@ -51,7 +62,21 @@ export default function Upload() {
                   }}
                   sx={{ width: "60%" }}
                 />
-                <SearchButton variant="contained" disableRipple>
+                <SearchButton
+                  variant="contained"
+                  disableRipple
+                  onClick={() => {
+                    setUploadContent([
+                      ...uploadContent,
+                      {
+                        data: "19/06/2023 08:00",
+                        status: "Incluído",
+                        name: "arquivoteste2.xlsx",
+                        id: uploadContent.length + 1,
+                      },
+                    ]);
+                  }}
+                >
                   <Stack
                     direction="row"
                     justifyContent="flex-start"
@@ -97,13 +122,15 @@ export default function Upload() {
                 height: "fit-content",
               }}
             >
-              {uploads.map((upload) => (
+              {uploadContent.map((upload) => (
                 <Stack
                   key={upload.id}
                   direction="row"
                   sx={{
                     width: "100%",
-                    backgroundColor: "#F1F1F1",
+                    backgroundColor: `${
+                      upload.id % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
+                    }`,
                     p: 1,
                     borderRadius: "2px",
                   }}
@@ -130,7 +157,11 @@ export default function Upload() {
                   >
                     {upload.name}
                   </Typography>
-                  <DeleteIcon color="error"/>
+                  <DeleteIcon
+                    color="error"
+                    onClick={() => handleRemove(upload.id)}
+                    sx={{ ":hover": { cursor: "pointer" } }}
+                  />
                 </Stack>
               ))}
             </Paper>
