@@ -1,36 +1,16 @@
-import SearchIcon from "@mui/icons-material/Search";
-import {
-  Container,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { Container, Grid, Stack, TextField, Typography } from "@mui/material";
 import * as React from "react";
 import Paper from "@mui/material/Paper";
-import { BootstrapButton } from "./styles";
-
+import { SearchButton, TableTitles } from "./styles";
+import DeleteIcon from '@mui/icons-material/Delete';
 export default function Upload() {
-  const currencies = [
+  const uploads = [
     {
-      value: "USD",
-      label: "$",
-    },
-    {
-      value: "EUR",
-      label: "€",
-    },
-    {
-      value: "BTC",
-      label: "฿",
-    },
-    {
-      value: "JPY",
-      label: "¥",
+      data: "19/06/2023 08:00",
+      status: "Incluído",
+      name: "arquivoteste.xlsx",
+      id: 1,
     },
   ];
   return (
@@ -44,54 +24,117 @@ export default function Upload() {
               justifyContent="space-between"
               alignItems="center"
             >
-              <Typography variant="h5" component="h2">
-                {"Orçamentos"}
+              <Typography variant="h5" component="h2" fontWeight={700}>
+                {"Upload - Toyolex"}
               </Typography>
               <Typography>
-                {"TUNAP Connect > Empresa > Oficina >Lista de orçamentos"}
+                {"TUNAP Connect > Empresa > Oficina >Lista de agendamentos"}
               </Typography>
             </Grid>
             <Paper
               sx={{
-                p: 2,
+                p: 4,
                 display: "flex",
                 flexDirection: "row",
                 height: "fit-content",
               }}
             >
-              <Stack spacing={2} direction="row" sx={{ width: "100%" }}>
+              <Stack
+                direction="row"
+                sx={{ width: "100%" }}
+                justifyContent="space-between"
+              >
                 <TextField
-                  label="Pesquisar"
+                  label="Nenhum arquivo selecionado"
                   InputProps={{
                     type: "search",
                   }}
+                  sx={{ width: "60%" }}
                 />
-                <BootstrapButton variant="contained" disableRipple>
-                  <SearchIcon />
-                </BootstrapButton>
-                <FormControl>
-                  <InputLabel id="demo-simple-select-label">Filtros</InputLabel>
-                  <Select id="outlined-select-currency" label="Filtros">
-                    {currencies.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <SearchButton variant="contained" disableRipple>
+                  <Stack
+                    direction="row"
+                    justifyContent="flex-start"
+                    columnGap={"40px"}
+                    alignItems={"center"}
+                    sx={{ width: "180px" }}
+                  >
+                    <AddCircleOutlineIcon />
+                    <Typography variant="h6" component="h5">
+                      {"Upload"}
+                    </Typography>
+                  </Stack>
+                </SearchButton>
               </Stack>
             </Paper>
           </Stack>
-          <Grid
-            container
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
+          <Stack
+            direction="column"
+            justifyContent="flex-start"
+            spacing={2}
+            sx={{ width: "100%" }}
           >
-            <Typography variant="h5" component="h2">
-              {"Lista de orçamentos"}
+            <Typography variant="h5" component="h2" fontWeight={700}>
+              {"Listar Uploads"}
             </Typography>
-          </Grid>
+            <TableTitles>
+              <Stack
+                direction="row"
+                sx={{ width: "100%" }}
+                justifyContent="space-between"
+              >
+                <Typography>{"Data Upload"}</Typography>
+                <Typography>{"Status"}</Typography>
+                <Typography>{"Nome do arquivo"}</Typography>
+                <Typography>{"Ação"}</Typography>
+              </Stack>
+            </TableTitles>
+            <Paper
+              sx={{
+                p: 2,
+                display: "flex",
+                flexDirection: "column",
+                height: "fit-content",
+              }}
+            >
+              {uploads.map((upload) => (
+                <Stack
+                  key={upload.id}
+                  direction="row"
+                  sx={{
+                    width: "100%",
+                    backgroundColor: "#F1F1F1",
+                    p: 1,
+                    borderRadius: "2px",
+                  }}
+                  justifyContent="space-between"
+                >
+                  <Typography
+                    variant="subtitle1"
+                    color={"#1C4961"}
+                    fontWeight={700}
+                  >
+                    {upload.data}
+                  </Typography>
+                  <Typography
+                    variant="subtitle1"
+                    color={"#1C4961"}
+                    fontWeight={700}
+                  >
+                    {upload.status}
+                  </Typography>
+                  <Typography
+                    variant="subtitle1"
+                    color={"#1C4961"}
+                    fontWeight={700}
+                  >
+                    {upload.name}
+                  </Typography>
+                  <DeleteIcon color="error"/>
+                </Stack>
+              ))}
+            </Paper>
+          </Stack>
         </Stack>
       </Container>
     </>
