@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
+import UploadFileIcon from '@mui/icons-material/UploadFile'
 
 import Link from 'next/link'
 import { useContext, useEffect, useMemo, useState } from 'react'
@@ -28,26 +29,37 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
   const { companySelected } = useContext(CompanyContext)
 
   const memuList: memuListProps = useMemo(
-    () => [
-      {
-        path: '/company',
-        href: '/company',
-        component: <AccountBalanceIcon />,
-        title: 'Empresas',
-      },
-      {
-        path: '/service-schedule',
-        href: `/service-schedule?company_id=${companySelected}`,
-        component: <CalendarMonthIcon />,
-        title: 'Agendamento',
-      },
-      // {
-      //   path: '/checklist',
-      //   href: '/checklist',
-      //   component: <AccessTimeFilledOutlinedIcon />,
-      //   title: 'Checklist',
-      // },
-    ],
+    () => {
+      let ret = [
+        {
+          path: '/company',
+          href: '/company',
+          component: <AccountBalanceIcon />,
+          title: 'Empresas',
+        }
+        // {
+        //   path: '/checklist',
+        //   href: '/checklist',
+        //   component: <AccessTimeFilledOutlinedIcon />,
+        //   title: 'Checklist',
+        // },
+      ]
+      if(companySelected) {
+        ret.push({
+          path: '/service-schedule',
+          href: `/service-schedule?company_id=${companySelected}`,
+          component: <CalendarMonthIcon />,
+          title: 'Agendamento',
+        })
+      }
+      ret.push({
+          path: '/upload',
+          href: `/upload`,
+          component: <UploadFileIcon />,
+          title: 'Upload',
+        })
+      return ret
+    },
     [companySelected],
   )
 
