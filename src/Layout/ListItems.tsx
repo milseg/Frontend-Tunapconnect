@@ -10,11 +10,18 @@ import { useRouter } from 'next/router'
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
+import EditIcon from '@mui/icons-material/Edit'
+
+import { ChevronRight, ExpandMore, StarBorder } from '@mui/icons-material'
+
 
 import Link from 'next/link'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { ListItemButton } from './styles'
 import { CompanyContext } from '@/contexts/CompanyContext'
+import Collapse from '@mui/material/Collapse'
+import List from '@mui/material/List'
+
 
 type memuListProps = Array<{
   path: string
@@ -27,6 +34,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
   const [routeActual, setRouteActual] = useState('')
   const router = useRouter()
   const { companySelected } = useContext(CompanyContext)
+  const [uploadOpen, setUploadOpen] = useState<boolean>(false);
 
   const memuList: memuListProps = useMemo(
     () => {
@@ -54,9 +62,9 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
       }
       ret.push({
           path: '/upload',
-          href: `/upload`,
+          href: `/upload?status=toyolex`,
           component: <UploadFileIcon />,
-          title: 'Upload',
+          title: 'Cadastros',
         })
       return ret
     },
@@ -76,6 +84,10 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
     [companySelected],
   )
 
+  const handleRegisterClick = () => {
+    setUploadOpen(!uploadOpen)
+  }
+
   useEffect(() => {
     setRouteActual(router.pathname)
   }, [router])
@@ -84,17 +96,45 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
     <React.Fragment>
       {menuListCompanyId.map((menu, index) => {
         return (
-          <Link href={menu.href} key={index} style={{ textDecoration: 'none' }}>
-            <ListItemButton
-              selected={routeActual.includes(menu.path)}
-              sx={{
-                ...(opended && { margin: '10px 20px' }),
-              }}
-            >
-              <ListItemIcon>{menu.component}</ListItemIcon>
-              <ListItemText primary={menu.title} style={{ color: 'white' }} />
-            </ListItemButton>
-          </Link>
+          menu.path === '/upload' ? (
+            <React.Fragment key={index}>
+              <ListItemButton
+                  selected={routeActual.includes(menu.path)}
+                  sx={{
+                    ...(opended && { margin: '10px 20px' }),
+                  }}
+                  onClick={handleRegisterClick}
+              >
+                <ListItemIcon><EditIcon /></ListItemIcon>
+                <ListItemText primary={menu.title} style={{ color: 'white' }} />
+                {uploadOpen ? <ExpandMore /> : <ChevronRight />}
+              </ListItemButton>
+              <Collapse in={uploadOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  <Link href={menu.href} style={{ textDecoration: 'none' }}>
+                    <ListItemButton sx={{ pl: 4 }}>
+                      <ListItemIcon>
+                        {menu.component}
+                      </ListItemIcon>
+                      <ListItemText primary="Upload" />
+                    </ListItemButton>
+                  </Link>
+                </List>
+              </Collapse>
+            </React.Fragment>
+            ) : (
+              <Link href={menu.href} key={index} style={{ textDecoration: 'none' }}>
+                <ListItemButton
+                  selected={routeActual.includes(menu.path)}
+                  sx={{
+                    ...(opended && { margin: '10px 20px' }),
+                  }}
+                >
+                  <ListItemIcon>{menu.component}</ListItemIcon>
+                  <ListItemText primary={menu.title} style={{ color: 'white' }} />
+                </ListItemButton>
+              </Link>
+            )
         )
       })}
     </React.Fragment>
