@@ -22,9 +22,8 @@ import { useQuery } from 'react-query'
 
 interface ModalCreateNewClientVehicleProps {
   handleClose: () => void
-  handleSaveNewClientVehicle: () => void
   isOpen: boolean
-  handleAddClientVehicle: (client: ClientVehicleResponseType) => void
+  handleSaveReturnClientVehicle: (client: ClientVehicleResponseType) => void
 }
 
 interface actionAlertsProps {
@@ -36,8 +35,7 @@ interface actionAlertsProps {
 export default function ModalCreateNewClientVehicle({
   isOpen,
   handleClose,
-  handleSaveNewClientVehicle,
-  handleAddClientVehicle,
+  handleSaveReturnClientVehicle,
 }: ModalCreateNewClientVehicleProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
@@ -141,19 +139,21 @@ export default function ModalCreateNewClientVehicle({
   async function onSubmit(data: any) {
     try {
       const dataFormatted = {
-        chasis: data.chasis,
+        chasis: data.chassis,
         vehicle_id: data.vehicle,
         color: data.cor,
+        number_motor: null,
+        renavan: null,
         plate: data.plate,
         mileage: data.km,
       }
+      console.log(dataFormatted)
       const resp = await api.post(
         `/client-vehicle?company_id=${companySelected}`,
         dataFormatted,
       )
 
-      handleAddClientVehicle(resp.data.data[0])
-      handleSaveNewClientVehicle()
+      handleSaveReturnClientVehicle(resp.data.data)
       handleActiveAlert(true, 'success', resp.data.msg)
     } catch (error: any) {
       if (error.response.status === 400) {

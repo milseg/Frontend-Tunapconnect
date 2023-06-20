@@ -83,6 +83,8 @@ export default function ServiceSchedulesCreate() {
   const [client, setClient] = useState<ClientResponseType | null>(null)
   const [clientForModalSearch, setClientForModalSearch] =
     useState<ClientResponseType | null>(null)
+  const [clientVehicleForModalSearch, setClientVehicleForModalSearch] =
+    useState<ClientVehicleResponseType | null>(null)
   const [clientVehicle, setClientVehicle] =
     useState<ClientVehicleResponseType | null>()
   const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
@@ -165,13 +167,17 @@ export default function ServiceSchedulesCreate() {
     setOpenModalNewClient(false)
     setOpenModalClientSearch(true)
   }
-  function handleEditClient() {
-    setOpenModalNewClient(false)
-    // setOpenModalClientSearch(true)
+
+  function handleSaveReturnClientVehicle(
+    value: ClientVehicleResponseType | null,
+  ) {
+    setClientVehicleForModalSearch(value)
+    setOpenModalNewClientVehicle(false)
+    setOpenModalClientVehicleSearch(true)
   }
 
-  function handleSaveNewClientVehicle() {
-    setOpenModalNewClientVehicle(false)
+  function handleEditClient() {
+    setOpenModalNewClient(false)
     // setOpenModalClientSearch(true)
   }
 
@@ -740,6 +746,7 @@ export default function ServiceSchedulesCreate() {
         openMolal={openModalClientVehicleSearch}
         handleAddClientVehicle={handleAddClientVehicle}
         handleOpenModalNewClientVehicle={handleOpenModalNewClientVehicle}
+        dataVehicleCreated={clientVehicleForModalSearch}
       />
       {/* <ModalSearchClaimService
         handleClose={handleCloseModalClaimServiceVehicleSearch}
@@ -751,6 +758,7 @@ export default function ServiceSchedulesCreate() {
         handleClose={handleCloseModalNewClient}
         handleSaveReturnClient={handleSaveReturnClient}
       />
+
       <ModalEditClient
         isOpen={openModalEditClient && !!client}
         handleClose={handleCloseModalEditClient}
@@ -758,12 +766,13 @@ export default function ServiceSchedulesCreate() {
         handleAddClient={handleAddClient}
         data={client}
       />
+
       <ModalCreateNewClientVehicle
         isOpen={openModalNewClientVehicle}
         handleClose={handleCloseModalNewClientVehicle}
-        handleSaveNewClientVehicle={handleSaveNewClientVehicle}
-        handleAddClientVehicle={handleAddClientVehicle}
+        handleSaveReturnClientVehicle={handleSaveReturnClientVehicle}
       />
+
       <ModalCreateEditClientVehicle
         isOpen={openModalEditClientVehicle}
         handleClose={handleCloseModalEditClientVehicle}

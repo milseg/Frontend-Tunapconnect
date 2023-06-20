@@ -23,6 +23,7 @@ interface ModalSearchClientVehicleProps {
   handleClose: () => void
   handleOpenModalNewClientVehicle: () => void
   handleAddClientVehicle: (data: ClientVehicleResponseType) => void
+  dataVehicleCreated: ClientVehicleResponseType | null
 }
 
 type SearchFormProps = {
@@ -39,6 +40,7 @@ export default function ModalSearchClientVehicle({
   handleClose,
   handleAddClientVehicle,
   handleOpenModalNewClientVehicle,
+  dataVehicleCreated,
 }: ModalSearchClientVehicleProps) {
   const [clientVehicleList, setClientVehicleList] = useState<
     ClientVehicleResponseType[] | []
@@ -128,7 +130,11 @@ export default function ModalSearchClientVehicle({
       reset({
         search: '',
       })
-      setClientVehicleList([])
+      if (dataVehicleCreated) {
+        setClientVehicleList([dataVehicleCreated])
+      } else {
+        setClientVehicleList([])
+      }
     }
   }, [openMolal])
 
