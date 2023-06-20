@@ -21,9 +21,8 @@ import { ClientResponseType } from '@/types/service-schedule'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
-  handleSaveNewClient: () => void
+  handleSaveReturnClient: (client: ClientResponseType | null) => void
   isOpen: boolean
-  handleAddClient: (client: ClientResponseType) => void
 }
 
 interface actionAlertsProps {
@@ -35,8 +34,7 @@ interface actionAlertsProps {
 export default function ModalCreateNewClient({
   isOpen,
   handleClose,
-  handleSaveNewClient,
-  handleAddClient,
+  handleSaveReturnClient,
 }: ModalCreateNewClientProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
@@ -109,8 +107,8 @@ export default function ModalCreateNewClient({
 
       const resp = await api.post('/client', dataFormatted)
 
-      handleAddClient(resp.data.data[0])
-      handleSaveNewClient()
+      // handleAddClient(resp.data.data[0])
+      handleSaveReturnClient(resp.data.data[0])
       handleActiveAlert(true, 'success', resp.data.msg)
     } catch (error: any) {
       if (error.response.status === 400) {

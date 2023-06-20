@@ -73,7 +73,6 @@ export default function ModalCreateNewClientVehicle({
         const resp = await api.get(
           `/vehicle-brand?company_id=${companySelected}`,
         )
-        console.log(resp)
         return resp.data.data
       } catch (err) {}
     },
@@ -101,7 +100,6 @@ export default function ModalCreateNewClientVehicle({
         )
 
         // setValue('model', 'none')
-        console.log(resp)
         return resp.data.data
       } catch (err) {}
     },
@@ -111,8 +109,6 @@ export default function ModalCreateNewClientVehicle({
       refetchOnMount: false,
     },
   )
-
-  console.log(watch('vehicle'))
 
   const { data: dataVehicleList } = useQuery<any[]>(
     [
@@ -143,7 +139,6 @@ export default function ModalCreateNewClientVehicle({
   )
 
   async function onSubmit(data: any) {
-    console.log(data)
     try {
       const dataFormatted = {
         chasis: data.chasis,
@@ -310,7 +305,6 @@ export default function ModalCreateNewClientVehicle({
                       <MenuItem value={'none'}>{'Selecione...'}</MenuItem>
                       {dataVehicleList &&
                         dataVehicleList.map((option) => {
-                          console.log(option)
                           return (
                             <MenuItem
                               key={option.id + option.name}

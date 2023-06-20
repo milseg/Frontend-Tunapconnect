@@ -147,7 +147,7 @@ export default function ModalSearchClientVehicle({
             direction="row"
           >
             {' '}
-            <Typography variant="h6">Buscar por cliente</Typography>
+            <Typography variant="h6">Buscar por veículo</Typography>
             {/* {clientList.length > 0 && ( */}
             <ButtonModalDialog onClick={handleClientModal}>
               adicionar novo

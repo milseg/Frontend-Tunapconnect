@@ -106,15 +106,15 @@ export default function ModalEditClient({
         company_id: companySelected,
         active: true,
         name: formData.name,
-        document: formData.document,
         phone: listPhone.length > 0 ? listPhone : null,
         email: listEmail.length > 0 ? listEmail : null,
         address: listAddress.length > 0 ? listAddress : null,
       }
 
       const resp = await api.put('/client/' + data?.id, dataFormatted)
+      console.log(resp)
 
-      handleAddClient(resp.data.data[0])
+      handleAddClient(resp.data.data)
       handleEditClient()
       handleActiveAlert(true, 'success', resp.data.msg)
     } catch (error: any) {
@@ -193,6 +193,7 @@ export default function ModalEditClient({
               style={{ marginTop: 11 }}
               fullWidth
               {...register('document', { required: true })}
+              disabled
             />
             {fieldsPhone.map((item, index) => {
               return (

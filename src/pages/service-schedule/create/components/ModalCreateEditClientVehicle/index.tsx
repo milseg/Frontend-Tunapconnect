@@ -114,8 +114,6 @@ export default function ModalCreateEditClientVehicle({
     },
   )
 
-  console.log(watch('vehicle'))
-
   const { data: dataVehicleList } = useQuery<any[]>(
     [
       'service_schedule',
@@ -151,19 +149,21 @@ export default function ModalCreateEditClientVehicle({
         chasis: data.chasis,
         vehicle_id: data.vehicle,
         color: data.cor,
+        number_moto: null,
+        renavan: null,
         plate: data.plate,
         mileage: data.km,
       }
-      const resp = await api.post(
-        `/client-vehicle?company_id=${companySelected}`,
+      const resp = await api.put(
+        `/client-vehicle/${vehicleData?.id}`,
         dataFormatted,
       )
 
-      handleAddClientVehicle(resp.data.data[0])
+      handleAddClientVehicle(resp.data.data)
       handleSaveEditClientVehicle()
       handleActiveAlert(true, 'success', resp.data.msg)
-      console.log(dataFormatted)
     } catch (error: any) {
+      console.log(error)
       if (error.response.status === 400) {
         handleActiveAlert(true, 'error', error.response.data.msg)
       } else {
@@ -220,7 +220,7 @@ export default function ModalCreateEditClientVehicle({
         open={isOpen && dataVehicleBrandListStatus === 'success'}
         onClose={handleClose}
       >
-        <DialogTitle>Criação de Veículo</DialogTitle>
+        <DialogTitle>Edição de Veículo</DialogTitle>
         <DialogContent>
           <Stack
             width={400}
@@ -249,6 +249,7 @@ export default function ModalCreateEditClientVehicle({
                         setValue('vehicle', 'none')
                         field.onChange(event)
                       }}
+                      disabled
                     >
                       <MenuItem value={'none'}>
                         {'Selecione um Consultor'}
@@ -287,6 +288,7 @@ export default function ModalCreateEditClientVehicle({
                         setValue('vehicle', 'none')
                         field.onChange(event)
                       }}
+                      disabled
                     >
                       <MenuItem value={'none'}>{'Selecione...'}</MenuItem>
                       {dataVehicleModelsList &&
@@ -319,11 +321,11 @@ export default function ModalCreateEditClientVehicle({
                         width: '100%',
                       }}
                       {...field}
+                      disabled
                     >
                       <MenuItem value={'none'}>{'Selecione...'}</MenuItem>
                       {dataVehicleList &&
                         dataVehicleList.map((option) => {
-                          console.log(option)
                           return (
                             <MenuItem
                               key={option.id + option.name}
@@ -344,6 +346,7 @@ export default function ModalCreateEditClientVehicle({
               style={{ marginTop: 11 }}
               fullWidth
               {...register('cor', { required: true })}
+              disabled
             />
             <InputNewClient
               label="CHASSIS"
@@ -351,6 +354,7 @@ export default function ModalCreateEditClientVehicle({
               style={{ marginTop: 11 }}
               fullWidth
               {...register('chassis', { required: true })}
+              disabled
             />
             <InputNewClient
               label="PLACA"
@@ -358,6 +362,7 @@ export default function ModalCreateEditClientVehicle({
               style={{ marginTop: 11 }}
               fullWidth
               {...register('plate', { required: true })}
+              disabled
             />
             <InputNewClient
               label="KM"

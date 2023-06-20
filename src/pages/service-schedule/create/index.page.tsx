@@ -81,6 +81,8 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
 
 export default function ServiceSchedulesCreate() {
   const [client, setClient] = useState<ClientResponseType | null>(null)
+  const [clientForModalSearch, setClientForModalSearch] =
+    useState<ClientResponseType | null>(null)
   const [clientVehicle, setClientVehicle] =
     useState<ClientVehicleResponseType | null>()
   const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
@@ -140,6 +142,7 @@ export default function ServiceSchedulesCreate() {
   }
 
   function handleOpenModalClientSearch() {
+    setClientForModalSearch(null)
     setOpenModalClientSearch(true)
   }
   function handleOpenModalClientVehicleSearch() {
@@ -153,9 +156,14 @@ export default function ServiceSchedulesCreate() {
     setOpenModalEditClientVehicle(false)
   }
 
-  function handleSaveNewClient() {
+  // function handleSaveNewClient() {
+  //   setOpenModalNewClient(false)
+  //   // setOpenModalClientSearch(true)
+  // }
+  function handleSaveReturnClient(value: ClientResponseType | null) {
+    setClientForModalSearch(value)
     setOpenModalNewClient(false)
-    // setOpenModalClientSearch(true)
+    setOpenModalClientSearch(true)
   }
   function handleEditClient() {
     setOpenModalNewClient(false)
@@ -227,14 +235,9 @@ export default function ServiceSchedulesCreate() {
 
   function handleAddClient(client: ClientResponseType) {
     setClient(client)
-    // {
-    //   id: client.id,
-    //   name: client.name ?? 'Não informado',
-    //   cpf: client.document ?? 'Não informado',
-    //   email: client.email ?? ['Não informado'],
-    //   telefone: client.phone ?? ['Não informado'],
-    //   address: client.address ?? ['Não informado'],
-    // }
+    if (openModalEditClient) {
+      setOpenModalEditClient(false)
+    }
   }
   function handleAddClientVehicle(client_vehicle: ClientVehicleResponseType) {
     // setClientVehicle(null)
@@ -723,12 +726,15 @@ export default function ServiceSchedulesCreate() {
           )}
         </Grid>
       </Container>
+
       <ModalSearchClient
         handleClose={handleCloseModalClienteSearch}
         openMolal={openModalClientSearch}
         handleAddClient={handleAddClient}
         handleOpenModalNewClient={handleOpenModalNewClient}
+        dataClient={clientForModalSearch}
       />
+
       <ModalSearchClientVehicle
         handleClose={handleCloseModalClientVehicleSearch}
         openMolal={openModalClientVehicleSearch}
@@ -743,8 +749,7 @@ export default function ServiceSchedulesCreate() {
       <ModalCreateNewClient
         isOpen={openModalNewClient}
         handleClose={handleCloseModalNewClient}
-        handleSaveNewClient={handleSaveNewClient}
-        handleAddClient={handleAddClient}
+        handleSaveReturnClient={handleSaveReturnClient}
       />
       <ModalEditClient
         isOpen={openModalEditClient && !!client}
