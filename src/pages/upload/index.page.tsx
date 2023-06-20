@@ -2,7 +2,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Container, Grid, Stack, TextField, Typography } from "@mui/material";
 import * as React from "react";
 import Paper from "@mui/material/Paper";
-import { SearchButton, TableTitles } from "./styles";
+import { CustomLabel, SearchButton, TableTitles, UploadFileField } from "./styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import { UpdateFiles } from "@/types/upload-file";
@@ -52,17 +52,20 @@ export default function Upload() {
             >
               <Stack
                 direction="row"
-                sx={{ width: "100%" }}
+                sx={{ width: "100%", alignItems: 'center' }}
                 justifyContent="space-between"
               >
-                <TextField
-                  label="Nenhum arquivo selecionado"
-                  InputProps={{
-                    type: "search",
-                  }}
-                  sx={{ width: "60%" }}
-                />
+                <CustomLabel>
+                  Nenhum  arquivo selecionado
+                  <UploadFileField
+                    InputProps={{
+                      type: "file",
+                    }}
+                    sx={{ width: "60%" }}
+                  />
+                </CustomLabel>
                 <SearchButton
+                  type="submit"
                   variant="contained"
                   disableRipple
                   onClick={() => {
