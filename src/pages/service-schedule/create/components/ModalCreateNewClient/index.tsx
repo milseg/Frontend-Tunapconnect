@@ -90,13 +90,13 @@ export default function ModalCreateNewClient({
     formState: { errors },
   } = useForm<newClientFormData>({
     resolver: zodResolver(newClientFormSchema),
-    // defaultValues: {
-    //   name: '',
-    //   document: '',
-    //   phone: [{ phone: '' }],
-    //   email: [{ email: '' }],
-    //   address: [{ address: '' }],
-    // },
+    defaultValues: {
+      name: '',
+      document: '',
+      phone: [{ phone: '' }],
+      email: [{ email: '' }],
+      address: [{ address: '' }],
+    },
   })
   const {
     fields: fieldsPhone,
@@ -149,13 +149,10 @@ export default function ModalCreateNewClient({
         address: listAddress,
       }
 
-      // validateCPF
+      const resp = await api.post('/client', dataFormatted)
 
-      // const resp = await api.post('/client', dataFormatted)
-
-      // handleAddClient(resp.data.data[0])
-      // handleSaveReturnClient(resp.data.data[0])
-      // handleActiveAlert(true, 'success', resp.data.msg)
+      handleSaveReturnClient(resp.data.data[0])
+      handleActiveAlert(true, 'success', resp.data.msg)
     } catch (error: any) {
       if (error.response.status === 400) {
         handleActiveAlert(true, 'error', error.response.data.msg)
