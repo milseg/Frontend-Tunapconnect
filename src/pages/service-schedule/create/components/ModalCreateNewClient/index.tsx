@@ -3,6 +3,8 @@ import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 
 import { Stack } from '@mui/system'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -18,6 +20,8 @@ import { CompanyContext } from '@/contexts/CompanyContext'
 import { Backdrop, CircularProgress } from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientResponseType } from '@/types/service-schedule'
+import { ErrorContainer } from './styles'
+import { validateCPF } from '@/ultis/validation'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
@@ -30,6 +34,39 @@ interface actionAlertsProps {
   title: string
   type: 'success' | 'error' | 'warning'
 }
+
+const newClientFormSchema = z.object({
+  name: z
+    .string()
+    .nonempty({ message: 'Digite um nome!' })
+    .min(5, { message: 'Digite um nome valido!' }),
+  document: z.string().refine(validateCPF, { message: 'CPF inválido!' }),
+  phone: z.array(
+    z.object({
+      phone: z.string(),
+    }),
+  ),
+  email: z.array(
+    z.object({
+      email: z
+        .string()
+        .email({ message: 'Digite um e-mail valido!' })
+        .or(z.literal('')),
+    }),
+  ),
+  address: z.array(
+    z.object({
+      address: z.string(),
+    }),
+  ),
+})
+
+newClientFormSchema.required({
+  name: true,
+  document: true,
+})
+
+type newClientFormData = z.infer<typeof newClientFormSchema>
 
 export default function ModalCreateNewClient({
   isOpen,
@@ -45,14 +82,21 @@ export default function ModalCreateNewClient({
 
   const { companySelected } = useContext(CompanyContext)
 
-  const { register, handleSubmit, control, reset } = useForm({
-    defaultValues: {
-      name: '',
-      document: '',
-      phone: [{ phone: '' }],
-      email: [{ email: '' }],
-      address: [{ address: '' }],
-    },
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<newClientFormData>({
+    resolver: zodResolver(newClientFormSchema),
+    // defaultValues: {
+    //   name: '',
+    //   document: '',
+    //   phone: [{ phone: '' }],
+    //   email: [{ email: '' }],
+    //   address: [{ address: '' }],
+    // },
   })
   const {
     fields: fieldsPhone,
@@ -105,11 +149,13 @@ export default function ModalCreateNewClient({
         address: listAddress,
       }
 
-      const resp = await api.post('/client', dataFormatted)
+      // validateCPF
+
+      // const resp = await api.post('/client', dataFormatted)
 
       // handleAddClient(resp.data.data[0])
-      handleSaveReturnClient(resp.data.data[0])
-      handleActiveAlert(true, 'success', resp.data.msg)
+      // handleSaveReturnClient(resp.data.data[0])
+      // handleActiveAlert(true, 'success', resp.data.msg)
     } catch (error: any) {
       if (error.response.status === 400) {
         handleActiveAlert(true, 'error', error.response.data.msg)
@@ -152,6 +198,8 @@ export default function ModalCreateNewClient({
     }
   }, [isOpen])
 
+  console.log(errors)
+
   return (
     <>
       <Dialog open={isOpen} onClose={handleClose}>
@@ -170,6 +218,7 @@ export default function ModalCreateNewClient({
               fullWidth
               {...register('name', { required: true })}
             />
+            <ErrorContainer>{errors.name?.message}</ErrorContainer>
             <InputNewClient
               label="CPF"
               variant="filled"
@@ -177,6 +226,7 @@ export default function ModalCreateNewClient({
               fullWidth
               {...register('document', { required: true })}
             />
+            <ErrorContainer>{errors.document?.message}</ErrorContainer>
             {fieldsPhone.map((item, index) => {
               return (
                 <Stack direction="row" key={item.id}>
@@ -214,39 +264,45 @@ export default function ModalCreateNewClient({
               )
             })}
             {fieldsEmail.map((item, index) => {
+              console.log(errors?.email)
               return (
-                <Stack direction="row" key={item.id}>
-                  <Controller
-                    render={({ field }) => (
-                      <InputNewClient
-                        label="E-MAIL"
-                        variant="filled"
-                        style={{ marginTop: 11 }}
-                        fullWidth
-                        {...field}
-                      />
+                <div key={item.id}>
+                  <Stack direction="row" key={item.id}>
+                    <Controller
+                      render={({ field }) => (
+                        <InputNewClient
+                          label="E-MAIL"
+                          variant="filled"
+                          style={{ marginTop: 11 }}
+                          fullWidth
+                          {...field}
+                        />
+                      )}
+                      name={`email.${index}.email`}
+                      control={control}
+                    />
+                    {index === 0 ? (
+                      <ButtonAddInputs
+                        onClick={() => {
+                          appendEmail({ email: '' })
+                        }}
+                        style={{ marginTop: 12, marginLeft: 10 }}
+                      >
+                        <AddCircleIcon />
+                      </ButtonAddInputs>
+                    ) : (
+                      <ButtonAddInputs
+                        onClick={() => removeEmail(index)}
+                        style={{ marginTop: 12, marginLeft: 10 }}
+                      >
+                        <DeleteIcon />
+                      </ButtonAddInputs>
                     )}
-                    name={`email.${index}.email`}
-                    control={control}
-                  />
-                  {index === 0 ? (
-                    <ButtonAddInputs
-                      onClick={() => {
-                        appendEmail({ email: '' })
-                      }}
-                      style={{ marginTop: 12, marginLeft: 10 }}
-                    >
-                      <AddCircleIcon />
-                    </ButtonAddInputs>
-                  ) : (
-                    <ButtonAddInputs
-                      onClick={() => removeEmail(index)}
-                      style={{ marginTop: 12, marginLeft: 10 }}
-                    >
-                      <DeleteIcon />
-                    </ButtonAddInputs>
-                  )}
-                </Stack>
+                  </Stack>
+                  <ErrorContainer sx={{ mt: 1 }}>
+                    {errors?.email && errors?.email[index]?.email?.message}
+                  </ErrorContainer>
+                </div>
               )
             })}
             {fieldsAddress.map((item, index) => {
