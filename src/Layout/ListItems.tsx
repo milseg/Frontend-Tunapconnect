@@ -112,7 +112,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
               <Collapse in={uploadOpen} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <Link href={menu.href} style={{ textDecoration: 'none' }}>
-                    <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemButton sx={{ pl: 4, marginLeft: '30px', width: 'fit-content'}}>
                       <ListItemIcon>
                         {menu.component}
                       </ListItemIcon>
