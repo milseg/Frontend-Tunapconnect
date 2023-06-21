@@ -49,6 +49,9 @@ export default function Upload() {
   } = useInfiniteQuery({
     queryKey: ["uploadFileQuery"],
     queryFn: uploadFileRequests.getUploadsList,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
     getNextPageParam: (lastPage: string | any[], allPages: string | any[]) => {
       if (!(lastPage?.length < 6)) {
         return allPages.length + 1;
