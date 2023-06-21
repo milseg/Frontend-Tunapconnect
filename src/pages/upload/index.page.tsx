@@ -18,12 +18,15 @@ import {
 } from "./styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
-import { UpdateFiles } from "@/types/upload-file";
+import { IPostFile, UpdateFiles } from "@/types/upload-file";
 import { useInfiniteQuery, useMutation } from "react-query";
 import uploadFileRequests from "../api/uploadFile.api";
 import { api } from "@/lib/api";
+import { AnyARecord } from "dns";
 
 export default function Upload() {
+  const [currentFile, setCurrentFile] = useState<File>();
+
   const [uploadContent, setUploadContent] = useState<UpdateFiles[]>([
     {
       data: "19/06/2023 08:00",
@@ -67,16 +70,20 @@ export default function Upload() {
     setUploadContent(newUploadContent);
   };
 
-  const handleSubmit = (e: any) => {
+  const handleUpload = (e: any) => {
     e.preventDefault();
-    console.log(e);
+    let formData: any = new FormData();
+    formData.append("file", currentFile);
+    if (currentFile && fileName !== "Nenhum arquivo selecionado") {
+      handleAddFile({ file: currentFile, tipo_arquivo: "toyota" });
+    }
     if (fileName !== "Nenhum arquivo selecionado") {
       setUploadContent([
         ...uploadContent,
         {
           data: "19/06/2023 08:00",
           status: "Incluído",
-          name: fileName,
+          name: currentFile?.name,
           id: uploadContent.length + 1,
         },
       ]);
@@ -84,17 +91,16 @@ export default function Upload() {
   };
 
   const handleImport = (event: any) => {
-    const files = event.target.files;
+    const { files } = event.target;
+    const selectedFiles = files as FileList;
     if (
-      files[0].type ===
+      selectedFiles[0].type ===
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" &&
-      files.length
+      selectedFiles.length
     ) {
-      const file = files[0];
-      setFileName(file.name);
-      console.log(typeof file);
+      setCurrentFile(selectedFiles[0]);
+      setFileName(selectedFiles[0].name);
     }
-    console.log(filesListDTO);
   };
 
   const updateFilesUploadMutation = useMutation(
@@ -114,12 +120,10 @@ export default function Upload() {
     }
   );
 
-  async function handleAddFile(stageData: UpdateFiles) {
+  async function handleAddFile(stageData: IPostFile) {
     const dataForPost = {
-      data: stageData?.data,
-      status: stageData?.status,
-      name: stageData?.name,
-      id: stageData?.id,
+      file: stageData.file,
+      tipo_arquivo: stageData.tipo_arquivo,
     };
 
     // @ts-ignore
@@ -152,7 +156,7 @@ export default function Upload() {
                 height: "fit-content",
               }}
             >
-              <FormUpdate onSubmit={handleSubmit}>
+              <FormUpdate>
                 <CustomLabel>
                   {fileName}
                   <UploadFileField
@@ -163,7 +167,12 @@ export default function Upload() {
                     onChange={handleImport}
                   />
                 </CustomLabel>
-                <SearchButton type="submit" variant="contained" disableRipple>
+                <SearchButton
+                  type="submit"
+                  variant="contained"
+                  disableRipple
+                  onClick={handleUpload}
+                >
                   <Stack
                     direction="row"
                     justifyContent="flex-start"
