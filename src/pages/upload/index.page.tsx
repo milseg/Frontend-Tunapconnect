@@ -25,7 +25,7 @@ import { api } from "@/lib/api";
 import { AnyARecord } from "dns";
 
 export default function Upload() {
-  const [currentFile, setCurrentFile] = useState<File>();
+  const [currentFile, setCurrentFile] = useState<File>(new File([], ""))
 
   const [uploadContent, setUploadContent] = useState<UpdateFiles[]>([
     {
@@ -75,7 +75,7 @@ export default function Upload() {
 
   const handleUpload = (e: any) => {
     e.preventDefault();
-    let formData: any = new FormData();
+    let formData: FormData = new FormData();
     formData.append("file", currentFile);
     if (currentFile && fileName !== "Nenhum arquivo selecionado") {
       handleAddFile({ file: currentFile, tipo_arquivo: "toyota" });
