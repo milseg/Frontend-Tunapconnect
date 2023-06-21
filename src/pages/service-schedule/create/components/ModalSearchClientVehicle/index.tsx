@@ -24,6 +24,7 @@ interface ModalSearchClientVehicleProps {
   handleOpenModalNewClientVehicle: () => void
   handleAddClientVehicle: (data: ClientVehicleResponseType) => void
   dataVehicleCreated: ClientVehicleResponseType | null
+  dataSearchClientVehicle: string | null
 }
 
 type SearchFormProps = {
@@ -41,6 +42,7 @@ export default function ModalSearchClientVehicle({
   handleAddClientVehicle,
   handleOpenModalNewClientVehicle,
   dataVehicleCreated,
+  dataSearchClientVehicle,
 }: ModalSearchClientVehicleProps) {
   const [clientVehicleList, setClientVehicleList] = useState<
     ClientVehicleResponseType[] | []
@@ -137,6 +139,34 @@ export default function ModalSearchClientVehicle({
       }
     }
   }, [openMolal])
+  useEffect(() => {
+    if (dataSearchClientVehicle) {
+      setIsLoading(true)
+      setValue('search', dataSearchClientVehicle)
+      const getData = async () => {
+        try {
+          const result = await api.get(
+            `/client-vehicle?company_id=${companySelected}&search=${dataSearchClientVehicle}&limit=10`,
+          )
+
+          setClientVehicleList(result.data.data)
+          if (!pagination) {
+            setPagination((prevState) => {
+              return {
+                actual: 1,
+                total: result.data.total_pages,
+              }
+            })
+          }
+        } catch (error) {
+          console.log(error)
+        } finally {
+          setIsLoading(false)
+        }
+      }
+      getData()
+    }
+  }, [dataSearchClientVehicle])
 
   // const DisableButtonNext = pagination
   //   ? pagination?.actual >= pagination?.total

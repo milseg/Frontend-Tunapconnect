@@ -90,6 +90,10 @@ export default function ServiceSchedulesCreate() {
     useState<string | null>(null)
   const [clientVehicleForModalSearch, setClientVehicleForModalSearch] =
     useState<ClientVehicleResponseType | null>(null)
+  const [
+    clientVehicleFormDataForModalSearch,
+    setClientVehicleFormDataForModalSearch,
+  ] = useState<string | null>(null)
   const [clientVehicle, setClientVehicle] =
     useState<ClientVehicleResponseType | null>()
   const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
@@ -131,6 +135,7 @@ export default function ServiceSchedulesCreate() {
   const {
     register: registerClientVehicle,
     handleSubmit: handleSubmitClientVehicle,
+    reset: resetClientVehicle,
   } = useForm({
     defaultValues: {
       searchClientVehicle: '',
@@ -138,13 +143,14 @@ export default function ServiceSchedulesCreate() {
   })
 
   function onSubmitClient(data: any) {
-    console.log(data)
     setClientFormDataForModalSearch(data.searchClient)
     setOpenModalClientSearch(true)
     resetClient()
   }
   function onSubmitClientVehicle(data: any) {
-    console.log(data)
+    setClientVehicleFormDataForModalSearch(data.searchClientVehicle)
+    setOpenModalClientVehicleSearch(true)
+    resetClientVehicle()
   }
 
   function handleCloseModalClienteSearch() {
@@ -855,6 +861,7 @@ export default function ServiceSchedulesCreate() {
         handleAddClientVehicle={handleAddClientVehicle}
         handleOpenModalNewClientVehicle={handleOpenModalNewClientVehicle}
         dataVehicleCreated={clientVehicleForModalSearch}
+        dataSearchClientVehicle={clientVehicleFormDataForModalSearch}
       />
       {/* <ModalSearchClaimService
         handleClose={handleCloseModalClaimServiceVehicleSearch}

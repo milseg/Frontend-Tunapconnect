@@ -147,7 +147,6 @@ export default function ModalSearchClient({
           const result = await api.get(
             `/client?company_id=${companySelected}&search=${dataSearchClient}&limit=10`,
           )
-          console.log(result)
           setClientList(result.data.data)
           if (!pagination) {
             setPagination((prevState) => {
