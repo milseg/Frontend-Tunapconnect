@@ -38,13 +38,21 @@ export const UploadFileField = styled(TextField)({
 });
 
 export const CustomLabel = styled.label`
-    width: 60%;
-    height: 100%;
-    font-size: 1rem;
-    text-align: center;
-    align-items: center;
-    display: flex;
-    border: 1px solid black;
-    border-radius: 0.4rem;
-    padding: 2px 3px;
-`
+  width: 60%;
+  height: 100%;
+  font-size: 1rem;
+  text-align: center;
+  align-items: center;
+  display: flex;
+  border: 1px solid black;
+  border-radius: 0.4rem;
+  padding: 2px 3px;
+`;
+
+export const FormUpdate = styled.form`
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+`;

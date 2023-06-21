@@ -1,11 +1,25 @@
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { Container, Grid, Stack, TextField, Typography } from "@mui/material";
+import {
+  Container,
+  FormControl,
+  Grid,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import * as React from "react";
 import Paper from "@mui/material/Paper";
-import { CustomLabel, SearchButton, TableTitles, UploadFileField } from "./styles";
+import {
+  CustomLabel,
+  FormUpdate,
+  SearchButton,
+  TableTitles,
+  UploadFileField,
+} from "./styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import { UpdateFiles } from "@/types/upload-file";
+
 export default function Upload() {
   const [uploadContent, setUploadContent] = useState<UpdateFiles[]>([
     {
@@ -16,12 +30,43 @@ export default function Upload() {
     },
   ]);
 
+  const [fileName, setFileName] = useState<string>(
+    "Nenhum arquivo selecionado"
+  );
+
   const handleRemove = (selectId: number) => {
     const newUploadContent = uploadContent.filter(
       (fileUp) => fileUp.id !== selectId
     );
     console.log(newUploadContent);
     setUploadContent(newUploadContent);
+  };
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    console.log(e);
+    setUploadContent([
+      ...uploadContent,
+      {
+        data: "19/06/2023 08:00",
+        status: "Incluído",
+        name: fileName,
+        id: uploadContent.length + 1,
+      },
+    ]);
+  };
+
+  const handleImport = (event: any) => {
+    const files = event.target.files;
+    if (
+      files[0].type ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" &&
+      files.length
+    ) {
+      const file = files[0];
+      setFileName(file.name);
+      console.log(typeof file);
+    }
   };
 
   return (
@@ -50,36 +95,18 @@ export default function Upload() {
                 height: "fit-content",
               }}
             >
-              <Stack
-                direction="row"
-                sx={{ width: "100%", alignItems: 'center' }}
-                justifyContent="space-between"
-              >
+              <FormUpdate onSubmit={handleSubmit}>
                 <CustomLabel>
-                  Nenhum  arquivo selecionado
+                  {fileName}
                   <UploadFileField
                     InputProps={{
                       type: "file",
                     }}
                     sx={{ width: "60%" }}
+                    onChange={handleImport}
                   />
                 </CustomLabel>
-                <SearchButton
-                  type="submit"
-                  variant="contained"
-                  disableRipple
-                  onClick={() => {
-                    setUploadContent([
-                      ...uploadContent,
-                      {
-                        data: "19/06/2023 08:00",
-                        status: "Incluído",
-                        name: "arquivoteste2.xlsx",
-                        id: uploadContent.length + 1,
-                      },
-                    ]);
-                  }}
-                >
+                <SearchButton type="submit" variant="contained" disableRipple>
                   <Stack
                     direction="row"
                     justifyContent="flex-start"
@@ -93,7 +120,7 @@ export default function Upload() {
                     </Typography>
                   </Stack>
                 </SearchButton>
-              </Stack>
+              </FormUpdate>
             </Paper>
           </Stack>
           <Stack
