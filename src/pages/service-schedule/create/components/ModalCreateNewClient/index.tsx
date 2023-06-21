@@ -195,8 +195,6 @@ export default function ModalCreateNewClient({
     }
   }, [isOpen])
 
-  console.log(errors)
-
   return (
     <>
       <Dialog open={isOpen} onClose={handleClose}>
@@ -261,7 +259,6 @@ export default function ModalCreateNewClient({
               )
             })}
             {fieldsEmail.map((item, index) => {
-              console.log(errors?.email)
               return (
                 <div key={item.id}>
                   <Stack direction="row" key={item.id}>

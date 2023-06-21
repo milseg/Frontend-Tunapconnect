@@ -103,7 +103,8 @@ export const ButtonIcon = styled(IconButton)(({ theme }) => ({
 export const ButtonOpenModalSearch = styled(Button)(({ theme }) => ({
   color: 'white',
   background: '#0E948B',
-  borderRadius: 4,
+  borderRadius: 4.2,
+  padding: '7px 10px',
 
   textTransform: 'uppercase',
   '&:hover': {

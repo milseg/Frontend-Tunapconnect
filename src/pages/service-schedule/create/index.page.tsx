@@ -6,6 +6,7 @@ import Container from '@mui/material/Container'
 
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
+import SearchIcon from '@mui/icons-material/Search'
 
 import {
   ClientResponseType,
@@ -20,6 +21,7 @@ import List from '@mui/material/List'
 import Stack from '@mui/material/Stack'
 
 import {
+  ButtonOpenModalSearch,
   ButtonSubmit,
   DividerCard,
   InfoCardName,
@@ -52,8 +54,9 @@ import ModalCreateNewClient from './components/ModalCreateNewClient'
 import ModalCreateNewClientVehicle from './components/ModalCreateNewClientVehicle'
 import { MoreOptionsServiceScheduleCreate } from './components/MoreOptionsServiceScheduleCreate'
 import ModalEditClient from './components/ModalEditClient'
-import { Typography } from '@mui/material'
+import { InputAdornment, OutlinedInput, Typography } from '@mui/material'
 import ModalCreateEditClientVehicle from './components/ModalCreateEditClientVehicle'
+import { useForm } from 'react-hook-form'
 
 type updateData = {
   code: null
@@ -83,6 +86,8 @@ export default function ServiceSchedulesCreate() {
   const [client, setClient] = useState<ClientResponseType | null>(null)
   const [clientForModalSearch, setClientForModalSearch] =
     useState<ClientResponseType | null>(null)
+  const [clientFormDataForModalSearch, setClientFormDataForModalSearch] =
+    useState<string | null>(null)
   const [clientVehicleForModalSearch, setClientVehicleForModalSearch] =
     useState<ClientVehicleResponseType | null>(null)
   const [clientVehicle, setClientVehicle] =
@@ -113,6 +118,34 @@ export default function ServiceSchedulesCreate() {
   const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
+
+  const {
+    register: registerClient,
+    handleSubmit: handleSubmitClient,
+    reset: resetClient,
+  } = useForm({
+    defaultValues: {
+      searchClient: '',
+    },
+  })
+  const {
+    register: registerClientVehicle,
+    handleSubmit: handleSubmitClientVehicle,
+  } = useForm({
+    defaultValues: {
+      searchClientVehicle: '',
+    },
+  })
+
+  function onSubmitClient(data: any) {
+    console.log(data)
+    setClientFormDataForModalSearch(data.searchClient)
+    setOpenModalClientSearch(true)
+    resetClient()
+  }
+  function onSubmitClientVehicle(data: any) {
+    console.log(data)
+  }
 
   function handleCloseModalClienteSearch() {
     setOpenModalClientSearch(false)
@@ -405,14 +438,51 @@ export default function ServiceSchedulesCreate() {
                       display: 'flex',
                     }}
                   >
-                    <Typography variant="h6">Adicione um Cliente</Typography>
-                    {/* <ButtonOpenModalSearch
-                      aria-label="options to client"
-                      onClick={() => setOpenModalClientSearch(true)}
-                      endIcon={<SearchIcon />}
+                    <Stack
+                      direction="column"
+                      alignItems="center"
+                      justifyContent="center"
+                      gap={1}
+                      sx={{
+                        py: 10,
+                      }}
+                      component="form"
+                      onSubmit={handleSubmitClient(onSubmitClient)}
                     >
-                      buscar
-                    </ButtonOpenModalSearch> */}
+                      <Typography variant="h6">Adicione um Cliente</Typography>
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="center"
+                        gap={1}
+                      >
+                        <OutlinedInput
+                          id="outlined-adornment-weight"
+                          size="small"
+                          placeholder="Digite um nome"
+                          endAdornment={
+                            <InputAdornment position="end">
+                              <SearchIcon />
+                            </InputAdornment>
+                          }
+                          required
+                          aria-describedby="outlined-weight-helper-text"
+                          inputProps={{
+                            'aria-label': 'weight',
+                          }}
+                          {...registerClient('searchClient', {
+                            required: true,
+                          })}
+                        />
+                        <ButtonOpenModalSearch
+                          aria-label="options to client"
+                          // onClick={() => setOpenModalClientSearch(true)}
+                          type="submit"
+                        >
+                          buscar
+                        </ButtonOpenModalSearch>
+                      </Stack>
+                    </Stack>
                   </Box>
                 )}
               </Paper>
@@ -502,14 +572,51 @@ export default function ServiceSchedulesCreate() {
                       display: 'flex',
                     }}
                   >
-                    <Typography variant="h6">Adicione um Veículo</Typography>
-                    {/* <ButtonOpenModalSearch
-                      aria-label="add to client"
-                      onClick={() => setOpenModalClientVehicleSearch(true)}
-                      endIcon={<SearchIcon />}
+                    <Stack
+                      direction="column"
+                      alignItems="center"
+                      justifyContent="center"
+                      gap={1}
+                      sx={{
+                        py: 10,
+                      }}
+                      component="form"
+                      onSubmit={handleSubmitClientVehicle(
+                        onSubmitClientVehicle,
+                      )}
                     >
-                      buscar
-                    </ButtonOpenModalSearch> */}
+                      <Typography variant="h6">Adicione um Veículo</Typography>
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="center"
+                        gap={1}
+                      >
+                        <OutlinedInput
+                          id="outlined-adornment-weight"
+                          size="small"
+                          placeholder="Digite um nome"
+                          endAdornment={
+                            <InputAdornment position="end">
+                              <SearchIcon />
+                            </InputAdornment>
+                          }
+                          required
+                          aria-describedby="outlined-weight-helper-text"
+                          inputProps={{
+                            'aria-label': 'weight',
+                          }}
+                          {...registerClientVehicle('searchClientVehicle')}
+                        />
+                        <ButtonOpenModalSearch
+                          aria-label="search vehicle"
+                          // onClick={() => setOpenModalClientSearch(true)}
+                          type="submit"
+                        >
+                          buscar
+                        </ButtonOpenModalSearch>
+                      </Stack>
+                    </Stack>
                   </Box>
                 )}
               </Paper>
@@ -739,6 +846,7 @@ export default function ServiceSchedulesCreate() {
         handleAddClient={handleAddClient}
         handleOpenModalNewClient={handleOpenModalNewClient}
         dataClient={clientForModalSearch}
+        dataSearchClient={clientFormDataForModalSearch}
       />
 
       <ModalSearchClientVehicle
