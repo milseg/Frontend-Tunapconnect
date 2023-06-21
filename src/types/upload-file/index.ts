@@ -4,3 +4,8 @@ export interface UpdateFiles {
   name: string;
   id: number;
 }
+
+export interface IFileListDTO {
+  id: string;
+  name: string;
+}

@@ -19,6 +19,9 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import { UpdateFiles } from "@/types/upload-file";
+import { useInfiniteQuery, useMutation } from "react-query";
+import uploadFileRequests from "../api/uploadFile.api";
+import { api } from "@/lib/api";
 
 export default function Upload() {
   const [uploadContent, setUploadContent] = useState<UpdateFiles[]>([
@@ -34,6 +37,28 @@ export default function Upload() {
     "Nenhum arquivo selecionado"
   );
 
+  const {
+    data: filesListDTO,
+    fetchNextPage,
+    isFetchingNextPage,
+    isError,
+    hasNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["uploadFileQuery"],
+    queryFn: uploadFileRequests.getUploadsList,
+    getNextPageParam: (lastPage: string | any[], allPages: string | any[]) => {
+      if (!(lastPage?.length < 6)) {
+        return allPages.length + 1;
+      } else {
+        return undefined;
+      }
+    },
+  });
+
+  function handleLoadFiles() {
+    fetchNextPage();
+  }
+
   const handleRemove = (selectId: number) => {
     const newUploadContent = uploadContent.filter(
       (fileUp) => fileUp.id !== selectId
@@ -45,15 +70,17 @@ export default function Upload() {
   const handleSubmit = (e: any) => {
     e.preventDefault();
     console.log(e);
-    setUploadContent([
-      ...uploadContent,
-      {
-        data: "19/06/2023 08:00",
-        status: "Incluído",
-        name: fileName,
-        id: uploadContent.length + 1,
-      },
-    ]);
+    if (fileName !== "Nenhum arquivo selecionado") {
+      setUploadContent([
+        ...uploadContent,
+        {
+          data: "19/06/2023 08:00",
+          status: "Incluído",
+          name: fileName,
+          id: uploadContent.length + 1,
+        },
+      ]);
+    }
   };
 
   const handleImport = (event: any) => {
@@ -67,7 +94,37 @@ export default function Upload() {
       setFileName(file.name);
       console.log(typeof file);
     }
+    console.log(filesListDTO);
   };
+
+  const updateFilesUploadMutation = useMutation(
+    (newDataUploadFile: UpdateFiles) => {
+      return api.post(`/upload_arquivos`, newDataUploadFile).then((resp) => {
+        return resp.data.data[0];
+      });
+    },
+
+    {
+      onSuccess: () => {
+        console.log("sucess");
+      },
+      onError: () => {
+        console.log("error");
+      },
+    }
+  );
+
+  async function handleAddFile(stageData: UpdateFiles) {
+    const dataForPost = {
+      data: stageData?.data,
+      status: stageData?.status,
+      name: stageData?.name,
+      id: stageData?.id,
+    };
+
+    // @ts-ignore
+    updateFilesUploadMutation.mutate(dataForPost);
+  }
 
   return (
     <>
