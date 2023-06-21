@@ -38,6 +38,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
   const { companySelected } = useContext(CompanyContext)
   const { listCompanies, addCompaniesList, user } = useContext(AuthContext)
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
+  const [registerOpen, setRegisterOpen] = useState<boolean>(false);
 
   const memuList: memuListProps = useMemo(
     () => {
@@ -91,6 +92,10 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
   )
 
   const handleRegisterClick = () => {
+    setRegisterOpen(!registerOpen)
+  }
+
+  const handleUploadClick = () => {
     setUploadOpen(!uploadOpen)
   }
 
@@ -113,16 +118,29 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
               >
                 <ListItemIcon><EditIcon /></ListItemIcon>
                 <ListItemText primary={menu.title} style={{ color: 'white' }} />
-                {uploadOpen ? <ExpandMore /> : <ChevronRight />}
+                {registerOpen ? <ExpandMore /> : <ChevronRight />}
               </ListItemButton>
-              <Collapse in={uploadOpen} timeout="auto" unmountOnExit>
+              <Collapse in={registerOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  <ListItemButton 
+                    sx={{ 
+                      pl: 4, marginLeft: '40px', width: 'fit-content'
+                    }}
+                    onClick={handleUploadClick}
+                  >
+                    <ListItemIcon>
+                        {menu.component}
+                    </ListItemIcon>
+                    <ListItemText primary="Upload" />
+                    {uploadOpen ? <ExpandMore /> : <ChevronRight />}
+                  </ListItemButton>
+                </List>
+              </Collapse>
+              <Collapse in={uploadOpen && registerOpen} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <Link href={menu.href} style={{ textDecoration: 'none' }}>
-                    <ListItemButton sx={{ pl: 4, marginLeft: '30px', width: 'fit-content'}}>
-                      <ListItemIcon>
-                        {menu.component}
-                      </ListItemIcon>
-                      <ListItemText primary="Upload" />
+                    <ListItemButton sx={{ pl: 4, marginLeft: '70px', width: 'fit-content'}}>
+                      <ListItemText primary="Upload Toyolex" />
                     </ListItemButton>
                   </Link>
                 </List>
