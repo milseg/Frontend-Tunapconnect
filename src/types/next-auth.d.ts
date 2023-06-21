@@ -11,6 +11,8 @@ declare module 'next-auth' {
     msg?: string
     token: string
     privilege: string
+    user_tunap: boolean
+    userTunap?: boolean
     id: string
     accessToken?: string
     expires: string
@@ -38,6 +40,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     name: string
     privilege: string
+    userTunap: boolean
     accessToken: string
     id: string
     companies: {

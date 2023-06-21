@@ -22,6 +22,8 @@ import { CompanyContext } from '@/contexts/CompanyContext'
 import Collapse from '@mui/material/Collapse'
 import List from '@mui/material/List'
 
+import { AuthContext } from '@/contexts/AuthContext'
+
 
 type memuListProps = Array<{
   path: string
@@ -34,6 +36,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
   const [routeActual, setRouteActual] = useState('')
   const router = useRouter()
   const { companySelected } = useContext(CompanyContext)
+  const { listCompanies, addCompaniesList, user } = useContext(AuthContext)
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
 
   const memuList: memuListProps = useMemo(
@@ -60,12 +63,15 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
           title: 'Agendamento',
         })
       }
-      ret.push({
+      if(user?.userTunap) {
+        ret.push({
           path: '/upload',
           href: `/upload?status=toyolex`,
           component: <UploadFileIcon />,
           title: 'Cadastros',
         })
+      }
+      
       return ret
     },
     [companySelected],
