@@ -16,6 +16,7 @@ type User = {
   id: string | undefined
   name: string | undefined
   privilege: string | undefined
+  userTunap: boolean | undefined
 }
 
 interface companyProps {
@@ -55,13 +56,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       username: data.username,
       password: data.password,
     })
-
+    console.log("signin")
     if (resp?.ok && resp?.status === 200) {
+      console.log("signin ok")
       const session = await getSession()
+      console.log("[AuthContext] saving user", session?.user)
       setUser({
         id: session?.user.id,
         name: session?.user.name,
         privilege: session?.user.privilege,
+        userTunap: session?.user.userTunap,
       })
       setListCompanies(session?.user.companies as companyProps[])
       Router.push('/company')

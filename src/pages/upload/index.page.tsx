@@ -1,12 +1,32 @@
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { Container, Grid, Stack, TextField, Typography } from "@mui/material";
+import {
+  Container,
+  FormControl,
+  Grid,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import * as React from "react";
 import Paper from "@mui/material/Paper";
-import { SearchButton, TableTitles } from "./styles";
+import {
+  CustomLabel,
+  FormUpdate,
+  SearchButton,
+  TableTitles,
+  UploadFileField,
+} from "./styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
-import { UpdateFiles } from "@/types/upload-file";
+import { IPostFile, UpdateFiles } from "@/types/upload-file";
+import { useInfiniteQuery, useMutation } from "react-query";
+import uploadFileRequests from "../api/uploadFile.api";
+import { api } from "@/lib/api";
+import { AnyARecord } from "dns";
+
 export default function Upload() {
+  const [currentFile, setCurrentFile] = useState<File>(new File([], ""))
+
   const [uploadContent, setUploadContent] = useState<UpdateFiles[]>([
     {
       data: "19/06/2023 08:00",
@@ -16,6 +36,35 @@ export default function Upload() {
     },
   ]);
 
+  const [fileName, setFileName] = useState<string>(
+    "Nenhum arquivo selecionado"
+  );
+
+  const {
+    data: filesListDTO,
+    fetchNextPage,
+    isFetchingNextPage,
+    isError,
+    hasNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["uploadFileQuery"],
+    queryFn: uploadFileRequests.getUploadsList,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    getNextPageParam: (lastPage: string | any[], allPages: string | any[]) => {
+      if (!(lastPage?.length < 6)) {
+        return allPages.length + 1;
+      } else {
+        return undefined;
+      }
+    },
+  });
+
+  function handleLoadFiles() {
+    fetchNextPage();
+  }
+
   const handleRemove = (selectId: number) => {
     const newUploadContent = uploadContent.filter(
       (fileUp) => fileUp.id !== selectId
@@ -23,6 +72,66 @@ export default function Upload() {
     console.log(newUploadContent);
     setUploadContent(newUploadContent);
   };
+
+  const handleUpload = (e: any) => {
+    e.preventDefault();
+    let formData: FormData = new FormData();
+    formData.append("file", currentFile);
+    if (currentFile && fileName !== "Nenhum arquivo selecionado") {
+      handleAddFile({ file: currentFile, tipo_arquivo: "toyota" });
+    }
+    if (fileName !== "Nenhum arquivo selecionado") {
+      setUploadContent([
+        ...uploadContent,
+        {
+          data: "19/06/2023 08:00",
+          status: "Incluído",
+          name: currentFile?.name,
+          id: uploadContent.length + 1,
+        },
+      ]);
+    }
+  };
+
+  const handleImport = (event: any) => {
+    const { files } = event.target;
+    const selectedFiles = files as FileList;
+    if (
+      selectedFiles[0].type ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" &&
+      selectedFiles.length
+    ) {
+      setCurrentFile(selectedFiles[0]);
+      setFileName(selectedFiles[0].name);
+    }
+  };
+
+  const updateFilesUploadMutation = useMutation(
+    (newDataUploadFile: UpdateFiles) => {
+      return api.post(`/upload_arquivos`, newDataUploadFile).then((resp) => {
+        return resp.data.data[0];
+      });
+    },
+
+    {
+      onSuccess: () => {
+        console.log("sucess");
+      },
+      onError: () => {
+        console.log("error");
+      },
+    }
+  );
+
+  async function handleAddFile(stageData: IPostFile) {
+    const dataForPost = {
+      file: stageData.file,
+      tipo_arquivo: stageData.tipo_arquivo,
+    };
+
+    // @ts-ignore
+    updateFilesUploadMutation.mutate(dataForPost);
+  }
 
   return (
     <>
@@ -50,32 +159,22 @@ export default function Upload() {
                 height: "fit-content",
               }}
             >
-              <Stack
-                direction="row"
-                sx={{ width: "100%" }}
-                justifyContent="space-between"
-              >
-                <TextField
-                  label="Nenhum arquivo selecionado"
-                  InputProps={{
-                    type: "search",
-                  }}
-                  sx={{ width: "60%" }}
-                />
+              <FormUpdate>
+                <CustomLabel>
+                  {fileName}
+                  <UploadFileField
+                    InputProps={{
+                      type: "file",
+                    }}
+                    sx={{ width: "60%" }}
+                    onChange={handleImport}
+                  />
+                </CustomLabel>
                 <SearchButton
+                  type="submit"
                   variant="contained"
                   disableRipple
-                  onClick={() => {
-                    setUploadContent([
-                      ...uploadContent,
-                      {
-                        data: "19/06/2023 08:00",
-                        status: "Incluído",
-                        name: "arquivoteste2.xlsx",
-                        id: uploadContent.length + 1,
-                      },
-                    ]);
-                  }}
+                  onClick={handleUpload}
                 >
                   <Stack
                     direction="row"
@@ -90,7 +189,7 @@ export default function Upload() {
                     </Typography>
                   </Stack>
                 </SearchButton>
-              </Stack>
+              </FormUpdate>
             </Paper>
           </Stack>
           <Stack
