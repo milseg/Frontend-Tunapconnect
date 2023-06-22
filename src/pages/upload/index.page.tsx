@@ -1,4 +1,6 @@
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { Container, Grid, Stack, Typography } from "@mui/material";
 import * as React from "react";
 import Paper from "@mui/material/Paper";
@@ -12,44 +14,33 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import { IFileProps } from "@/types/upload-file";
-import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "react-query";
 import uploadFileRequests from "../api/uploadFile.api";
 import { apiB } from "@/lib/api";
+import { ButtonPaginate } from "../service-schedule/create/styles";
 
 export default function Upload() {
   const [currentFile, setCurrentFile] = useState<File>(new File([], ""));
+  const [pageNumber, setPageNumber] = React.useState(1);
 
   const [fileName, setFileName] = useState<string>(
     "Nenhum arquivo selecionado"
   );
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
-  const {
-    data: filesListDTO,
-    fetchNextPage,
-    isFetchingNextPage,
-    isError,
-    hasNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["uploadFileQuery"],
+  const { data: filesListDTO } = useQuery({
+    queryKey: ["uploadFileQuery", pageNumber],
     queryFn: uploadFileRequests.getUploadsList,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
     keepPreviousData: true,
-    getNextPageParam: (lastPage: string | any[], allPages: string | any[]) => {
-      if (!(lastPage?.length < 6)) {
-        return allPages.length + 1;
-      } else {
-        return undefined;
-      }
-    },
   });
-
-  function handleLoadFiles() {
-    fetchNextPage();
-  }
 
   const handleUpload = (e: any) => {
     e.preventDefault();
@@ -176,7 +167,7 @@ export default function Upload() {
                 <Typography>{"Data Upload"}</Typography>
                 <Typography>{"Status"}</Typography>
                 <Typography>{"Nome do arquivo"}</Typography>
-                <Typography>{"Ação"}</Typography>
+                {/**<Typography>{"Ação"}</Typography>**/}
               </Stack>
             </TableTitles>
             <Paper
@@ -188,51 +179,72 @@ export default function Upload() {
               }}
             >
               {filesListDTO &&
-                filesListDTO.pages.length > 0 &&
-                filesListDTO.pages.map((page: any, i) =>
-                  page.files.map((file: IFileProps) => (
-                    <Stack
-                      key={file.id_file}
-                      direction="row"
-                      sx={{
-                        width: "100%",
-                        backgroundColor: `${
-                          file.id_file % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
-                        }`,
-                        p: 1,
-                        borderRadius: "2px",
-                      }}
-                      justifyContent="space-between"
+                filesListDTO.files.length > 0 &&
+                filesListDTO.files.map((file: IFileProps) => (
+                  <Stack
+                    key={file.id_file}
+                    direction="row"
+                    sx={{
+                      width: "100%",
+                      backgroundColor: `${
+                        file.id_file % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
+                      }`,
+                      p: 1,
+                      borderRadius: "2px",
+                    }}
+                    justifyContent="space-between"
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      color={"#1C4961"}
+                      fontWeight={700}
                     >
-                      <Typography
-                        variant="subtitle1"
-                        color={"#1C4961"}
-                        fontWeight={700}
-                      >
-                        {file.created_at}
-                      </Typography>
-                      <Typography
-                        variant="subtitle1"
-                        color={"#1C4961"}
-                        fontWeight={700}
-                      >
-                        {file.status}
-                      </Typography>
-                      <Typography
-                        variant="subtitle1"
-                        color={"#1C4961"}
-                        fontWeight={700}
-                      >
-                        {file.original_name}
-                      </Typography>
-                      <DeleteIcon
+                      {file.created_at}
+                    </Typography>
+                    <Typography
+                      variant="subtitle1"
+                      color={"#1C4961"}
+                      fontWeight={700}
+                    >
+                      {file.status}
+                    </Typography>
+                    <Typography
+                      variant="subtitle1"
+                      color={"#1C4961"}
+                      fontWeight={700}
+                    >
+                      {file.original_name}
+                    </Typography>
+                    {/**<DeleteIcon
                         color="error"
                         sx={{ ":hover": { cursor: "pointer" } }}
-                      />
-                    </Stack>
-                  ))
-                )}
+                    />**/}
+                  </Stack>
+                ))}
             </Paper>
+          </Stack>
+          <Stack
+            direction="row"
+            sx={{ width: "100%" }}
+            alignItems="center"
+            justifyContent="center"
+            display="flex"
+            columnGap="12px"
+          >
+            <ButtonPaginate
+              type="submit"
+              disableRipple
+              onClick={() => setPageNumber((pageNumber) => pageNumber - 1)}
+            >
+              <ArrowBackIosNewIcon />
+            </ButtonPaginate>
+            <ButtonPaginate
+              type="submit"
+              disableRipple
+              onClick={() => setPageNumber((pageNumber) => pageNumber + 1)}
+            >
+              <ArrowForwardIosIcon />
+            </ButtonPaginate>
           </Stack>
         </Stack>
       </Container>

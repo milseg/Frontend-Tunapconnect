@@ -14,6 +14,19 @@ export const SearchButton = styled(Button)({
   borderColor: "#0E948B",
 });
 
+export const paginationButton = styled(Button)({
+  boxShadow: "none",
+  textTransform: "none",
+  fontSize: 16,
+  padding: "12px 12px",
+  border: "1px solid",
+  lineHeight: 1.5,
+  backgroundColor: "#F1F1F1",
+  borderColor: "#F1F1F1",
+  width: "52px",
+  height: "52px"
+})
+
 export const TableTitles = styled(Paper)({
   boxShadow: "none",
   textTransform: "none",

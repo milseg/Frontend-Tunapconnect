@@ -8,7 +8,7 @@ export interface UpdateFiles {
 }
 
 export interface IFileListDTO {
-  files: IFileProps;
+  files: IFileProps[];
 }
 export interface IFileProps{
   cloud_url: string;
