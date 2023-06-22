@@ -12,7 +12,9 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
 import EditIcon from '@mui/icons-material/Edit'
 
-import { ChevronRight, ExpandMore, StarBorder } from '@mui/icons-material'
+import ChevronRight from '@mui/icons-material/ChevronRight'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import StarBorder from '@mui/icons-material/StarBorder'
 
 
 import Link from 'next/link'
