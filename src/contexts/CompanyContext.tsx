@@ -133,6 +133,11 @@ export function CompanyProvider({ children }: GeralProviderProps) {
         setCompanySelected(parseInt(companySelectedCookie.companySelected))
         verifyCompany(companySelectedCookie.companySelected as string)
       } else {
+        getSession().then((sessionData) => {
+          if (sessionData?.user.companies.length) {
+            router.push('/company')
+          }
+        })
         //router.push('/company')
       }
     }
