@@ -1,10 +1,5 @@
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import {
-  Container,
-  Grid,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Container, Grid, Stack, Typography } from "@mui/material";
 import * as React from "react";
 import Paper from "@mui/material/Paper";
 import {
@@ -16,10 +11,11 @@ import {
 } from "./styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
-import { IFileProps} from "@/types/upload-file";
-import {  useInfiniteQuery, useMutation } from "react-query";
+import { IFileProps } from "@/types/upload-file";
+import { useInfiniteQuery, useMutation } from "react-query";
 import uploadFileRequests from "../api/uploadFile.api";
 import { apiB } from "@/lib/api";
+import { queryClient } from "@/lib/react-query";
 
 export default function Upload() {
   const [currentFile, setCurrentFile] = useState<File>(new File([], ""));
@@ -40,6 +36,7 @@ export default function Upload() {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
+    keepPreviousData: true,
     getNextPageParam: (lastPage: string | any[], allPages: string | any[]) => {
       if (!(lastPage?.length < 6)) {
         return allPages.length + 1;
@@ -57,7 +54,7 @@ export default function Upload() {
     e.preventDefault();
     let formData: FormData = new FormData();
     formData.append("file", currentFile);
-    formData.append("tipo_arquivo", 'toyolex');
+    formData.append("tipo_arquivo", "toyolex");
     if (currentFile && fileName !== "Nenhum arquivo selecionado") {
       handleAddFile(formData);
     }
@@ -66,11 +63,7 @@ export default function Upload() {
   const handleImport = (event: any) => {
     const { files } = event.target;
     const selectedFiles = files as FileList;
-    if (
-      selectedFiles[0].type ===
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" &&
-      selectedFiles.length
-    ) {
+    if (selectedFiles.length) {
       setCurrentFile(selectedFiles[0]);
       setFileName(selectedFiles[0].name);
     }
@@ -85,12 +78,13 @@ export default function Upload() {
           },
         })
         .then((resp) => {
-          return resp.data.data[0];
+          return resp.data[1].message;
         });
     },
 
     {
       onSuccess: () => {
+        queryClient.invalidateQueries(["uploadFileQuery"]);
         console.log("sucess");
       },
       onError: () => {
