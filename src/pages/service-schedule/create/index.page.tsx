@@ -21,7 +21,6 @@ import List from '@mui/material/List'
 import Stack from '@mui/material/Stack'
 
 import {
-  ButtonOpenModalSearch,
   ButtonSubmit,
   DividerCard,
   InfoCardName,
