@@ -1,10 +1,8 @@
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import {
   Container,
-  FormControl,
   Grid,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 import * as React from "react";
@@ -18,10 +16,10 @@ import {
 } from "./styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
-import { IFileProps, IPostFile, UpdateFiles } from "@/types/upload-file";
-import { useInfiniteQuery, useMutation } from "react-query";
+import { IFileProps} from "@/types/upload-file";
+import {  useInfiniteQuery, useMutation } from "react-query";
 import uploadFileRequests from "../api/uploadFile.api";
-import { api } from "@/lib/api";
+import { apiB } from "@/lib/api";
 
 export default function Upload() {
   const [currentFile, setCurrentFile] = useState<File>(new File([], ""));
@@ -59,8 +57,9 @@ export default function Upload() {
     e.preventDefault();
     let formData: FormData = new FormData();
     formData.append("file", currentFile);
+    formData.append("tipo_arquivo", 'toyolex');
     if (currentFile && fileName !== "Nenhum arquivo selecionado") {
-      handleAddFile({ file: currentFile, tipo_arquivo: "toyota" });
+      handleAddFile(formData);
     }
   };
 
@@ -78,10 +77,16 @@ export default function Upload() {
   };
 
   const updateFilesUploadMutation = useMutation(
-    (newDataUploadFile: UpdateFiles) => {
-      return api.post(`/upload_arquivos`, newDataUploadFile).then((resp) => {
-        return resp.data.data[0];
-      });
+    (fd: FormData) => {
+      return apiB
+        .post(`/upload_arquivos`, fd, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((resp) => {
+          return resp.data.data[0];
+        });
     },
 
     {
@@ -94,14 +99,9 @@ export default function Upload() {
     }
   );
 
-  async function handleAddFile(stageData: IPostFile) {
-    const dataForPost = {
-      file: stageData.file,
-      tipo_arquivo: stageData.tipo_arquivo,
-    };
-    console.log(dataForPost);
+  async function handleAddFile(stageData: FormData) {
     // @ts-ignore
-    updateFilesUploadMutation.mutate(dataForPost);
+    updateFilesUploadMutation.mutate(stageData);
   }
 
   return (
