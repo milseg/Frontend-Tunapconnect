@@ -110,7 +110,7 @@ export default function Upload() {
                 {"Upload - Toyolex"}
               </Typography>
               <Typography>
-                {"TUNAP Connect > Empresa > Oficina >Lista de agendamentos"}
+                {"TUNAP Connect > Intranet > Upload > Upload - Toyolex"}
               </Typography>
             </Grid>
             <Paper
