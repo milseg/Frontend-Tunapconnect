@@ -12,10 +12,9 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import { IFileProps } from "@/types/upload-file";
-import { useInfiniteQuery, useMutation } from "react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import uploadFileRequests from "../api/uploadFile.api";
 import { apiB } from "@/lib/api";
-import { queryClient } from "@/lib/react-query";
 
 export default function Upload() {
   const [currentFile, setCurrentFile] = useState<File>(new File([], ""));
@@ -23,6 +22,8 @@ export default function Upload() {
   const [fileName, setFileName] = useState<string>(
     "Nenhum arquivo selecionado"
   );
+
+  const queryClient = useQueryClient()
 
   const {
     data: filesListDTO,
@@ -84,7 +85,7 @@ export default function Upload() {
 
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(["uploadFileQuery"]);
+        queryClient.invalidateQueries("uploadFileQuery");
         console.log("sucess");
       },
       onError: () => {
