@@ -24,7 +24,6 @@ interface ModalSearchClienteProps {
   handleOpenModalNewClient: () => void
   handleAddClient: (data: ClientResponseType) => void
   dataClient: ClientResponseType | null
-  dataSearchClient: string | null
 }
 
 type SearchFormProps = {
@@ -42,7 +41,6 @@ export default function ModalSearchClient({
   handleAddClient,
   handleOpenModalNewClient,
   dataClient,
-  dataSearchClient,
 }: ModalSearchClienteProps) {
   const [clientList, setClientList] = useState<ClientResponseType[] | []>([])
   const [clientSelected, setClientSelected] =
@@ -137,34 +135,6 @@ export default function ModalSearchClient({
       }
     }
   }, [openMolal])
-  useEffect(() => {
-    console.log(dataSearchClient)
-    setValue('search', dataSearchClient as string)
-    if (dataSearchClient) {
-      const getData = async () => {
-        setIsLoading(true)
-        try {
-          const result = await api.get(
-            `/client?company_id=${companySelected}&search=${dataSearchClient}&limit=10`,
-          )
-          setClientList(result.data.data)
-          if (!pagination) {
-            setPagination((prevState) => {
-              return {
-                actual: 1,
-                total: result.data.total_pages,
-              }
-            })
-          }
-        } catch (error) {
-          console.log(error)
-        } finally {
-          setIsLoading(false)
-        }
-      }
-      getData()
-    }
-  }, [dataSearchClient])
 
   // const DisableButtonNext = pagination
   //   ? pagination?.actual >= pagination?.total

@@ -60,7 +60,7 @@ import {
   Typography,
 } from '@mui/material'
 import ModalCreateEditClientVehicle from './components/ModalEditClientVehicle'
-import { useForm } from 'react-hook-form'
+// import { useForm } from 'react-hook-form'
 
 type updateData = {
   code: null
@@ -90,14 +90,14 @@ export default function ServiceSchedulesCreate() {
   const [client, setClient] = useState<ClientResponseType | null>(null)
   const [clientForModalSearch, setClientForModalSearch] =
     useState<ClientResponseType | null>(null)
-  const [clientFormDataForModalSearch, setClientFormDataForModalSearch] =
-    useState<string | null>(null)
+  // const [clientFormDataForModalSearch, setClientFormDataForModalSearch] =
+  useState<string | null>(null)
   const [clientVehicleCreated, setClientVehicleCreated] =
     useState<ClientVehicleResponseType | null>(null)
-  const [
-    clientVehicleFormDataForModalSearch,
-    setClientVehicleFormDataForModalSearch,
-  ] = useState<string | null>(null)
+  // const [
+  //   clientVehicleFormDataForModalSearch,
+  //   setClientVehicleFormDataForModalSearch,
+  // ] = useState<string | null>(null)
   const [clientVehicle, setClientVehicle] =
     useState<ClientVehicleResponseType | null>()
   const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
@@ -127,35 +127,35 @@ export default function ServiceSchedulesCreate() {
 
   const { companySelected } = useContext(CompanyContext)
 
-  const {
-    register: registerClient,
-    handleSubmit: handleSubmitClient,
-    reset: resetClient,
-  } = useForm({
-    defaultValues: {
-      searchClient: '',
-    },
-  })
-  const {
-    register: registerClientVehicle,
-    handleSubmit: handleSubmitClientVehicle,
-    reset: resetClientVehicle,
-  } = useForm({
-    defaultValues: {
-      searchClientVehicle: '',
-    },
-  })
+  // const {
+  //   register: registerClient,
+  //   handleSubmit: handleSubmitClient,
+  //   reset: resetClient,
+  // } = useForm({
+  //   defaultValues: {
+  //     searchClient: '',
+  //   },
+  // })
+  // const {
+  //   register: registerClientVehicle,
+  //   handleSubmit: handleSubmitClientVehicle,
+  //   reset: resetClientVehicle,
+  // } = useForm({
+  //   defaultValues: {
+  //     searchClientVehicle: '',
+  //   },
+  // })
 
-  function onSubmitClient(data: any) {
-    setClientFormDataForModalSearch(data.searchClient)
-    setOpenModalClientSearch(true)
-    resetClient()
-  }
-  function onSubmitClientVehicle(data: any) {
-    setClientVehicleFormDataForModalSearch(data.searchClientVehicle)
-    setOpenModalClientVehicleSearch(true)
-    resetClientVehicle()
-  }
+  // function onSubmitClient(data: any) {
+  //   setClientFormDataForModalSearch(data.searchClient)
+  //   setOpenModalClientSearch(true)
+  //   // resetClient()
+  // }
+  // function onSubmitClientVehicle(data: any) {
+  //   setClientVehicleFormDataForModalSearch(data.searchClientVehicle)
+  //   setOpenModalClientVehicleSearch(true)
+  //   // resetClientVehicle()
+  // }
 
   function handleCloseModalClienteSearch() {
     setOpenModalClientSearch(false)
@@ -460,7 +460,7 @@ export default function ServiceSchedulesCreate() {
                         py: 10,
                       }}
                       component="form"
-                      onSubmit={handleSubmitClient(onSubmitClient)}
+                      // onSubmit={handleSubmitClient(onSubmitClient)}
                     >
                       <Typography variant="h6">Adicione um Cliente</Typography>
 
@@ -481,6 +481,9 @@ export default function ServiceSchedulesCreate() {
                             <IconButton
                               aria-label="sbumit seach client"
                               edge="end"
+                              onClick={() => {
+                                setOpenModalClientSearch(true)
+                              }}
                             >
                               <SearchIcon />
                             </IconButton>
@@ -491,9 +494,9 @@ export default function ServiceSchedulesCreate() {
                         inputProps={{
                           'aria-label': 'weight',
                         }}
-                        {...registerClient('searchClient', {
-                          required: true,
-                        })}
+                        // {...registerClient('searchClient', {
+                        //   required: true,
+                        // })}
                       />
                     </Stack>
                   </Box>
@@ -593,9 +596,9 @@ export default function ServiceSchedulesCreate() {
                       sx={{
                         py: 10,
                       }}
-                      onSubmit={handleSubmitClientVehicle(
-                        onSubmitClientVehicle,
-                      )}
+                      // onSubmit={handleSubmitClientVehicle(
+                      //   onSubmitClientVehicle,
+                      // )}
                     >
                       <Typography variant="h6">Adicione um Veículo</Typography>
 
@@ -861,7 +864,6 @@ export default function ServiceSchedulesCreate() {
         handleAddClient={handleAddClient}
         handleOpenModalNewClient={handleOpenModalNewClient}
         dataClient={clientForModalSearch}
-        dataSearchClient={clientFormDataForModalSearch}
       />
 
       <ModalSearchClientVehicle
@@ -870,7 +872,6 @@ export default function ServiceSchedulesCreate() {
         handleAddClientVehicle={handleAddClientVehicle}
         handleOpenModalNewClientVehicle={handleOpenModalNewClientVehicle}
         dataVehicleCreated={clientVehicleCreated}
-        dataSearchClientVehicle={clientVehicleFormDataForModalSearch}
       />
       {/* <ModalSearchClaimService
         handleClose={handleCloseModalClaimServiceVehicleSearch}

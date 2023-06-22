@@ -24,7 +24,6 @@ interface ModalSearchClientVehicleProps {
   handleOpenModalNewClientVehicle: () => void
   handleAddClientVehicle: (data: ClientVehicleResponseType) => void
   dataVehicleCreated: ClientVehicleResponseType | null
-  dataSearchClientVehicle: string | null
 }
 
 type SearchFormProps = {
@@ -42,7 +41,6 @@ export default function ModalSearchClientVehicle({
   handleAddClientVehicle,
   handleOpenModalNewClientVehicle,
   dataVehicleCreated,
-  dataSearchClientVehicle,
 }: ModalSearchClientVehicleProps) {
   const [clientVehicleList, setClientVehicleList] = useState<
     ClientVehicleResponseType[] | []
@@ -52,7 +50,7 @@ export default function ModalSearchClientVehicle({
   const [isLoading, setIsLoading] = useState(false)
   const [pagination, setPagination] = useState<paginationProps | null>(null)
 
-  const { register, handleSubmit, setValue, reset } = useForm({
+  const { register, handleSubmit, reset, setValue } = useForm({
     defaultValues: {
       search: '',
     },
@@ -140,35 +138,6 @@ export default function ModalSearchClientVehicle({
       }
     }
   }, [openMolal])
-  useEffect(() => {
-    setValue('search', '')
-    if (dataSearchClientVehicle) {
-      setIsLoading(true)
-      setValue('search', dataSearchClientVehicle)
-      const getData = async () => {
-        try {
-          const result = await api.get(
-            `/client-vehicle?company_id=${companySelected}&search=${dataSearchClientVehicle}&limit=10`,
-          )
-
-          setClientVehicleList(result.data.data)
-          if (!pagination) {
-            setPagination((prevState) => {
-              return {
-                actual: 1,
-                total: result.data.total_pages,
-              }
-            })
-          }
-        } catch (error) {
-          console.log(error)
-        } finally {
-          setIsLoading(false)
-        }
-      }
-      getData()
-    }
-  }, [dataSearchClientVehicle])
 
   // const DisableButtonNext = pagination
   //   ? pagination?.actual >= pagination?.total
@@ -272,9 +241,9 @@ export default function ModalSearchClientVehicle({
               if (clientVehicleSelected) {
                 handleAddClientVehicle(clientVehicleSelected)
                 handleClose()
-                // setClientVehicleSelected(null)
-                // setClientVehicleList([])
-                // setValue('search', '')
+                setClientVehicleSelected(null)
+                setClientVehicleList([])
+                setValue('search', '')
               }
             }}
           >
