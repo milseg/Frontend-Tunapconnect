@@ -14,17 +14,15 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import { IFileProps } from "@/types/upload-file";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import uploadFileRequests from "../api/uploadFile.api";
 import { apiB } from "@/lib/api";
 import { ButtonPaginate } from "../service-schedule/create/styles";
+import { Loading } from "@/components/Loading";
 
 export default function Upload() {
   const [currentFile, setCurrentFile] = useState<File>(new File([], ""));
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [pageNumber, setPageNumber] = React.useState(1);
 
   const [fileName, setFileName] = useState<string>(
@@ -33,7 +31,7 @@ export default function Upload() {
 
   const queryClient = useQueryClient();
 
-  const { data: filesListDTO } = useQuery({
+  const { data: filesListDTO, isFetching } = useQuery({
     queryKey: ["uploadFileQuery", pageNumber],
     queryFn: uploadFileRequests.getUploadsList,
     refetchOnWindowFocus: false,
@@ -47,7 +45,7 @@ export default function Upload() {
     let formData: FormData = new FormData();
     formData.append("file", currentFile);
     formData.append("tipo_arquivo", "toyolex");
-    if (currentFile && fileName !== "Nenhum arquivo selecionado") {
+    if (currentFile && fileName !== "Nenhum arquivo selecionado (selecione aqui)") {
       handleAddFile(formData);
     }
   };
@@ -77,8 +75,9 @@ export default function Upload() {
     {
       onSuccess: () => {
         queryClient.invalidateQueries("uploadFileQuery");
-        console.log("sucess");
+        setIsUploading(false);
         setFileName("Nenhum arquivo selecionado (selecione aqui)")
+        console.log("sucess");
       },
       onError: () => {
         console.log("error");
@@ -88,6 +87,7 @@ export default function Upload() {
 
   async function handleAddFile(stageData: FormData) {
     // @ts-ignore
+    setIsUploading(true);
     updateFilesUploadMutation.mutate(stageData);
   }
 
@@ -128,25 +128,29 @@ export default function Upload() {
                     onChange={handleImport}
                   />
                 </CustomLabel>
-                <SearchButton
-                  type="submit"
-                  variant="contained"
-                  disableRipple
-                  onClick={handleUpload}
-                >
-                  <Stack
-                    direction="row"
-                    justifyContent="flex-start"
-                    columnGap={"40px"}
-                    alignItems={"center"}
-                    sx={{ width: "180px" }}
+                {isUploading ? (
+                  <Loading />
+                ) : (
+                  <SearchButton
+                    type="submit"
+                    variant="contained"
+                    disableRipple
+                    onClick={handleUpload}
                   >
-                    <AddCircleOutlineIcon />
-                    <Typography variant="h6" component="h5">
-                      {"Upload"}
-                    </Typography>
-                  </Stack>
-                </SearchButton>
+                    <Stack
+                      direction="row"
+                      justifyContent="flex-start"
+                      columnGap={"40px"}
+                      alignItems={"center"}
+                      sx={{ width: "180px" }}
+                    >
+                      <AddCircleOutlineIcon />
+                      <Typography variant="h6" component="h5">
+                        {"Upload"}
+                      </Typography>
+                    </Stack>
+                  </SearchButton>
+                )}
               </FormUpdate>
             </Paper>
           </Stack>
