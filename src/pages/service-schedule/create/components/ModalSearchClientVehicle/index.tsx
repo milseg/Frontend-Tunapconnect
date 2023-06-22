@@ -87,7 +87,7 @@ export default function ModalSearchClientVehicle({
     }
   }
 
-  function handleClientModal() {
+  function handleClientVehicleModal() {
     handleOpenModalNewClientVehicle()
     handleClose()
   }
@@ -136,10 +136,12 @@ export default function ModalSearchClientVehicle({
         setClientVehicleList([dataVehicleCreated])
       } else {
         setClientVehicleList([])
+        setClientVehicleSelected(null)
       }
     }
   }, [openMolal])
   useEffect(() => {
+    setValue('search', '')
     if (dataSearchClientVehicle) {
       setIsLoading(true)
       setValue('search', dataSearchClientVehicle)
@@ -185,7 +187,7 @@ export default function ModalSearchClientVehicle({
             {' '}
             <Typography variant="h6">Buscar por veículo</Typography>
             {/* {clientList.length > 0 && ( */}
-            <ButtonModalDialog onClick={handleClientModal}>
+            <ButtonModalDialog onClick={handleClientVehicleModal}>
               adicionar novo
             </ButtonModalDialog>
             {/* )} */}
@@ -224,7 +226,7 @@ export default function ModalSearchClientVehicle({
 
             <ClientVehicleTable
               data={clientVehicleList}
-              handleModalNewClient={handleClientModal}
+              handleModalNewClient={handleClientVehicleModal}
               handleSelectedClientVehicle={handleSelectedClientVehicle}
               isLoading={isLoading}
             />
@@ -270,9 +272,9 @@ export default function ModalSearchClientVehicle({
               if (clientVehicleSelected) {
                 handleAddClientVehicle(clientVehicleSelected)
                 handleClose()
-                setClientVehicleList([])
-                setClientVehicleSelected(null)
-                setValue('search', '')
+                // setClientVehicleSelected(null)
+                // setClientVehicleList([])
+                // setValue('search', '')
               }
             }}
           >

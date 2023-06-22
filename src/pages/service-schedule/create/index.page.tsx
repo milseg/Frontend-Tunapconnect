@@ -59,7 +59,7 @@ import {
   OutlinedInput,
   Typography,
 } from '@mui/material'
-import ModalCreateEditClientVehicle from './components/ModalCreateEditClientVehicle'
+import ModalCreateEditClientVehicle from './components/ModalEditClientVehicle'
 import { useForm } from 'react-hook-form'
 
 type updateData = {
@@ -92,7 +92,7 @@ export default function ServiceSchedulesCreate() {
     useState<ClientResponseType | null>(null)
   const [clientFormDataForModalSearch, setClientFormDataForModalSearch] =
     useState<string | null>(null)
-  const [clientVehicleForModalSearch, setClientVehicleForModalSearch] =
+  const [clientVehicleCreated, setClientVehicleCreated] =
     useState<ClientVehicleResponseType | null>(null)
   const [
     clientVehicleFormDataForModalSearch,
@@ -214,7 +214,7 @@ export default function ServiceSchedulesCreate() {
   function handleSaveReturnClientVehicle(
     value: ClientVehicleResponseType | null,
   ) {
-    setClientVehicleForModalSearch(value)
+    setClientVehicleCreated(value)
     setOpenModalNewClientVehicle(false)
     setOpenModalClientVehicleSearch(true)
   }
@@ -290,8 +290,11 @@ export default function ServiceSchedulesCreate() {
   }
   function handleAddClientVehicle(client_vehicle: ClientVehicleResponseType) {
     // setClientVehicle(null)
-    console.log(client_vehicle)
     setClientVehicle(client_vehicle)
+    setClientVehicleCreated(null)
+    if (openModalEditClientVehicle) {
+      setOpenModalEditClientVehicle(false)
+    }
   }
 
   const {
@@ -850,7 +853,7 @@ export default function ServiceSchedulesCreate() {
         openMolal={openModalClientVehicleSearch}
         handleAddClientVehicle={handleAddClientVehicle}
         handleOpenModalNewClientVehicle={handleOpenModalNewClientVehicle}
-        dataVehicleCreated={clientVehicleForModalSearch}
+        dataVehicleCreated={clientVehicleCreated}
         dataSearchClientVehicle={clientVehicleFormDataForModalSearch}
       />
       {/* <ModalSearchClaimService
@@ -869,7 +872,7 @@ export default function ServiceSchedulesCreate() {
         handleClose={handleCloseModalEditClient}
         handleEditClient={handleEditClient}
         handleAddClient={handleAddClient}
-        data={client}
+        clientData={client}
       />
 
       <ModalCreateNewClientVehicle

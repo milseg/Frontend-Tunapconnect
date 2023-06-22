@@ -2,23 +2,18 @@ import Dialog from '@mui/material/Dialog'
 
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
 import { Stack } from '@mui/system'
-import { ButtonModalActions, InputNewClient } from '../../styles'
-import { useContext, useEffect, useState } from 'react'
+import { ButtonModalActions, ErrorContainer, InputText } from '../../styles'
+import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
-import { CompanyContext } from '@/contexts/CompanyContext'
-import {
-  Backdrop,
-  Box,
-  CircularProgress,
-  MenuItem,
-  TextField,
-} from '@mui/material'
+import { Backdrop, CircularProgress } from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientVehicleResponseType } from '../ModalSearchClientVehicle/type'
-import { useQuery } from 'react-query'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 
 interface ModalCreateEditClientVehicleProps {
   handleClose: () => void
@@ -34,7 +29,22 @@ interface actionAlertsProps {
   type: 'success' | 'error' | 'warning'
 }
 
-export default function ModalCreateEditClientVehicle({
+const vehicleEditFormSchema = z.object({
+  brand: z.string(),
+  model: z.string(),
+  vehicle: z.string(),
+  cor: z.string(),
+  chassis: z.string(),
+  plate: z.string(),
+  km: z
+    .string()
+    .min(1, { message: 'Digite uma quilometragem' })
+    .refine((val) => parseInt(val) >= 0, {
+      message: 'Digite um número valido',
+    }),
+})
+
+export default function ModalEditClientVehicle({
   isOpen,
   handleClose,
   handleSaveEditClientVehicle,
@@ -48,9 +58,15 @@ export default function ModalCreateEditClientVehicle({
     type: 'success',
   })
 
-  const { companySelected } = useContext(CompanyContext)
-
-  const { register, handleSubmit, control, watch, setValue } = useForm({
+  const {
+    register: registerEditClientVehicle,
+    handleSubmit: handleSubmitEditClientVehicle,
+    // control: controlEditClientVehicle,
+    // watch: watchEditClientVehicle,
+    setValue: setValueEditClientVehicle,
+    formState: { errors: errorsEditClientVehicle },
+  } = useForm({
+    resolver: zodResolver(vehicleEditFormSchema),
     defaultValues: {
       brand: 'none',
       model: 'none',
@@ -62,92 +78,118 @@ export default function ModalCreateEditClientVehicle({
     },
   })
 
-  const { data: dataVehicleBrandList, status: dataVehicleBrandListStatus } =
-    useQuery<any[]>(
-      [
-        'service_schedule',
-        'create',
-        'VehicleModelsList',
-        'vehicle',
-        companySelected,
-      ],
-      async () => {
-        try {
-          const resp = await api.get(
-            `/vehicle-brand?company_id=${companySelected}`,
-          )
-          return resp.data.data
-        } catch (err) {}
-      },
-      {
-        enabled: isOpen,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-      },
-    )
-  const { data: dataVehicleModelsList } = useQuery<any[]>(
-    [
-      'service_schedule',
-      'create',
-      'VehicleModelsList',
-      'vehicleModels',
-      companySelected,
-      watch('brand'),
-    ],
-    async () => {
-      try {
-        // reset({ model: 'none' })
-        const resp = await api.get(
-          // `/vehicle-model?company_id=${companySelected}`,
-          `/vehicle-model/active-vehicle-models?brand_id=${watch('brand')}`,
-        )
+  // const { data: dataVehicleBrandList, status: dataVehicleBrandListStatus } =
+  //   useQuery<any[]>(
+  //     [
+  //       'service_schedule',
+  //       'create',
+  //       'VehicleModelsList',
+  //       'vehicle',
+  //       companySelected,
+  //       vehicleData?.id,
+  //     ],
+  //     async () => {
+  //       try {
+  //         const resp = await api.get(
+  //           `/vehicle-brand?company_id=${companySelected}`,
+  //         )
+  //         return resp.data.data
+  //       } catch (err) {}
+  //     },
+  //     {
+  //       enabled: isOpen,
+  //       refetchOnWindowFocus: false,
+  //       refetchOnMount: false,
+  //       onSuccess: () => {
+  //         setValueEditClientVehicle(
+  //           'brand',
+  //           `${vehicleData?.vehicle?.model?.brand?.id ?? 'none'}`,
+  //         )
+  //       },
+  //     },
+  //   )
+  // const { data: dataVehicleModelsList } = useQuery<any[]>(
+  //   [
+  //     'service_schedule',
+  //     'edit',
+  //     'VehicleModelsList',
+  //     'vehicleModels',
+  //     companySelected,
+  //     vehicleData?.id,
+  //     watchEditClientVehicle('brand'),
+  //   ],
+  //   async () => {
+  //     try {
+  //       // reset({ model: 'none' })
+  //       const resp = await api.get(
+  //         `/vehicle-model/active-vehicle-models?brand_id=${watchEditClientVehicle(
+  //           'brand',
+  //         )}`,
+  //       )
 
-        // setValue('model', 'none')
+  //       // setValue('model', 'none')
 
-        return resp.data.data
-      } catch (err) {}
-    },
-    {
-      enabled: watch('brand') !== 'none',
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-    },
-  )
+  //       return resp.data.data
+  //     } catch (err) {}
+  //   },
+  //   {
+  //     enabled: watchEditClientVehicle('brand') !== 'none',
+  //     refetchOnWindowFocus: false,
+  //     refetchOnMount: false,
+  //     onSuccess: () => {
+  //       setValueEditClientVehicle(
+  //         'model',
+  //         `${vehicleData?.vehicle?.model?.id ?? 'none'}`,
+  //       )
+  //     },
+  //   },
+  // )
 
-  const { data: dataVehicleList } = useQuery<any[]>(
-    [
-      'service_schedule',
-      'create',
-      'dataVehicleList',
-      'vehicleList',
-      'model-by-id',
-      companySelected,
-      watch('model'),
-    ],
-    async () => {
-      try {
-        // reset({ vehicle: 'none' })
-        const resp = await api.get(
-          `/vehicle/active-vehicles?model_id=${watch('model')}`,
-        )
+  // const { data: dataVehicleList, status: dataVehicleListStatus } = useQuery<
+  //   any[]
+  // >(
+  //   [
+  //     'service_schedule',
+  //     'edit',
+  //     'dataVehicleList',
+  //     'vehicleList',
+  //     'model-by-id',
+  //     companySelected,
+  //     vehicleData?.id,
+  //     watchEditClientVehicle('model'),
+  //   ],
+  //   async () => {
+  //     try {
+  //       // reset({ vehicle: 'none' })
+  //       const resp = await api.get(
+  //         `/vehicle/active-vehicles?model_id=${watchEditClientVehicle(
+  //           'model',
+  //         )}`,
+  //       )
 
-        // setValue('vehicle', 'none')
+  //       // setValue('vehicle', 'none')
 
-        return resp.data.data
-      } catch (err) {}
-    },
-    {
-      enabled: watch('model') !== 'none',
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-    },
-  )
+  //       return resp.data.data
+  //     } catch (err) {}
+  //   },
+  //   {
+  //     enabled: watchEditClientVehicle('model') !== 'none',
+  //     refetchOnWindowFocus: false,
+  //     refetchOnMount: false,
+  //     onSuccess: () => {
+  //       setValueEditClientVehicle(
+  //         'vehicle',
+  //         `${vehicleData?.vehicle?.id ?? 'none'}`,
+  //       )
+  //     },
+  //   },
+  // )
 
   async function onSubmit(data: any) {
     try {
       const dataFormatted = {
-        chasis: data.chasis,
-        vehicle_id: data.vehicle,
+        chasis: data.chassis,
+        vehicle_id: vehicleData?.vehicle?.id,
         color: data.cor,
         number_moto: null,
         renavan: null,
@@ -195,43 +237,40 @@ export default function ModalCreateEditClientVehicle({
 
   useEffect(() => {
     if (isOpen) {
-      // reset({
-      //   brand: `${vehicleData?.vehicle?.model?.brand?.id ?? 'none'}`,
-      //   model: `${vehicleData?.vehicle?.model?.id ?? 'none'}`,
-      //   vehicle: `${vehicleData?.vehicle?.id ?? 'none'}`,
-      //   cor: `${vehicleData?.color ?? ''}`,
-      //   chassis: `${vehicleData?.chasis ?? ''}`,
-      //   plate: `${vehicleData?.plate ?? ''}`,
-      //   km: `${vehicleData?.mileage ?? ''}`,
-      // })
-      setValue('brand', `${vehicleData?.vehicle?.model?.brand?.id ?? 'none'}`)
-      setValue('model', `${vehicleData?.vehicle?.model?.id ?? 'none'}`)
-      setValue('vehicle', `${vehicleData?.vehicle?.id ?? 'none'}`)
-      setValue('cor', `${vehicleData?.color ?? ''}`)
-      setValue('chassis', `${vehicleData?.chasis ?? ''}`)
-      setValue('plate', `${vehicleData?.plate ?? ''}`)
-      setValue('km', `${vehicleData?.mileage ?? ''}`)
+      setValueEditClientVehicle(
+        'brand',
+        `${vehicleData?.vehicle?.model?.brand?.name ?? ''}`,
+      )
+      setValueEditClientVehicle(
+        'model',
+        `${vehicleData?.vehicle?.model?.name ?? ''}`,
+      )
+      setValueEditClientVehicle(
+        'vehicle',
+        `${vehicleData?.vehicle?.name ?? ''}`,
+      )
+      setValueEditClientVehicle('cor', `${vehicleData?.color ?? ''}`)
+      setValueEditClientVehicle('chassis', `${vehicleData?.chasis ?? ''}`)
+      setValueEditClientVehicle('plate', `${vehicleData?.plate ?? ''}`)
+      setValueEditClientVehicle('km', `${vehicleData?.mileage ?? ''}`)
     }
   }, [isOpen])
 
   return (
     <>
-      <Dialog
-        open={isOpen && dataVehicleBrandListStatus === 'success'}
-        onClose={handleClose}
-      >
+      <Dialog open={isOpen} onClose={handleClose}>
         <DialogTitle>Edição de Veículo</DialogTitle>
         <DialogContent>
           <Stack
             width={400}
             gap={1}
             component="form"
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmitEditClientVehicle(onSubmit)}
           >
-            <Box width="100%">
+            {/* <Box width="100%">
               <Controller
                 name="brand"
-                control={control}
+                control={controlEditClientVehicle}
                 render={({ field }) => {
                   return (
                     <TextField
@@ -245,8 +284,8 @@ export default function ModalCreateEditClientVehicle({
                       }}
                       {...field}
                       onChange={(event: any) => {
-                        setValue('model', 'none')
-                        setValue('vehicle', 'none')
+                        setValueEditClientVehicle('model', 'none')
+                        setValueEditClientVehicle('vehicle', 'none')
                         field.onChange(event)
                       }}
                       disabled
@@ -271,7 +310,7 @@ export default function ModalCreateEditClientVehicle({
             <Box width="100%">
               <Controller
                 name="model"
-                control={control}
+                control={controlEditClientVehicle}
                 render={({ field }) => {
                   return (
                     <TextField
@@ -285,7 +324,7 @@ export default function ModalCreateEditClientVehicle({
                       }}
                       {...field}
                       onChange={(event: any) => {
-                        setValue('vehicle', 'none')
+                        setValueEditClientVehicle('vehicle', 'none')
                         field.onChange(event)
                       }}
                       disabled
@@ -308,7 +347,7 @@ export default function ModalCreateEditClientVehicle({
             <Box width="100%">
               <Controller
                 name="vehicle"
-                control={control}
+                control={controlEditClientVehicle}
                 render={({ field }) => {
                   return (
                     <TextField
@@ -339,39 +378,72 @@ export default function ModalCreateEditClientVehicle({
                   )
                 }}
               />
-            </Box>
-            <InputNewClient
+            </Box> */}
+            <InputText
+              label="Marca"
+              variant="filled"
+              style={{ marginTop: 11 }}
+              fullWidth
+              {...registerEditClientVehicle('brand')}
+              disabled
+            />
+            <InputText
+              label="Modelo"
+              variant="filled"
+              style={{ marginTop: 11 }}
+              fullWidth
+              {...registerEditClientVehicle('model')}
+              disabled
+            />
+            <InputText
+              label="Veículo"
+              variant="filled"
+              style={{ marginTop: 11 }}
+              fullWidth
+              {...registerEditClientVehicle('vehicle')}
+              disabled
+            />
+            <InputText
               label="Cor"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('cor', { required: true })}
+              {...registerEditClientVehicle('cor', { required: true })}
               disabled
             />
-            <InputNewClient
+            <InputText
               label="CHASSIS"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('chassis', { required: true })}
+              {...registerEditClientVehicle('chassis', { required: true })}
               disabled
             />
-            <InputNewClient
+            <InputText
               label="PLACA"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('plate', { required: true })}
+              {...registerEditClientVehicle('plate', { required: true })}
               disabled
             />
-            <InputNewClient
+            <InputText
               label="KM"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('km', { required: true })}
+              type="number"
+              placeholder="KM"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              {...registerEditClientVehicle('km', { required: true })}
             />
-
+            {errorsEditClientVehicle.km && (
+              <ErrorContainer sx={{ marginTop: 1 }}>
+                {errorsEditClientVehicle.km?.message}
+              </ErrorContainer>
+            )}
             <Stack
               flexDirection="row"
               justifyContent="flex-end"

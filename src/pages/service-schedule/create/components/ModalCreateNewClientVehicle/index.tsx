@@ -5,7 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { Controller, useForm } from 'react-hook-form'
 
 import { Stack } from '@mui/system'
-import { ButtonModalActions, InputNewClient } from '../../styles'
+import { ButtonModalActions, ErrorContainer, InputText } from '../../styles'
 import { useContext, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
@@ -19,6 +19,8 @@ import {
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientVehicleResponseType } from '../ModalSearchClientVehicle/type'
 import { useQuery } from 'react-query'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 
 interface ModalCreateNewClientVehicleProps {
   handleClose: () => void
@@ -31,6 +33,36 @@ interface actionAlertsProps {
   title: string
   type: 'success' | 'error' | 'warning'
 }
+
+const vehicleFormCreateNewSchema = z.object({
+  brand: z
+    .string()
+    .or(z.number())
+    .refine((val) => val !== 'none', {
+      message: 'Selecione uma marca',
+    }),
+  model: z
+    .string()
+    .or(z.number())
+    .refine((val) => val !== 'none', {
+      message: 'Selecione um modelo',
+    }),
+  vehicle: z
+    .string()
+    .or(z.number())
+    .refine((val) => val !== 'none', {
+      message: 'Selecione um veículo',
+    }),
+  cor: z.string().min(1, { message: 'Digite uma cor' }),
+  chassis: z.string().min(1, { message: 'Digite um chassis' }),
+  plate: z.string().min(1, { message: 'Digite uma placa' }),
+  km: z
+    .string()
+    .min(1, { message: 'Digite uma quilometragem' })
+    .refine((val) => parseInt(val) >= 0, {
+      message: 'Digite um número valido',
+    }),
+})
 
 export default function ModalCreateNewClientVehicle({
   isOpen,
@@ -46,7 +78,16 @@ export default function ModalCreateNewClientVehicle({
 
   const { companySelected } = useContext(CompanyContext)
 
-  const { register, handleSubmit, reset, control, watch, setValue } = useForm({
+  const {
+    register: registerCreateNewVehicle,
+    handleSubmit: handleSubmitCreateNewVehicle,
+    reset: resetCreateNewVehicle,
+    control: controlCreateNewVehicle,
+    watch: watchCreateNewVehicle,
+    setValue: setValueCreateNewVehicle,
+    formState: { errors: errorsCreateNewVehicle },
+  } = useForm({
+    resolver: zodResolver(vehicleFormCreateNewSchema),
     defaultValues: {
       brand: 'none',
       model: 'none',
@@ -87,14 +128,16 @@ export default function ModalCreateNewClientVehicle({
       'VehicleModelsList',
       'vehicleModels',
       companySelected,
-      watch('brand'),
+      watchCreateNewVehicle('brand'),
     ],
     async () => {
       try {
         // reset({ model: 'none' })
         const resp = await api.get(
           // `/vehicle-model?company_id=${companySelected}`,
-          `/vehicle-model/active-vehicle-models?brand_id=${watch('brand')}`,
+          `/vehicle-model/active-vehicle-models?brand_id=${watchCreateNewVehicle(
+            'brand',
+          )}`,
         )
 
         // setValue('model', 'none')
@@ -102,7 +145,7 @@ export default function ModalCreateNewClientVehicle({
       } catch (err) {}
     },
     {
-      enabled: watch('brand') !== 'none',
+      enabled: watchCreateNewVehicle('brand') !== 'none',
       refetchOnWindowFocus: false,
       refetchOnMount: false,
     },
@@ -116,21 +159,21 @@ export default function ModalCreateNewClientVehicle({
       'vehicleList',
       'model-by-id',
       companySelected,
-      watch('model'),
+      watchCreateNewVehicle('model'),
     ],
     async () => {
       try {
         const resp = await api.get(
-          `/vehicle/active-vehicles?model_id=${watch('model')}`,
+          `/vehicle/active-vehicles?model_id=${watchCreateNewVehicle('model')}`,
         )
 
-        setValue('vehicle', 'none')
+        setValueCreateNewVehicle('vehicle', 'none')
 
         return resp.data.data
       } catch (err) {}
     },
     {
-      enabled: watch('model') !== 'none',
+      enabled: watchCreateNewVehicle('model') !== 'none',
       refetchOnWindowFocus: false,
       refetchOnMount: false,
     },
@@ -187,7 +230,7 @@ export default function ModalCreateNewClientVehicle({
 
   useEffect(() => {
     if (isOpen) {
-      reset({
+      resetCreateNewVehicle({
         brand: 'none',
         model: 'none',
         vehicle: 'none',
@@ -208,12 +251,12 @@ export default function ModalCreateNewClientVehicle({
             width={400}
             gap={1}
             component="form"
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmitCreateNewVehicle(onSubmit)}
           >
             <Box width="100%">
               <Controller
                 name="brand"
-                control={control}
+                control={controlCreateNewVehicle}
                 render={({ field }) => {
                   return (
                     <TextField
@@ -227,8 +270,8 @@ export default function ModalCreateNewClientVehicle({
                       }}
                       {...field}
                       onChange={(event: any) => {
-                        setValue('model', 'none')
-                        setValue('vehicle', 'none')
+                        setValueCreateNewVehicle('model', 'none')
+                        setValueCreateNewVehicle('vehicle', 'none')
                         field.onChange(event)
                       }}
                     >
@@ -248,11 +291,16 @@ export default function ModalCreateNewClientVehicle({
                   )
                 }}
               />
+              {errorsCreateNewVehicle.vehicle && (
+                <ErrorContainer sx={{ marginTop: 1 }}>
+                  {errorsCreateNewVehicle.brand?.message}
+                </ErrorContainer>
+              )}
             </Box>
             <Box width="100%">
               <Controller
                 name="model"
-                control={control}
+                control={controlCreateNewVehicle}
                 render={({ field }) => {
                   return (
                     <TextField
@@ -266,7 +314,7 @@ export default function ModalCreateNewClientVehicle({
                       }}
                       {...field}
                       onChange={(event: any) => {
-                        setValue('vehicle', 'none')
+                        setValueCreateNewVehicle('vehicle', 'none')
                         field.onChange(event)
                       }}
                     >
@@ -284,11 +332,16 @@ export default function ModalCreateNewClientVehicle({
                   )
                 }}
               />
+              {errorsCreateNewVehicle.vehicle && (
+                <ErrorContainer sx={{ marginTop: 1 }}>
+                  {errorsCreateNewVehicle.model?.message}
+                </ErrorContainer>
+              )}
             </Box>
             <Box width="100%">
               <Controller
                 name="vehicle"
-                control={control}
+                control={controlCreateNewVehicle}
                 render={({ field }) => {
                   return (
                     <TextField
@@ -318,36 +371,65 @@ export default function ModalCreateNewClientVehicle({
                   )
                 }}
               />
+              {errorsCreateNewVehicle.vehicle && (
+                <ErrorContainer sx={{ marginTop: 1 }}>
+                  {errorsCreateNewVehicle.vehicle?.message}
+                </ErrorContainer>
+              )}
             </Box>
-            <InputNewClient
+            <InputText
               label="Cor"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('cor', { required: true })}
+              {...registerCreateNewVehicle('cor', { required: true })}
             />
-            <InputNewClient
+            {errorsCreateNewVehicle.cor && (
+              <ErrorContainer sx={{ marginTop: 1 }}>
+                {errorsCreateNewVehicle.cor?.message}
+              </ErrorContainer>
+            )}
+            <InputText
               label="CHASSIS"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('chassis', { required: true })}
+              {...registerCreateNewVehicle('chassis', { required: true })}
             />
-            <InputNewClient
+            {errorsCreateNewVehicle.chassis && (
+              <ErrorContainer sx={{ marginTop: 1 }}>
+                {errorsCreateNewVehicle.chassis?.message}
+              </ErrorContainer>
+            )}
+            <InputText
               label="PLACA"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('plate', { required: true })}
+              {...registerCreateNewVehicle('plate', { required: true })}
             />
-            <InputNewClient
+            {errorsCreateNewVehicle.plate && (
+              <ErrorContainer sx={{ marginTop: 1 }}>
+                {errorsCreateNewVehicle.plate?.message}
+              </ErrorContainer>
+            )}
+            <InputText
               label="KM"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('km', { required: true })}
+              type="number"
+              placeholder="KM"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              {...registerCreateNewVehicle('km', { required: true })}
             />
-
+            {errorsCreateNewVehicle.km && (
+              <ErrorContainer sx={{ marginTop: 1 }}>
+                {errorsCreateNewVehicle.km?.message}
+              </ErrorContainer>
+            )}
             <Stack
               flexDirection="row"
               justifyContent="flex-end"

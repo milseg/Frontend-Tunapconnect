@@ -10,7 +10,8 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import {
   ButtonAddInputs,
   ButtonModalActions,
-  InputNewClient,
+  ErrorContainer,
+  InputText,
 } from '../../styles'
 import { useContext, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
@@ -19,12 +20,16 @@ import { Backdrop, CircularProgress } from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientResponseType } from '@/types/service-schedule'
 
+import * as z from 'zod'
+import { validateCPF } from '@/ultis/validation'
+import { zodResolver } from '@hookform/resolvers/zod'
+
 interface ModalEditClientProps {
   handleClose: () => void
   handleEditClient: () => void
   isOpen: boolean
   handleAddClient: (client: ClientResponseType) => void
-  data: ClientResponseType | null
+  clientData: ClientResponseType | null
 }
 
 interface actionAlertsProps {
@@ -33,12 +38,43 @@ interface actionAlertsProps {
   type: 'success' | 'error' | 'warning'
 }
 
+const editClientFormSchema = z.object({
+  name: z
+    .string()
+    .nonempty({ message: 'Digite um nome!' })
+    .min(5, { message: 'Digite um nome valido!' }),
+  document: z.string().refine(validateCPF, { message: 'CPF inválido!' }),
+  phone: z.array(
+    z.object({
+      phone: z.string(),
+    }),
+  ),
+  email: z.array(
+    z.object({
+      email: z
+        .string()
+        .email({ message: 'Digite um e-mail valido!' })
+        .or(z.literal('')),
+    }),
+  ),
+  address: z.array(
+    z.object({
+      address: z.string(),
+    }),
+  ),
+})
+
+editClientFormSchema.required({
+  name: true,
+  document: true,
+})
+
 export default function ModalEditClient({
   isOpen,
   handleClose,
   handleEditClient,
   handleAddClient,
-  data,
+  clientData,
 }: ModalEditClientProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
@@ -49,7 +85,14 @@ export default function ModalEditClient({
 
   const { companySelected } = useContext(CompanyContext)
 
-  const { register, handleSubmit, control, setValue } = useForm({
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors: errorsEditClient },
+  } = useForm({
+    resolver: zodResolver(editClientFormSchema),
     defaultValues: {
       name: '',
       document: '',
@@ -106,12 +149,15 @@ export default function ModalEditClient({
         company_id: companySelected,
         active: true,
         name: formData.name,
+        document: clientData?.document,
         phone: listPhone.length > 0 ? listPhone : null,
         email: listEmail.length > 0 ? listEmail : null,
         address: listAddress.length > 0 ? listAddress : null,
       }
 
-      const resp = await api.put('/client/' + data?.id, dataFormatted)
+      console.log(dataFormatted)
+
+      const resp = await api.put('/client/' + clientData?.id, dataFormatted)
       console.log(resp)
 
       handleAddClient(resp.data.data)
@@ -148,22 +194,22 @@ export default function ModalEditClient({
   }
 
   useEffect(() => {
-    if (data) {
-      setValue('name', data?.name)
-      setValue('document', data?.document)
-      data?.phone &&
-        data?.phone.length > 0 &&
-        data?.phone.forEach((item: any, index: number) => {
+    if (clientData) {
+      setValue('name', clientData?.name)
+      setValue('document', clientData?.document)
+      clientData?.phone &&
+        clientData?.phone.length > 0 &&
+        clientData?.phone.forEach((item: any, index: number) => {
           updatePhone(index, { phone: item })
         })
-      data?.email &&
-        data?.email.length > 0 &&
-        data?.email.forEach((item: any, index: number) => {
+      clientData?.email &&
+        clientData?.email.length > 0 &&
+        clientData?.email.forEach((item: any, index: number) => {
           updateEmail(index, { email: item })
         })
-      data?.address &&
-        data?.address.length > 0 &&
-        data?.address.forEach((item: any, index: number) => {
+      clientData?.address &&
+        clientData?.address.length > 0 &&
+        clientData?.address.forEach((item: any, index: number) => {
           updateAddress(index, { address: item })
         })
     }
@@ -180,14 +226,15 @@ export default function ModalEditClient({
             component="form"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <InputNewClient
+            <InputText
               label="Nome"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
               {...register('name', { required: true })}
             />
-            <InputNewClient
+            <ErrorContainer>{errorsEditClient.name?.message}</ErrorContainer>
+            <InputText
               label="CPF"
               variant="filled"
               style={{ marginTop: 11 }}
@@ -195,12 +242,15 @@ export default function ModalEditClient({
               {...register('document', { required: true })}
               disabled
             />
+            <ErrorContainer>
+              {errorsEditClient.document?.message}
+            </ErrorContainer>
             {fieldsPhone.map((item, index) => {
               return (
                 <Stack direction="row" key={item.id}>
                   <Controller
                     render={({ field }) => (
-                      <InputNewClient
+                      <InputText
                         label="TELEFONE"
                         variant="filled"
                         style={{ marginTop: 11 }}
@@ -233,38 +283,44 @@ export default function ModalEditClient({
             })}
             {fieldsEmail.map((item, index) => {
               return (
-                <Stack direction="row" key={item.id}>
-                  <Controller
-                    render={({ field }) => (
-                      <InputNewClient
-                        label="E-MAIL"
-                        variant="filled"
-                        style={{ marginTop: 11 }}
-                        fullWidth
-                        {...field}
-                      />
+                <div key={item.id}>
+                  <Stack direction="row">
+                    <Controller
+                      render={({ field }) => (
+                        <InputText
+                          label="E-MAIL"
+                          variant="filled"
+                          style={{ marginTop: 11 }}
+                          fullWidth
+                          {...field}
+                        />
+                      )}
+                      name={`email.${index}.email`}
+                      control={control}
+                    />
+                    {index === 0 ? (
+                      <ButtonAddInputs
+                        onClick={() => {
+                          appendEmail({ email: '' })
+                        }}
+                        style={{ marginTop: 12, marginLeft: 10 }}
+                      >
+                        <AddCircleIcon />
+                      </ButtonAddInputs>
+                    ) : (
+                      <ButtonAddInputs
+                        onClick={() => removeEmail(index)}
+                        style={{ marginTop: 12, marginLeft: 10 }}
+                      >
+                        <DeleteIcon />
+                      </ButtonAddInputs>
                     )}
-                    name={`email.${index}.email`}
-                    control={control}
-                  />
-                  {index === 0 ? (
-                    <ButtonAddInputs
-                      onClick={() => {
-                        appendEmail({ email: '' })
-                      }}
-                      style={{ marginTop: 12, marginLeft: 10 }}
-                    >
-                      <AddCircleIcon />
-                    </ButtonAddInputs>
-                  ) : (
-                    <ButtonAddInputs
-                      onClick={() => removeEmail(index)}
-                      style={{ marginTop: 12, marginLeft: 10 }}
-                    >
-                      <DeleteIcon />
-                    </ButtonAddInputs>
-                  )}
-                </Stack>
+                  </Stack>
+                  <ErrorContainer sx={{ mt: 1 }}>
+                    {errorsEditClient?.email &&
+                      errorsEditClient?.email[index]?.email?.message}
+                  </ErrorContainer>
+                </div>
               )
             })}
             {fieldsAddress.map((item, index) => {
@@ -272,7 +328,7 @@ export default function ModalEditClient({
                 <Stack direction="row" key={item.id}>
                   <Controller
                     render={({ field }) => (
-                      <InputNewClient
+                      <InputText
                         label="Endereço"
                         variant="filled"
                         style={{ marginTop: 11 }}

@@ -9,11 +9,7 @@ import * as z from 'zod'
 import { Stack } from '@mui/system'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import {
-  ButtonAddInputs,
-  ButtonModalActions,
-  InputNewClient,
-} from '../../styles'
+import { ButtonAddInputs, ButtonModalActions, InputText } from '../../styles'
 import { useContext, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
@@ -206,7 +202,7 @@ export default function ModalCreateNewClient({
             component="form"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <InputNewClient
+            <InputText
               label="Nome"
               variant="filled"
               style={{ marginTop: 11 }}
@@ -214,7 +210,7 @@ export default function ModalCreateNewClient({
               {...register('name', { required: true })}
             />
             <ErrorContainer>{errors.name?.message}</ErrorContainer>
-            <InputNewClient
+            <InputText
               label="CPF"
               variant="filled"
               style={{ marginTop: 11 }}
@@ -227,7 +223,7 @@ export default function ModalCreateNewClient({
                 <Stack direction="row" key={item.id}>
                   <Controller
                     render={({ field }) => (
-                      <InputNewClient
+                      <InputText
                         label="TELEFONE"
                         variant="filled"
                         style={{ marginTop: 11 }}
@@ -264,7 +260,7 @@ export default function ModalCreateNewClient({
                   <Stack direction="row" key={item.id}>
                     <Controller
                       render={({ field }) => (
-                        <InputNewClient
+                        <InputText
                           label="E-MAIL"
                           variant="filled"
                           style={{ marginTop: 11 }}
@@ -304,7 +300,7 @@ export default function ModalCreateNewClient({
                 <Stack direction="row" key={item.id}>
                   <Controller
                     render={({ field }) => (
-                      <InputNewClient
+                      <InputText
                         label="Endereço"
                         variant="filled"
                         style={{ marginTop: 11 }}

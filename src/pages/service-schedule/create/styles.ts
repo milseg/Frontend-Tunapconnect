@@ -159,7 +159,7 @@ export const ButtonModalActions = styled(Button)(({ theme }) => ({
   },
 }))
 
-export const InputNewClient = styled(TextField)(({ theme }) => ({
+export const InputText = styled(TextField)(({ theme }) => ({
   '& .MuiFilledInput-root': {
     border: '1px solid #e2e2e1',
     overflow: 'hidden',
@@ -199,4 +199,11 @@ export const ButtonPaginate = styled(IconButton)(({ theme }) => ({
   '&:disabled': {
     background: '#e0f2f1',
   },
+}))
+
+export const ErrorContainer = styled(Typography)(({ theme }) => ({
+  lineHeight: 1,
+  fontSize: 14,
+  marginLeft: 5,
+  color: 'red',
 }))
