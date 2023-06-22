@@ -9,6 +9,9 @@ export interface UpdateFiles {
 
 export interface IFileListDTO {
   files: IFileProps[];
+  page: number;
+  total_pages: number;
+  total_records: number;
 }
 export interface IFileProps{
   cloud_url: string;

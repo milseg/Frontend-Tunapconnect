@@ -45,7 +45,10 @@ export default function Upload() {
     let formData: FormData = new FormData();
     formData.append("file", currentFile);
     formData.append("tipo_arquivo", "toyolex");
-    if (currentFile && fileName !== "Nenhum arquivo selecionado (selecione aqui)") {
+    if (
+      currentFile &&
+      fileName !== "Nenhum arquivo selecionado (selecione aqui)"
+    ) {
       handleAddFile(formData);
     }
   };
@@ -57,6 +60,7 @@ export default function Upload() {
       setCurrentFile(selectedFiles[0]);
       setFileName(selectedFiles[0].name);
     }
+    console.log(filesListDTO);
   };
 
   const updateFilesUploadMutation = useMutation(
@@ -76,7 +80,7 @@ export default function Upload() {
       onSuccess: () => {
         queryClient.invalidateQueries("uploadFileQuery");
         setIsUploading(false);
-        setFileName("Nenhum arquivo selecionado (selecione aqui)")
+        setFileName("Nenhum arquivo selecionado (selecione aqui)");
         console.log("sucess");
       },
       onError: () => {
@@ -248,6 +252,7 @@ export default function Upload() {
               type="submit"
               disableRipple
               onClick={() => setPageNumber((pageNumber) => pageNumber - 1)}
+              disabled={pageNumber === 1}
             >
               <ArrowBackIosNewIcon />
             </ButtonPaginate>
@@ -255,6 +260,7 @@ export default function Upload() {
               type="submit"
               disableRipple
               onClick={() => setPageNumber((pageNumber) => pageNumber + 1)}
+              disabled={pageNumber === filesListDTO?.total_pages}
             >
               <ArrowForwardIosIcon />
             </ButtonPaginate>
