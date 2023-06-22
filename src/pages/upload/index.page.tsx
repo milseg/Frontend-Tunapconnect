@@ -210,6 +210,10 @@ export default function Upload() {
                       variant="subtitle1"
                       color={"#1C4961"}
                       fontWeight={700}
+                      sx={{
+                        width: "40%",
+                        textAlign: "center",
+                      }}
                     >
                       {file.status}
                     </Typography>
@@ -217,6 +221,10 @@ export default function Upload() {
                       variant="subtitle1"
                       color={"#1C4961"}
                       fontWeight={700}
+                      sx={{
+                        width: "20%",
+                        textAlign: "right",
+                      }}
                     >
                       {file.original_name}
                     </Typography>

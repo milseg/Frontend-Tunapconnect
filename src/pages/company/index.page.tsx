@@ -54,7 +54,7 @@ export default function CompanyList() {
   )
 
   useEffect(() => {
-    console.log("unselect company")
+    //console.log("unselect company")
     deselectCompany()
   }, [])
 
