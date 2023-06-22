@@ -1,16 +1,25 @@
 export interface UpdateFiles {
-  data: string;
+  cloud_url: string;
+  created_at: string;
+  filename: string;
+  id_file: number;
+  original_name: string;
   status: string;
-  name?: string;
-  id: number;
 }
 
 export interface IFileListDTO {
-  id: string;
-  name: string;
+  files: IFileProps;
+}
+export interface IFileProps{
+  cloud_url: string;
+  created_at: string;
+  filename: string;
+  id_file: number;
+  original_name: string;
+  status: string;
 }
 
-export interface IPostFile{
+export interface IPostFile {
   file: File;
   tipo_arquivo: string;
 }

@@ -18,23 +18,13 @@ import {
 } from "./styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
-import { IPostFile, UpdateFiles } from "@/types/upload-file";
+import { IFileProps, IPostFile, UpdateFiles } from "@/types/upload-file";
 import { useInfiniteQuery, useMutation } from "react-query";
 import uploadFileRequests from "../api/uploadFile.api";
 import { api } from "@/lib/api";
-import { AnyARecord } from "dns";
 
 export default function Upload() {
-  const [currentFile, setCurrentFile] = useState<File>(new File([], ""))
-
-  const [uploadContent, setUploadContent] = useState<UpdateFiles[]>([
-    {
-      data: "19/06/2023 08:00",
-      status: "Incluído",
-      name: "arquivoteste.xlsx",
-      id: 1,
-    },
-  ]);
+  const [currentFile, setCurrentFile] = useState<File>(new File([], ""));
 
   const [fileName, setFileName] = useState<string>(
     "Nenhum arquivo selecionado"
@@ -65,31 +55,12 @@ export default function Upload() {
     fetchNextPage();
   }
 
-  const handleRemove = (selectId: number) => {
-    const newUploadContent = uploadContent.filter(
-      (fileUp) => fileUp.id !== selectId
-    );
-    console.log(newUploadContent);
-    setUploadContent(newUploadContent);
-  };
-
   const handleUpload = (e: any) => {
     e.preventDefault();
     let formData: FormData = new FormData();
     formData.append("file", currentFile);
     if (currentFile && fileName !== "Nenhum arquivo selecionado") {
       handleAddFile({ file: currentFile, tipo_arquivo: "toyota" });
-    }
-    if (fileName !== "Nenhum arquivo selecionado") {
-      setUploadContent([
-        ...uploadContent,
-        {
-          data: "19/06/2023 08:00",
-          status: "Incluído",
-          name: currentFile?.name,
-          id: uploadContent.length + 1,
-        },
-      ]);
     }
   };
 
@@ -128,7 +99,7 @@ export default function Upload() {
       file: stageData.file,
       tipo_arquivo: stageData.tipo_arquivo,
     };
-
+    console.log(dataForPost);
     // @ts-ignore
     updateFilesUploadMutation.mutate(dataForPost);
   }
@@ -221,48 +192,51 @@ export default function Upload() {
                 height: "fit-content",
               }}
             >
-              {uploadContent.map((upload) => (
-                <Stack
-                  key={upload.id}
-                  direction="row"
-                  sx={{
-                    width: "100%",
-                    backgroundColor: `${
-                      upload.id % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
-                    }`,
-                    p: 1,
-                    borderRadius: "2px",
-                  }}
-                  justifyContent="space-between"
-                >
-                  <Typography
-                    variant="subtitle1"
-                    color={"#1C4961"}
-                    fontWeight={700}
-                  >
-                    {upload.data}
-                  </Typography>
-                  <Typography
-                    variant="subtitle1"
-                    color={"#1C4961"}
-                    fontWeight={700}
-                  >
-                    {upload.status}
-                  </Typography>
-                  <Typography
-                    variant="subtitle1"
-                    color={"#1C4961"}
-                    fontWeight={700}
-                  >
-                    {upload.name}
-                  </Typography>
-                  <DeleteIcon
-                    color="error"
-                    onClick={() => handleRemove(upload.id)}
-                    sx={{ ":hover": { cursor: "pointer" } }}
-                  />
-                </Stack>
-              ))}
+              {filesListDTO &&
+                filesListDTO.pages.length > 0 &&
+                filesListDTO.pages.map((page: any, i) =>
+                  page.files.map((file: IFileProps) => (
+                    <Stack
+                      key={file.id_file}
+                      direction="row"
+                      sx={{
+                        width: "100%",
+                        backgroundColor: `${
+                          file.id_file % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
+                        }`,
+                        p: 1,
+                        borderRadius: "2px",
+                      }}
+                      justifyContent="space-between"
+                    >
+                      <Typography
+                        variant="subtitle1"
+                        color={"#1C4961"}
+                        fontWeight={700}
+                      >
+                        {file.created_at}
+                      </Typography>
+                      <Typography
+                        variant="subtitle1"
+                        color={"#1C4961"}
+                        fontWeight={700}
+                      >
+                        {file.status}
+                      </Typography>
+                      <Typography
+                        variant="subtitle1"
+                        color={"#1C4961"}
+                        fontWeight={700}
+                      >
+                        {file.original_name}
+                      </Typography>
+                      <DeleteIcon
+                        color="error"
+                        sx={{ ":hover": { cursor: "pointer" } }}
+                      />
+                    </Stack>
+                  ))
+                )}
             </Paper>
           </Stack>
         </Stack>
