@@ -54,7 +54,12 @@ import ModalCreateNewClient from './components/ModalCreateNewClient'
 import ModalCreateNewClientVehicle from './components/ModalCreateNewClientVehicle'
 import { MoreOptionsServiceScheduleCreate } from './components/MoreOptionsServiceScheduleCreate'
 import ModalEditClient from './components/ModalEditClient'
-import { InputAdornment, OutlinedInput, Typography } from '@mui/material'
+import {
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
+  Typography,
+} from '@mui/material'
 import ModalCreateEditClientVehicle from './components/ModalCreateEditClientVehicle'
 import { useForm } from 'react-hook-form'
 
@@ -456,38 +461,31 @@ export default function ServiceSchedulesCreate() {
                       onSubmit={handleSubmitClient(onSubmitClient)}
                     >
                       <Typography variant="h6">Adicione um Cliente</Typography>
-                      <Stack
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="center"
-                        gap={1}
-                      >
-                        <OutlinedInput
-                          id="outlined-adornment-weight"
-                          size="small"
-                          placeholder="Digite um nome"
-                          endAdornment={
-                            <InputAdornment position="end">
+
+                      <OutlinedInput
+                        id="outlined-adornment-weight"
+                        size="small"
+                        placeholder="Digite um nome"
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="sbumit seach client"
+                              edge="end"
+                              type="submit"
+                            >
                               <SearchIcon />
-                            </InputAdornment>
-                          }
-                          required
-                          aria-describedby="outlined-weight-helper-text"
-                          inputProps={{
-                            'aria-label': 'weight',
-                          }}
-                          {...registerClient('searchClient', {
-                            required: true,
-                          })}
-                        />
-                        <ButtonOpenModalSearch
-                          aria-label="options to client"
-                          // onClick={() => setOpenModalClientSearch(true)}
-                          type="submit"
-                        >
-                          buscar
-                        </ButtonOpenModalSearch>
-                      </Stack>
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                        required
+                        aria-describedby="outlined-weight-helper-text"
+                        inputProps={{
+                          'aria-label': 'weight',
+                        }}
+                        {...registerClient('searchClient', {
+                          required: true,
+                        })}
+                      />
                     </Stack>
                   </Box>
                 )}
@@ -592,36 +590,29 @@ export default function ServiceSchedulesCreate() {
                       )}
                     >
                       <Typography variant="h6">Adicione um Veículo</Typography>
-                      <Stack
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="center"
-                        gap={1}
-                      >
-                        <OutlinedInput
-                          id="outlined-adornment-weight"
-                          size="small"
-                          placeholder="Digite um nome"
-                          endAdornment={
-                            <InputAdornment position="end">
+
+                      <OutlinedInput
+                        id="outlined-adornment-weight"
+                        size="small"
+                        placeholder="Digite um nome"
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="search submit"
+                              edge="end"
+                              type="submit"
+                            >
                               <SearchIcon />
-                            </InputAdornment>
-                          }
-                          required
-                          aria-describedby="outlined-weight-helper-text"
-                          inputProps={{
-                            'aria-label': 'weight',
-                          }}
-                          {...registerClientVehicle('searchClientVehicle')}
-                        />
-                        <ButtonOpenModalSearch
-                          aria-label="search vehicle"
-                          // onClick={() => setOpenModalClientSearch(true)}
-                          type="submit"
-                        >
-                          buscar
-                        </ButtonOpenModalSearch>
-                      </Stack>
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                        required
+                        aria-describedby="outlined-weight-helper-text"
+                        inputProps={{
+                          'aria-label': 'weight',
+                        }}
+                        {...registerClientVehicle('searchClientVehicle')}
+                      />
                     </Stack>
                   </Box>
                 )}
