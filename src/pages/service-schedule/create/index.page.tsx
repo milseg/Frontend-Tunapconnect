@@ -468,12 +468,19 @@ export default function ServiceSchedulesCreate() {
                         id="outlined-adornment-weight"
                         size="small"
                         placeholder="Digite um nome"
+                        onClick={() => {
+                          setOpenModalClientSearch(true)
+                        }}
+                        onKeyUp={(e) => {
+                          if (e.code === 'Enter') {
+                            setOpenModalClientSearch(true)
+                          }
+                        }}
                         endAdornment={
                           <InputAdornment position="end">
                             <IconButton
                               aria-label="sbumit seach client"
                               edge="end"
-                              type="submit"
                             >
                               <SearchIcon />
                             </IconButton>
@@ -586,7 +593,6 @@ export default function ServiceSchedulesCreate() {
                       sx={{
                         py: 10,
                       }}
-                      component="form"
                       onSubmit={handleSubmitClientVehicle(
                         onSubmitClientVehicle,
                       )}
@@ -597,12 +603,22 @@ export default function ServiceSchedulesCreate() {
                         id="outlined-adornment-weight"
                         size="small"
                         placeholder="Digite um nome"
+                        onClick={() => {
+                          setOpenModalClientVehicleSearch(true)
+                        }}
+                        onKeyUp={(e) => {
+                          if (e.code === 'Enter') {
+                            setOpenModalClientVehicleSearch(true)
+                          }
+                        }}
                         endAdornment={
                           <InputAdornment position="end">
                             <IconButton
                               aria-label="search submit"
                               edge="end"
-                              type="submit"
+                              onClick={() =>
+                                setOpenModalClientVehicleSearch(true)
+                              }
                             >
                               <SearchIcon />
                             </IconButton>
@@ -613,7 +629,7 @@ export default function ServiceSchedulesCreate() {
                         inputProps={{
                           'aria-label': 'weight',
                         }}
-                        {...registerClientVehicle('searchClientVehicle')}
+                        // {...registerClientVehicle('searchClientVehicle')}
                       />
                     </Stack>
                   </Box>
