@@ -28,7 +28,7 @@ export default function Upload() {
   const [pageNumber, setPageNumber] = React.useState(1);
 
   const [fileName, setFileName] = useState<string>(
-    "Nenhum arquivo selecionado"
+    "Nenhum arquivo selecionado (selecione aqui)"
   );
 
   const queryClient = useQueryClient();
@@ -78,6 +78,7 @@ export default function Upload() {
       onSuccess: () => {
         queryClient.invalidateQueries("uploadFileQuery");
         console.log("sucess");
+        setFileName("Nenhum arquivo selecionado (selecione aqui)")
       },
       onError: () => {
         console.log("error");
