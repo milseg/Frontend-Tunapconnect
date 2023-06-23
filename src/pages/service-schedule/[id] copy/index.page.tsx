@@ -1,0 +1,826 @@
+import * as React from 'react'
+
+import { useContext, useEffect, useState } from 'react'
+
+import Container from '@mui/material/Container'
+
+import Grid from '@mui/material/Grid'
+import Paper from '@mui/material/Paper'
+
+import {
+  ClientInfor,
+  ClientVehicle,
+  TechnicalConsultant,
+} from '@/types/service-schedule'
+import { api } from '@/lib/api'
+
+import { useRouter } from 'next/router'
+
+import List from '@mui/material/List'
+
+import Stack from '@mui/material/Stack'
+
+import {
+  ButtonCenter,
+  ButtonLeft,
+  ButtonRight,
+  ButtonSubmit,
+  DividerCard,
+  InfoCardName,
+  InfoCardText,
+  ListItemCard,
+  TitleCard,
+} from './styles'
+import Skeleton from '@mui/material/Skeleton'
+import PrintIcon from '@mui/icons-material/Print'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+
+import dayjs, { Dayjs } from 'dayjs'
+
+import MenuItem from '@mui/material/MenuItem'
+import { MoreOptionsButtonSelect } from '@/components/MoreOptionsButtonSelect'
+import TextField from '@mui/material/TextField'
+import Box from '@mui/material/Box'
+import { formatDateTime, formatDateTimeTimezone } from '@/ultis/formatDate'
+import ActionAlerts from '@/components/ActionAlerts'
+import { DataTimeInput } from '@/components/DataTimeInput'
+import { ActionAlertsStateProps } from '@/components/ActionAlerts/ActionAlerts'
+import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
+import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
+
+import { PrintInspectionModal } from './components/PrintInspectionModal'
+import { TableModal } from './components/TableModal'
+import { useQuery } from 'react-query'
+import { formatCPF } from '@/ultis/formatCPF'
+import { formatPlate } from '@/ultis/formatPlate'
+
+import { CompanyContext } from '@/contexts/CompanyContext'
+
+import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
+
+import { ChecklistProps } from '@/pages/checklist/types'
+import { CheckListModelListModal } from './components/CheckListModelListModal'
+
+type isEditSelectedCardType =
+  | 'client'
+  | 'clientVehicle'
+  | 'schedule'
+  | 'technicalConsultant'
+  | null
+
+type updateData = {
+  code: null
+  promised_date: string
+  technical_consultant_id: number | undefined
+  client_id: number | undefined
+  client_vehicle_id: number | undefined
+  company_id: string | undefined
+  chasis: string | undefined
+  plate: string | undefined
+  claims_service: any[]
+}
+
+const HeaderBreadcrumbData: listBreadcrumb[] = [
+  {
+    label: 'Tunap',
+    href: '/company',
+  },
+  {
+    label: 'Edição de agendamento',
+    href: '/service-schedule/edit',
+  },
+]
+
+export default function ServiceSchedulesEdit() {
+  const [client, setClient] = useState<ClientInfor | null>()
+  const [clientVehicle, setClientVehicle] = useState<ClientVehicle | null>()
+  const [visitDate, setVisitDate] = useState<Dayjs | null>(null)
+  const [technicalConsultant, setTechnicalConsultant] =
+    useState<TechnicalConsultant | null>(null)
+  const [technicalConsultantsList, setTechnicalConsultantsList] = useState<
+    TechnicalConsultant[]
+  >([])
+  const [isEditSelectedCard, setIsEditSelectedCard] =
+    useState<isEditSelectedCardType>(null)
+  const [wasEdited, setWasEdited] = useState(false)
+
+  const [actionAlerts, setActionAlerts] =
+    useState<ActionAlertsStateProps | null>(null)
+
+  const [openChecklistModal, setOpenChecklistModal] = useState(false)
+  const [openPrintInspectionModal, setOpenPrintInspectionModal] =
+    useState(false)
+  const [openCheckListModelListModal, setOpenCheckListModelListModal] =
+    useState(false)
+
+  const router = useRouter()
+
+  const { companySelected } = useContext(CompanyContext)
+  const { serviceScheduleState, setServiceSchedule, setCheckList } = useContext(
+    ServiceScheduleContext,
+  )
+
+  const closeChecklistModal = () => {
+    setOpenChecklistModal(false)
+  }
+
+  function handleIsEditSelectedCard(value: isEditSelectedCardType) {
+    setIsEditSelectedCard(value)
+    setWasEdited(true)
+  }
+
+  function handleTechnicalConsultant(id: number) {
+    setTechnicalConsultant((prevState) => {
+      return technicalConsultantsList.filter((c) => c.id === id)[0]
+    })
+  }
+
+  function handleCancelled() {
+    setWasEdited(false)
+    setIsEditSelectedCard(null)
+  }
+
+  function handleAlert(isOpen: boolean) {
+    setActionAlerts({
+      isOpen,
+      title: '',
+      type: 'success',
+    })
+  }
+
+  function handleDateSchedule(data: Dayjs | null) {
+    setVisitDate(data)
+  }
+
+  async function onSave() {
+    const dataFormatted: updateData = {
+      code: null,
+      promised_date: formatDateTimeTimezone(`${visitDate}`),
+      // promised_date: "2023-04-2",
+      technical_consultant_id: technicalConsultant?.id,
+      client_id: client?.id,
+      client_vehicle_id: clientVehicle?.id,
+      company_id: `${companySelected}`,
+      chasis: clientVehicle?.chassis,
+      plate: clientVehicle?.plate,
+      claims_service: [],
+    }
+    try {
+      const respUpdate: any = await api.put(
+        '/service-schedule/' + router.query.id,
+        dataFormatted,
+      )
+      setIsEditSelectedCard(null)
+      setActionAlerts({
+        isOpen: true,
+        title: `${respUpdate.data.msg ?? 'Salvo com sucesso!'}!`,
+        type: 'success',
+      })
+    } catch (e: any) {
+      setActionAlerts({
+        isOpen: true,
+        title: `${e.response.data.msg ?? 'Error inesperado'}!`,
+        type: 'error',
+      })
+    }
+  }
+
+  const {
+    data: dataTechnicalConsultantList,
+    status: dataTechnicalConsultantListStatus,
+  } = useQuery<TechnicalConsultant[]>(
+    [
+      'service_schedule',
+      'by_id',
+      'edit',
+      'technical-consultant-list',
+      'options',
+    ],
+    async () => {
+      const resp = await api.get(
+        `/technical-consultant?company_id=${companySelected}`,
+      )
+      return resp.data.data
+    },
+    { enabled: !!companySelected && wasEdited },
+  )
+
+  const { data: dataServiceSchedule, status: dataServiceScheduleStatus } =
+    useQuery({
+      queryKey: ['service_schedule', 'by_id', 'edit'],
+      queryFn: async () => {
+        const { id } = router.query
+
+        if (serviceScheduleState.serviceSchedule) {
+          return serviceScheduleState.serviceSchedule
+        } else {
+          const resp = await api.get(`/service-schedule/${id}`)
+          setServiceSchedule(resp.data.data)
+          return resp.data.data
+        }
+      },
+      enabled:
+        !!router?.query?.id &&
+        !!companySelected &&
+        !wasEdited &&
+        !openChecklistModal,
+    })
+
+  useEffect(() => {
+    if (dataTechnicalConsultantListStatus === 'success') {
+      setTechnicalConsultantsList(
+        dataTechnicalConsultantList.map((item: TechnicalConsultant) => ({
+          id: item.id,
+          name: item.name,
+        })),
+      )
+    }
+  }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList])
+
+  useEffect(() => {
+    if (dataServiceScheduleStatus === 'success') {
+      const { client, client_vehicle, technical_consultant, promised_date } =
+        dataServiceSchedule
+      setClient({
+        id: client.id,
+        name: client.name ?? 'Não informado',
+        cpf: client.document ?? 'Não informado',
+        email: client.email ?? 'Não informado',
+        telefone: client.phone ?? 'Não informado',
+        address: client.address ?? 'Não informado',
+      })
+
+      setClientVehicle({
+        id: client_vehicle.id,
+        brand: client_vehicle?.vehicle?.model?.brand?.name ?? 'Não informado',
+        chassis: client_vehicle?.chasis ?? 'Não informado',
+        vehicle: client_vehicle?.vehicle?.name ?? 'Não informado',
+        model:
+          `${client_vehicle?.vehicle?.model?.name} - ${client_vehicle.vehicle.model_year}` ??
+          'Não informado',
+        color: client_vehicle?.color ?? 'Não informado',
+        plate: client_vehicle?.plate ?? 'Não informado',
+      })
+      const promisedDate = dayjs(new Date(promised_date))
+      setVisitDate(promisedDate)
+
+      setTechnicalConsultant({
+        id: technical_consultant?.id ?? 'Não informado',
+        name: technical_consultant?.name ?? 'Não informado',
+      })
+    }
+  }, [dataServiceScheduleStatus, dataServiceSchedule])
+
+  const { data: checklistDefault, status: checklistDefaultStatus } =
+    useQuery<ChecklistProps>(
+      [
+        'service_schedule',
+        'checklist-list',
+        'by_id',
+        'edit',
+        'forModal',
+        companySelected,
+        router.query.id,
+      ],
+      async () => {
+        try {
+          const resp = await api.get(
+            `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc&limit=1`,
+          )
+
+          return resp.data.data[0]
+        } catch (err) {
+          console.error(err)
+        }
+      },
+      {
+        // enabled: openPrintInspectionModal,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+      },
+    )
+
+  function handleCloseModalPrintInspectionDefault() {
+    setOpenPrintInspectionModal(false)
+  }
+  function handleCheckListModelListModal() {
+    setOpenCheckListModelListModal(false)
+  }
+
+  return (
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={12} lg={12}>
+          <HeaderBreadcrumb
+            data={HeaderBreadcrumbData}
+            title="Agenda de Serviços"
+          />
+        </Grid>
+        <Grid item xs={12} md={7} lg={7}>
+          <Stack spacing={3}>
+            {/* cliente */}
+            <Paper
+              sx={{
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <TitleCard>Cliente</TitleCard>
+                <MoreOptionsButtonSelect
+                  handleIsEditSelectedCard={handleIsEditSelectedCard}
+                  typeEdit="client"
+                  // disabledButton={true}
+                />
+              </Stack>
+              <DividerCard />
+              <List dense={false}>
+                <ListItemCard alignItems="flex-start">
+                  <InfoCardName>Nome:</InfoCardName>{' '}
+                  {client?.name ? (
+                    <InfoCardText>{client?.name}</InfoCardText>
+                  ) : (
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  )}
+                </ListItemCard>
+                <ListItemCard alignItems="flex-start">
+                  <InfoCardName>CPF:</InfoCardName>{' '}
+                  {client?.cpf ? (
+                    <InfoCardText>{formatCPF(client?.cpf)}</InfoCardText>
+                  ) : (
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  )}
+                </ListItemCard>
+                {client?.telefone ? (
+                  client?.telefone.map((phone, index) => (
+                    <ListItemCard
+                      key={index + '-' + phone}
+                      alignItems="flex-start"
+                    >
+                      <InfoCardName>Telefone:</InfoCardName>{' '}
+                      <InfoCardText>{phone}</InfoCardText>
+                    </ListItemCard>
+                  ))
+                ) : (
+                  <ListItemCard>
+                    <InfoCardName>Telefone:</InfoCardName>{' '}
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  </ListItemCard>
+                )}
+                {client?.email ? (
+                  client?.email.map((email, index) => (
+                    <ListItemCard
+                      key={index + '-' + email}
+                      alignItems="flex-start"
+                    >
+                      <InfoCardName>E-mail:</InfoCardName>{' '}
+                      <InfoCardText>{email}</InfoCardText>
+                    </ListItemCard>
+                  ))
+                ) : (
+                  <ListItemCard alignItems="flex-start">
+                    <InfoCardName>E-mail:</InfoCardName>{' '}
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  </ListItemCard>
+                )}
+                {client?.address ? (
+                  client?.address.map((address, index) => (
+                    <ListItemCard
+                      key={index + '-' + address}
+                      alignItems="flex-start"
+                    >
+                      <InfoCardName>Endereço:</InfoCardName>{' '}
+                      <InfoCardText>{address}</InfoCardText>
+                    </ListItemCard>
+                  ))
+                ) : (
+                  <ListItemCard alignItems="flex-start">
+                    <InfoCardName>Endereço:</InfoCardName>{' '}
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  </ListItemCard>
+                )}
+              </List>
+            </Paper>
+            {/* Veículo */}
+            <Paper
+              sx={{
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <TitleCard>Veículo</TitleCard>
+                <MoreOptionsButtonSelect
+                  handleIsEditSelectedCard={handleIsEditSelectedCard}
+                  typeEdit="clientVehicle"
+                  disabledButton={true}
+                />
+              </Stack>
+              <DividerCard />
+              <List dense={false}>
+                <ListItemCard>
+                  <InfoCardName>Marca:</InfoCardName>{' '}
+                  {clientVehicle?.brand ? (
+                    <InfoCardText>{clientVehicle?.brand}</InfoCardText>
+                  ) : (
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  )}
+                </ListItemCard>
+                <ListItemCard>
+                  <InfoCardName>Modelo:</InfoCardName>{' '}
+                  {clientVehicle?.model ? (
+                    <InfoCardText>{clientVehicle?.model}</InfoCardText>
+                  ) : (
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  )}
+                </ListItemCard>
+                <ListItemCard>
+                  <InfoCardName>Veículo:</InfoCardName>{' '}
+                  {clientVehicle?.vehicle ? (
+                    <InfoCardText>{clientVehicle?.vehicle}</InfoCardText>
+                  ) : (
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  )}
+                </ListItemCard>
+                <ListItemCard>
+                  <InfoCardName>Cor:</InfoCardName>{' '}
+                  {clientVehicle?.color ? (
+                    <InfoCardText>{clientVehicle?.color}</InfoCardText>
+                  ) : (
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  )}
+                </ListItemCard>
+                <ListItemCard>
+                  <InfoCardName>Chassi:</InfoCardName>{' '}
+                  {clientVehicle?.chassis ? (
+                    <InfoCardText>{clientVehicle?.chassis}</InfoCardText>
+                  ) : (
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  )}
+                </ListItemCard>
+                <ListItemCard>
+                  <InfoCardName>Placa:</InfoCardName>{' '}
+                  {clientVehicle?.plate ? (
+                    <InfoCardText>
+                      {formatPlate(clientVehicle?.plate)}
+                    </InfoCardText>
+                  ) : (
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  )}
+                </ListItemCard>
+              </List>
+            </Paper>
+          </Stack>
+        </Grid>
+
+        <Grid item xs={12} md={5} lg={5}>
+          <Stack spacing={2}>
+            <Stack
+              spacing={2}
+              direction="row"
+              display="flex"
+              justifyContent="center"
+            >
+              <ButtonLeft onClick={() => setOpenChecklistModal(true)}>
+                Listar Checklists
+              </ButtonLeft>
+              <ButtonCenter
+                // disabled={defaultCheckListPrint === null}
+                onClick={() => {
+                  if (checklistDefaultStatus === 'success') {
+                    setCheckList(checklistDefault as ChecklistProps)
+
+                    setOpenPrintInspectionModal(true)
+                  }
+                }}
+              >
+                <PrintIcon />
+              </ButtonCenter>
+              <ButtonRight
+                startIcon={<AddCircleOutlineIcon />}
+                onClick={() => {
+                  setOpenCheckListModelListModal(true)
+                }}
+              >
+                Novo
+              </ButtonRight>
+            </Stack>
+            {/* <Stack
+              spacing={2}
+              direction="row"
+              display="flex"
+              justifyContent="center"
+            >
+              <ButtonLeft disabled>Listar Orçamentos</ButtonLeft>
+              <ButtonCenter disabled>
+                <PrintIcon />
+              </ButtonCenter>
+              <ButtonRight disabled startIcon={<AddCircleOutlineIcon />}>
+                Novo
+              </ButtonRight>
+            </Stack> */}
+            {/* Agendamento */}
+            <Paper
+              sx={{
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <TitleCard>AGENDAMENTO</TitleCard>
+                <MoreOptionsButtonSelect
+                  handleIsEditSelectedCard={handleIsEditSelectedCard}
+                  typeEdit="schedule"
+                />
+              </Stack>
+              <DividerCard />
+              <List dense={false}>
+                <ListItemCard>
+                  <InfoCardName>Número do atendimento:</InfoCardName>{' '}
+                  {router.query.id ? (
+                    <InfoCardText>{router.query.id}</InfoCardText>
+                  ) : (
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  )}
+                </ListItemCard>
+                <ListItemCard>
+                  <InfoCardName>Data da visita:</InfoCardName>
+                  {isEditSelectedCard === 'schedule' && (
+                    <DataTimeInput
+                      dateSchedule={visitDate}
+                      handleDateSchedule={handleDateSchedule}
+                    />
+                  )}
+                  {isEditSelectedCard !== 'schedule' && visitDate && (
+                    <InfoCardText>
+                      {formatDateTime(`${visitDate}`)}
+                    </InfoCardText>
+                  )}
+                  {!visitDate && (
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  )}
+                </ListItemCard>
+              </List>
+            </Paper>
+            {wasEdited && isEditSelectedCard === 'schedule' && (
+              <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
+                <Paper
+                  sx={{
+                    p: '0 2',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    background: 'transparent',
+                  }}
+                  elevation={0}
+                >
+                  <Stack direction="row" justifyContent="flex-end" spacing={2}>
+                    <ButtonSubmit
+                      variant="contained"
+                      size="small"
+                      onClick={() => onSave()}
+                    >
+                      save
+                    </ButtonSubmit>
+                    <ButtonSubmit
+                      variant="contained"
+                      size="small"
+                      onClick={() => handleCancelled()}
+                    >
+                      cancelar
+                    </ButtonSubmit>
+                  </Stack>
+                </Paper>
+              </Grid>
+            )}
+
+            <Paper
+              sx={{
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <TitleCard>Consultor técnico</TitleCard>
+                <MoreOptionsButtonSelect
+                  handleIsEditSelectedCard={handleIsEditSelectedCard}
+                  typeEdit="technicalConsultant"
+                />
+              </Stack>
+              <DividerCard />
+              <List dense={false}>
+                <ListItemCard>
+                  <InfoCardName>Nome:</InfoCardName>{' '}
+                  {isEditSelectedCard !== 'technicalConsultant' &&
+                  technicalConsultant?.name ? (
+                    <InfoCardText>{technicalConsultant?.name}</InfoCardText>
+                  ) : (
+                    isEditSelectedCard !== 'technicalConsultant' && (
+                      <InfoCardText width="100%">
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                          width="100%"
+                        />
+                      </InfoCardText>
+                    )
+                  )}
+                  {isEditSelectedCard === 'technicalConsultant' && (
+                    <Box width="100%">
+                      <TextField
+                        id="standard-select-currency"
+                        select
+                        sx={{
+                          width: '100%',
+                        }}
+                        value={technicalConsultant?.id}
+                        variant="standard"
+                        onChange={(e) =>
+                          handleTechnicalConsultant(parseInt(e.target.value))
+                        }
+                      >
+                        {technicalConsultantsList.map((option) => (
+                          <MenuItem
+                            key={option.id + option.name}
+                            value={option.id}
+                          >
+                            {option.name}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Box>
+                  )}
+                </ListItemCard>
+                <ListItemCard>
+                  <InfoCardName>Código consultor:</InfoCardName>{' '}
+                  {technicalConsultant?.id ? (
+                    <InfoCardText>{technicalConsultant?.id}</InfoCardText>
+                  ) : (
+                    <InfoCardText width="100%">
+                      <Skeleton
+                        variant="text"
+                        sx={{ fontSize: '1rem', lineHeight: 1.5 }}
+                        width="100%"
+                      />
+                    </InfoCardText>
+                  )}
+                </ListItemCard>
+              </List>
+            </Paper>
+            {wasEdited && isEditSelectedCard === 'technicalConsultant' && (
+              <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
+                <Paper
+                  sx={{
+                    p: '0 2',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    background: 'transparent',
+                  }}
+                  elevation={0}
+                >
+                  <Stack direction="row" justifyContent="flex-end" spacing={2}>
+                    <ButtonSubmit
+                      variant="contained"
+                      size="small"
+                      onClick={() => onSave()}
+                    >
+                      save
+                    </ButtonSubmit>
+                    <ButtonSubmit
+                      variant="contained"
+                      size="small"
+                      onClick={() => handleCancelled()}
+                    >
+                      cancelar
+                    </ButtonSubmit>
+                  </Stack>
+                </Paper>
+              </Grid>
+            )}
+          </Stack>
+        </Grid>
+        {actionAlerts !== null && (
+          <ActionAlerts
+            isOpen={actionAlerts.isOpen}
+            title={actionAlerts.title}
+            type={actionAlerts.type}
+            handleAlert={handleAlert}
+          />
+        )}
+      </Grid>
+      <TableModal
+        isOpen={openChecklistModal}
+        title="Lista de checklists"
+        serviceScheduleId={router?.query?.id as string}
+        closeChecklistModal={closeChecklistModal}
+      />
+      <PrintInspectionModal
+        isOpen={openPrintInspectionModal}
+        handleCloseModal={handleCloseModalPrintInspectionDefault}
+      />
+      <CheckListModelListModal
+        isOpen={openCheckListModelListModal}
+        handleClose={handleCheckListModelListModal}
+      />
+    </Container>
+  )
+}
+
+ServiceSchedulesEdit.auth = true
