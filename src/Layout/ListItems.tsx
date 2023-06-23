@@ -25,6 +25,7 @@ import Collapse from '@mui/material/Collapse'
 import List from '@mui/material/List'
 
 import { AuthContext } from '@/contexts/AuthContext'
+import { useUploadContext } from '@/contexts/UploadContext'
 
 
 type memuListProps = Array<{
@@ -39,6 +40,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
   const router = useRouter()
   const { companySelected } = useContext(CompanyContext)
   const { listCompanies, addCompaniesList, user } = useContext(AuthContext)
+  const {refetchList,setRefetchList} = useUploadContext();
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
   const [registerOpen, setRegisterOpen] = useState<boolean>(false);
 
@@ -101,6 +103,10 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
     setUploadOpen(!uploadOpen)
   }
 
+  const handleListReload = ()=>{
+    setRefetchList(!refetchList);
+  }
+
   useEffect(() => {
     setRouteActual(router.pathname)
   }, [router])
@@ -140,7 +146,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
               </Collapse>
               <Collapse in={uploadOpen && registerOpen} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                  <Link href={menu.href} style={{ textDecoration: 'none' }}>
+                  <Link href={menu.href} style={{ textDecoration: 'none' }}  onClick={handleListReload}>
                     <ListItemButton sx={{ pl: 4, marginLeft: '70px', width: 'fit-content'}}>
                       <ListItemText primary="Upload Toyolex" />
                     </ListItemButton>

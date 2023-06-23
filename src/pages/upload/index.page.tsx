@@ -1,7 +1,7 @@
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import { Container, Grid, Stack, Typography } from "@mui/material";
+import { Container, Grid, Skeleton, Stack, Typography } from "@mui/material";
 import * as React from "react";
 import Paper from "@mui/material/Paper";
 import {
@@ -19,11 +19,13 @@ import uploadFileRequests from "../api/uploadFile.api";
 import { apiB } from "@/lib/api";
 import { ButtonPaginate } from "../service-schedule/create/styles";
 import { Loading } from "@/components/Loading";
+import { useUploadContext } from "@/contexts/UploadContext";
 
 export default function Upload() {
   const [currentFile, setCurrentFile] = useState<File>(new File([], ""));
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [pageNumber, setPageNumber] = React.useState(1);
+  const {refetchList, setRefetchList} = useUploadContext();
 
   const [fileName, setFileName] = useState<string>(
     "Nenhum arquivo selecionado (selecione aqui)"
@@ -31,8 +33,12 @@ export default function Upload() {
 
   const queryClient = useQueryClient();
 
-  const { data: filesListDTO, isFetching } = useQuery({
-    queryKey: ["uploadFileQuery", pageNumber],
+  const {
+    data: filesListDTO,
+    isFetching,
+    isLoading,
+  } = useQuery({
+    queryKey: ["uploadFileQuery", pageNumber, refetchList],
     queryFn: uploadFileRequests.getUploadsList,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -179,66 +185,70 @@ export default function Upload() {
                 {/**<Typography>{"Ação"}</Typography>**/}
               </Stack>
             </TableTitles>
-            <Paper
-              sx={{
-                p: 2,
-                display: "flex",
-                flexDirection: "column",
-                height: "fit-content",
-              }}
-            >
-              {filesListDTO &&
-                filesListDTO.files.length > 0 &&
-                filesListDTO.files.map((file: IFileProps) => (
-                  <Stack
-                    key={file.id_file}
-                    direction="row"
-                    sx={{
-                      width: "100%",
-                      backgroundColor: `${
-                        file.id_file % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
-                      }`,
-                      p: 1,
-                      borderRadius: "2px",
-                    }}
-                    justifyContent="space-between"
-                  >
-                    <Typography
-                      variant="subtitle1"
-                      color={"#1C4961"}
-                      fontWeight={700}
-                    >
-                      {file.created_at}
-                    </Typography>
-                    <Typography
-                      variant="subtitle1"
-                      color={"#1C4961"}
-                      fontWeight={700}
+            {isFetching ? (
+              <Skeleton variant="rounded" sx={{ width: "100%" }} height={150} />
+            ) : (
+              <Paper
+                sx={{
+                  p: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "fit-content",
+                }}
+              >
+                {filesListDTO &&
+                  filesListDTO.files.length > 0 &&
+                  filesListDTO.files.map((file: IFileProps) => (
+                    <Stack
+                      key={file.id_file}
+                      direction="row"
                       sx={{
-                        width: "40%",
-                        textAlign: "center",
+                        width: "100%",
+                        backgroundColor: `${
+                          file.id_file % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
+                        }`,
+                        p: 1,
+                        borderRadius: "2px",
                       }}
+                      justifyContent="space-between"
                     >
-                      {file.status}
-                    </Typography>
-                    <Typography
-                      variant="subtitle1"
-                      color={"#1C4961"}
-                      fontWeight={700}
-                      sx={{
-                        width: "20%",
-                        textAlign: "right",
-                      }}
-                    >
-                      {file.original_name}
-                    </Typography>
-                    {/**<DeleteIcon
+                      <Typography
+                        variant="subtitle1"
+                        color={"#1C4961"}
+                        fontWeight={700}
+                      >
+                        {file.created_at}
+                      </Typography>
+                      <Typography
+                        variant="subtitle1"
+                        color={"#1C4961"}
+                        fontWeight={700}
+                        sx={{
+                          width: "40%",
+                          textAlign: "center",
+                        }}
+                      >
+                        {file.status}
+                      </Typography>
+                      <Typography
+                        variant="subtitle1"
+                        color={"#1C4961"}
+                        fontWeight={700}
+                        sx={{
+                          width: "20%",
+                          textAlign: "right",
+                        }}
+                      >
+                        {file.original_name}
+                      </Typography>
+                      {/**<DeleteIcon
                         color="error"
                         sx={{ ":hover": { cursor: "pointer" } }}
                     />**/}
-                  </Stack>
-                ))}
-            </Paper>
+                    </Stack>
+                  ))}
+              </Paper>
+            )}
           </Stack>
           <Stack
             direction="row"
