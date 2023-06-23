@@ -3,26 +3,33 @@ import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
 
 import { Stack } from '@mui/system'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import { ButtonAddInputs, ButtonModalActions, InputText } from '../../styles'
+import {
+  ButtonAddInputs,
+  ButtonModalActions,
+  ErrorContainer,
+  InputText,
+} from '../../styles'
 import { useContext, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { Backdrop, CircularProgress } from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientResponseType } from '@/types/service-schedule'
-import { ErrorContainer } from './styles'
-import { validateCPF } from '@/ultis/validation'
 
-interface ModalCreateNewClientProps {
+import * as z from 'zod'
+import { validateCPF } from '@/ultis/validation'
+import { zodResolver } from '@hookform/resolvers/zod'
+
+interface ModalEditClientProps {
   handleClose: () => void
-  handleSaveReturnClient: (client: ClientResponseType | null) => void
+  handleEditClient: () => void
   isOpen: boolean
+  handleAddClient: (client: ClientResponseType) => void
+  clientData: ClientResponseType | null
 }
 
 interface actionAlertsProps {
@@ -31,7 +38,7 @@ interface actionAlertsProps {
   type: 'success' | 'error' | 'warning'
 }
 
-const newClientFormSchema = z.object({
+const editClientFormSchema = z.object({
   name: z
     .string()
     .nonempty({ message: 'Digite um nome!' })
@@ -57,18 +64,18 @@ const newClientFormSchema = z.object({
   ),
 })
 
-newClientFormSchema.required({
+editClientFormSchema.required({
   name: true,
   document: true,
 })
 
-type newClientFormData = z.infer<typeof newClientFormSchema>
-
-export default function ModalCreateNewClient({
+export default function ModalEditClient({
   isOpen,
   handleClose,
-  handleSaveReturnClient,
-}: ModalCreateNewClientProps) {
+  handleEditClient,
+  handleAddClient,
+  clientData,
+}: ModalEditClientProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
     isOpen: false,
@@ -82,10 +89,10 @@ export default function ModalCreateNewClient({
     register,
     handleSubmit,
     control,
-    reset,
-    formState: { errors },
-  } = useForm<newClientFormData>({
-    resolver: zodResolver(newClientFormSchema),
+    setValue,
+    formState: { errors: errorsEditClient },
+  } = useForm({
+    resolver: zodResolver(editClientFormSchema),
     defaultValues: {
       name: '',
       document: '',
@@ -98,6 +105,7 @@ export default function ModalCreateNewClient({
     fields: fieldsPhone,
     append: appendPhone,
     remove: removePhone,
+    update: updatePhone,
   } = useFieldArray({
     control,
     name: 'phone',
@@ -107,6 +115,7 @@ export default function ModalCreateNewClient({
     fields: fieldsEmail,
     append: appendEmail,
     remove: removeEmail,
+    update: updateEmail,
   } = useFieldArray({
     control,
     name: 'email',
@@ -115,22 +124,23 @@ export default function ModalCreateNewClient({
     fields: fieldsAddress,
     append: appendAddress,
     remove: removeAddress,
+    update: updateAddress,
   } = useFieldArray({
     control,
     name: 'address',
   })
 
-  async function onSubmit(data: any) {
+  async function onSubmit(formData: any) {
     setIsLoading(true)
-    const listPhone = data.phone
+    const listPhone = formData.phone
       .map((item: any) => item.phone)
       .filter((item: any) => item !== '')
 
-    const listEmail = data.email
+    const listEmail = formData.email
       .map((item: any) => item.email)
       .filter((item: any) => item !== '')
 
-    const listAddress = data.address
+    const listAddress = formData.address
       .map((item: any) => item.address)
       .filter((item: any) => item !== '')
 
@@ -138,16 +148,20 @@ export default function ModalCreateNewClient({
       const dataFormatted = {
         company_id: companySelected,
         active: true,
-        name: data.name,
-        document: data.document,
-        phone: listPhone,
-        email: listEmail,
-        address: listAddress,
+        name: formData.name,
+        document: clientData?.document,
+        phone: listPhone.length > 0 ? listPhone : null,
+        email: listEmail.length > 0 ? listEmail : null,
+        address: listAddress.length > 0 ? listAddress : null,
       }
 
-      const resp = await api.post('/client', dataFormatted)
+      console.log(dataFormatted)
 
-      handleSaveReturnClient(resp.data.data[0])
+      const resp = await api.put('/client/' + clientData?.id, dataFormatted)
+      console.log(resp)
+
+      handleAddClient(resp.data.data)
+      handleEditClient()
       handleActiveAlert(true, 'success', resp.data.msg)
     } catch (error: any) {
       if (error.response.status === 400) {
@@ -180,21 +194,31 @@ export default function ModalCreateNewClient({
   }
 
   useEffect(() => {
-    if (isOpen) {
-      reset({
-        name: '',
-        document: '',
-        phone: [{ phone: '' }],
-        email: [{ email: '' }],
-        address: [{ address: '' }],
-      })
+    if (clientData) {
+      setValue('name', clientData?.name)
+      setValue('document', clientData?.document)
+      clientData?.phone &&
+        clientData?.phone.length > 0 &&
+        clientData?.phone.forEach((item: any, index: number) => {
+          updatePhone(index, { phone: item })
+        })
+      clientData?.email &&
+        clientData?.email.length > 0 &&
+        clientData?.email.forEach((item: any, index: number) => {
+          updateEmail(index, { email: item })
+        })
+      clientData?.address &&
+        clientData?.address.length > 0 &&
+        clientData?.address.forEach((item: any, index: number) => {
+          updateAddress(index, { address: item })
+        })
     }
   }, [isOpen])
 
   return (
     <>
       <Dialog open={isOpen} onClose={handleClose}>
-        <DialogTitle>Criação de cliente </DialogTitle>
+        <DialogTitle>Edição de cliente </DialogTitle>
         <DialogContent>
           <Stack
             width={400}
@@ -209,15 +233,18 @@ export default function ModalCreateNewClient({
               fullWidth
               {...register('name', { required: true })}
             />
-            <ErrorContainer>{errors.name?.message}</ErrorContainer>
+            <ErrorContainer>{errorsEditClient.name?.message}</ErrorContainer>
             <InputText
               label="CPF"
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
               {...register('document', { required: true })}
+              disabled
             />
-            <ErrorContainer>{errors.document?.message}</ErrorContainer>
+            <ErrorContainer>
+              {errorsEditClient.document?.message}
+            </ErrorContainer>
             {fieldsPhone.map((item, index) => {
               return (
                 <Stack direction="row" key={item.id}>
@@ -257,7 +284,7 @@ export default function ModalCreateNewClient({
             {fieldsEmail.map((item, index) => {
               return (
                 <div key={item.id}>
-                  <Stack direction="row" key={item.id}>
+                  <Stack direction="row">
                     <Controller
                       render={({ field }) => (
                         <InputText
@@ -290,7 +317,8 @@ export default function ModalCreateNewClient({
                     )}
                   </Stack>
                   <ErrorContainer sx={{ mt: 1 }}>
-                    {errors?.email && errors?.email[index]?.email?.message}
+                    {errorsEditClient?.email &&
+                      errorsEditClient?.email[index]?.email?.message}
                   </ErrorContainer>
                 </div>
               )
