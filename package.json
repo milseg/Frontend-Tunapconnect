@@ -13,6 +13,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/server": "^11.10.0",
     "@emotion/styled": "^11.10.6",
+    "@hookform/resolvers": "^3.1.1",
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.13",
     "@mui/styled-engine-sc": "^5.11.11",
@@ -46,7 +47,8 @@
     "sweetalert2": "^11.4.8",
     "sweetalert2-react-content": "^5.0.7",
     "typescript": "4.9.5",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@rocketseat/eslint-config": "^1.2.0",

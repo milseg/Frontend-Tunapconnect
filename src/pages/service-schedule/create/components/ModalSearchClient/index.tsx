@@ -23,6 +23,7 @@ interface ModalSearchClienteProps {
   handleClose: () => void
   handleOpenModalNewClient: () => void
   handleAddClient: (data: ClientResponseType) => void
+  dataClient: ClientResponseType | null
 }
 
 type SearchFormProps = {
@@ -39,6 +40,7 @@ export default function ModalSearchClient({
   handleClose,
   handleAddClient,
   handleOpenModalNewClient,
+  dataClient,
 }: ModalSearchClienteProps) {
   const [clientList, setClientList] = useState<ClientResponseType[] | []>([])
   const [clientSelected, setClientSelected] =
@@ -126,7 +128,11 @@ export default function ModalSearchClient({
       reset({
         search: '',
       })
-      setClientList([])
+      if (dataClient) {
+        setClientList([dataClient])
+      } else {
+        setClientList([])
+      }
     }
   }, [openMolal])
 
