@@ -26,3 +26,8 @@ export interface IPostFile {
   file: File;
   tipo_arquivo: string;
 }
+
+export type UploadContextData = {
+  refetchList: boolean;
+  setRefetchList: (state: (boolean)) => void;
+}

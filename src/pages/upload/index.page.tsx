@@ -19,11 +19,13 @@ import uploadFileRequests from "../api/uploadFile.api";
 import { apiB } from "@/lib/api";
 import { ButtonPaginate } from "../service-schedule/create/styles";
 import { Loading } from "@/components/Loading";
+import { useUploadContext } from "@/contexts/UploadContext";
 
 export default function Upload() {
   const [currentFile, setCurrentFile] = useState<File>(new File([], ""));
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [pageNumber, setPageNumber] = React.useState(1);
+  const {refetchList, setRefetchList} = useUploadContext();
 
   const [fileName, setFileName] = useState<string>(
     "Nenhum arquivo selecionado (selecione aqui)"
@@ -36,7 +38,7 @@ export default function Upload() {
     isFetching,
     isLoading,
   } = useQuery({
-    queryKey: ["uploadFileQuery", pageNumber],
+    queryKey: ["uploadFileQuery", pageNumber, refetchList],
     queryFn: uploadFileRequests.getUploadsList,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
