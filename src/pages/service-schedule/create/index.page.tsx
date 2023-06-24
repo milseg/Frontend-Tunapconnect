@@ -60,6 +60,7 @@ import {
   Typography,
 } from '@mui/material'
 import ModalCreateEditClientVehicle from './components/ModalEditClientVehicle'
+import ClaimServiceTable from './components/ClaimServiceTable'
 // import { useForm } from 'react-hook-form'
 
 type updateData = {
@@ -94,6 +95,7 @@ export default function ServiceSchedulesCreate() {
   useState<string | null>(null)
   const [clientVehicleCreated, setClientVehicleCreated] =
     useState<ClientVehicleResponseType | null>(null)
+
   // const [
   //   clientVehicleFormDataForModalSearch,
   //   setClientVehicleFormDataForModalSearch,
@@ -719,7 +721,7 @@ export default function ServiceSchedulesCreate() {
           </Grid>
 
           <Grid item xs={12} md={5} lg={5}>
-            <Stack spacing={2}>
+            <Stack spacing={3}>
               {/* Agendamento */}
               <Paper
                 sx={{
@@ -748,7 +750,7 @@ export default function ServiceSchedulesCreate() {
                   </ListItemCard>
                 </List>
               </Paper>
-              <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
+              {/* <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
                 <Paper
                   sx={{
                     p: '0 2',
@@ -758,8 +760,39 @@ export default function ServiceSchedulesCreate() {
                   }}
                   elevation={0}
                 ></Paper>
-              </Grid>
+              </Grid> */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Reclamações</TitleCard>
+                  <MoreOptionsServiceScheduleCreate
+                    aria-label="options claims service"
+                    buttons={[
+                      {
+                        label: 'Editar',
+                        action: () => {},
+                      },
+                      {
+                        label: 'Pesquisar',
+                        action: () => {},
+                      },
+                    ]}
+                  />
+                </Stack>
+                <DividerCard />
+                {/* @ts-ignore */}
 
+                <ClaimServiceTable />
+              </Paper>
               <Paper
                 sx={{
                   p: 2,

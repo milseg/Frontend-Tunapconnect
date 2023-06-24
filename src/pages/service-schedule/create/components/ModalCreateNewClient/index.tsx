@@ -13,11 +13,22 @@ import { ButtonAddInputs, ButtonModalActions, InputText } from '../../styles'
 import { useContext, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
-import { Backdrop, CircularProgress } from '@mui/material'
+import {
+  Backdrop,
+  CircularProgress,
+  FormControlLabel,
+  FormGroup,
+  Switch,
+} from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientResponseType } from '@/types/service-schedule'
 import { ErrorContainer } from './styles'
-import { validateCPF } from '@/ultis/validation'
+import { validateCNPJ, validateCPF } from '@/ultis/validation'
+import {
+  TextMaskCPF,
+  TextMaskPHONE,
+  TextMaskCNPJ,
+} from '@/components/InputMask'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
@@ -36,7 +47,8 @@ const newClientFormSchema = z.object({
     .string()
     .nonempty({ message: 'Digite um nome!' })
     .min(5, { message: 'Digite um nome valido!' }),
-  document: z.string().refine(validateCPF, { message: 'CPF inválido!' }),
+  cpf: z.string().refine(validateCPF, { message: 'CPF inválido!' }),
+  cnpj: z.string().refine(validateCNPJ, { message: 'CNPJ inválido!' }),
   phone: z.array(
     z.object({
       phone: z.string(),
@@ -70,6 +82,7 @@ export default function ModalCreateNewClient({
   handleSaveReturnClient,
 }: ModalCreateNewClientProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [isCPF, setIsCPF] = useState(true)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
     isOpen: false,
     title: '',
@@ -88,7 +101,8 @@ export default function ModalCreateNewClient({
     resolver: zodResolver(newClientFormSchema),
     defaultValues: {
       name: '',
-      document: '',
+      cpf: '',
+      cnpj: '',
       phone: [{ phone: '' }],
       email: [{ email: '' }],
       address: [{ address: '' }],
@@ -181,9 +195,13 @@ export default function ModalCreateNewClient({
 
   useEffect(() => {
     if (isOpen) {
+      if (!isCPF) {
+        setIsCPF(true)
+      }
       reset({
         name: '',
-        document: '',
+        cpf: '',
+        cnpj: '',
         phone: [{ phone: '' }],
         email: [{ email: '' }],
         address: [{ address: '' }],
@@ -207,17 +225,85 @@ export default function ModalCreateNewClient({
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
+              error={!!errors.name}
               {...register('name', { required: true })}
             />
+
             <ErrorContainer>{errors.name?.message}</ErrorContainer>
-            <InputText
-              label="CPF"
-              variant="filled"
-              style={{ marginTop: 11 }}
-              fullWidth
-              {...register('document', { required: true })}
-            />
-            <ErrorContainer>{errors.document?.message}</ErrorContainer>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isCPF}
+                    onChange={() => {
+                      if (isCPF) {
+                        // setValue('cnpj', '')
+                        reset({ cnpj: '' })
+                      } else {
+                        // setValue('cpf', '')
+                        reset({ cpf: '' })
+                      }
+                      setIsCPF(!isCPF)
+                    }}
+                    name="loading"
+                    color="primary"
+                    size="small"
+                    // defaultChecked
+                    sx={{
+                      '& .MuiSwitch-switchBase': {
+                        '&.Mui-checked': {
+                          transform: 'translateX(16px)',
+                          color: '#0E948B',
+                          '& + .MuiSwitch-track': {
+                            background: '#0E948B',
+                          },
+                        },
+                      },
+                    }}
+                  />
+                }
+                labelPlacement="start"
+                label="É CPF ? "
+                sx={{
+                  '& > span': {
+                    fontSize: 13,
+                    fontWeight: 'bold',
+                  },
+                  marginRight: '0',
+                }}
+              />
+            </FormGroup>
+            {isCPF && (
+              <InputText
+                label="CPF"
+                variant="filled"
+                error={!!errors.cpf}
+                // style={{ marginTop: 11 }}
+                fullWidth
+                {...register('cpf', { required: true })}
+                InputProps={{
+                  // @ts-ignore
+                  inputComponent: TextMaskCPF,
+                }}
+              />
+            )}
+            {!isCPF && (
+              <InputText
+                label="CNPJ"
+                variant="filled"
+                // style={{ marginTop: 11 }}
+                error={!!errors.cnpj}
+                fullWidth
+                {...register('cnpj', { required: true })}
+                InputProps={{
+                  // @ts-ignore
+                  inputComponent: TextMaskCNPJ,
+                }}
+              />
+            )}
+            {isCPF && <ErrorContainer>{errors.cpf?.message}</ErrorContainer>}
+            {!isCPF && <ErrorContainer>{errors.cnpj?.message}</ErrorContainer>}
+
             {fieldsPhone.map((item, index) => {
               return (
                 <Stack direction="row" key={item.id}>
@@ -229,6 +315,10 @@ export default function ModalCreateNewClient({
                         style={{ marginTop: 11 }}
                         fullWidth
                         {...field}
+                        InputProps={{
+                          // @ts-ignore
+                          inputComponent: TextMaskPHONE,
+                        }}
                       />
                     )}
                     name={`phone.${index}.phone`}
@@ -265,6 +355,9 @@ export default function ModalCreateNewClient({
                           variant="filled"
                           style={{ marginTop: 11 }}
                           fullWidth
+                          error={
+                            !!errors?.email && !!errors?.email[index]?.email
+                          }
                           {...field}
                         />
                       )}
