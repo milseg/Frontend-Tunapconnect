@@ -1,24 +1,13 @@
+/* eslint-disable no-unused-vars */
 import * as React from 'react'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TablePagination from '@mui/material/TablePagination'
 import TableRow from '@mui/material/TableRow'
-import SearchIcon from '@mui/icons-material/Search'
 
-import {
-  IconButton,
-  InputAdornment,
-  OutlinedInput,
-  Stack,
-  TableFooter,
-  TextareaAutosize,
-  TextField,
-} from '@mui/material'
-import { ButtonPaginate } from '../../styles'
+import { IconButton, Stack } from '@mui/material'
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
@@ -82,18 +71,19 @@ const rows = [
 
 export default function ClaimServiceTable() {
   const [page, setPage] = React.useState(0)
+
   const [rowsPerPage, setRowsPerPage] = React.useState(5)
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
   }
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setRowsPerPage(+event.target.value)
-    setPage(0)
-  }
+  // const handleChangeRowsPerPage = (
+  //   event: React.ChangeEvent<HTMLInputElement>,
+  // ) => {
+  //   setRowsPerPage(+event.target.value)
+  //   setPage(0)
+  // }
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }} elevation={0}>
