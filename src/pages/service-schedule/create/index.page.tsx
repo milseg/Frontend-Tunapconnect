@@ -61,6 +61,8 @@ import {
 } from '@mui/material'
 import ModalCreateEditClientVehicle from './components/ModalEditClientVehicle'
 import ClaimServiceTable from './components/ClaimServiceTable'
+
+import { formatCNPJAndCPF } from '@/ultis/formatCNPJAndCPF'
 // import { useForm } from 'react-hook-form'
 
 type updateData = {
@@ -385,7 +387,9 @@ export default function ServiceSchedulesCreate() {
                     <ListItemCard alignItems="flex-start">
                       <InfoCardName>CPF:</InfoCardName>{' '}
                       <InfoCardText>
-                        {client?.document ?? 'Não informado'}
+                        {client?.document
+                          ? formatCNPJAndCPF(client?.document)
+                          : 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                     {client?.phone && client?.phone.length > 0 ? (

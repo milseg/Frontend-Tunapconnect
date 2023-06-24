@@ -47,8 +47,19 @@ const newClientFormSchema = z.object({
     .string()
     .nonempty({ message: 'Digite um nome!' })
     .min(5, { message: 'Digite um nome valido!' }),
-  cpf: z.string().refine(validateCPF, { message: 'CPF inválido!' }),
-  cnpj: z.string().refine(validateCNPJ, { message: 'CNPJ inválido!' }),
+  document: z.string().refine(
+    (e) => {
+      if (validateCPF(e)) {
+        return true
+      }
+      if (validateCNPJ(e)) {
+        return true
+      }
+      return false
+    },
+    { message: 'Digite um valor valido!' },
+  ),
+
   phone: z.array(
     z.object({
       phone: z.string(),
@@ -101,8 +112,7 @@ export default function ModalCreateNewClient({
     resolver: zodResolver(newClientFormSchema),
     defaultValues: {
       name: '',
-      cpf: '',
-      cnpj: '',
+      document: '',
       phone: [{ phone: '' }],
       email: [{ email: '' }],
       address: [{ address: '' }],
@@ -148,12 +158,14 @@ export default function ModalCreateNewClient({
       .map((item: any) => item.address)
       .filter((item: any) => item !== '')
 
+    const documentFormatted = data.document.replace(/\D/g, '')
+
     try {
       const dataFormatted = {
         company_id: companySelected,
         active: true,
         name: data.name,
-        document: data.document,
+        document: documentFormatted,
         phone: listPhone,
         email: listEmail,
         address: listAddress,
@@ -200,8 +212,7 @@ export default function ModalCreateNewClient({
       }
       reset({
         name: '',
-        cpf: '',
-        cnpj: '',
+        document: '',
         phone: [{ phone: '' }],
         email: [{ email: '' }],
         address: [{ address: '' }],
@@ -236,13 +247,14 @@ export default function ModalCreateNewClient({
                   <Switch
                     checked={isCPF}
                     onChange={() => {
-                      if (isCPF) {
-                        // setValue('cnpj', '')
-                        reset({ cnpj: '' })
-                      } else {
-                        // setValue('cpf', '')
-                        reset({ cpf: '' })
-                      }
+                      reset({ document: '' })
+                      // if (isCPF) {
+                      //   // setValue('cnpj', '')
+                      //   reset({ cnpj: '' })
+                      // } else {
+                      //   // setValue('cpf', '')
+                      //   reset({ cpf: '' })
+                      // }
                       setIsCPF(!isCPF)
                     }}
                     name="loading"
@@ -273,21 +285,21 @@ export default function ModalCreateNewClient({
                 }}
               />
             </FormGroup>
-            {isCPF && (
-              <InputText
-                label="CPF"
-                variant="filled"
-                error={!!errors.cpf}
-                // style={{ marginTop: 11 }}
-                fullWidth
-                {...register('cpf', { required: true })}
-                InputProps={{
-                  // @ts-ignore
-                  inputComponent: TextMaskCPF,
-                }}
-              />
-            )}
-            {!isCPF && (
+
+            <InputText
+              label={isCPF ? 'CPF' : 'CNPJ'}
+              variant="filled"
+              error={!!errors.document}
+              // style={{ marginTop: 11 }}
+              fullWidth
+              {...register('document', { required: true })}
+              InputProps={{
+                // @ts-ignore
+                inputComponent: isCPF ? TextMaskCPF : TextMaskCNPJ,
+              }}
+            />
+
+            {/* {!isCPF && (
               <InputText
                 label="CNPJ"
                 variant="filled"
@@ -300,10 +312,12 @@ export default function ModalCreateNewClient({
                   inputComponent: TextMaskCNPJ,
                 }}
               />
+            )} */}
+            {/* {isCPF && (
+              <ErrorContainer>{errors.document?.message}</ErrorContainer>
             )}
-            {isCPF && <ErrorContainer>{errors.cpf?.message}</ErrorContainer>}
-            {!isCPF && <ErrorContainer>{errors.cnpj?.message}</ErrorContainer>}
-
+            {!isCPF && <ErrorContainer>{errors.cnpj?.message}</ErrorContainer>} */}
+            <ErrorContainer>{errors.document?.message}</ErrorContainer>
             {fieldsPhone.map((item, index) => {
               return (
                 <Stack direction="row" key={item.id}>
