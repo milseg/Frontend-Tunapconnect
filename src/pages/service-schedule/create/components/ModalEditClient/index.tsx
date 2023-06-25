@@ -161,12 +161,13 @@ export default function ModalEditClient({
         company_id: companySelected,
         active: true,
         name: formData.name,
-        document: clientData?.document,
+        document: Number(clientData?.document as string),
         phone: listPhone.length > 0 ? listPhone : null,
         email: listEmail.length > 0 ? listEmail : null,
         address: listAddress.length > 0 ? listAddress : null,
       }
 
+      console.log(dataFormatted)
       console.log(dataFormatted)
 
       const resp = await api.put('/client/' + clientData?.id, dataFormatted)

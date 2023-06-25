@@ -29,6 +29,7 @@ import {
   TextMaskPHONE,
   TextMaskCNPJ,
 } from '@/components/InputMask'
+import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
@@ -148,7 +149,7 @@ export default function ModalCreateNewClient({
     setIsLoading(true)
     const listPhone = data.phone
       .map((item: any) => item.phone)
-      .filter((item: any) => item !== '')
+      .filter((item: any) => item !== '').map((item: any) => item.replace(/\D/g, ''))
 
     const listEmail = data.email
       .map((item: any) => item.email)
@@ -165,7 +166,8 @@ export default function ModalCreateNewClient({
         company_id: companySelected,
         active: true,
         name: data.name,
-        document: documentFormatted,
+        cpf: isCPF,
+        document: Number(documentFormatted),
         phone: listPhone,
         email: listEmail,
         address: listAddress,
