@@ -167,11 +167,7 @@ export default function ModalEditClient({
         address: listAddress.length > 0 ? listAddress : null,
       }
 
-      console.log(dataFormatted)
-      console.log(dataFormatted)
-
       const resp = await api.put('/client/' + clientData?.id, dataFormatted)
-      console.log(resp)
 
       handleAddClient(resp.data.data)
       handleEditClient()

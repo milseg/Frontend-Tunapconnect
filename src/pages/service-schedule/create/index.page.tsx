@@ -9,6 +9,7 @@ import Paper from '@mui/material/Paper'
 import SearchIcon from '@mui/icons-material/Search'
 
 import {
+  ClaimServiceResponseType,
   ClientResponseType,
   TechnicalConsultant,
 } from '@/types/service-schedule'
@@ -93,15 +94,10 @@ export default function ServiceSchedulesCreate() {
   const [client, setClient] = useState<ClientResponseType | null>(null)
   const [clientForModalSearch, setClientForModalSearch] =
     useState<ClientResponseType | null>(null)
-  // const [clientFormDataForModalSearch, setClientFormDataForModalSearch] =
-  useState<string | null>(null)
+
   const [clientVehicleCreated, setClientVehicleCreated] =
     useState<ClientVehicleResponseType | null>(null)
 
-  // const [
-  //   clientVehicleFormDataForModalSearch,
-  //   setClientVehicleFormDataForModalSearch,
-  // ] = useState<string | null>(null)
   const [clientVehicle, setClientVehicle] =
     useState<ClientVehicleResponseType | null>()
   const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
@@ -119,8 +115,8 @@ export default function ServiceSchedulesCreate() {
   const [openModalClientSearch, setOpenModalClientSearch] = useState(false)
   const [openModalClientVehicleSearch, setOpenModalClientVehicleSearch] =
     useState(false)
-  // const [openModalClaimServiceSearch, setOpenModalClaimServiceSearch] =
-  //   useState(false)
+  const [claimServiceList, setClaimServiceList] =
+    useState<ClaimServiceResponseType[]>([])
   const [openModalNewClient, setOpenModalNewClient] = useState(false)
   const [openModalEditClient, setOpenModalEditClient] = useState(false)
   const [openModalNewClientVehicle, setOpenModalNewClientVehicle] =
@@ -253,6 +249,41 @@ export default function ServiceSchedulesCreate() {
     setVisitDate(data)
   }
 
+  function handleRemoveClaimService(id: number) {
+    setClaimServiceList(prevState => prevState.filter((c) => c.id !== id))
+  }
+
+  async function handleSaveClaimService(data: string) {
+    console.log(data)
+    try {
+      const resp = await api.post('/claim-service', {
+        company_id: companySelected,
+        description: data
+      })
+      console.log(resp)
+      const isClaimService = claimServiceList.findIndex(r => r.id === resp.data.data.id)
+      if(isClaimService < 0) {
+        setClaimServiceList(prevState => [...prevState, resp.data.data])
+      }
+      // setActionAlerts({
+      //   isOpen: true,
+      //   title: `${resp.data.msg ?? 'Salvo com sucesso!'}!`,
+      //   type: 'success',
+      // })
+    } catch (e: any) {
+      console.log(e.response.data.data)
+      const isClaimService = claimServiceList.findIndex(r => r.id === e.response.data.data.id)
+      if(isClaimService < 0) {
+        setClaimServiceList(prevState => [...prevState, e.response.data.data])
+      }
+      // setActionAlerts({
+      //   isOpen: true,
+      //   title: `${e.response.data.msg ?? 'Error inesperado'}!`,
+      //   type: 'error',
+      // })
+    }
+  }
+
   async function onSave() {
     const dataFormatted: updateData = {
       code: null,
@@ -323,6 +354,12 @@ export default function ServiceSchedulesCreate() {
       refetchOnMount: false,
     },
   )
+
+  // useEffect(() => {
+  //   api.get('/claim-service?company_id=1').then((resp) => {
+  //     setClaimServiceList(resp.data.data)
+  //   })
+  // },[])
 
   useEffect(() => {
     if (dataTechnicalConsultantListStatus === 'success') {
@@ -500,9 +537,6 @@ export default function ServiceSchedulesCreate() {
                         inputProps={{
                           'aria-label': 'weight',
                         }}
-                        // {...registerClient('searchClient', {
-                        //   required: true,
-                        // })}
                       />
                     </Stack>
                   </Box>
@@ -638,89 +672,12 @@ export default function ServiceSchedulesCreate() {
                         inputProps={{
                           'aria-label': 'weight',
                         }}
-                        // {...registerClientVehicle('searchClientVehicle')}
                       />
                     </Stack>
                   </Box>
                 )}
               </Paper>
-              {/* Claim Service */}
-              {/* <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <TitleCard>Serviços</TitleCard>
-                  <ButtonAdd
-                    aria-label="add to client"
-                    onClick={() => {
-                      setOpenModalClientVehicleSearch(true)
-                    }}
-                  >
-                    <AddCircleIcon />
-                  </ButtonAdd>
-                </Stack>
-                <DividerCard />
-                <List dense={false}>
-                  <ListItemCard>
-                    <InfoCardName>Marca:</InfoCardName>{' '}
-                    {clientVehicle?.brand ? (
-                      <InfoCardText>{clientVehicle?.brand}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Modelo:</InfoCardName>{' '}
-                    {clientVehicle?.model ? (
-                      <InfoCardText>{clientVehicle?.model}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Veículo:</InfoCardName>{' '}
-                    {clientVehicle?.vehicle ? (
-                      <InfoCardText>{clientVehicle?.vehicle}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Cor:</InfoCardName>{' '}
-                    {clientVehicle?.color ? (
-                      <InfoCardText>{clientVehicle?.color}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Chassi:</InfoCardName>{' '}
-                    {clientVehicle?.chassis ? (
-                      <InfoCardText>{clientVehicle?.chassis}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Placa:</InfoCardName>{' '}
-                    {clientVehicle?.plate ? (
-                      <InfoCardText>
-                        {formatPlate(clientVehicle?.plate)}
-                      </InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                </List>
-              </Paper> */}
+             
             </Stack>
           </Grid>
 
@@ -790,12 +747,17 @@ export default function ServiceSchedulesCreate() {
                         action: () => {},
                       },
                     ]}
+                    disabledButton
                   />
                 </Stack>
                 <DividerCard />
-                {/* @ts-ignore */}
 
-                <ClaimServiceTable />
+
+                <ClaimServiceTable 
+                  claimServiceList={claimServiceList}
+                  handleSaveClaimService={handleSaveClaimService}
+                  handleRemoveClaimService={handleRemoveClaimService}
+                />
               </Paper>
               <Paper
                 sx={{
@@ -910,11 +872,7 @@ export default function ServiceSchedulesCreate() {
         handleOpenModalNewClientVehicle={handleOpenModalNewClientVehicle}
         dataVehicleCreated={clientVehicleCreated}
       />
-      {/* <ModalSearchClaimService
-        handleClose={handleCloseModalClaimServiceVehicleSearch}
-        openMolal={openModalClaimServiceSearch}
-        handleAddClaimService={handleAddClaimServiceVehicle}
-      /> */}
+
       <ModalCreateNewClient
         isOpen={openModalNewClient}
         handleClose={handleCloseModalNewClient}

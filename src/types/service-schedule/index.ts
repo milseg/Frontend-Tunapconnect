@@ -126,3 +126,11 @@ export interface ServiceScheduleType {
   technical_consultant: TechnicalConsultantType
   claims_service: any[]
 }
+
+
+export type ClaimServiceResponseType = {
+  company_id: number,
+  integration_code: null,
+  id: number
+  description: string
+}

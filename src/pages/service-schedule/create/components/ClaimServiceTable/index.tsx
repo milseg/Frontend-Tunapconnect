@@ -12,6 +12,9 @@ import { IconButton, Stack } from '@mui/material'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import { TextareaReclamation } from './styles'
+import { useContext, useState } from 'react'
+import { ClaimServiceResponseType } from '@/types/service-schedule'
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Column {
   id: 'name' | 'code' | 'population' | 'size' | 'density'
@@ -69,12 +72,28 @@ const rows = [
   createData('Brazil', 'BR', 210147125, 8515767),
 ]
 
-export default function ClaimServiceTable() {
-  const [page, setPage] = React.useState(0)
+interface ClaimServiceTableProps{
+  handleSaveClaimService: (value: string) => void;
+  claimServiceList : ClaimServiceResponseType[] | []
+  handleRemoveClaimService: (value: number) => void;
+}
 
-  const [rowsPerPage, setRowsPerPage] = React.useState(5)
+interface onKeyBoardEventTextArea extends React.KeyboardEvent<HTMLTextAreaElement>  {
+  target: EventTarget  & {
+    value : string;
+  }
+}
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+export default function ClaimServiceTable({ claimServiceList, handleSaveClaimService, handleRemoveClaimService}: ClaimServiceTableProps) {
+  const [page, setPage] = useState(0)
+  const [claimServices, setClaimServices] = useState<ClaimServiceResponseType[]>([])
+  const [textareaReclamationValue, setTextareaReclamationValue] = useState('')
+  
+  const rowsPerPage = 5
+
+  // const { companySelected } = useContext(CompanyContext)
+
+  const handleChangePage = (newPage: number) => {
     setPage(newPage)
   }
 
@@ -91,11 +110,34 @@ export default function ClaimServiceTable() {
         id="outlined-multiline-static"
         minRows={1}
         maxRows={6}
-        onKeyDown={(e) => {
+        onKeyDown={(e:onKeyBoardEventTextArea) => {
           if (e.ctrlKey && e.key === 'Enter') {
-            console.log('aeee')
+            setTextareaReclamationValue(e.target.value+'\n')
+          } else {
+            if (e.key === 'Enter' && e.code === 'Enter' ) {
+              e.preventDefault()
+              handleSaveClaimService(e.target.value)
+              setTextareaReclamationValue('')
+            } 
           }
         }}
+        onChange={(e) => {
+          setTextareaReclamationValue(prevState => {
+            if(e.target.value[e.target.value.length - 1] === '\n'){
+              if(prevState[prevState.length - 1] !== '\n') {
+                
+                return e.target.value
+              }
+              if(prevState[prevState.length - 2] === '\n') {
+                return e.target.value
+              }
+              return prevState
+            } else {
+              return e.target.value
+            }
+          })
+        }}
+        value={textareaReclamationValue}
       />
 
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -114,37 +156,52 @@ export default function ClaimServiceTable() {
             </TableRow>
           </TableHead> */}
           <TableBody>
-            {rows
+            {
+            claimServiceList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).length > 0 ?
+            claimServiceList
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
                 return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                    {columns.map((column) => {
-                      const value = row[column.id]
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.format && typeof value === 'number'
-                            ? column.format(value)
-                            : value}
-                        </TableCell>
-                      )
-                    })}
+                  <TableRow hover key={row.id}>
+                    <TableCell  align='left'>
+                      {row.description}
+                    </TableCell>
+                    <TableCell  align='right'>
+                    <IconButton aria-label="delete" color='error' onClick={() => handleRemoveClaimService(row.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                    </TableCell>
                   </TableRow>
                 )
-              })}
+              }): (
+                <TableRow hover >
+             
+                <TableCell  align='center' colSpan={2}>
+                  Sem reclamações
+                </TableCell>
+              </TableRow>
+              )}
           </TableBody>
         </Table>
       </TableContainer>
       <Stack direction="row" justifyContent="center" gap={1} marginTop={2}>
         <IconButton
-        // onClick={handlePaginatePrevious}
-        // disabled={DisableButtonPrevious}
+        onClick={() => {
+     
+          if (page - 1 >= 0) {
+            setPage(page - 1)
+          }
+        }}
         >
           <ArrowBackIosNewIcon />
         </IconButton>
         <IconButton
-        // type="submit"
-        // onClick={handlePaginateNext}
+        onClick={() => {
+          const isNextPage = claimServiceList.length > 0 ? (claimServiceList.length / 5) : 0
+          if(page < isNextPage) {
+            setPage(page + 1)
+          }
+        }}
         // disabled={DisableButtonNext}
         >
           <ArrowForwardIosIcon />
