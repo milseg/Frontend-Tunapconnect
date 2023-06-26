@@ -68,7 +68,7 @@ export function CompanyProvider({ children }: GeralProviderProps) {
   }
 
   const deselectCompany = 
-    async function() {
+    function() {
       destroyCookie(null, process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string)
       setCompanyData(null)
       setCompanySelected(null)
