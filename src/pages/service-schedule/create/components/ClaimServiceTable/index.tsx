@@ -180,13 +180,9 @@ export default function ClaimServiceTable({ claimServiceList, handleSaveClaimSer
                 )
               }): (
                 <TableRow hover >
-                  
                 <TableCell  align='center' colSpan={2}>
-                 <span dangerouslySetInnerHTML={{__html: `eeeeee\n\n\eeee`.replace(/\n/g, '<br>')}}></span> 
-                </TableCell>
-                {/* <TableCell  align='center' colSpan={2}>
                   Sem reclamações
-                </TableCell> */}
+                </TableCell>
               </TableRow>
               )}
           </TableBody>
