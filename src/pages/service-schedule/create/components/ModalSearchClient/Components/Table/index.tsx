@@ -17,6 +17,7 @@ interface ClientsTableProps {
   handleSelectedClient: (client: ClientResponseType) => void
   data: ClientResponseType[]
   isLoading: boolean
+  handleDoubleClick: () => void
 }
 
 export default function ClientsTable({
@@ -24,6 +25,7 @@ export default function ClientsTable({
   handleModalNewClient,
   handleSelectedClient,
   isLoading,
+  handleDoubleClick
 }: ClientsTableProps) {
   const [clientSelected, setClientSelected] = useState<number | null>(null)
   return (
@@ -48,7 +50,10 @@ export default function ClientsTable({
                   sx={{
                     '&:last-child td, &:last-child th': { border: 0 },
                   }}
-                  onClick={() => {
+                  onClick={(e) => {
+                    if(e.detail === 2) {
+                      handleDoubleClick()
+                    }
                     handleSelectedClient(row)
                     setClientSelected(row.id)
                   }}

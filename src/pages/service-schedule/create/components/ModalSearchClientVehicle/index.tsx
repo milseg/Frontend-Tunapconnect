@@ -125,6 +125,16 @@ export default function ModalSearchClientVehicle({
     })
   }
 
+  function handleDoubleClickClientVehicle() {
+    if (clientVehicleSelected) {
+      handleAddClientVehicle(clientVehicleSelected)
+      handleClose()
+      setClientVehicleSelected(null)
+      setClientVehicleList([])
+      setValue('search', '')
+    }
+  }
+
   useEffect(() => {
     if (openMolal) {
       reset({
@@ -198,6 +208,7 @@ export default function ModalSearchClientVehicle({
               handleModalNewClient={handleClientVehicleModal}
               handleSelectedClientVehicle={handleSelectedClientVehicle}
               isLoading={isLoading}
+              handleDoubleClick={handleDoubleClickClientVehicle}
             />
 
             {clientVehicleList.length > 0 && (

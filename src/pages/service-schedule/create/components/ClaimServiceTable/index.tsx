@@ -51,39 +51,9 @@ interface onKeyBoardEventTextArea extends React.KeyboardEvent<HTMLTextAreaElemen
 
 export default function ClaimServiceTable({ claimServiceList, handleSaveClaimService, handleRemoveClaimService}: ClaimServiceTableProps) {
   const [page, setPage] = useState(0)
-  const [claimServices, setClaimServices] = useState<ClaimServiceResponseType[]>([])
   const [textareaReclamationValue, setTextareaReclamationValue] = useState('')
   
   const rowsPerPage = 5
-
-  // const { companySelected } = useContext(CompanyContext)
-
-  const handleChangePage = (newPage: number) => {
-    setPage(newPage)
-  }
-
-  // const handleChangeRowsPerPage = (
-  //   event: React.ChangeEvent<HTMLInputElement>,
-  // ) => {
-  //   setRowsPerPage(+event.target.value)
-  //   setPage(0)
-  // }
-
-  function formatterStringBreak(value: string) {
-    // const regex = /(\n)/g
-    const string = value.split(/(\n)/g).map(item => {
-      return item === '\n' ? <br/> : item
-    })
-    return string
-  }
-
-  React.useEffect(() => {
-    const regex = /(\n)/g
-    const string = '1111\n\n222'.split(regex).map(item => {
-      return item === '\n' ? <br/> : item
-    })
-    console.log( string)
-  },[])
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }} elevation={0}>
