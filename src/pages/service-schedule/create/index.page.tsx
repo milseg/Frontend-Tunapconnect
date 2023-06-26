@@ -64,6 +64,7 @@ import ModalCreateEditClientVehicle from './components/ModalEditClientVehicle'
 import ClaimServiceTable from './components/ClaimServiceTable'
 
 import { formatCNPJAndCPF } from '@/ultis/formatCNPJAndCPF'
+import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 // import { useForm } from 'react-hook-form'
 
 type updateData = {
@@ -126,6 +127,7 @@ export default function ServiceSchedulesCreate() {
   const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
+  const { setServiceSchedule } = useContext(ServiceScheduleContext)
 
   // const {
   //   register: registerClient,
@@ -297,19 +299,20 @@ export default function ServiceSchedulesCreate() {
       checklist_version_id: 14,
     }
 
-    console.log(dataFormatted)
+  
 
     try {
       const respCreate: any = await api.post('/service-schedule', dataFormatted)
-      const idCreatedResponse = respCreate.data.data.id
+      const idCreatedResponse = respCreate.data.data
+      setServiceSchedule(idCreatedResponse, true)
 
-      router.push('/service-schedule/' + idCreatedResponse)
+      router.push('/service-schedule/' + idCreatedResponse.id)
 
-      setActionAlerts({
-        isOpen: true,
-        title: `${respCreate.data.msg ?? 'Salvo com sucesso!'}!`,
-        type: 'success',
-      })
+      // setActionAlerts({
+      //   isOpen: true,
+      //   title: `${respCreate.data.msg ?? 'Salvo com sucesso!'}!`,
+      //   type: 'success',
+      // })
     } catch (e: any) {
       console.error(e)
       setActionAlerts({
