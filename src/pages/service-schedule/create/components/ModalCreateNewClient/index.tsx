@@ -13,11 +13,23 @@ import { ButtonAddInputs, ButtonModalActions, InputText } from '../../styles'
 import { useContext, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
-import { Backdrop, CircularProgress } from '@mui/material'
+import {
+  Backdrop,
+  CircularProgress,
+  FormControlLabel,
+  FormGroup,
+  Switch,
+} from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientResponseType } from '@/types/service-schedule'
 import { ErrorContainer } from './styles'
-import { validateCPF } from '@/ultis/validation'
+import { validateCNPJ, validateCPF } from '@/ultis/validation'
+import {
+  TextMaskCPF,
+  TextMaskPHONE,
+  TextMaskCNPJ,
+} from '@/components/InputMask'
+import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 
 interface ModalCreateNewClientProps {
   handleClose: () => void
@@ -36,7 +48,19 @@ const newClientFormSchema = z.object({
     .string()
     .nonempty({ message: 'Digite um nome!' })
     .min(5, { message: 'Digite um nome valido!' }),
-  document: z.string().refine(validateCPF, { message: 'CPF inválido!' }),
+  document: z.string().refine(
+    (e) => {
+      if (validateCPF(e)) {
+        return true
+      }
+      if (validateCNPJ(e)) {
+        return true
+      }
+      return false
+    },
+    { message: 'Digite um valor valido!' },
+  ),
+
   phone: z.array(
     z.object({
       phone: z.string(),
@@ -70,6 +94,7 @@ export default function ModalCreateNewClient({
   handleSaveReturnClient,
 }: ModalCreateNewClientProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [isCPF, setIsCPF] = useState(true)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
     isOpen: false,
     title: '',
@@ -124,7 +149,7 @@ export default function ModalCreateNewClient({
     setIsLoading(true)
     const listPhone = data.phone
       .map((item: any) => item.phone)
-      .filter((item: any) => item !== '')
+      .filter((item: any) => item !== '').map((item: any) => item.replace(/\D/g, ''))
 
     const listEmail = data.email
       .map((item: any) => item.email)
@@ -134,12 +159,15 @@ export default function ModalCreateNewClient({
       .map((item: any) => item.address)
       .filter((item: any) => item !== '')
 
+    const documentFormatted = data.document.replace(/\D/g, '')
+
     try {
       const dataFormatted = {
         company_id: companySelected,
         active: true,
         name: data.name,
-        document: data.document,
+        cpf: isCPF,
+        document: Number(documentFormatted),
         phone: listPhone,
         email: listEmail,
         address: listAddress,
@@ -181,6 +209,9 @@ export default function ModalCreateNewClient({
 
   useEffect(() => {
     if (isOpen) {
+      if (!isCPF) {
+        setIsCPF(true)
+      }
       reset({
         name: '',
         document: '',
@@ -207,16 +238,87 @@ export default function ModalCreateNewClient({
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
+              error={!!errors.name}
               {...register('name', { required: true })}
             />
+
             <ErrorContainer>{errors.name?.message}</ErrorContainer>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isCPF}
+                    onChange={() => {
+                      reset({ document: '' })
+                      // if (isCPF) {
+                      //   // setValue('cnpj', '')
+                      //   reset({ cnpj: '' })
+                      // } else {
+                      //   // setValue('cpf', '')
+                      //   reset({ cpf: '' })
+                      // }
+                      setIsCPF(!isCPF)
+                    }}
+                    name="loading"
+                    color="primary"
+                    size="small"
+                    // defaultChecked
+                    sx={{
+                      '& .MuiSwitch-switchBase': {
+                        '&.Mui-checked': {
+                          transform: 'translateX(16px)',
+                          color: '#0E948B',
+                          '& + .MuiSwitch-track': {
+                            background: '#0E948B',
+                          },
+                        },
+                      },
+                    }}
+                  />
+                }
+                labelPlacement="start"
+                label="É CPF ? "
+                sx={{
+                  '& > span': {
+                    fontSize: 13,
+                    fontWeight: 'bold',
+                  },
+                  marginRight: '0',
+                }}
+              />
+            </FormGroup>
+
             <InputText
-              label="CPF"
+              label={isCPF ? 'CPF' : 'CNPJ'}
               variant="filled"
-              style={{ marginTop: 11 }}
+              error={!!errors.document}
+              // style={{ marginTop: 11 }}
               fullWidth
               {...register('document', { required: true })}
+              InputProps={{
+                // @ts-ignore
+                inputComponent: isCPF ? TextMaskCPF : TextMaskCNPJ,
+              }}
             />
+
+            {/* {!isCPF && (
+              <InputText
+                label="CNPJ"
+                variant="filled"
+                // style={{ marginTop: 11 }}
+                error={!!errors.cnpj}
+                fullWidth
+                {...register('cnpj', { required: true })}
+                InputProps={{
+                  // @ts-ignore
+                  inputComponent: TextMaskCNPJ,
+                }}
+              />
+            )} */}
+            {/* {isCPF && (
+              <ErrorContainer>{errors.document?.message}</ErrorContainer>
+            )}
+            {!isCPF && <ErrorContainer>{errors.cnpj?.message}</ErrorContainer>} */}
             <ErrorContainer>{errors.document?.message}</ErrorContainer>
             {fieldsPhone.map((item, index) => {
               return (
@@ -229,6 +331,10 @@ export default function ModalCreateNewClient({
                         style={{ marginTop: 11 }}
                         fullWidth
                         {...field}
+                        InputProps={{
+                          // @ts-ignore
+                          inputComponent: TextMaskPHONE,
+                        }}
                       />
                     )}
                     name={`phone.${index}.phone`}
@@ -265,6 +371,9 @@ export default function ModalCreateNewClient({
                           variant="filled"
                           style={{ marginTop: 11 }}
                           fullWidth
+                          error={
+                            !!errors?.email && !!errors?.email[index]?.email
+                          }
                           {...field}
                         />
                       )}

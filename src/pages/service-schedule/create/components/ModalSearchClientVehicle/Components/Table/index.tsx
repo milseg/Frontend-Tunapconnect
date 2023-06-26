@@ -18,6 +18,7 @@ interface ClientVehicleTableProps {
   handleSelectedClientVehicle: (client: ClientVehicleResponseType) => void
   data: ClientVehicleResponseType[] | []
   isLoading: boolean
+  handleDoubleClick: () => void
 }
 
 export default function ClientVehicleTable({
@@ -25,6 +26,7 @@ export default function ClientVehicleTable({
   handleModalNewClient,
   handleSelectedClientVehicle,
   isLoading,
+  handleDoubleClick
 }: ClientVehicleTableProps) {
   const [clientSelected, setClientSelected] = useState<number | null>(null)
   return (
@@ -50,7 +52,10 @@ export default function ClientVehicleTable({
                   sx={{
                     '&:last-child td, &:last-child th': { border: 0 },
                   }}
-                  onClick={() => {
+                  onClick={(e) => {
+                    if(e.detail === 2) {
+                      handleDoubleClick()
+                    }
                     handleSelectedClientVehicle(row)
                     setClientSelected(row.id)
                   }}

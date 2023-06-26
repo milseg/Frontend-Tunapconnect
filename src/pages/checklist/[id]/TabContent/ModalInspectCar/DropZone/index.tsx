@@ -203,6 +203,7 @@ export function InspectionDropzone({
                 href={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${item?.url}`}
                 target="_blank"
                 key={item?.id}
+                rel="noreferrer"
               >
                 <Image
                   style={{

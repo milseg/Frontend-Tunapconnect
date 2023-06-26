@@ -9,6 +9,7 @@ import Paper from '@mui/material/Paper'
 import SearchIcon from '@mui/icons-material/Search'
 
 import {
+  ClaimServiceResponseType,
   ClientResponseType,
   TechnicalConsultant,
 } from '@/types/service-schedule'
@@ -60,6 +61,10 @@ import {
   Typography,
 } from '@mui/material'
 import ModalCreateEditClientVehicle from './components/ModalEditClientVehicle'
+import ClaimServiceTable from './components/ClaimServiceTable'
+
+import { formatCNPJAndCPF } from '@/ultis/formatCNPJAndCPF'
+import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 // import { useForm } from 'react-hook-form'
 
 type updateData = {
@@ -90,14 +95,10 @@ export default function ServiceSchedulesCreate() {
   const [client, setClient] = useState<ClientResponseType | null>(null)
   const [clientForModalSearch, setClientForModalSearch] =
     useState<ClientResponseType | null>(null)
-  // const [clientFormDataForModalSearch, setClientFormDataForModalSearch] =
-  useState<string | null>(null)
+
   const [clientVehicleCreated, setClientVehicleCreated] =
     useState<ClientVehicleResponseType | null>(null)
-  // const [
-  //   clientVehicleFormDataForModalSearch,
-  //   setClientVehicleFormDataForModalSearch,
-  // ] = useState<string | null>(null)
+
   const [clientVehicle, setClientVehicle] =
     useState<ClientVehicleResponseType | null>()
   const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
@@ -115,8 +116,8 @@ export default function ServiceSchedulesCreate() {
   const [openModalClientSearch, setOpenModalClientSearch] = useState(false)
   const [openModalClientVehicleSearch, setOpenModalClientVehicleSearch] =
     useState(false)
-  // const [openModalClaimServiceSearch, setOpenModalClaimServiceSearch] =
-  //   useState(false)
+  const [claimServiceList, setClaimServiceList] =
+    useState<ClaimServiceResponseType[]>([])
   const [openModalNewClient, setOpenModalNewClient] = useState(false)
   const [openModalEditClient, setOpenModalEditClient] = useState(false)
   const [openModalNewClientVehicle, setOpenModalNewClientVehicle] =
@@ -126,6 +127,7 @@ export default function ServiceSchedulesCreate() {
   const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
+  const { setServiceSchedule } = useContext(ServiceScheduleContext)
 
   // const {
   //   register: registerClient,
@@ -249,6 +251,36 @@ export default function ServiceSchedulesCreate() {
     setVisitDate(data)
   }
 
+  function handleRemoveClaimService(id: number) {
+    setClaimServiceList(prevState => prevState.filter((c) => c.id !== id))
+  }
+
+  async function handleSaveClaimService(data: string) {
+    console.log(data)
+    try {
+      const resp = await api.post('/claim-service', {
+        company_id: companySelected,
+        description: data
+      })
+      console.log(resp)
+      const isClaimService = claimServiceList.findIndex(r => r.id === resp.data.data.id)
+      if(isClaimService < 0) {
+        setClaimServiceList(prevState => [...prevState, resp.data.data])
+      }
+      // setActionAlerts({
+      //   isOpen: true,
+      //   title: `${resp.data.msg ?? 'Salvo com sucesso!'}!`,
+      //   type: 'success',
+      // })
+    } catch (e: any) {
+      setActionAlerts({
+        isOpen: true,
+        title: `${e.response.data.msg ?? 'Error inesperado'}!`,
+        type: 'error',
+      })
+    }
+  }
+
   async function onSave() {
     const dataFormatted: updateData = {
       code: null,
@@ -258,22 +290,26 @@ export default function ServiceSchedulesCreate() {
       client_vehicle_id: clientVehicle?.id,
       company_id: `${companySelected}`,
       plate: clientVehicle?.plate,
-      claims_service: [],
+      claims_service: [...claimServiceList],
       checklist_version_id: 14,
     }
 
+  
+
     try {
       const respCreate: any = await api.post('/service-schedule', dataFormatted)
-      const idCreatedResponse = respCreate.data.data.id
+      const idCreatedResponse = respCreate.data.data
+      setServiceSchedule(idCreatedResponse, true)
 
-      router.push('/service-schedule/' + idCreatedResponse)
+      router.push('/service-schedule/' + idCreatedResponse.id)
 
-      setActionAlerts({
-        isOpen: true,
-        title: `${respCreate.data.msg ?? 'Salvo com sucesso!'}!`,
-        type: 'success',
-      })
+      // setActionAlerts({
+      //   isOpen: true,
+      //   title: `${respCreate.data.msg ?? 'Salvo com sucesso!'}!`,
+      //   type: 'success',
+      // })
     } catch (e: any) {
+      console.error(e)
       setActionAlerts({
         isOpen: true,
         title: `${e.response.data.msg ?? 'Error inesperado'}!`,
@@ -319,6 +355,12 @@ export default function ServiceSchedulesCreate() {
       refetchOnMount: false,
     },
   )
+
+  // useEffect(() => {
+  //   api.get('/claim-service?company_id=1').then((resp) => {
+  //     setClaimServiceList(resp.data.data)
+  //   })
+  // },[])
 
   useEffect(() => {
     if (dataTechnicalConsultantListStatus === 'success') {
@@ -383,7 +425,9 @@ export default function ServiceSchedulesCreate() {
                     <ListItemCard alignItems="flex-start">
                       <InfoCardName>CPF:</InfoCardName>{' '}
                       <InfoCardText>
-                        {client?.document ?? 'Não informado'}
+                        {client?.document
+                          ? formatCNPJAndCPF(client?.document)
+                          : 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                     {client?.phone && client?.phone.length > 0 ? (
@@ -494,9 +538,6 @@ export default function ServiceSchedulesCreate() {
                         inputProps={{
                           'aria-label': 'weight',
                         }}
-                        // {...registerClient('searchClient', {
-                        //   required: true,
-                        // })}
                       />
                     </Stack>
                   </Box>
@@ -632,94 +673,17 @@ export default function ServiceSchedulesCreate() {
                         inputProps={{
                           'aria-label': 'weight',
                         }}
-                        // {...registerClientVehicle('searchClientVehicle')}
                       />
                     </Stack>
                   </Box>
                 )}
               </Paper>
-              {/* Claim Service */}
-              {/* <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <TitleCard>Serviços</TitleCard>
-                  <ButtonAdd
-                    aria-label="add to client"
-                    onClick={() => {
-                      setOpenModalClientVehicleSearch(true)
-                    }}
-                  >
-                    <AddCircleIcon />
-                  </ButtonAdd>
-                </Stack>
-                <DividerCard />
-                <List dense={false}>
-                  <ListItemCard>
-                    <InfoCardName>Marca:</InfoCardName>{' '}
-                    {clientVehicle?.brand ? (
-                      <InfoCardText>{clientVehicle?.brand}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Modelo:</InfoCardName>{' '}
-                    {clientVehicle?.model ? (
-                      <InfoCardText>{clientVehicle?.model}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Veículo:</InfoCardName>{' '}
-                    {clientVehicle?.vehicle ? (
-                      <InfoCardText>{clientVehicle?.vehicle}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Cor:</InfoCardName>{' '}
-                    {clientVehicle?.color ? (
-                      <InfoCardText>{clientVehicle?.color}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Chassi:</InfoCardName>{' '}
-                    {clientVehicle?.chassis ? (
-                      <InfoCardText>{clientVehicle?.chassis}</InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Placa:</InfoCardName>{' '}
-                    {clientVehicle?.plate ? (
-                      <InfoCardText>
-                        {formatPlate(clientVehicle?.plate)}
-                      </InfoCardText>
-                    ) : (
-                      <InfoCardText width="100%"></InfoCardText>
-                    )}
-                  </ListItemCard>
-                </List>
-              </Paper> */}
+             
             </Stack>
           </Grid>
 
           <Grid item xs={12} md={5} lg={5}>
-            <Stack spacing={2}>
+            <Stack spacing={3}>
               {/* Agendamento */}
               <Paper
                 sx={{
@@ -748,7 +712,7 @@ export default function ServiceSchedulesCreate() {
                   </ListItemCard>
                 </List>
               </Paper>
-              <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
+              {/* <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
                 <Paper
                   sx={{
                     p: '0 2',
@@ -758,8 +722,44 @@ export default function ServiceSchedulesCreate() {
                   }}
                   elevation={0}
                 ></Paper>
-              </Grid>
+              </Grid> */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Reclamações</TitleCard>
+                  <MoreOptionsServiceScheduleCreate
+                    aria-label="options claims service"
+                    buttons={[
+                      {
+                        label: 'Editar',
+                        action: () => {},
+                      },
+                      {
+                        label: 'Pesquisar',
+                        action: () => {},
+                      },
+                    ]}
+                    disabledButton
+                  />
+                </Stack>
+                <DividerCard />
 
+
+                <ClaimServiceTable 
+                  claimServiceList={claimServiceList}
+                  handleSaveClaimService={handleSaveClaimService}
+                  handleRemoveClaimService={handleRemoveClaimService}
+                />
+              </Paper>
               <Paper
                 sx={{
                   p: 2,
@@ -873,11 +873,7 @@ export default function ServiceSchedulesCreate() {
         handleOpenModalNewClientVehicle={handleOpenModalNewClientVehicle}
         dataVehicleCreated={clientVehicleCreated}
       />
-      {/* <ModalSearchClaimService
-        handleClose={handleCloseModalClaimServiceVehicleSearch}
-        openMolal={openModalClaimServiceSearch}
-        handleAddClaimService={handleAddClaimServiceVehicle}
-      /> */}
+
       <ModalCreateNewClient
         isOpen={openModalNewClient}
         handleClose={handleCloseModalNewClient}

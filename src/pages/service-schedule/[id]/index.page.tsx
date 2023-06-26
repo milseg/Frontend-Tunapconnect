@@ -116,7 +116,7 @@ export default function ServiceSchedulesEdit() {
   const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
-  const { serviceScheduleState, setServiceSchedule, setCheckList } = useContext(
+  const { serviceScheduleState, setServiceSchedule, setCheckList, setServiceScheduleiSCreated } = useContext(
     ServiceScheduleContext,
   )
 
@@ -306,6 +306,17 @@ export default function ServiceSchedulesEdit() {
   function handleCheckListModelListModal() {
     setOpenCheckListModelListModal(false)
   }
+
+  useEffect(() => {
+      if(serviceScheduleState.serviceScheduleiSCreated) {
+        setActionAlerts({
+          isOpen: true,
+          title: 'Criado com sucesso!',
+          type: 'success',
+        })
+      }
+      return () => setServiceScheduleiSCreated(false)
+  }, [])
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>

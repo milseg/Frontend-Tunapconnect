@@ -7,11 +7,13 @@ type StateType = {
   serviceSchedule: ServiceScheduleType | null
   checklist: ChecklistReturnType | null
   checklistModel: ChecklistModelType | null
+  serviceScheduleiSCreated: boolean
 }
 
 type ServiceScheduleContextProps = {
   serviceScheduleState: StateType
-  setServiceSchedule: (data: ServiceScheduleType) => void
+  setServiceScheduleiSCreated: (value: boolean) => void
+  setServiceSchedule: (data: ServiceScheduleType, isCreated?: boolean) => void
   setCheckList: (data: ChecklistProps) => void
   setCheckListModel: (data: ChecklistModelType) => void
 }
@@ -30,6 +32,7 @@ export function ServiceScheduleProvider({
     serviceScheduleListReducer,
     {
       serviceSchedule: null,
+      serviceScheduleiSCreated: false,
       checklist: null,
       checklistModel: null,
     },
@@ -44,7 +47,19 @@ export function ServiceScheduleProvider({
       case 'ADD_NEW_SERVICE_SCHEDULE':
         return {
           ...state,
-          serviceSchedule: payload,
+          serviceSchedule: payload.data,
+          serviceScheduleiSCreated: payload.serviceScheduleiSCreated
+        }
+      case 'IS_CREATED_NEW_SERVICE_SCHEDULE':
+        return {
+          ...state,
+          serviceScheduleiSCreated: payload.data
+        }
+      case 'ADD_NEW_SERVICE_SCHEDULE':
+        return {
+          ...state,
+          serviceSchedule: payload.data,
+          serviceScheduleiSCreated: payload.serviceScheduleiSCreated
         }
       case 'ADD_NEW_CHECKLIST':
         return {
@@ -66,10 +81,21 @@ export function ServiceScheduleProvider({
     }
   }
 
-  function setServiceSchedule(data: ServiceScheduleType) {
+  function setServiceSchedule(dataServiceSchedule: ServiceScheduleType, serviceScheduleiSCreated = false ) {
+    const data ={
+      data: dataServiceSchedule,
+      serviceScheduleiSCreated
+    }
     dispatch({
       type: 'ADD_NEW_SERVICE_SCHEDULE',
       payload: data,
+    })
+  }
+
+  function setServiceScheduleiSCreated(value: boolean) {
+    dispatch({
+      type: 'IS_CREATED_NEW_SERVICE_SCHEDULE',
+      payload: value,
     })
   }
 
@@ -95,6 +121,7 @@ export function ServiceScheduleProvider({
         setCheckList,
         serviceScheduleState,
         setCheckListModel,
+        setServiceScheduleiSCreated
       }}
     >
       {children}

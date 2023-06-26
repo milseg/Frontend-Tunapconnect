@@ -123,6 +123,16 @@ export default function ModalSearchClient({
     })
   }
 
+  function handleDoubleClickClient(){
+    if(clientSelected) {
+      handleAddClient(clientSelected)
+      handleClose()
+      setClientList([])
+      setClientSelected(null)
+      setValue('search', '')
+    }
+  }
+
   useEffect(() => {
     if (openMolal) {
       reset({
@@ -195,6 +205,7 @@ export default function ModalSearchClient({
               handleModalNewClient={handleClientModal}
               handleSelectedClient={handleSelectedClient}
               isLoading={isLoading}
+              handleDoubleClick={handleDoubleClickClient}
             />
 
             {clientList.length > 0 && (
