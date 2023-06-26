@@ -15,6 +15,7 @@ import { TextareaReclamation } from './styles'
 import { useContext, useState } from 'react'
 import { ClaimServiceResponseType } from '@/types/service-schedule'
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Html } from 'next/document'
 
 interface Column {
   id: 'name' | 'code' | 'population' | 'size' | 'density'
@@ -164,7 +165,11 @@ export default function ClaimServiceTable({ claimServiceList, handleSaveClaimSer
                 return (
                   <TableRow hover key={row.id}>
                     <TableCell  align='left'>
-                      {row.description}
+                      {row.description.includes('\n')? (
+                        <span dangerouslySetInnerHTML={{__html: row.description.replace(/\n/g, '<br>')}}></span> 
+                      ): row.description}
+                    {/* <span dangerouslySetInnerHTML={{__html: row.description.replace(/\n/g, '<br>')}}></span> 
+                      {row.description} */}
                     </TableCell>
                     <TableCell  align='right'>
                     <IconButton aria-label="delete" color='error' onClick={() => handleRemoveClaimService(row.id)}>
@@ -175,10 +180,13 @@ export default function ClaimServiceTable({ claimServiceList, handleSaveClaimSer
                 )
               }): (
                 <TableRow hover >
-             
+                  
                 <TableCell  align='center' colSpan={2}>
-                  Sem reclamações
+                 <span dangerouslySetInnerHTML={{__html: `eeeeee\n\n\eeee`.replace(/\n/g, '<br>')}}></span> 
                 </TableCell>
+                {/* <TableCell  align='center' colSpan={2}>
+                  Sem reclamações
+                </TableCell> */}
               </TableRow>
               )}
           </TableBody>

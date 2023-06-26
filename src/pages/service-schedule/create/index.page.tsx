@@ -293,9 +293,11 @@ export default function ServiceSchedulesCreate() {
       client_vehicle_id: clientVehicle?.id,
       company_id: `${companySelected}`,
       plate: clientVehicle?.plate,
-      claims_service: [],
+      claims_service: [...claimServiceList],
       checklist_version_id: 14,
     }
+
+    console.log(dataFormatted)
 
     try {
       const respCreate: any = await api.post('/service-schedule', dataFormatted)
@@ -309,6 +311,7 @@ export default function ServiceSchedulesCreate() {
         type: 'success',
       })
     } catch (e: any) {
+      console.error(e)
       setActionAlerts({
         isOpen: true,
         title: `${e.response.data.msg ?? 'Error inesperado'}!`,
