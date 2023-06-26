@@ -273,16 +273,11 @@ export default function ServiceSchedulesCreate() {
       //   type: 'success',
       // })
     } catch (e: any) {
-      console.log(e.response.data.data)
-      const isClaimService = claimServiceList.findIndex(r => r.id === e.response.data.data.id)
-      if(isClaimService < 0) {
-        setClaimServiceList(prevState => [...prevState, e.response.data.data])
-      }
-      // setActionAlerts({
-      //   isOpen: true,
-      //   title: `${e.response.data.msg ?? 'Error inesperado'}!`,
-      //   type: 'error',
-      // })
+      setActionAlerts({
+        isOpen: true,
+        title: `${e.response.data.msg ?? 'Error inesperado'}!`,
+        type: 'error',
+      })
     }
   }
 

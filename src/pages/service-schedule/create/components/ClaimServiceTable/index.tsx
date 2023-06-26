@@ -10,11 +10,11 @@ import { IconButton, Stack } from '@mui/material'
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import { TextareaReclamation } from './styles'
+import { ButtonTextareaReclamation, TextareaReclamation } from './styles'
 import { useContext, useState } from 'react'
 import { ClaimServiceResponseType } from '@/types/service-schedule'
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Html } from 'next/document'
+import AddIcon from '@mui/icons-material/Add';
 
 interface Column {
   id: 'name' 
@@ -57,40 +57,45 @@ export default function ClaimServiceTable({ claimServiceList, handleSaveClaimSer
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }} elevation={0}>
-      <TextareaReclamation
-        id="outlined-multiline-static"
-        minRows={1}
-        maxRows={6}
-        onKeyDown={(e:onKeyBoardEventTextArea) => {
-          if (e.ctrlKey && e.key === 'Enter') {
-            setTextareaReclamationValue(e.target.value+'\n')
-          } else {
-            if (e.key === 'Enter' && e.code === 'Enter' ) {
-              e.preventDefault()
-              handleSaveClaimService(e.target.value)
-              setTextareaReclamationValue('')
-            } 
-          }
-        }}
-        onChange={(e) => {
-          setTextareaReclamationValue(prevState => {
-            if(e.target.value[e.target.value.length - 1] === '\n'){
-              if(prevState[prevState.length - 1] !== '\n') {
-                
-                return e.target.value
-              }
-              if(prevState[prevState.length - 2] === '\n') {
-                return e.target.value
-              }
-              return prevState
+      <Stack direction='row' gap={1}>
+        <TextareaReclamation
+          id="outlined-multiline-static"
+          minRows={1}
+          maxRows={6}
+          onKeyDown={(e:onKeyBoardEventTextArea) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+              setTextareaReclamationValue(e.target.value+'\n')
             } else {
-              return e.target.value
+              if (e.key === 'Enter' && e.code === 'Enter' ) {
+                e.preventDefault()
+                handleSaveClaimService(e.target.value)
+                setTextareaReclamationValue('')
+              } 
             }
-          })
-        }}
-        value={textareaReclamationValue}
-      />
-
+          }}
+          onChange={(e) => {
+            setTextareaReclamationValue(prevState => {
+              if(e.target.value[e.target.value.length - 1] === '\n'){
+                if(prevState[prevState.length - 1] !== '\n') {
+                  
+                  return e.target.value
+                }
+                if(prevState[prevState.length - 2] === '\n') {
+                  return e.target.value
+                }
+                return prevState
+              } else {
+                return e.target.value
+              }
+            })
+          }}
+          value={textareaReclamationValue}
+        />
+        <ButtonTextareaReclamation onClick={() => {
+          handleSaveClaimService(textareaReclamationValue)
+          setTextareaReclamationValue('')
+        }}><AddIcon /></ButtonTextareaReclamation>
+      </Stack>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="sticky table">
           {/* <TableHead>
