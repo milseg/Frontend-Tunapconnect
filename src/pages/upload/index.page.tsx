@@ -21,6 +21,8 @@ import { ButtonPaginate } from "../service-schedule/create/styles";
 import { Loading } from "@/components/Loading";
 import { useUploadContext } from "@/contexts/UploadContext";
 
+import { formatDateTime } from '@/ultis/formatDate'
+
 export default function Upload() {
   const [currentFile, setCurrentFile] = useState<File>(new File([], ""));
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -217,7 +219,7 @@ export default function Upload() {
                         color={"#1C4961"}
                         fontWeight={700}
                       >
-                        {file.created_at}
+                        {formatDateTime(file.created_at)}
                       </Typography>
                       <Typography
                         variant="subtitle1"
