@@ -38,7 +38,7 @@ type memuListProps = Array<{
 export const MainListItems = ({ opended }: { opended: boolean }) => {
   const [routeActual, setRouteActual] = useState('')
   const router = useRouter()
-  const { companySelected } = useContext(CompanyContext)
+  const { companySelected, deselectCompany } = useContext(CompanyContext)
   const { listCompanies, addCompaniesList, user } = useContext(AuthContext)
   const {refetchList,setRefetchList} = useUploadContext();
   const [uploadOpen, setUploadOpen] = useState<boolean>(false);
@@ -46,6 +46,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
 
   const memuList: memuListProps = useMemo(
     () => {
+      //console.log("listItems routeActual", routeActual)
       let ret = [
         {
           path: '/company',
@@ -60,14 +61,16 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
         //   title: 'Checklist',
         // },
       ]
-      if(companySelected) {
-        ret.push({
-          path: '/service-schedule',
-          href: `/service-schedule?company_id=${companySelected}`,
-          component: <CalendarMonthIcon />,
-          title: 'Agendamento',
-        })
-      }
+      //console.log("routeActual", routeActual, "companySelected", companySelected)
+      //if(routeActual !== '/company' && companySelected) {
+        //console.log("pushRoute")
+      ret.push({
+        path: '/service-schedule',
+        href: `/service-schedule?company_id=${companySelected}`,
+        component: <CalendarMonthIcon />,
+        title: 'Agendamento',
+      })
+      //}
       if(user?.userTunap) {
         ret.push({
           path: '/upload',
@@ -79,7 +82,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
       
       return ret
     },
-    [companySelected],
+    [companySelected, routeActual],
   )
 
   const menuListCompanyId = useMemo(
@@ -108,6 +111,10 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
   }
 
   useEffect(() => {
+    if(routeActual !== '/company' && router.pathname === '/company') {
+      //console.log("deselectCompany()")
+      deselectCompany()
+    }
     setRouteActual(router.pathname)
   }, [router])
 
@@ -154,7 +161,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
                 </List>
               </Collapse>
             </React.Fragment>
-            ) : (
+            ) : (menu.path !== '/service-schedule' || (routeActual !== '/company' && companySelected)) && (
               <Link href={menu.href} key={index} style={{ textDecoration: 'none' }}>
                 <ListItemButton
                   selected={routeActual.includes(menu.path)}
