@@ -290,7 +290,7 @@ export default function ServiceSchedulesCreate() {
       client_vehicle_id: clientVehicle?.id,
       company_id: `${companySelected}`,
       plate: clientVehicle?.plate,
-      claims_service: [...claimServiceList],
+      claims_service: claimServiceList.map(c => ({ claim_service_id: c.id })) ?? [],
       checklist_version_id: 14,
     }
 

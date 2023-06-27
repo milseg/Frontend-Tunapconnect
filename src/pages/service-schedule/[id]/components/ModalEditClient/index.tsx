@@ -95,6 +95,8 @@ export default function ModalEditClient({
     type: 'success',
   })
 
+  console.log(clientData)
+
   const { companySelected } = useContext(CompanyContext)
 
   const {
@@ -248,8 +250,9 @@ export default function ModalEditClient({
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('document', { disabled: true })}
+              {...register('document', {required: true})}
               focused
+              disabled
               InputProps={{
                 // @ts-ignore
                 inputComponent: TextMaskCPF,
