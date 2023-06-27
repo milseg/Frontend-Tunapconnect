@@ -69,7 +69,7 @@ import {
 import ModalCreateEditClientVehicle from './components/ModalEditClientVehicle'
 import ClaimServiceTable from './components/ClaimServiceTable'
 
-import { formatCNPJAndCPF } from '@/ultis/formatCNPJAndCPF'
+import { formatCNPJAndCPF, formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 import { ChecklistProps } from '@/pages/checklist/types'
 import { TableModal } from './components/TableModal'
@@ -84,6 +84,7 @@ type updateData = {
   client_id: number | undefined
   client_vehicle_id: number | undefined
   company_id: string | undefined
+  cpf: null | boolean,
   // chasis: string | undefined
   plate: string | undefined
   claims_service: any[]
@@ -163,6 +164,7 @@ export default function ServiceSchedulesCreate() {
       'edit',
       'technical-consultant-list',
       'options',
+      companySelected
     ],
     async () => {
       const resp = await api.get(
@@ -175,10 +177,11 @@ export default function ServiceSchedulesCreate() {
 
   const { data: dataServiceSchedule, status: dataServiceScheduleStatus } =
     useQuery({
-      queryKey: ['service_schedule', 'by_id', 'edit'],
+      queryKey: ['service_schedule', 'by_id', 'edit',   router.query.id,
+      companySelected],
       queryFn: async () => {
         const { id } = router.query
-
+        console.log(serviceScheduleState.serviceSchedule)
         if (serviceScheduleState.serviceSchedule) {
           return serviceScheduleState.serviceSchedule
         } else {
@@ -187,8 +190,9 @@ export default function ServiceSchedulesCreate() {
           return resp.data.data
         }
       },
-      enabled:
-        !!router?.query?.id 
+      // refetchOnMount: true,
+      refetchOnWindowFocus: false,
+      enabled: !!router.query.id
     })
 
   
@@ -209,15 +213,14 @@ export default function ServiceSchedulesCreate() {
           const resp = await api.get(
             `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc&limit=1`,
           )
-
-          return resp.data.data[0]
+          return resp.data.data[0] ?? []
         } catch (err) {
           console.error(err)
         }
       },
       {
         // enabled: openPrintInspectionModal,
-        refetchOnMount: false,
+        // refetchOnMount: false,
         refetchOnWindowFocus: false,
       },
     )
@@ -324,16 +327,19 @@ export default function ServiceSchedulesCreate() {
   }
 
   async function handleSaveClaimService(data: string) {
-    console.log(data)
+
     try {
-      const resp = await api.post('/claim-service', {
-        company_id: companySelected,
-        description: data
-      })
-      console.log(resp)
-      const isClaimService = claimServiceList.findIndex(r => r.id === resp.data.data.id)
-      if(isClaimService < 0) {
-        setClaimServiceList(prevState => [...prevState, resp.data.data])
+      if(data) {
+        const resp = await api.post('/claim-service', {
+          company_id: companySelected,
+          description: data
+        })
+
+        const isClaimService = claimServiceList.findIndex(r => r.id === resp.data.data.id)
+        console.log(isClaimService)
+        if(isClaimService < 0) {
+          setClaimServiceList(prevState => [...prevState, resp.data.data])
+        }
       }
       // setActionAlerts({
       //   isOpen: true,
@@ -343,14 +349,14 @@ export default function ServiceSchedulesCreate() {
     } catch (e: any) {
       setActionAlerts({
         isOpen: true,
-        title: `${e.response.data.msg ?? 'Error inesperado'}!`,
+        title: `${e?.response?.data?.msg ?? 'Error inesperado'}!`,
         type: 'error',
       })
     }
   }
 
   async function onSave() {
-    console.log('save')
+
     const dataFormatted: updateData = {
       code: null,
       promised_date: formatDateTimeTimezone(`${visitDate}`),
@@ -359,18 +365,16 @@ export default function ServiceSchedulesCreate() {
       client_vehicle_id: clientVehicle?.id,
       company_id: `${companySelected}`,
       plate: clientVehicle?.plate,
+      cpf: null,
       claims_service: claimServiceList.map(c => ({ claim_service_id: c.id })) ?? [],
       checklist_version_id: 14,
     }
-
-  
 
     try {
       const respUpdate: any = await api.put(
         '/service-schedule/' + router.query.id,
         dataFormatted,
       )
-      console.log(respUpdate)
       const respUpdateResponse = respUpdate.data.data
       setServiceSchedule(respUpdateResponse, true)
 
@@ -382,10 +386,9 @@ export default function ServiceSchedulesCreate() {
         type: 'success',
       })
     } catch (e: any) {
-      console.error(e)
       setActionAlerts({
         isOpen: true,
-        title: `${e.response.data.msg ?? 'Error inesperado'}!`,
+        title: `${e?.response?.data?.msg ?? 'Error inesperado'}!`,
         type: 'error',
       })
     }
@@ -512,7 +515,7 @@ export default function ServiceSchedulesCreate() {
                       <InfoCardName>CPF:</InfoCardName>{' '}
                       <InfoCardText>
                         {client?.document
-                          ? formatCNPJAndCPF(client?.document)
+                          ? formatCNPJAndCPFNumber(client?.document,'CPF')
                           : 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>

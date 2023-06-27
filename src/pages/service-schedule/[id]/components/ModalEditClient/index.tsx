@@ -95,8 +95,6 @@ export default function ModalEditClient({
     type: 'success',
   })
 
-  console.log(clientData)
-
   const { companySelected } = useContext(CompanyContext)
 
   const {
