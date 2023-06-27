@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 // export function validateCPF(strCPF: string) {
 //   let soma
 //   let resto
@@ -21,6 +22,8 @@
 //   if (resto !== parseInt(strCPF.substring(10, 11))) return false
 //   return true
 // }
+
+// @ts-nocheck
 
 const calcFirstChecker = (firstNineDigits: string): number => {
   let sum = 0
@@ -79,4 +82,43 @@ export const validateCPF = (value: string): boolean => {
   const checker2 = calcSecondChecker(`${firstNineDigits}${checker1}`)
 
   return checker === `${checker1}${checker2}`
+}
+
+export function validateCNPJ(cnpj: string) {
+  cnpj = cnpj.replace(/[^\d]+/g, '')
+
+  // eslint-disable-next-line eqeqeq
+  if (cnpj.length != 14) return false
+
+  let resultado
+
+  let tamanhoTotal = cnpj.length - 2
+  let cnpjSemDigitos = cnpj.substring(0, tamanhoTotal)
+  const digitosVerificadores = cnpj.substring(tamanhoTotal)
+  let soma = 0
+  let pos = tamanhoTotal - 7
+  for (let i = tamanhoTotal; i >= 1; i--) {
+    // @ts-ignore
+    soma += cnpjSemDigitos.charAt(tamanhoTotal - i) * pos--
+    if (pos < 2) pos = 9
+  }
+  resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11)
+  // @ts-ignore
+  if (resultado != digitosVerificadores.charAt(0)) return false
+
+  tamanhoTotal = tamanhoTotal + 1
+  cnpjSemDigitos = cnpj.substring(0, tamanhoTotal)
+  soma = 0
+  pos = tamanhoTotal - 7
+  for (let i = tamanhoTotal; i >= 1; i--) {
+    // @ts-ignore
+    soma += cnpjSemDigitos.charAt(tamanhoTotal - i) * pos--
+    if (pos < 2) pos = 9
+  }
+
+  resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11)
+  // @ts-ignore
+  if (resultado != digitosVerificadores.charAt(1)) return false
+
+  return true
 }

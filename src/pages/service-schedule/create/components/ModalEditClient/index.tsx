@@ -16,13 +16,14 @@ import {
 import { useContext, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
-import { Backdrop, CircularProgress } from '@mui/material'
+import { Backdrop, CircularProgress, InputAdornment } from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientResponseType } from '@/types/service-schedule'
 
 import * as z from 'zod'
-import { validateCPF } from '@/ultis/validation'
+import { validateCNPJ, validateCPF } from '@/ultis/validation'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { TextMaskPHONE, TextMaskCPF } from '@/components/InputMask'
 
 interface ModalEditClientProps {
   handleClose: () => void
@@ -43,7 +44,18 @@ const editClientFormSchema = z.object({
     .string()
     .nonempty({ message: 'Digite um nome!' })
     .min(5, { message: 'Digite um nome valido!' }),
-  document: z.string().refine(validateCPF, { message: 'CPF inválido!' }),
+  document: z.string().refine(
+    (e) => {
+      if (validateCPF(e)) {
+        return true
+      }
+      if (validateCNPJ(e)) {
+        return true
+      }
+      return false
+    },
+    { message: 'CPF inválido!' },
+  ),
   phone: z.array(
     z.object({
       phone: z.string(),
@@ -149,16 +161,13 @@ export default function ModalEditClient({
         company_id: companySelected,
         active: true,
         name: formData.name,
-        document: clientData?.document,
+        document: Number(clientData?.document as string),
         phone: listPhone.length > 0 ? listPhone : null,
         email: listEmail.length > 0 ? listEmail : null,
         address: listAddress.length > 0 ? listAddress : null,
       }
 
-      console.log(dataFormatted)
-
       const resp = await api.put('/client/' + clientData?.id, dataFormatted)
-      console.log(resp)
 
       handleAddClient(resp.data.data)
       handleEditClient()
@@ -239,8 +248,15 @@ export default function ModalEditClient({
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('document', { required: true })}
-              disabled
+              {...register('document', { disabled: true })}
+              focused
+              InputProps={{
+                // @ts-ignore
+                inputComponent: TextMaskCPF,
+                startAdornment: (
+                  <InputAdornment position="start"></InputAdornment>
+                ),
+              }}
             />
             <ErrorContainer>
               {errorsEditClient.document?.message}
@@ -256,6 +272,10 @@ export default function ModalEditClient({
                         style={{ marginTop: 11 }}
                         fullWidth
                         {...field}
+                        InputProps={{
+                          // @ts-ignore
+                          inputComponent: TextMaskPHONE,
+                        }}
                       />
                     )}
                     name={`phone.${index}.phone`}
