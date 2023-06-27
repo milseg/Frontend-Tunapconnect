@@ -216,7 +216,7 @@ export function TableModal({
       }
     },
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: true,
   })
 
   async function handleEditChecklist(idChecklistSelected: number) {

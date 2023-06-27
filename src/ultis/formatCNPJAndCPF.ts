@@ -13,9 +13,9 @@ export function formatCNPJAndCPF(document: string) {
     )
   }
 }
-export function formatCNPJAndCPFNumber(value: number | string, type: 'CPF' | 'CNPJ'): string {
+export function formatCNPJAndCPFNumber(value: number | string, type: boolean | null): string {
 
-  if (type === 'CPF') {
+  if (type === true) {
     const stringDefault = '00000000000'
     const qtdDigitsCPF = 11 - `${value}`.length 
 
@@ -25,7 +25,10 @@ export function formatCNPJAndCPFNumber(value: number | string, type: 'CPF' | 'CN
       '$1.$2.$3-$4',
     )
   }
-  if (type === 'CNPJ') {
+  if (type === null) {
+    return `${value}`
+  }
+  if (type === false) {
     const stringDefault = '00000000000000'
     const qtdDigitsCNPJ = 14 - `${value}`.length 
 

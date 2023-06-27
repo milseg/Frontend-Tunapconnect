@@ -198,10 +198,10 @@ export default function ServiceSchedulesCreate() {
   
 
   const { data: checklistDefault, status: checklistDefaultStatus } =
-    useQuery<ChecklistProps>(
+    useQuery<ChecklistProps | null>(
       [
         'service_schedule',
-        'checklist-list',
+        'checklist-default',
         'by_id',
         'edit',
         'forModal',
@@ -213,14 +213,14 @@ export default function ServiceSchedulesCreate() {
           const resp = await api.get(
             `/checklist/list?company_id=${companySelected}&service_schedule_id=${router.query.id}&orderby=updated_at desc&limit=1`,
           )
-          return resp.data.data[0] ?? []
+          return resp.data.data[0] ?? null
         } catch (err) {
           console.error(err)
         }
       },
       {
         // enabled: openPrintInspectionModal,
-        // refetchOnMount: false,
+        refetchOnMount: true,
         refetchOnWindowFocus: false,
       },
     )
@@ -334,9 +334,9 @@ export default function ServiceSchedulesCreate() {
           company_id: companySelected,
           description: data
         })
-
+        console.log(resp)
+        console.log(claimServiceList)
         const isClaimService = claimServiceList.findIndex(r => r.id === resp.data.data.id)
-        console.log(isClaimService)
         if(isClaimService < 0) {
           setClaimServiceList(prevState => [...prevState, resp.data.data])
         }
@@ -443,6 +443,7 @@ export default function ServiceSchedulesCreate() {
       setClientVehicle(client_vehicle)
       const promisedDate = dayjs(new Date(promised_date))
       setVisitDate(promisedDate)
+      console.log(claims_service)
       setClaimServiceList(claims_service)
       setTechnicalConsultant({
         id: technical_consultant?.id ?? 'Não informado',
@@ -512,10 +513,10 @@ export default function ServiceSchedulesCreate() {
                       </InfoCardText>
                     </ListItemCard>
                     <ListItemCard alignItems="flex-start">
-                      <InfoCardName>CPF:</InfoCardName>{' '}
+                      <InfoCardName>{client.cpf === null ? 'Documento:' : client.cpf === true? 'CPF:': 'CNPJ' }</InfoCardName>{' '}
                       <InfoCardText>
                         {client?.document
-                          ? formatCNPJAndCPFNumber(client?.document,'CPF')
+                          ? formatCNPJAndCPFNumber(client?.document, client.cpf)
                           : 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
@@ -742,14 +743,17 @@ export default function ServiceSchedulesCreate() {
               direction="row"
               display="flex"
               justifyContent="center"
+              
             >
-              <ButtonLeft onClick={() => {
+              <ButtonLeft 
+                disabled={checklistDefault === null}
+                onClick={() => {
                 setOpenChecklistModal(true)
                 }}>
                 Listar Checklists
               </ButtonLeft>
               <ButtonCenter
-                // disabled={defaultCheckListPrint === null}
+                disabled={checklistDefault === null}
                 onClick={() => {
                   if (checklistDefaultStatus === 'success') {
                    setCheckList(checklistDefault as ChecklistProps)

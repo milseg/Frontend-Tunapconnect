@@ -11,6 +11,7 @@ import { TableCellHeader, TableRowSBody, TableRowSNoData } from './style'
 import { Stack } from '@mui/system'
 import { useState } from 'react'
 import { Box, CircularProgress } from '@mui/material'
+import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 
 interface ClientsTableProps {
   handleModalNewClient: () => void
@@ -60,7 +61,8 @@ export default function ClientsTable({
                   selected={clientSelected === row.id}
                 >
                   <TableCell scope="row">{row.name}</TableCell>
-                  <TableCell align="right">{row.document}</TableCell>
+                  <TableCell align="right">{formatCNPJAndCPFNumber(row.document, 
+                    row.cpf)}</TableCell>
                 </TableRowSBody>
               ))
             ) : (
