@@ -202,59 +202,58 @@ export default function Upload() {
                 {filesListDTO &&
                   filesListDTO.files.length > 0 &&
                   filesListDTO.files.map((file: IFileProps) => (
-                    <Link
+                    <Stack
                       key={file.id_file}
-                      href={`https://b.tunapconnect.com/download_arquivo/${file.id_file}`}
-                      style={{textDecoration: 'none'}}
+                      direction="row"
+                      sx={{
+                        width: "100%",
+                        backgroundColor: `${
+                          file.id_file % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
+                        }`,
+                        p: 1,
+                        borderRadius: "2px",
+                      }}
+                      justifyContent="space-between"
                     >
-                      <Stack
-                        key={file.id_file}
-                        direction="row"
+                      <Typography
+                        variant="subtitle1"
+                        color={"#1C4961"}
+                        fontWeight={700}
+                      >
+                        {formatDateTime(file.created_at)}
+                      </Typography>
+                      <Typography
+                        variant="subtitle1"
+                        color={"#1C4961"}
+                        fontWeight={700}
                         sx={{
-                          width: "100%",
-                          backgroundColor: `${
-                            file.id_file % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
-                          }`,
-                          p: 1,
-                          borderRadius: "2px",
+                          width: "40%",
+                          textAlign: "center",
                         }}
-                        justifyContent="space-between"
+                      >
+                        {file.status}
+                      </Typography>
+                      <Link
+                        key={file.id_file}
+                        href={`https://b.tunapconnect.com/download_arquivo/${file.id_file}`}
+                        style={{textDecoration: 'none', width: "20%"}}
                       >
                         <Typography
                           variant="subtitle1"
                           color={"#1C4961"}
                           fontWeight={700}
-                        >
-                          {formatDateTime(file.created_at)}
-                        </Typography>
-                        <Typography
-                          variant="subtitle1"
-                          color={"#1C4961"}
-                          fontWeight={700}
                           sx={{
-                            width: "40%",
-                            textAlign: "center",
-                          }}
-                        >
-                          {file.status}
-                        </Typography>
-                        <Typography
-                          variant="subtitle1"
-                          color={"#1C4961"}
-                          fontWeight={700}
-                          sx={{
-                            width: "20%",
                             textAlign: "right",
                           }}
                         >
                           {file.original_name}
                         </Typography>
-                        {/**<DeleteIcon
-                        color="error"
-                        sx={{ ":hover": { cursor: "pointer" } }}
-                    />**/}
-                      </Stack>
-                    </Link>
+                      </Link>
+                      {/**<DeleteIcon
+                      color="error"
+                      sx={{ ":hover": { cursor: "pointer" } }}
+                  />**/}
+                    </Stack>
                   ))}
               </Paper>
             )}
