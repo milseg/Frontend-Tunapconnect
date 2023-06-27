@@ -13,7 +13,7 @@ export interface IFileListDTO {
   total_pages: number;
   total_records: number;
 }
-export interface IFileProps{
+export interface IFileProps {
   cloud_url: string;
   created_at: string;
   filename: string;
@@ -29,5 +29,5 @@ export interface IPostFile {
 
 export type UploadContextData = {
   refetchList: boolean;
-  setRefetchList: (state: (boolean)) => void;
-}
+  setRefetchList: (state: boolean) => void;
+};

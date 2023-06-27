@@ -21,13 +21,14 @@ import { ButtonPaginate } from "../service-schedule/create/styles";
 import { Loading } from "@/components/Loading";
 import { useUploadContext } from "@/contexts/UploadContext";
 
-import { formatDateTime } from '@/ultis/formatDate'
+import { formatDateTime } from "@/ultis/formatDate";
+import Link from "next/link";
 
 export default function Upload() {
   const [currentFile, setCurrentFile] = useState<File>(new File([], ""));
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [pageNumber, setPageNumber] = React.useState(1);
-  const {refetchList, setRefetchList} = useUploadContext();
+  const { refetchList, setRefetchList } = useUploadContext();
 
   const [fileName, setFileName] = useState<string>(
     "Nenhum arquivo selecionado (selecione aqui)"
@@ -201,53 +202,59 @@ export default function Upload() {
                 {filesListDTO &&
                   filesListDTO.files.length > 0 &&
                   filesListDTO.files.map((file: IFileProps) => (
-                    <Stack
+                    <Link
                       key={file.id_file}
-                      direction="row"
-                      sx={{
-                        width: "100%",
-                        backgroundColor: `${
-                          file.id_file % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
-                        }`,
-                        p: 1,
-                        borderRadius: "2px",
-                      }}
-                      justifyContent="space-between"
+                      href={`https://b.tunapconnect.com/download_arquivo/${file.id_file}`}
+                      style={{textDecoration: 'none'}}
                     >
-                      <Typography
-                        variant="subtitle1"
-                        color={"#1C4961"}
-                        fontWeight={700}
-                      >
-                        {formatDateTime(file.created_at)}
-                      </Typography>
-                      <Typography
-                        variant="subtitle1"
-                        color={"#1C4961"}
-                        fontWeight={700}
+                      <Stack
+                        key={file.id_file}
+                        direction="row"
                         sx={{
-                          width: "40%",
-                          textAlign: "center",
+                          width: "100%",
+                          backgroundColor: `${
+                            file.id_file % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
+                          }`,
+                          p: 1,
+                          borderRadius: "2px",
                         }}
+                        justifyContent="space-between"
                       >
-                        {file.status}
-                      </Typography>
-                      <Typography
-                        variant="subtitle1"
-                        color={"#1C4961"}
-                        fontWeight={700}
-                        sx={{
-                          width: "20%",
-                          textAlign: "right",
-                        }}
-                      >
-                        {file.original_name}
-                      </Typography>
-                      {/**<DeleteIcon
+                        <Typography
+                          variant="subtitle1"
+                          color={"#1C4961"}
+                          fontWeight={700}
+                        >
+                          {formatDateTime(file.created_at)}
+                        </Typography>
+                        <Typography
+                          variant="subtitle1"
+                          color={"#1C4961"}
+                          fontWeight={700}
+                          sx={{
+                            width: "40%",
+                            textAlign: "center",
+                          }}
+                        >
+                          {file.status}
+                        </Typography>
+                        <Typography
+                          variant="subtitle1"
+                          color={"#1C4961"}
+                          fontWeight={700}
+                          sx={{
+                            width: "20%",
+                            textAlign: "right",
+                          }}
+                        >
+                          {file.original_name}
+                        </Typography>
+                        {/**<DeleteIcon
                         color="error"
                         sx={{ ":hover": { cursor: "pointer" } }}
                     />**/}
-                    </Stack>
+                      </Stack>
+                    </Link>
                   ))}
               </Paper>
             )}
