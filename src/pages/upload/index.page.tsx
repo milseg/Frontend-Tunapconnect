@@ -44,7 +44,7 @@ export default function Upload() {
     isFetching,
     isLoading,
   } = useQuery({
-    queryKey: ["uploadFileQuery", pageNumber, refetchList],
+    queryKey: ["uploadFileQuery", pageNumber, refetchList, router.query.status],
     queryFn: uploadFileRequests.getUploadsList,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
