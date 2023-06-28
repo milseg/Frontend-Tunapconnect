@@ -115,7 +115,7 @@ export default function ChecklistCreateById() {
       },
     },
   )
-  console.log(serviceScheduleState)
+
   const { data, isSuccess, isLoading, isFetching } =
     useQuery<ChecklistModelType>(
       ['checklist-create', router?.query?.service_schedule_id,router.query.checklist_model_id],
