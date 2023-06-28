@@ -40,10 +40,10 @@ const MyApp = (props: CustomAppProps) => {
 
   return (
     <SessionProvider session={session} refetchInterval={60 * 5}>
-      <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <CompanyProvider>
             <ServiceScheduleProvider>
+              <QueryClientProvider client={queryClient}>
               <CacheProvider value={emotionCache}>
                 <Head>
                   <meta
@@ -70,10 +70,10 @@ const MyApp = (props: CustomAppProps) => {
                   <ReactQueryDevtools initialIsOpen={false} />
                 </ThemeProvider>
               </CacheProvider>
+              </QueryClientProvider>
             </ServiceScheduleProvider>
           </CompanyProvider>
         </AuthProvider>
-      </QueryClientProvider>
     </SessionProvider>
   )
 }

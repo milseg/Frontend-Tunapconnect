@@ -72,20 +72,23 @@ export default function ChecklistCreateById() {
   const queryClient = useQueryClient()
 
   const router = useRouter()
-  const { serviceScheduleState, setCheckListModel, setServiceSchedule } =
+  const { serviceScheduleState, setCheckListModel, setServiceSchedule, setCheckList } =
     useContext(ServiceScheduleContext)
 
   const tabContentRef = useRef<RefTabContentRefType>(null)
 
   const updateChecklistMutations = useMutation(
-    (newDataChecklist: ChecklistProps) => {
-      setLoading(true)
-      return api.post(`/checklist`, newDataChecklist).then((resp) => {
-        setTimeout(() => {
-          setLoading(false)
-        }, 3000)
-        return resp.data.data[0]
-      })
+    async (newDataChecklist: ChecklistProps) => {
+      
+      try {
+        setLoading(true)
+        const resp = await api.post(`/checklist`, newDataChecklist)
+        // setCheckList(resp.data.data)
+        // router.push(`/checklist/${resp.data.data.id}`)
+        return resp.data.data
+      } catch (error) {
+        
+      } 
     },
 
     {
@@ -95,7 +98,11 @@ export default function ChecklistCreateById() {
           title: 'Salvo com sucesso',
           type: 'success',
         })
-        queryClient.invalidateQueries('checklist-createByID')
+        setCheckList(data)
+     
+        router.push(`/checklist/${data.id}`)
+        queryClient.invalidateQueries(['checklist-create', router?.query?.service_schedule_id,router.query.checklist_model_id])
+        setLoading(false)
         return data
       },
       onError: () => {
@@ -104,13 +111,14 @@ export default function ChecklistCreateById() {
           title: 'Salvo com sucesso',
           type: 'error',
         })
+        setLoading(false)
       },
     },
   )
-
+  console.log(serviceScheduleState)
   const { data, isSuccess, isLoading, isFetching } =
     useQuery<ChecklistModelType>(
-      ['checklist-createByID'],
+      ['checklist-create', router?.query?.service_schedule_id,router.query.checklist_model_id],
       async () => {
         try {
           if (!serviceScheduleState.serviceSchedule) {
@@ -126,7 +134,7 @@ export default function ChecklistCreateById() {
             if (resp.data.data.length > 0) {
               const isExistChecklistModel = resp.data.data.filter(
                 (item: any) =>
-                  item.id === Number(router.query.checklist_model_id),
+                  item.id === Number(router?.query?.checklist_model_id),
               )[0]
               if (isExistChecklistModel) {
                 setCheckListModel(isExistChecklistModel)
@@ -140,10 +148,10 @@ export default function ChecklistCreateById() {
       },
       {
         refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        enabled:
-          !!router?.query?.checklist_model_id &&
-          !!router?.query?.service_schedule_id,
+        refetchOnMount: true,
+        // enabled:
+        //   !!router?.query?.checklist_model_id &&
+        //   !!router?.query?.service_schedule_id,
       },
     )
   const { serviceSchedule, checklistModel } = serviceScheduleState
