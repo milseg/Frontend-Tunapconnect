@@ -122,7 +122,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
     <React.Fragment>
       {menuListCompanyId.map((menu, index) => {
         return (
-          menu.path === '/upload' ? (
+          menu.path === '/upload' ? (routeActual !== '/service-schedule' && (
             <React.Fragment key={index}>
               <ListItemButton
                   selected={routeActual.includes(menu.path)}
@@ -166,7 +166,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
                 </List>
               </Collapse>
             </React.Fragment>
-            ) : (menu.path !== '/service-schedule' || (routeActual !== '/company' && companySelected)) && (
+            )) : (menu.path !== '/service-schedule' || (routeActual !== '/company' && routeActual !== '/upload' && companySelected)) && (
               <Link href={menu.href} key={index} style={{ textDecoration: 'none' }}>
                 <ListItemButton
                   selected={routeActual.includes(menu.path)}

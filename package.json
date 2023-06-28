@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .tsx,.ts --ignore-pattern node_modules/ --ignore-pattern src/**/*.css --ignore-pattern .vscode/ --ignore-pattern .vercel/ --ignore-pattern .next/ --ignore-pattern public/",
+    "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
     "@emotion/css": "^11.10.6",
