@@ -74,7 +74,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
       if(user?.userTunap) {
         ret.push({
           path: '/upload',
-          href: `/upload?status=toyolex`,
+          href: `/upload`,
           component: <UploadFileIcon />,
           title: 'Cadastros',
         })
@@ -153,9 +153,14 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
               </Collapse>
               <Collapse in={uploadOpen && registerOpen} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                  <Link href={menu.href} style={{ textDecoration: 'none' }}  onClick={handleListReload}>
+                  <Link href={`${menu.href}?status=toyolex`} style={{ textDecoration: 'none' }}  onClick={handleListReload}>
                     <ListItemButton sx={{ pl: 4, marginLeft: '70px', width: 'fit-content'}}>
                       <ListItemText primary="Upload Toyolex" />
+                    </ListItemButton>
+                  </Link>
+                  <Link href={`${menu.href}?status=umuarama`} style={{ textDecoration: 'none' }}  onClick={handleListReload}>
+                    <ListItemButton sx={{ pl: 4, marginLeft: '70px', width: 'fit-content'}}>
+                      <ListItemText primary="Upload Umuarama" />
                     </ListItemButton>
                   </Link>
                 </List>
