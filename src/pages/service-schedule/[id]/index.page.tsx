@@ -181,7 +181,6 @@ export default function ServiceSchedulesCreate() {
       companySelected],
       queryFn: async () => {
         const { id } = router.query
-        console.log(serviceScheduleState.serviceSchedule)
         if (serviceScheduleState.serviceSchedule) {
           return serviceScheduleState.serviceSchedule
         } else {
@@ -334,8 +333,6 @@ export default function ServiceSchedulesCreate() {
           company_id: companySelected,
           description: data
         })
-        console.log(resp)
-        console.log(claimServiceList)
         const isClaimService = claimServiceList.findIndex(r => r.id === resp.data.data.id)
         if(isClaimService < 0) {
           setClaimServiceList(prevState => [...prevState, resp.data.data])
@@ -434,16 +431,13 @@ export default function ServiceSchedulesCreate() {
 }, [])
 
   useEffect(() => {
-    console.log(dataServiceSchedule)
     if (dataServiceScheduleStatus === 'success') {
-      console.log(dataServiceSchedule)
       const { client, client_vehicle, technical_consultant, promised_date, claims_service } =
         dataServiceSchedule
       setClient(client)
       setClientVehicle(client_vehicle)
       const promisedDate = dayjs(new Date(promised_date))
       setVisitDate(promisedDate)
-      console.log(claims_service)
       setClaimServiceList(claims_service)
       setTechnicalConsultant({
         id: technical_consultant?.id ?? 'Não informado',

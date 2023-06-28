@@ -276,6 +276,7 @@ export function TableModal({
               // slotProps={{
               //   footer: { nextPage: pages?.next, previousPage: pages?.previous, handlePages }
               // }}
+              
               apiRef={apiRef}
               initialState={{
                 pagination: {
@@ -285,9 +286,9 @@ export function TableModal({
                 },
               }}
               loading={isLoading}
-              onRowClick={(id) => {
-                // router.push(`/service-schedules/${id.id}`)
-              }}
+              // onRowClick={(id) => {
+              //   // router.push(`/service-schedules/${id.id}`)
+              // }}
               pageSizeOptions={[7]}
               disableRowSelectionOnClick
               disableColumnFilter
