@@ -23,7 +23,7 @@ import {
 } from '@/types/service-schedule'
 import { api } from '@/lib/api'
 import IconButton from '@mui/material/IconButton'
-import { Delete } from '@mui/icons-material'
+import Delete from '@mui/icons-material/Delete'
 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { ActionDeleteConfirmations } from '@/helpers/ActionConfirmations'
