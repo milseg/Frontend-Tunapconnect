@@ -15,11 +15,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import { IFileProps } from "@/types/upload-file";
 import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useRouter } from 'next/router'
 import uploadFileRequests from "../api/uploadFile.api";
 import { apiB } from "@/lib/api";
 import { ButtonPaginate } from "../service-schedule/create/styles";
 import { Loading } from "@/components/Loading";
 import { useUploadContext } from "@/contexts/UploadContext";
+
 
 import { formatDateTime } from "@/ultis/formatDate";
 import Link from "next/link";
@@ -35,13 +37,14 @@ export default function Upload() {
   );
 
   const queryClient = useQueryClient();
+  const router = useRouter()
 
   const {
     data: filesListDTO,
     isFetching,
     isLoading,
   } = useQuery({
-    queryKey: ["uploadFileQuery", pageNumber, refetchList],
+    queryKey: ["uploadFileQuery", pageNumber, refetchList, router.query.status],
     queryFn: uploadFileRequests.getUploadsList,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -53,7 +56,7 @@ export default function Upload() {
     e.preventDefault();
     let formData: FormData = new FormData();
     formData.append("file", currentFile);
-    formData.append("tipo_arquivo", "toyolex");
+    formData.append("tipo_arquivo", router.query.status as string);
     if (
       currentFile &&
       fileName !== "Nenhum arquivo selecionado (selecione aqui)"
@@ -104,6 +107,8 @@ export default function Upload() {
     updateFilesUploadMutation.mutate(stageData);
   }
 
+  const capitalizeFirstLetter = (w: string): string => w.charAt(0).toUpperCase() + w.slice(1)
+
   return (
     <>
       <Container maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
@@ -116,10 +121,10 @@ export default function Upload() {
               alignItems="center"
             >
               <Typography variant="h5" component="h2" fontWeight={700}>
-                {"Upload - Toyolex"}
+                {"Upload - "+capitalizeFirstLetter(router.query.status as string)}
               </Typography>
               <Typography>
-                {"TUNAP Connect > Intranet > Upload > Upload - Toyolex"}
+                {"TUNAP Connect > Intranet > Upload > Upload - "+capitalizeFirstLetter(router.query.status as string)}
               </Typography>
             </Grid>
             <Paper
