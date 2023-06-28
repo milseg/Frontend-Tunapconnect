@@ -3,34 +3,38 @@ import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 
 import { Stack } from '@mui/system'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import {
-  ButtonAddInputs,
-  ButtonModalActions,
-  ErrorContainer,
-  InputText,
-} from '../../styles'
+import { ButtonAddInputs, ButtonModalActions, InputText } from '../../styles'
 import { useContext, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
-import { Backdrop, CircularProgress, InputAdornment } from '@mui/material'
+import {
+  Backdrop,
+  CircularProgress,
+  FormControlLabel,
+  FormGroup,
+  Switch,
+} from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientResponseType } from '@/types/service-schedule'
-
-import * as z from 'zod'
+import { ErrorContainer } from './styles'
 import { validateCNPJ, validateCPF } from '@/ultis/validation'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { TextMaskPHONE, TextMaskCPF } from '@/components/InputMask'
+import {
+  TextMaskCPF,
+  TextMaskPHONE,
+  TextMaskCNPJ,
+} from '@/components/InputMask'
+import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 
-interface ModalEditClientProps {
+interface ModalCreateNewClientProps {
   handleClose: () => void
-  handleEditClient: () => void
+  handleSaveReturnClient: (client: ClientResponseType | null) => void
   isOpen: boolean
-  handleAddClient: (client: ClientResponseType) => void
-  clientData: ClientResponseType | null
 }
 
 interface actionAlertsProps {
@@ -39,7 +43,7 @@ interface actionAlertsProps {
   type: 'success' | 'error' | 'warning'
 }
 
-const editClientFormSchema = z.object({
+const newClientFormSchema = z.object({
   name: z
     .string()
     .nonempty({ message: 'Digite um nome!' })
@@ -54,8 +58,9 @@ const editClientFormSchema = z.object({
       }
       return false
     },
-    { message: 'CPF inválido!' },
+    { message: 'Digite um valor valido!' },
   ),
+
   phone: z.array(
     z.object({
       phone: z.string(),
@@ -76,19 +81,20 @@ const editClientFormSchema = z.object({
   ),
 })
 
-editClientFormSchema.required({
+newClientFormSchema.required({
   name: true,
   document: true,
 })
 
-export default function ModalEditClient({
+type newClientFormData = z.infer<typeof newClientFormSchema>
+
+export default function ModalCreateNewClient({
   isOpen,
   handleClose,
-  handleEditClient,
-  handleAddClient,
-  clientData,
-}: ModalEditClientProps) {
+  handleSaveReturnClient,
+}: ModalCreateNewClientProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [isCPF, setIsCPF] = useState(true)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
     isOpen: false,
     title: '',
@@ -101,10 +107,10 @@ export default function ModalEditClient({
     register,
     handleSubmit,
     control,
-    setValue,
-    formState: { errors: errorsEditClient },
-  } = useForm({
-    resolver: zodResolver(editClientFormSchema),
+    reset,
+    formState: { errors },
+  } = useForm<newClientFormData>({
+    resolver: zodResolver(newClientFormSchema),
     defaultValues: {
       name: '',
       document: '',
@@ -117,7 +123,6 @@ export default function ModalEditClient({
     fields: fieldsPhone,
     append: appendPhone,
     remove: removePhone,
-    update: updatePhone,
   } = useFieldArray({
     control,
     name: 'phone',
@@ -127,7 +132,6 @@ export default function ModalEditClient({
     fields: fieldsEmail,
     append: appendEmail,
     remove: removeEmail,
-    update: updateEmail,
   } = useFieldArray({
     control,
     name: 'email',
@@ -136,41 +140,42 @@ export default function ModalEditClient({
     fields: fieldsAddress,
     append: appendAddress,
     remove: removeAddress,
-    update: updateAddress,
   } = useFieldArray({
     control,
     name: 'address',
   })
 
-  async function onSubmit(formData: any) {
+  async function onSubmit(data: any) {
     setIsLoading(true)
-    const listPhone = formData.phone
+    const listPhone = data.phone
       .map((item: any) => item.phone)
-      .filter((item: any) => item !== '')
+      .filter((item: any) => item !== '').map((item: any) => item.replace(/\D/g, ''))
 
-    const listEmail = formData.email
+    const listEmail = data.email
       .map((item: any) => item.email)
       .filter((item: any) => item !== '')
 
-    const listAddress = formData.address
+    const listAddress = data.address
       .map((item: any) => item.address)
       .filter((item: any) => item !== '')
+
+    const documentFormatted = data.document.replace(/\D/g, '')
 
     try {
       const dataFormatted = {
         company_id: companySelected,
         active: true,
-        name: formData.name,
-        document: Number(clientData?.document as string),
-        phone: listPhone.length > 0 ? listPhone : null,
-        email: listEmail.length > 0 ? listEmail : null,
-        address: listAddress.length > 0 ? listAddress : null,
+        name: data.name,
+        cpf: isCPF,
+        document: Number(documentFormatted),
+        phone: listPhone,
+        email: listEmail,
+        address: listAddress,
       }
 
-      const resp = await api.put('/client/' + clientData?.id, dataFormatted)
+      const resp = await api.post('/client', dataFormatted)
 
-      handleAddClient(resp.data.data)
-      handleEditClient()
+      handleSaveReturnClient(resp.data.data[0])
       handleActiveAlert(true, 'success', resp.data.msg)
     } catch (error: any) {
       if (error.response.status === 400) {
@@ -203,31 +208,24 @@ export default function ModalEditClient({
   }
 
   useEffect(() => {
-    if (clientData) {
-      setValue('name', clientData?.name)
-      setValue('document', clientData?.document)
-      clientData?.phone &&
-        clientData?.phone.length > 0 &&
-        clientData?.phone.forEach((item: any, index: number) => {
-          updatePhone(index, { phone: item })
-        })
-      clientData?.email &&
-        clientData?.email.length > 0 &&
-        clientData?.email.forEach((item: any, index: number) => {
-          updateEmail(index, { email: item })
-        })
-      clientData?.address &&
-        clientData?.address.length > 0 &&
-        clientData?.address.forEach((item: any, index: number) => {
-          updateAddress(index, { address: item })
-        })
+    if (isOpen) {
+      if (!isCPF) {
+        setIsCPF(true)
+      }
+      reset({
+        name: '',
+        document: '',
+        phone: [{ phone: '' }],
+        email: [{ email: '' }],
+        address: [{ address: '' }],
+      })
     }
   }, [isOpen])
 
   return (
     <>
       <Dialog open={isOpen} onClose={handleClose}>
-        <DialogTitle>Edição de cliente </DialogTitle>
+        <DialogTitle>Criação de cliente </DialogTitle>
         <DialogContent>
           <Stack
             width={400}
@@ -240,28 +238,88 @@ export default function ModalEditClient({
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
+              error={!!errors.name}
               {...register('name', { required: true })}
             />
-            <ErrorContainer>{errorsEditClient.name?.message}</ErrorContainer>
+
+            <ErrorContainer>{errors.name?.message}</ErrorContainer>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isCPF}
+                    onChange={() => {
+                      reset({ document: '' })
+                      // if (isCPF) {
+                      //   // setValue('cnpj', '')
+                      //   reset({ cnpj: '' })
+                      // } else {
+                      //   // setValue('cpf', '')
+                      //   reset({ cpf: '' })
+                      // }
+                      setIsCPF(!isCPF)
+                    }}
+                    name="loading"
+                    color="primary"
+                    size="small"
+                    // defaultChecked
+                    sx={{
+                      '& .MuiSwitch-switchBase': {
+                        '&.Mui-checked': {
+                          transform: 'translateX(16px)',
+                          color: '#0E948B',
+                          '& + .MuiSwitch-track': {
+                            background: '#0E948B',
+                          },
+                        },
+                      },
+                    }}
+                  />
+                }
+                labelPlacement="start"
+                label="É CPF ? "
+                sx={{
+                  '& > span': {
+                    fontSize: 13,
+                    fontWeight: 'bold',
+                  },
+                  marginRight: '0',
+                }}
+              />
+            </FormGroup>
+
             <InputText
-              label="CPF"
+              label={isCPF ? 'CPF' : 'CNPJ'}
               variant="filled"
-              style={{ marginTop: 11 }}
+              error={!!errors.document}
+              // style={{ marginTop: 11 }}
               fullWidth
               {...register('document', { required: true })}
-              focused
-              disabled
               InputProps={{
                 // @ts-ignore
-                inputComponent: TextMaskCPF,
-                startAdornment: (
-                  <InputAdornment position="start"></InputAdornment>
-                ),
+                inputComponent: isCPF ? TextMaskCPF : TextMaskCNPJ,
               }}
             />
-            <ErrorContainer>
-              {errorsEditClient.document?.message}
-            </ErrorContainer>
+
+            {/* {!isCPF && (
+              <InputText
+                label="CNPJ"
+                variant="filled"
+                // style={{ marginTop: 11 }}
+                error={!!errors.cnpj}
+                fullWidth
+                {...register('cnpj', { required: true })}
+                InputProps={{
+                  // @ts-ignore
+                  inputComponent: TextMaskCNPJ,
+                }}
+              />
+            )} */}
+            {/* {isCPF && (
+              <ErrorContainer>{errors.document?.message}</ErrorContainer>
+            )}
+            {!isCPF && <ErrorContainer>{errors.cnpj?.message}</ErrorContainer>} */}
+            <ErrorContainer>{errors.document?.message}</ErrorContainer>
             {fieldsPhone.map((item, index) => {
               return (
                 <Stack direction="row" key={item.id}>
@@ -305,7 +363,7 @@ export default function ModalEditClient({
             {fieldsEmail.map((item, index) => {
               return (
                 <div key={item.id}>
-                  <Stack direction="row">
+                  <Stack direction="row" key={item.id}>
                     <Controller
                       render={({ field }) => (
                         <InputText
@@ -313,6 +371,9 @@ export default function ModalEditClient({
                           variant="filled"
                           style={{ marginTop: 11 }}
                           fullWidth
+                          error={
+                            !!errors?.email && !!errors?.email[index]?.email
+                          }
                           {...field}
                         />
                       )}
@@ -338,8 +399,7 @@ export default function ModalEditClient({
                     )}
                   </Stack>
                   <ErrorContainer sx={{ mt: 1 }}>
-                    {errorsEditClient?.email &&
-                      errorsEditClient?.email[index]?.email?.message}
+                    {errors?.email && errors?.email[index]?.email?.message}
                   </ErrorContainer>
                 </div>
               )

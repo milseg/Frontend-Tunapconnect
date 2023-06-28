@@ -56,7 +56,7 @@ export default function ClaimServiceTable({ claimServiceList, handleSaveClaimSer
   const rowsPerPage = 5
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden'}} elevation={0}>
+    <Paper sx={{ width: '100%', overflow: 'hidden' }} elevation={0}>
       <Stack direction='row' gap={1} sx={{ marginBottom: 1}}>
         <TextareaReclamation
           id="outlined-multiline-static"
@@ -112,7 +112,7 @@ export default function ClaimServiceTable({ claimServiceList, handleSaveClaimSer
             </TableRow>
           </TableHead> */}
           <TableBody>
-            {
+            { claimServiceList &&
             claimServiceList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).length > 0 ?
             claimServiceList
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -120,7 +120,7 @@ export default function ClaimServiceTable({ claimServiceList, handleSaveClaimSer
                 return (
                   <TableRow hover key={row.id}>
                     <TableCell  align='left'>
-                      {row?.description.includes('\n')? (
+                      {row?.description?.includes('\n')? (
                         row.description.split(/(\n)/g).map((item, index) => {
                           return item === '\n' ? <br key={Math.random() *2000 + '-' + index}/> :<span key={Math.random() *2000 + '-' + index}>{item}</span> 
                         })
