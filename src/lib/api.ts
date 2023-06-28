@@ -9,6 +9,14 @@ const api = axios.create({
   },
 })
 
+const apiB = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_APP_API_URL_B,
+  responseType: 'json',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
 api.interceptors.request.use(
   async function (config) {
     const session = await getSession()
@@ -22,4 +30,4 @@ api.interceptors.request.use(
   },
 )
 
-export { api }
+export { api, apiB }
