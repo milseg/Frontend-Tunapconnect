@@ -6,7 +6,6 @@ export const globals: CSSObject = {
     padding: 0,
     margin: 0,
   },
-
   body: {
     background: '#F0F2F5',
   },

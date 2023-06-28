@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react'
 
-import { parseCookies, setCookie } from 'nookies'
+import { parseCookies, setCookie, destroyCookie } from 'nookies'
 import { useRouter } from 'next/router'
 import { getSession } from 'next-auth/react'
 
@@ -27,6 +27,7 @@ type CompanyContextType = {
   companySelected: number | null
   createCompany: (value: companyProps, isRedirect: boolean) => void
   handleCompanySelected: (value: companyProps) => void
+  deselectCompany: () => void
 }
 
 type GeralProviderProps = {
@@ -65,6 +66,13 @@ export function CompanyProvider({ children }: GeralProviderProps) {
     isRedirect &&
       (await router.push(`/service-schedule?company_id=${company.id}`))
   }
+
+  const deselectCompany = 
+    function() {
+      destroyCookie(null, process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string)
+      setCompanyData(null)
+      setCompanySelected(null)
+    };
 
   async function handleCompanySelected(company: companyProps) {
     await createCompany(company, true)
@@ -125,7 +133,12 @@ export function CompanyProvider({ children }: GeralProviderProps) {
         setCompanySelected(parseInt(companySelectedCookie.companySelected))
         verifyCompany(companySelectedCookie.companySelected as string)
       } else {
-        router.push('/company')
+        getSession().then((sessionData) => {
+          if (sessionData?.user.companies.length) {
+            router.push('/company')
+          }
+        })
+        //router.push('/company')
       }
     }
   }, [companySelected])
@@ -143,6 +156,7 @@ export function CompanyProvider({ children }: GeralProviderProps) {
         companySelected,
         createCompany,
         handleCompanySelected,
+        deselectCompany,
       }}
     >
       {children}

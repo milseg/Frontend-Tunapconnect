@@ -2,7 +2,7 @@ import * as React from 'react'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { Skeleton, Typography } from '@mui/material'
 import Title from '@/components/Title'
 import { ContainerItem } from './styles'
@@ -21,7 +21,7 @@ interface companyProps {
 }
 
 export default function CompanyList() {
-  const { handleCompanySelected } = useContext(CompanyContext)
+  const { handleCompanySelected, deselectCompany } = useContext(CompanyContext)
   const { listCompanies, addCompaniesList } = useContext(AuthContext)
 
   function handleSelectCompany(newCompany: companyProps) {
@@ -53,6 +53,11 @@ export default function CompanyList() {
       },
     },
   )
+
+  /*useEffect(() => {
+    console.log("unselect company")
+    deselectCompany()
+  }, [])*/
 
   return (
     <>
