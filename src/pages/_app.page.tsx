@@ -63,7 +63,6 @@ const MyApp = (props: CustomAppProps) => {
                       content="initial-scale=1, width=device-width"
                     />
                   </Head>
-                  <ThemeProvider theme={theme}>
                     <CssBaseline />
                     <GlobalStyles styles={globals} />
 
@@ -78,15 +77,14 @@ const MyApp = (props: CustomAppProps) => {
                       <Component {...pageProps} />
                     )}
                   {/* <Component {...pageProps} /> */}
-                  <ReactQueryDevtools initialIsOpen={false} />
-                </ThemeProvider>
-              </CacheProvider>
-              </QueryClientProvider>
+                    <ReactQueryDevtools initialIsOpen={false} />
+                    </CacheProvider>
+                    </UploadProvider>
                     {/* <Component {...pageProps} /> */}
                     <ReactQueryDevtools initialIsOpen={false} />
                   </ThemeProvider>
                 </CacheProvider>
-              </UploadProvider>
+              </QueryClientProvider>
             </ServiceScheduleProvider>
           </CompanyProvider>
         </AuthProvider>
