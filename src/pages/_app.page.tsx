@@ -41,10 +41,20 @@ const MyApp = (props: CustomAppProps) => {
 
   return (
     <SessionProvider session={session} refetchInterval={60 * 5}>
-      <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <CompanyProvider>
             <ServiceScheduleProvider>
+              <QueryClientProvider client={queryClient}>
+              <CacheProvider value={emotionCache}>
+                <Head>
+                  <meta
+                    name="viewport"
+                    content="initial-scale=1, width=device-width"
+                  />
+                </Head>
+                <ThemeProvider theme={theme}>
+                  <CssBaseline />
+                  <GlobalStyles styles={globals} />
               <UploadProvider>
                 <CacheProvider value={emotionCache}>
                   <Head>
@@ -53,7 +63,6 @@ const MyApp = (props: CustomAppProps) => {
                       content="initial-scale=1, width=device-width"
                     />
                   </Head>
-                  <ThemeProvider theme={theme}>
                     <CssBaseline />
                     <GlobalStyles styles={globals} />
 
@@ -67,16 +76,18 @@ const MyApp = (props: CustomAppProps) => {
                     ) : (
                       <Component {...pageProps} />
                     )}
-
+                  {/* <Component {...pageProps} /> */}
+                    <ReactQueryDevtools initialIsOpen={false} />
+                    </CacheProvider>
+                    </UploadProvider>
                     {/* <Component {...pageProps} /> */}
                     <ReactQueryDevtools initialIsOpen={false} />
                   </ThemeProvider>
                 </CacheProvider>
-              </UploadProvider>
+              </QueryClientProvider>
             </ServiceScheduleProvider>
           </CompanyProvider>
         </AuthProvider>
-      </QueryClientProvider>
     </SessionProvider>
   );
 };

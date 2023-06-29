@@ -63,7 +63,7 @@ import {
 import ModalCreateEditClientVehicle from './components/ModalEditClientVehicle'
 import ClaimServiceTable from './components/ClaimServiceTable'
 
-import { formatCNPJAndCPF } from '@/ultis/formatCNPJAndCPF'
+import { formatCNPJAndCPF, formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 // import { useForm } from 'react-hook-form'
 
@@ -290,7 +290,7 @@ export default function ServiceSchedulesCreate() {
       client_vehicle_id: clientVehicle?.id,
       company_id: `${companySelected}`,
       plate: clientVehicle?.plate,
-      claims_service: [...claimServiceList],
+      claims_service: claimServiceList.map(c => ({ claim_service_id: c.id })) ?? [],
       checklist_version_id: 14,
     }
 
@@ -356,12 +356,6 @@ export default function ServiceSchedulesCreate() {
     },
   )
 
-  // useEffect(() => {
-  //   api.get('/claim-service?company_id=1').then((resp) => {
-  //     setClaimServiceList(resp.data.data)
-  //   })
-  // },[])
-
   useEffect(() => {
     if (dataTechnicalConsultantListStatus === 'success') {
       setTechnicalConsultantsList(
@@ -423,10 +417,10 @@ export default function ServiceSchedulesCreate() {
                       </InfoCardText>
                     </ListItemCard>
                     <ListItemCard alignItems="flex-start">
-                      <InfoCardName>CPF:</InfoCardName>{' '}
+                      <InfoCardName>{client.cpf === null ? 'Documento:' : client.cpf === true? 'CPF:': 'CNPJ' }</InfoCardName>{' '}
                       <InfoCardText>
                         {client?.document
-                          ? formatCNPJAndCPF(client?.document)
+                          ? formatCNPJAndCPFNumber(client?.document, client.cpf)
                           : 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>

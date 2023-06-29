@@ -248,7 +248,7 @@ export default function ModalEditClient({
               variant="filled"
               style={{ marginTop: 11 }}
               fullWidth
-              {...register('document', { required: true })}
+              {...register('document', {required: true})}
               focused
               disabled
               InputProps={{

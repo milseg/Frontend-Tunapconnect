@@ -194,6 +194,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 
   const modalCarRef = useRef<modalInspectionCarRefType>(null)
 
+
   const defaultValues = {
     [stageName]: stageActual?.itens.map((item, index) => {
       if (item.rules.type === 'select') {

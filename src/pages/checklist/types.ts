@@ -97,6 +97,16 @@ export interface ChecklistProps {
   name: string
   description: string
   active: boolean
+  company_id: number
+  brand_id: number | null
+  vehicle_id: number | null,
+  vehicle_client_id: number | null,
+  client_id: number | null,
+  checklist_model: number | null,
+  service_schedule_id: number | null
+  status: string
+  km: null,
+  fuel: null,
   stages: StagesDataProps[]
   created_at: Date
   updated_at: Date

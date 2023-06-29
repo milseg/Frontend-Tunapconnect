@@ -61,8 +61,7 @@ export default function ClientsTable({
                   selected={clientSelected === row.id}
                 >
                   <TableCell scope="row">{row.name}</TableCell>
-                  <TableCell align="right">{formatCNPJAndCPFNumber(row.document, 
-                    row.cpf)}</TableCell>
+                  <TableCell align="right">{formatCNPJAndCPFNumber(row.document, row.cpf)}</TableCell>
                 </TableRowSBody>
               ))
             ) : (

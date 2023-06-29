@@ -6,28 +6,28 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
-import { ClientResponseType } from '@/types/service-schedule'
+
 import { TableCellHeader, TableRowSBody, TableRowSNoData } from './style'
 import { Stack } from '@mui/system'
 import { useState } from 'react'
 import { Box, CircularProgress } from '@mui/material'
-import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
+import { ClientVehicleResponseType } from '../../type'
 
-interface ClientsTableProps {
+interface ClientVehicleTableProps {
   handleModalNewClient: () => void
-  handleSelectedClient: (client: ClientResponseType) => void
-  data: ClientResponseType[]
+  handleSelectedClientVehicle: (client: ClientVehicleResponseType) => void
+  data: ClientVehicleResponseType[] | []
   isLoading: boolean
   handleDoubleClick: () => void
 }
 
-export default function ClientsTable({
+export default function ClientVehicleTable({
   data,
   handleModalNewClient,
-  handleSelectedClient,
+  handleSelectedClientVehicle,
   isLoading,
   handleDoubleClick
-}: ClientsTableProps) {
+}: ClientVehicleTableProps) {
   const [clientSelected, setClientSelected] = useState<number | null>(null)
   return (
     <>
@@ -35,12 +35,13 @@ export default function ClientsTable({
         <Table
           sx={{ minWidth: 350, maxHeight: 350 }}
           size="small"
-          aria-label="a dense table"
+          aria-label="table vehicle"
         >
           <TableHead>
             <TableRow>
-              <TableCellHeader>Nome</TableCellHeader>
-              <TableCellHeader>CPF:</TableCellHeader>
+              <TableCellHeader>Veículo</TableCellHeader>
+              <TableCellHeader>CHASSIS:</TableCellHeader>
+              <TableCellHeader>Placa:</TableCellHeader>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -55,19 +56,19 @@ export default function ClientsTable({
                     if(e.detail === 2) {
                       handleDoubleClick()
                     }
-                    handleSelectedClient(row)
+                    handleSelectedClientVehicle(row)
                     setClientSelected(row.id)
                   }}
                   selected={clientSelected === row.id}
                 >
-                  <TableCell scope="row">{row.name}</TableCell>
-                  <TableCell align="right">{formatCNPJAndCPFNumber(row.document, 
-                    row.cpf)}</TableCell>
+                  <TableCell>{`${row.vehicle.model.name} - ${row.vehicle.name}`}</TableCell>
+                  <TableCell align="right">{row.chasis}</TableCell>
+                  <TableCell align="right">{row.plate}</TableCell>
                 </TableRowSBody>
               ))
             ) : (
               <TableRowSNoData>
-                <TableCell scope="row" colSpan={2} align="center">
+                <TableCell scope="row" colSpan={3} align="center">
                   <Stack gap={1} alignItems="center" justifyContent="center">
                     {isLoading ? (
                       <Box sx={{ display: 'flex' }}>

@@ -22,6 +22,7 @@ export interface ClientResponseType {
   id: number
   company_id: number
   name: string
+  cpf: boolean | null
   document: string
   address: string[]
   active: boolean
