@@ -43,6 +43,7 @@ export function PrintInspection({
     receptionStage = isExistReceptionStage
   }
 
+    
   const isExistDeliveryStage = checklistData?.stages.filter(
     (st: any) => st.name === 'Entrega',
   )
@@ -1722,6 +1723,55 @@ export function PrintInspection({
                   </div>
                 )
               })}
+          </Stack>
+          <Stack
+            direction="row"
+            marginTop={10}
+            flexWrap="wrap"
+          >
+            {/* @ts-ignore */}
+            {
+            // @ts-ignore
+            
+            checklistData?.stages[0]?.itens.length > 0
+              ? // @ts-ignore
+                checklistData?.stages[0]?.itens.map((i, idx) => {
+                  // if (img.image.length === 0) {
+                  //   return null
+                  // }
+                
+                  return (
+                    <div key={idx + Math.random() * 20000} >
+                      {i.values.images?.map(imgs => {
+                       return imgs.images.length > 0 ? imgs.images.map((item, index) => {
+                          return (
+                            <Image
+                              // @ts-ignore
+                              key={index + Math.random() * 20000}
+                              // @ts-ignore
+                              src={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${item.url}`}
+                              alt=""
+                              width={135}
+                              height={100}
+                              style={{ borderRadius: '5px' }}
+                            />
+                          )
+                        }): null
+                      })}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      {/* <img
+                        // @ts-ignore
+                        src={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}/${i.values.images.url}`}
+                        alt=""
+                        width={90}
+                        height={70}
+                        style={{ borderRadius: '5px' }}
+                      />
+                      <p>{}</p> */}
+                    </div>
+                  )
+                })
+              : null}
           </Stack>
           <Stack
             direction="row"

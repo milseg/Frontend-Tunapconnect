@@ -339,7 +339,8 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     setDataModals((prevState) => {
       return {
         ...prevState,
-        signatures,
+        signatures: signatures,
+
       }
     })
   }
@@ -395,11 +396,14 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         }
       }),
     }
+
+    console.log(dataFormatted)
     return dataFormatted
   }
 
   async function onSubmitData(data: OnSubmitData) {
     const dataActual = await handleGetValuesForm()
+    console.log(dataActual)
 
     handleAddListCheckList({
       ...dataActual,
@@ -415,6 +419,18 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       listImagesStage.push(...img)
     })
 
+    setDataModals((prevState) => {
+      return {
+        ...prevState,
+        signatures: stageActual.signatures ? stageActual?.signatures.map(i => ({
+          name: i.name,
+          rules: {
+            required: i.rules.required
+          },
+          image: i.image
+        })) : [],
+      }
+    })
     setListImage((prevState) => {
       if (Object.hasOwn(prevState, stageName)) {
         return {
