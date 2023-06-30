@@ -67,6 +67,9 @@ const Drawer = styled(MuiDrawer, {
       [theme.breakpoints.up('sm')]: {
         width: theme.spacing(9),
       },
+      [theme.breakpoints.down('sm')]: {
+        width: theme.spacing(0),
+      },
     }),
   },
 }))
@@ -188,7 +191,7 @@ export function DashboardContent({ children }: DashboardContentProps) {
             },
             marginLeft: {
               sm: open ? `${drawerWidth}px` : '71px',
-              xs: '71px',
+              xs: 0,
             },
             transition: 'all 0.1s ease-in-out',
           }}
