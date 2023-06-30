@@ -93,12 +93,10 @@ export default function ServiceSchedulesList() {
 
   useEffect(() => {
     if (!isWeb) {
-      console.log('mobile')
       if (!isMobile) {
         setIsMobile(true)
       }
     } else {
-      console.log('web')
       setIsMobile(false)
     }
   }, [isWeb])
