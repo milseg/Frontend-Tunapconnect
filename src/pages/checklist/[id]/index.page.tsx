@@ -131,8 +131,6 @@ export default function ChecklistCreateById() {
 
           return respChecklist.data.data
         }
-
-        
       } catch (error) {
         console.log(error)
       }
