@@ -85,7 +85,7 @@ export function DashboardContent({ children }: DashboardContentProps) {
     setOpen(!open)
   }
   const theme = useTheme()
-  const isWeb = useMediaQuery(theme.breakpoints.up('md'))
+  const isWeb = useMediaQuery(theme.breakpoints.up('lg'))
   const { companyData } = useContext(CompanyContext)
 
   const company = useMemo(() => companyData, [companyData])
