@@ -178,7 +178,6 @@ export function DashboardContent({ children }: DashboardContentProps) {
           component="main"
           onClick={(e) => {
             if(open) {
-              console.log('Tunap open')
               e.stopPropagation()
               setOpen(false)
             }
