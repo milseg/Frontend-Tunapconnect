@@ -129,7 +129,7 @@ export default function ButtonFilterSelect({
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
           variant="contained"
-          size="large"
+          size="small"
           disableElevation
           onClick={handleClick}
           endIcon={!isMobile ? <KeyboardArrowDownIcon /> : null}

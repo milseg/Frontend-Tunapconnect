@@ -96,9 +96,9 @@ export function DashboardContent({ children }: DashboardContentProps) {
         setOpen(false)
       }
     } else {
-      if (!open) {
-        setOpen(true)
-      }
+      // if (!open) {
+      //   setOpen(true)
+      // }
     }
   }, [isWeb])
 
