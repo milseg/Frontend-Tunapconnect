@@ -64,10 +64,10 @@ const Drawer = styled(MuiDrawer, {
         duration: theme.transitions.duration.leavingScreen,
       }),
       width: theme.spacing(7),
-      [theme.breakpoints.up('sm')]: {
+      [theme.breakpoints.up('md')]: {
         width: theme.spacing(9),
       },
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         width: theme.spacing(0),
       },
     }),
@@ -85,7 +85,7 @@ export function DashboardContent({ children }: DashboardContentProps) {
     setOpen(!open)
   }
   const theme = useTheme()
-  const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
+  const isWeb = useMediaQuery(theme.breakpoints.up('md'))
   const { companyData } = useContext(CompanyContext)
 
   const company = useMemo(() => companyData, [companyData])
@@ -184,13 +184,13 @@ export function DashboardContent({ children }: DashboardContentProps) {
             height: '100vh',
             overflow: 'auto',
             maxWidth: {
-              sm: open
+              md: open
                 ? `calc(100vw - ${drawerWidth}px)`
                 : `calc(100vw - 71px)`,
               xs: `100vw`,
             },
             marginLeft: {
-              sm: open ? `${drawerWidth}px` : '71px',
+              md: open ? `${drawerWidth}px` : '71px',
               xs: 0,
             },
             transition: 'all 0.1s ease-in-out',
