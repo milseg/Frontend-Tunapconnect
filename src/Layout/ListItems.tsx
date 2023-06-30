@@ -163,6 +163,16 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
                       <ListItemText primary="Upload Umuarama" />
                     </ListItemButton>
                   </Link>
+                  <Link href={`${menu.href}?status=newland`} style={{ textDecoration: 'none' }}  onClick={handleListReload}>
+                    <ListItemButton sx={{ pl: 4, marginLeft: '70px', width: 'fit-content'}}>
+                      <ListItemText primary="Upload Newland" />
+                    </ListItemButton>
+                  </Link>
+                  <Link href={`${menu.href}?status=canopus`} style={{ textDecoration: 'none' }}  onClick={handleListReload}>
+                    <ListItemButton sx={{ pl: 4, marginLeft: '70px', width: 'fit-content'}}>
+                      <ListItemText primary="Upload Canopus" />
+                    </ListItemButton>
+                  </Link>
                 </List>
               </Collapse>
             </React.Fragment>
