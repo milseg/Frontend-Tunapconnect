@@ -442,6 +442,13 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         [stageName]: listImagesStage,
       }
     })
+    
+
+            // setActionAlerts({
+        //   isOpen: true,
+        //   title: 'Salvo com sucesso',
+        //   type: 'success',
+        // })
   }, [])
 
   return (

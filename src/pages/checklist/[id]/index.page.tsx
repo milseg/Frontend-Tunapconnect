@@ -1,4 +1,4 @@
-import { ReactNode, SyntheticEvent, useContext, useRef, useState } from 'react'
+import { ReactNode, SyntheticEvent, useContext, useEffect, useRef, useState } from 'react'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -71,7 +71,8 @@ export default function ChecklistCreateById() {
   const queryClient = useQueryClient()
 
   const router = useRouter()
-  const { serviceScheduleState, setCheckList } = useContext(
+
+  const { serviceScheduleState, setCheckList, setServiceScheduleIsCreated, setServiceSchedule } = useContext(
     ServiceScheduleContext,
   )
 
@@ -96,12 +97,17 @@ export default function ChecklistCreateById() {
       onSuccess: (data) => {
         queryClient.invalidateQueries('checklist-createByID')
         setLoading(false)
+        setActionAlerts({
+          isOpen: true,
+          title: 'Salvo com sucesso',
+          type: 'error',
+        })
         return data
       },
       onError: () => {
         setActionAlerts({
           isOpen: true,
-          title: 'Salvo com sucesso',
+          title: 'Error ao salvar',
           type: 'error',
         })
       },
@@ -115,12 +121,18 @@ export default function ChecklistCreateById() {
         if (serviceScheduleState.checklist) {
           return serviceScheduleState.checklist
         } else {
-          const resp = await api.get(`/checklist/${router?.query?.id}`)
+          const respChecklist = await api.get(`/checklist/${router?.query?.id}`)
+          if(!serviceScheduleState.serviceSchedule) {
+            const respServiceSchedule = await api.get(`/service-schedule/${respChecklist.data.data.service_schedule_id}`)
+            setServiceSchedule(respServiceSchedule.data.data)
+          }
 
-          setCheckList(resp.data.data)
+          setCheckList(respChecklist.data.data)
 
-          return resp.data.data
+          return respChecklist.data.data
         }
+
+        
       } catch (error) {
         console.log(error)
       }
@@ -189,6 +201,19 @@ export default function ChecklistCreateById() {
     setPainelValue(newValue)
   }
 
+  useEffect(() => {
+    console.log('isCreated ---',serviceScheduleState.serviceScheduleIsCreated)
+    if(serviceScheduleState.serviceScheduleIsCreated) {
+      console.log('isCreated')
+      setActionAlerts({
+        isOpen: true,
+        title: 'Criado com sucesso!',
+        type: 'success',
+      })
+      setServiceScheduleIsCreated(false)
+    }
+  }, [])
+
   if (isLoading) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -202,6 +227,8 @@ export default function ChecklistCreateById() {
     )
   }
 
+
+
   if (isSuccess) {
     return (
       <>
@@ -211,7 +238,7 @@ export default function ChecklistCreateById() {
           >
             <Title variant="h6">
               Agenda:{checklist?.service_schedule_id} -{' '}
-              {checklist?.client?.name ?? 'Não informado'}
+              {serviceScheduleState.serviceSchedule?.client?.name ?? 'Não informado'}
             </Title>
           </LinkNext>
         </Box>

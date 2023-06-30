@@ -150,7 +150,7 @@ export default function ServiceSchedulesCreate() {
   const { 
     setServiceSchedule, 
     serviceScheduleState, 
-    setServiceScheduleiSCreated, 
+    setServiceScheduleIsCreated, 
     setCheckList 
   } = useContext(ServiceScheduleContext)
 
@@ -373,7 +373,7 @@ export default function ServiceSchedulesCreate() {
         dataFormatted,
       )
       const respUpdateResponse = respUpdate.data.data
-      setServiceSchedule(respUpdateResponse, true)
+      setServiceSchedule(respUpdateResponse)
 
       // router.push('/service-schedule/' + idCreatedResponse.id)
 
@@ -420,14 +420,16 @@ export default function ServiceSchedulesCreate() {
   }
 
   useEffect(() => {
-    if(serviceScheduleState.serviceScheduleiSCreated) {
+    // console.log('isCreated', serviceScheduleState)
+    if(serviceScheduleState.serviceScheduleIsCreated) {
+      console.log('isCreated')
       setActionAlerts({
         isOpen: true,
         title: 'Criado com sucesso!',
         type: 'success',
       })
+      setServiceScheduleIsCreated(false)
     }
-    return () => setServiceScheduleiSCreated(false)
 }, [])
 
   useEffect(() => {
