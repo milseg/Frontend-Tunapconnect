@@ -184,13 +184,13 @@ export function DashboardContent({ children }: DashboardContentProps) {
             height: '100vh',
             overflow: 'auto',
             maxWidth: {
-              md: open
-                ? `calc(100vw - ${drawerWidth}px)`
-                : `calc(100vw - 71px)`,
+              // md: open
+              //   ? `calc(100vw - ${drawerWidth}px)`
+              //   : `calc(100vw - 71px)`,
               xs: `100vw`,
             },
             marginLeft: {
-              md: open ? `${drawerWidth}px` : '71px',
+              // md: open ? `${drawerWidth}px` : '71px',
               xs: 0,
             },
             transition: 'all 0.1s ease-in-out',
