@@ -176,8 +176,10 @@ export function DashboardContent({ children }: DashboardContentProps) {
         </Drawer>
         <Box
           component="main"
-          onClick={() => {
+          onClick={(e) => {
             if(open) {
+              console.log('Tunap open')
+              e.stopPropagation()
               setOpen(false)
             }
           }}
