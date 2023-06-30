@@ -6,6 +6,7 @@ import MenuItem from '@mui/material/MenuItem'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { ButtonFilter } from './style'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
+import FilterListIcon from '@mui/icons-material/FilterList';
 import {
   Box,
   Button,
@@ -74,10 +75,12 @@ type filterValuesProps = {
 
 interface ButtonFilterSelectProps {
   handleFilterValues: (values: filterValuesProps) => any
+  isMobile: boolean
 }
 
 export default function ButtonFilterSelect({
   handleFilterValues,
+  isMobile
 }: ButtonFilterSelectProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [openModalDateSelect, setOpenModalDateSelect] = useState(false)
@@ -129,9 +132,10 @@ export default function ButtonFilterSelect({
           size="large"
           disableElevation
           onClick={handleClick}
-          endIcon={<KeyboardArrowDownIcon />}
+          endIcon={!isMobile ? <KeyboardArrowDownIcon /> : null}
+         
         >
-          Filtro
+         { isMobile ? <FilterListIcon /> : 'Filtro' }
         </ButtonFilter>
         <StyledMenu
           id="demo-customized-menu"
