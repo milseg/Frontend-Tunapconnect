@@ -63,13 +63,13 @@ const Drawer = styled(MuiDrawer, {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
-      width: theme.spacing(7),
-      [theme.breakpoints.up('md')]: {
-        width: theme.spacing(9),
-      },
-      [theme.breakpoints.down('md')]: {
-        width: theme.spacing(0),
-      },
+      width: theme.spacing(0),
+      // [theme.breakpoints.up('xs')]: {
+      //   width: theme.spacing(9),
+      // },
+      // [theme.breakpoints.down('md')]: {
+      //   width: theme.spacing(0),
+      // },
     }),
   },
 }))
