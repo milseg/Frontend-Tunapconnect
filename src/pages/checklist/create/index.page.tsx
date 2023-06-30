@@ -72,7 +72,7 @@ export default function ChecklistCreateById() {
   const queryClient = useQueryClient()
 
   const router = useRouter()
-  const { serviceScheduleState, setCheckListModel, setServiceSchedule, setCheckList } =
+  const { serviceScheduleState, setCheckListModel, setServiceSchedule, setCheckList, setServiceScheduleIsCreated } =
     useContext(ServiceScheduleContext)
 
   const tabContentRef = useRef<RefTabContentRefType>(null)
@@ -86,6 +86,7 @@ export default function ChecklistCreateById() {
         // setCheckList(resp.data.data)
         // router.push(`/checklist/${resp.data.data.id}`)
         return resp.data.data
+        console.log(resp.data.data)
       } catch (error) {
         
       } 
@@ -93,12 +94,13 @@ export default function ChecklistCreateById() {
 
     {
       onSuccess: (data) => {
-        setActionAlerts({
-          isOpen: true,
-          title: 'Salvo com sucesso',
-          type: 'success',
-        })
+        // setActionAlerts({
+        //   isOpen: true,
+        //   title: 'Salvo com sucesso',
+        //   type: 'success',
+        // })
         setCheckList(data)
+        setServiceScheduleIsCreated(true)
      
         router.push(`/checklist/${data.id}`)
         queryClient.invalidateQueries(['checklist-create', router?.query?.service_schedule_id,router.query.checklist_model_id])

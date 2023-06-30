@@ -142,11 +142,10 @@ export function DashboardContent({ children }: DashboardContentProps) {
           </Toolbar>
         </AppBar>
         <Drawer
-          // variant="permanent"
           variant="permanent"
           open={open}
           ModalProps={{
-            keepMounted: false, // Better open performance on mobile.
+            keepMounted: true, // Better open performance on mobile.
           }}
         >
           <Toolbar
@@ -176,12 +175,6 @@ export function DashboardContent({ children }: DashboardContentProps) {
         </Drawer>
         <Box
           component="main"
-          onClick={(e) => {
-            if(open) {
-              e.stopPropagation()
-              setOpen(false)
-            }
-          }}
           sx={{
             backgroundColor: (theme) =>
               theme.palette.mode === 'light'
