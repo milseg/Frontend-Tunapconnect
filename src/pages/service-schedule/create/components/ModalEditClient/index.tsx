@@ -16,7 +16,7 @@ import {
 import { useContext, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { CompanyContext } from '@/contexts/CompanyContext'
-import { Backdrop, CircularProgress, InputAdornment } from '@mui/material'
+import { Backdrop, CircularProgress, InputAdornment, useMediaQuery } from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientResponseType } from '@/types/service-schedule'
 
@@ -24,6 +24,7 @@ import * as z from 'zod'
 import { validateCNPJ, validateCPF } from '@/ultis/validation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TextMaskPHONE, TextMaskCPF } from '@/components/InputMask'
+import { useTheme } from '@mui/material/styles';
 
 interface ModalEditClientProps {
   handleClose: () => void
@@ -142,6 +143,9 @@ export default function ModalEditClient({
     name: 'address',
   })
 
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+
   async function onSubmit(formData: any) {
     setIsLoading(true)
     const listPhone = formData.phone
@@ -226,15 +230,22 @@ export default function ModalEditClient({
 
   return (
     <>
-      <Dialog open={isOpen} onClose={handleClose}>
+      <Dialog open={isOpen} onClose={handleClose} fullScreen={fullScreen} >
         <DialogTitle>Edição de cliente </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{
+          overflowX: fullScreen ? 'auto' : 'hidden',
+        }}>
           <Stack
-            width={400}
-            gap={1}
-            component="form"
-            onSubmit={handleSubmit(onSubmit)}
-          >
+            sx={{
+              width: '100%',
+              maxWidth: 550,
+              minWidth: fullScreen ? 300: 550,
+              margin: '0 auto',
+            }}
+              gap={1}
+              component="form"
+              onSubmit={handleSubmit(onSubmit)}
+            >
             <InputText
               label="Nome"
               variant="filled"

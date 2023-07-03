@@ -15,12 +15,14 @@ import {
   CircularProgress,
   MenuItem,
   TextField,
+  useMediaQuery,
 } from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientVehicleResponseType } from '../ModalSearchClientVehicle/type'
 import { useQuery } from 'react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import { useTheme } from '@mui/material/styles';
 
 interface ModalCreateNewClientVehicleProps {
   handleClose: () => void
@@ -98,6 +100,9 @@ export default function ModalCreateNewClientVehicle({
       km: '',
     },
   })
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const { data: dataVehicleBrandList } = useQuery<any[]>(
     [
@@ -244,11 +249,16 @@ export default function ModalCreateNewClientVehicle({
 
   return (
     <>
-      <Dialog open={isOpen} onClose={handleClose}>
+      <Dialog open={isOpen} onClose={handleClose} fullScreen={fullScreen}>
         <DialogTitle>Criação de Veículo</DialogTitle>
         <DialogContent>
           <Stack
-            width={400}
+            sx={{
+              width: '100%',
+              maxWidth: 550,
+              minWidth: fullScreen ? 300: 550,
+              margin: '0 auto',
+            }}
             gap={1}
             component="form"
             onSubmit={handleSubmitCreateNewVehicle(onSubmit)}

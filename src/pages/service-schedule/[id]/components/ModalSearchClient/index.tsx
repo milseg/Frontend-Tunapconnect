@@ -6,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import SearchIcon from '@mui/icons-material/Search'
 import DialogTitle from '@mui/material/DialogTitle'
-import { Box, Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography, useMediaQuery } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { ButtonIcon, ButtonModalDialog, ButtonPaginate } from '../../styles'
 import { api } from '@/lib/api'
@@ -14,6 +14,7 @@ import { useContext, useEffect, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { ClientResponseType } from '@/types/service-schedule'
 import ClientsTable from './Components/Table'
+import { useTheme } from '@mui/material/styles';
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
@@ -55,6 +56,10 @@ export default function ModalSearchClient({
   })
 
   const { companySelected } = useContext(CompanyContext)
+
+  const theme = useTheme();
+  const isWeb = useMediaQuery(theme.breakpoints.up('xs'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   async function onSubmitSearch(data: SearchFormProps) {
     setIsLoading(true)
@@ -153,18 +158,24 @@ export default function ModalSearchClient({
 
   return (
     <div>
-      <Dialog open={openMolal} onClose={handleClose}>
+      <Dialog open={openMolal} onClose={handleClose} fullScreen={fullScreen}>
         <DialogTitle>
           <Stack
             justifyContent="space-between"
             alignItems="center"
             direction="row"
+            sx={{
+              width: '100%',
+              maxWidth: 550,
+              minWidth: fullScreen ? 300: 550,
+              margin: '0 auto',
+            }}
           >
             {' '}
             <Typography variant="h6">Buscar por cliente</Typography>
             {/* {clientList.length > 0 && ( */}
             <ButtonModalDialog onClick={handleClientModal}>
-              adicionar novo
+              {isWeb? 'adicionar novo' : 'novo'}
             </ButtonModalDialog>
             {/* )} */}
           </Stack>

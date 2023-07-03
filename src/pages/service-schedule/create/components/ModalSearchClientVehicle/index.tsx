@@ -6,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import SearchIcon from '@mui/icons-material/Search'
 import DialogTitle from '@mui/material/DialogTitle'
-import { Box, Stack, Typography } from '@mui/material'
+import { Box, Stack, Typography, useMediaQuery } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { ButtonIcon, ButtonModalDialog, ButtonPaginate } from '../../styles'
 import { api } from '@/lib/api'
@@ -17,6 +17,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import { ClientVehicleResponseType } from './type'
 import ClientVehicleTable from './Components/Table'
+import { useTheme } from '@mui/material/styles';
 
 interface ModalSearchClientVehicleProps {
   openMolal: boolean
@@ -57,6 +58,9 @@ export default function ModalSearchClientVehicle({
   })
 
   const { companySelected } = useContext(CompanyContext)
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   async function onSubmitSearch(data: SearchFormProps) {
     setIsLoading(true)
@@ -156,18 +160,24 @@ export default function ModalSearchClientVehicle({
 
   return (
     <div>
-      <Dialog open={openMolal} onClose={handleClose}>
+      <Dialog open={openMolal} onClose={handleClose} fullScreen={fullScreen}>
         <DialogTitle>
           <Stack
             justifyContent="space-between"
             alignItems="center"
             direction="row"
+            sx={{
+              width: '100%',
+              maxWidth: 550,
+              minWidth: fullScreen ? 300: 550,
+              margin: '0 auto',
+            }}
           >
             {' '}
             <Typography variant="h6">Buscar por veículo</Typography>
             {/* {clientList.length > 0 && ( */}
             <ButtonModalDialog onClick={handleClientVehicleModal}>
-              adicionar novo
+              {fullScreen ? 'novo' : 'adicionar novo'}
             </ButtonModalDialog>
             {/* )} */}
           </Stack>
@@ -177,6 +187,10 @@ export default function ModalSearchClientVehicle({
             component="form"
             onSubmit={handleSubmit(onSubmitSearch)}
             sx={{
+              width: '100%',
+              maxWidth: 550,
+              minWidth: fullScreen ? 300: 550,
+              margin: '0 auto',
               flexWrap: 'nowrap',
               display: 'flex',
               flex: 1,

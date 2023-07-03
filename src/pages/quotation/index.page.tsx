@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { useContext, useState, useMemo, useEffect } from 'react'
@@ -35,16 +36,30 @@ import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
 
 import { useQuery } from 'react-query'
 import Skeleton from '@mui/material/Skeleton'
-import { formatDateTime } from '@/ultis/formatDate'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 import ButtonFilterSelect from './components/ButtonFilterSelect'
 import { Stack } from '@mui/system'
 // import FilterListIcon from '@mui/icons-material/FilterList'
 import { useMediaQuery, useTheme } from '@mui/material'
+import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
+import { QuotationResponseType } from '@/types/quotation'
 
 type SearchFormProps = {
   search: string
 }
+
+type QuotationListType = {
+  id: number | string,
+  client: string,
+  plate: string,
+  chassis: string,
+  technical_consultant:
+  string,
+  type_quotation: string,
+  discount: number | string,
+  total: number | string,
+}
+
 
 type DataFetchProps = {
   paginate: {
@@ -52,8 +67,8 @@ type DataFetchProps = {
     total_pages: number
     total_results: number
   }
-  serviceSchedulesList: ServiceSchedulesListProps[] | []
-  serviceSchedulesListAllData: ServiceScheduleType[]
+  quotationList: QuotationListType[] | []
+  quotationListData: QuotationResponseType[]
 }
 
 type filterValuesProps = {
@@ -74,7 +89,7 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
   },
 ]
 
-export default function ServiceSchedulesList() {
+export default function QuotationList() {
   const [pages, setPages] = useState<{
     next: boolean
     previous: boolean
@@ -106,11 +121,11 @@ export default function ServiceSchedulesList() {
     },
   })
 
-  function onSubmitSearch(data: SearchFormProps) {
-    router.push(
-      `/service-schedule?company_id=${companySelected}${
-        data.search ? '&search=' + data.search : ''
-      }`,
+ async function onSubmitSearch(data: SearchFormProps) {
+    await router.push(
+      `/quotations?${
+        data.search ? 'search=' + data.search : ''
+      }company_id=${companySelected}`,
     )
   }
 
@@ -118,7 +133,7 @@ export default function ServiceSchedulesList() {
     refetch()
   }
 
-  let url = `/service-schedule?company_id=${companySelected}`
+  let url = `/quotations?company_id=${companySelected}`
 
   if (router.query.limit) {
     url += `&limit=${router.query.limit}`
@@ -132,15 +147,15 @@ export default function ServiceSchedulesList() {
     url += `&search=${router.query.search}`
   }
 
-  if (router.query.promised_date_min) {
-    url += `&promised_date_min=${filterValues?.date.dateStart}`
-  }
-  if (router.query.promised_date_max) {
-    url += `&promised_date_max=${filterValues?.date.dateEnd}`
-  }
-  if (router.query.orderby) {
-    url += '&orderby=promised_date'
-  }
+  // if (router.query.promised_date_min) {
+  //   url += `&promised_date_min=${filterValues?.date.dateStart}`
+  // }
+  // if (router.query.promised_date_max) {
+  //   url += `&promised_date_max=${filterValues?.date.dateEnd}`
+  // }
+  // if (router.query.orderby) {
+  //   url += '&orderby=promised_date'
+  // }
 
   async function handleFilterValues(values: filterValuesProps) {
     setFilterValues(values)
@@ -164,18 +179,7 @@ export default function ServiceSchedulesList() {
         type: 'number',
         align: 'center',
         sortable: false,
-      },
-      {
-        field: 'promised_date',
-        headerName: 'Data Prometida',
-        headerClassName: 'super-app-theme--header',
-        width: 150,
-        type: 'text',
-        align: 'left',
-        sortable: false,
-        valueGetter: (params: GridValueGetterParams) =>
-          `${formatDateTime(params.row.promised_date) || ''}`,
-      },
+      }, 
       {
         field: 'client',
         headerName: 'Cliente',
@@ -190,7 +194,7 @@ export default function ServiceSchedulesList() {
         field: 'plate',
         headerName: 'Placa',
         headerClassName: 'super-app-theme--header',
-        width: 120,
+        width: 100,
         sortable: false,
       },
       {
@@ -199,7 +203,7 @@ export default function ServiceSchedulesList() {
         headerClassName: 'super-app-theme--header',
         flex: 1,
         maxWidth: 240,
-        minWidth: 120,
+        minWidth: 130,
         sortable: false,
       },
       {
@@ -212,11 +216,33 @@ export default function ServiceSchedulesList() {
         sortable: false,
       },
       {
-        field: 'vehicle',
-        headerName: 'Veículo',
+        field: 'type_quotation',
+        headerName: 'Tipo de cotação',
         headerClassName: 'super-app-theme--header',
-        width: 160,
+        width: 150,
+        type: 'text',
+        align: 'left',
         sortable: false,
+      },
+      {
+        field: 'discount',
+        headerName: 'Total de desconto',
+        headerClassName: 'super-app-theme--header',
+        width: 150,
+        sortable: false,
+        valueGetter: (params: GridValueGetterParams) =>{
+          return `${formatMoneyPtBR(params.row.discount) || ''}`
+        },
+      },
+      {
+        field: 'total',
+        headerName: 'Total geral',
+        headerClassName: 'super-app-theme--header',
+        width: 100,
+        sortable: false,
+        valueGetter: (params: GridValueGetterParams) =>{
+          return `${formatMoneyPtBR(params.row.total) || ''}`
+        },
       },
 
       {
@@ -230,7 +256,7 @@ export default function ServiceSchedulesList() {
           const onClick = (e: React.MouseEvent<HTMLElement>) => {
             e.stopPropagation()
             const id = params.id
-            ActionDeleteConfirmations(id as number, handleDelete)
+            ActionDeleteConfirmations(id as number, handleDelete, '/quotations/')
           }
           return (
             <IconButton
@@ -257,20 +283,21 @@ export default function ServiceSchedulesList() {
     refetch,
     isFetching,
   } = useQuery<DataFetchProps>(
-    ['service-scheduler-list', companySelected],
-    () => {
+    ['quotation-list', companySelected, url], 
+      () => {
       return api.get(url).then((response) => {
         console.log(response)
         const resp = response.data.data.map((data: any) => {
           return {
             id: data?.id ?? 'Não informado',
-            promised_date: data?.promised_date ?? 'Não informado',
             client: data?.client?.name ?? 'Não informado',
             plate: data?.client_vehicle?.plate ?? 'Não informado',
             chassis: data?.client_vehicle?.chasis ?? 'Não informado',
             technical_consultant:
               data?.technical_consultant?.name ?? 'Não informado',
-            vehicle: data?.client_vehicle?.vehicle?.name ?? 'não definido',
+            type_quotation: data?.os_type?.name ?? 'não definido',
+            discount: data?.TotalGeralDesconto ?? 'não definido',
+            total: data?.TotalGeral ?? 'não definido',
           }
         })
 
@@ -291,8 +318,8 @@ export default function ServiceSchedulesList() {
             total_pages: response.data.total_pages,
             total_results: response.data.total_results,
           },
-          serviceSchedulesList: resp,
-          serviceSchedulesListAllData: response.data.data,
+          quotationList: resp,
+          quotationListAllData: response.data.data,
         }
       })
     },
@@ -337,7 +364,7 @@ export default function ServiceSchedulesList() {
   }
 
   async function handleSetServiceSchedule(idSelected: number) {
-    const filterSelected = rows?.serviceSchedulesListAllData.filter(
+    const filterSelected = rows?.quotationListAllData.filter(
       (i) => i.id === idSelected,
     )[0]
 
@@ -483,7 +510,7 @@ export default function ServiceSchedulesList() {
           {!isFetching ? (
             <TableApp
               columns={columns}
-              rowsData={isSuccess ? rows.serviceSchedulesList : []}
+              rowsData={isSuccess ? rows.quotationList : []}
               handlePages={handlePages}
               pages={pages}
               loading={isFetching}
@@ -499,4 +526,4 @@ export default function ServiceSchedulesList() {
   )
 }
 
-ServiceSchedulesList.auth = true
+QuotationList.auth = true

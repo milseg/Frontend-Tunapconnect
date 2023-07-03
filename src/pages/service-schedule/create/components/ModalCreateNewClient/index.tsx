@@ -19,6 +19,7 @@ import {
   FormControlLabel,
   FormGroup,
   Switch,
+  useMediaQuery,
 } from '@mui/material'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientResponseType } from '@/types/service-schedule'
@@ -29,6 +30,7 @@ import {
   TextMaskPHONE,
   TextMaskCNPJ,
 } from '@/components/InputMask'
+import { useTheme } from '@mui/material/styles';
 // import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 
 interface ModalCreateNewClientProps {
@@ -145,6 +147,9 @@ export default function ModalCreateNewClient({
     name: 'address',
   })
 
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+
   async function onSubmit(data: any) {
     setIsLoading(true)
     const listPhone = data.phone
@@ -225,13 +230,18 @@ export default function ModalCreateNewClient({
 
   return (
     <>
-      <Dialog open={isOpen} onClose={handleClose}>
+      <Dialog open={isOpen} onClose={handleClose} fullScreen={fullScreen}>
         <DialogTitle>Criação de cliente </DialogTitle>
         <DialogContent>
           <Stack
-            width={400}
             gap={1}
             component="form"
+            sx={{
+              width: '100%',
+              maxWidth: 550,
+              minWidth: fullScreen ? 300: 550,
+              margin: '0 auto',
+            }}
             onSubmit={handleSubmit(onSubmit)}
           >
             <InputText
