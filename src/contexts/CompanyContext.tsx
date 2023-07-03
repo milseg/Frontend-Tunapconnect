@@ -67,12 +67,14 @@ export function CompanyProvider({ children }: GeralProviderProps) {
       (await router.push(`/service-schedule?company_id=${company.id}`))
   }
 
-  const deselectCompany = 
-    function() {
-      destroyCookie(null, process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string)
-      setCompanyData(null)
-      setCompanySelected(null)
-    };
+  const deselectCompany = function () {
+    destroyCookie(
+      null,
+      process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string,
+    )
+    setCompanyData(null)
+    setCompanySelected(null)
+  }
 
   async function handleCompanySelected(company: companyProps) {
     await createCompany(company, true)
@@ -138,7 +140,7 @@ export function CompanyProvider({ children }: GeralProviderProps) {
             router.push('/company')
           }
         })
-        //router.push('/company')
+        // router.push('/company')
       }
     }
   }, [companySelected])

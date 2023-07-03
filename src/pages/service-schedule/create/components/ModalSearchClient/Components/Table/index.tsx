@@ -26,7 +26,7 @@ export default function ClientsTable({
   handleModalNewClient,
   handleSelectedClient,
   isLoading,
-  handleDoubleClick
+  handleDoubleClick,
 }: ClientsTableProps) {
   const [clientSelected, setClientSelected] = useState<number | null>(null)
   return (
@@ -52,7 +52,7 @@ export default function ClientsTable({
                     '&:last-child td, &:last-child th': { border: 0 },
                   }}
                   onClick={(e) => {
-                    if(e.detail === 2) {
+                    if (e.detail === 2) {
                       handleDoubleClick()
                     }
                     handleSelectedClient(row)
@@ -61,8 +61,9 @@ export default function ClientsTable({
                   selected={clientSelected === row.id}
                 >
                   <TableCell scope="row">{row.name}</TableCell>
-                  <TableCell align="right">{formatCNPJAndCPFNumber(row.document, 
-                    row.cpf)}</TableCell>
+                  <TableCell align="right">
+                    {formatCNPJAndCPFNumber(row.document, row.cpf)}
+                  </TableCell>
                 </TableRowSBody>
               ))
             ) : (

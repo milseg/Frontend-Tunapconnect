@@ -54,10 +54,10 @@ export default function CompanyList() {
     },
   )
 
-  /*useEffect(() => {
-    console.log("unselect company")
+  useEffect(() => {
+    // console.log('unselect company')
     deselectCompany()
-  }, [])*/
+  }, [])
 
   return (
     <>

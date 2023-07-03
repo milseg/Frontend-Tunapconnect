@@ -15,7 +15,9 @@ import {
   CircularProgress,
   MenuItem,
   TextField,
+  useMediaQuery,
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles';
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientVehicleResponseType } from '../ModalSearchClientVehicle/type'
 import { useQuery } from 'react-query'
@@ -98,6 +100,9 @@ export default function ModalCreateNewClientVehicle({
       km: '',
     },
   })
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const { data: dataVehicleBrandList } = useQuery<any[]>(
     [
@@ -244,7 +249,7 @@ export default function ModalCreateNewClientVehicle({
 
   return (
     <>
-      <Dialog open={isOpen} onClose={handleClose}>
+      <Dialog open={isOpen} onClose={handleClose} fullScreen={fullScreen}>
         <DialogTitle>Criação de Veículo</DialogTitle>
         <DialogContent>
           <Stack
@@ -252,6 +257,12 @@ export default function ModalCreateNewClientVehicle({
             gap={1}
             component="form"
             onSubmit={handleSubmitCreateNewVehicle(onSubmit)}
+            sx={{
+              width: '100%',
+              maxWidth: 550,
+              minWidth: fullScreen ? 300: 550,
+              margin: '0 auto',
+            }}
           >
             <Box width="100%">
               <Controller
@@ -275,9 +286,7 @@ export default function ModalCreateNewClientVehicle({
                         field.onChange(event)
                       }}
                     >
-                      <MenuItem value={'none'}>
-                        {'Selecione...'}
-                      </MenuItem>
+                      <MenuItem value={'none'}>{'Selecione...'}</MenuItem>
                       {dataVehicleBrandList &&
                         dataVehicleBrandList.map((option) => (
                           <MenuItem

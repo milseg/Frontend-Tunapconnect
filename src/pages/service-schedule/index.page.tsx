@@ -39,7 +39,7 @@ import { formatDateTime } from '@/ultis/formatDate'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 import ButtonFilterSelect from './components/ButtonFilterSelect'
 import { Stack } from '@mui/system'
-import FilterListIcon from '@mui/icons-material/FilterList';
+// import FilterListIcon from '@mui/icons-material/FilterList'
 import { useMediaQuery, useTheme } from '@mui/material'
 
 type SearchFormProps = {
@@ -89,7 +89,6 @@ export default function ServiceSchedulesList() {
 
   const theme = useTheme()
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
-
 
   useEffect(() => {
     if (!isWeb) {
@@ -231,7 +230,7 @@ export default function ServiceSchedulesList() {
           const onClick = (e: React.MouseEvent<HTMLElement>) => {
             e.stopPropagation()
             const id = params.id
-            ActionDeleteConfirmations(id as number, handleDelete)
+            ActionDeleteConfirmations(id as number, handleDelete, '/service-schedule/')
           }
           return (
             <IconButton
@@ -389,27 +388,41 @@ export default function ServiceSchedulesList() {
   return (
     <Container maxWidth="lg" sx={{ mt: 1, mb: 4 }}>
       <Grid container spacing={0}>
-
-      <Grid item xs={12}>
-          <Stack direction='row' justifyContent='flex-start' alignItems='flex-start' >
-          <HeaderBreadcrumb
+        <Grid item xs={12}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+          >
+            <HeaderBreadcrumb
               data={HeaderBreadcrumbData}
               title="Lista de Agendamentos"
             />
-             {/* <ButtonAdd
-              size="large"
-              variant="contained"
-              sx={{ alignSelf: 'flex-end' }}
-              startIcon={<AddCircleOutlineIcon />}
-              onClick={async () => {
-                await router.push(`/service-schedule/create`)
-              }}
-              // disabled
-            >
-              Adicionar novo
-            </ButtonAdd> */}
+            {!isMobile ? (
+              <ButtonAdd
+                size="large"
+                variant="contained"
+                sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
+                startIcon={<AddCircleOutlineIcon />}
+                onClick={async () => {
+                  await router.push(`/service-schedule/create`)
+                }}
+                // disabled
+              >
+                novo
+              </ButtonAdd>
+            ) : (
+              <ButtonIcon
+                sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
+                onClick={async () => {
+                  await router.push(`/service-schedule/create`)
+                }}
+              >
+                <AddCircleOutlineIcon />
+              </ButtonIcon>
+            )}
           </Stack>
-            {/* <Grid
+          {/* <Grid
                 item
                 xs={}
                 // md={12}
@@ -421,47 +434,12 @@ export default function ServiceSchedulesList() {
                   justifyContent: 'center',
                 }}
               > */}
-               
-              {/* </Grid> */}
+
+          {/* </Grid> */}
         </Grid>
 
-      <Grid item xs={12}
-        sx={{marginBottom: 2}}
-      >
-          <Stack direction='row' justifyContent='flex-end' alignItems='flex-start' >
-          {/* <HeaderBreadcrumb
-              data={HeaderBreadcrumbData}
-              title="Lista de Agendamentos"
-            /> */}
-             <ButtonAdd
-              size="large"
-              variant="contained"
-              sx={{marginRight: '19px'}}
-              startIcon={<AddCircleOutlineIcon />}
-              onClick={async () => {
-                await router.push(`/service-schedule/create`)
-              }}
-              // disabled
-            >
-               novo
-            </ButtonAdd>
-          </Stack>
-            {/* <Grid
-                item
-                xs={}
-                // md={12}
-                // lg={4}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              > */}
-               
-              {/* </Grid> */}
-        </Grid>
-        <Grid item xs={12} sx={{marginBottom: 4}} >
+        <Grid item xs={12} sx={{ marginBottom: 2 }}></Grid>
+        <Grid item xs={12} sx={{ marginBottom: 4 }}>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'row' }}>
             <Grid container spacing={3}>
               <Grid
@@ -490,19 +468,19 @@ export default function ServiceSchedulesList() {
                     color="primary"
                     sx={{ marginLeft: 1 }}
                   >
-               
                     <SearchIcon />
                   </ButtonIcon>
                 </Box>
                 <Box>
-                  <ButtonFilterSelect handleFilterValues={handleFilterValues} isMobile={isMobile}/>
+                  <ButtonFilterSelect
+                    handleFilterValues={handleFilterValues}
+                    isMobile={isMobile}
+                  />
                 </Box>
               </Grid>
-            
             </Grid>
           </Paper>
         </Grid>
-    
 
         <Grid item xs={12}>
           {!isFetching ? (
