@@ -123,8 +123,8 @@ export default function ModalSearchClient({
     })
   }
 
-  function handleDoubleClickClient(){
-    if(clientSelected) {
+  function handleDoubleClickClient() {
+    if (clientSelected) {
       handleAddClient(clientSelected)
       handleClose()
       setClientList([])

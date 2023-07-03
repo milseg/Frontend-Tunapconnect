@@ -177,7 +177,7 @@ export function DashboardContent({ children }: DashboardContentProps) {
         <Box
           component="main"
           onClick={(e) => {
-            if(open) {
+            if (open) {
               e.stopPropagation()
               setOpen(false)
             }

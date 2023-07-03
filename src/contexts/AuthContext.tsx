@@ -56,11 +56,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       username: data.username,
       password: data.password,
     })
-    //console.log("signin")
+    // console.log("signin")
     if (resp?.ok && resp?.status === 200) {
-      //console.log("signin ok")
+      // console.log("signin ok")
       const session = await getSession()
-      //console.log("[AuthContext] saving user", session?.user)
+      // console.log("[AuthContext] saving user", session?.user)
       setUser({
         id: session?.user.id,
         name: session?.user.name,
@@ -85,14 +85,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [status])
 
   useEffect(() => {
-    const session = getSession().then((session) => {
+    getSession().then((session) => {
       setUser({
         id: session?.user.id,
         name: session?.user.name,
         privilege: session?.user.privilege,
         userTunap: session?.user.userTunap,
       })
-      return
     })
   }, [])
 

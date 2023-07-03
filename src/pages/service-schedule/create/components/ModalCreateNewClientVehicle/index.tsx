@@ -275,9 +275,7 @@ export default function ModalCreateNewClientVehicle({
                         field.onChange(event)
                       }}
                     >
-                      <MenuItem value={'none'}>
-                        {'Selecione...'}
-                      </MenuItem>
+                      <MenuItem value={'none'}>{'Selecione...'}</MenuItem>
                       {dataVehicleBrandList &&
                         dataVehicleBrandList.map((option) => (
                           <MenuItem

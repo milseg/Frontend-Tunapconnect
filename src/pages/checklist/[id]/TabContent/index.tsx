@@ -339,8 +339,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     setDataModals((prevState) => {
       return {
         ...prevState,
-        signatures: signatures,
-
+        signatures,
       }
     })
   }
@@ -422,13 +421,15 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     setDataModals((prevState) => {
       return {
         ...prevState,
-        signatures: stageActual.signatures ? stageActual?.signatures.map(i => ({
-          name: i.name,
-          rules: {
-            required: i.rules.required
-          },
-          image: i.image
-        })) : [],
+        signatures: stageActual.signatures
+          ? stageActual?.signatures.map((i) => ({
+              name: i.name,
+              rules: {
+                required: i.rules.required,
+              },
+              image: i.image,
+            }))
+          : [],
       }
     })
     setListImage((prevState) => {
@@ -442,13 +443,12 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         [stageName]: listImagesStage,
       }
     })
-    
 
-            // setActionAlerts({
-        //   isOpen: true,
-        //   title: 'Salvo com sucesso',
-        //   type: 'success',
-        // })
+    // setActionAlerts({
+    //   isOpen: true,
+    //   title: 'Salvo com sucesso',
+    //   type: 'success',
+    // })
   }, [])
 
   return (

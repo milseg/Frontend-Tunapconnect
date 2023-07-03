@@ -13,13 +13,15 @@ export function formatCNPJAndCPF(document: string) {
     )
   }
 }
-export function formatCNPJAndCPFNumber(value: number | string, type: boolean | null): string {
-
+export function formatCNPJAndCPFNumber(
+  value: number | string,
+  type: boolean | null,
+): string {
   if (type === true) {
     const stringDefault = '00000000000'
-    const qtdDigitsCPF = 11 - `${value}`.length 
+    const qtdDigitsCPF = 11 - `${value}`.length
 
-    let inicialCpfString = stringDefault.slice(0, qtdDigitsCPF)
+    const inicialCpfString = stringDefault.slice(0, qtdDigitsCPF)
     return `${inicialCpfString}${value}`.replace(
       /(\d{3})(\d{3})(\d{3})(\d{2})/,
       '$1.$2.$3-$4',
@@ -30,10 +32,10 @@ export function formatCNPJAndCPFNumber(value: number | string, type: boolean | n
   }
   if (type === false) {
     const stringDefault = '00000000000000'
-    const qtdDigitsCNPJ = 14 - `${value}`.length 
+    const qtdDigitsCNPJ = 14 - `${value}`.length
 
-    let inicialCNPJString = stringDefault.slice(0, qtdDigitsCNPJ)
- 
+    const inicialCNPJString = stringDefault.slice(0, qtdDigitsCNPJ)
+
     return `${inicialCNPJString}${value}`.replace(
       /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
       '$1.$2.$3/$4-$5',

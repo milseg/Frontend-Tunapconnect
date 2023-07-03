@@ -6,8 +6,7 @@ import Container from '@mui/material/Container'
 
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
-import SearchIcon from '@mui/icons-material/Search'
-import PrintIcon from '@mui/icons-material/Print';
+import PrintIcon from '@mui/icons-material/Print'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
 import {
@@ -59,17 +58,11 @@ import ModalCreateNewClient from './components/ModalCreateNewClient'
 import ModalCreateNewClientVehicle from './components/ModalCreateNewClientVehicle'
 import { MoreOptionsServiceScheduleCreate } from './components/MoreOptionsServiceScheduleCreate'
 import ModalEditClient from './components/ModalEditClient'
-import {
-  IconButton,
-  InputAdornment,
-  OutlinedInput,
-  Skeleton,
-  Typography,
-} from '@mui/material'
+import { Skeleton } from '@mui/material'
 import ModalCreateEditClientVehicle from './components/ModalEditClientVehicle'
 import ClaimServiceTable from './components/ClaimServiceTable'
 
-import { formatCNPJAndCPF, formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
+import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 import { ChecklistProps } from '@/pages/checklist/types'
 import { TableModal } from './components/TableModal'
@@ -84,7 +77,7 @@ type updateData = {
   client_id: number | undefined
   client_vehicle_id: number | undefined
   company_id: string | undefined
-  cpf: null | boolean,
+  cpf: null | boolean
   // chasis: string | undefined
   plate: string | undefined
   claims_service: any[]
@@ -127,8 +120,9 @@ export default function ServiceSchedulesCreate() {
   const [openModalClientSearch, setOpenModalClientSearch] = useState(false)
   const [openModalClientVehicleSearch, setOpenModalClientVehicleSearch] =
     useState(false)
-  const [claimServiceList, setClaimServiceList] =
-    useState<ClaimServiceResponseType[]>([])
+  const [claimServiceList, setClaimServiceList] = useState<
+    ClaimServiceResponseType[]
+  >([])
   const [openModalNewClient, setOpenModalNewClient] = useState(false)
   const [openModalEditClient, setOpenModalEditClient] = useState(false)
   const [openModalNewClientVehicle, setOpenModalNewClientVehicle] =
@@ -138,20 +132,19 @@ export default function ServiceSchedulesCreate() {
 
   const [openChecklistModal, setOpenChecklistModal] = useState(false)
   const [openPrintInspectionModal, setOpenPrintInspectionModal] =
-  useState(false)
+    useState(false)
 
   const [openCheckListModelListModal, setOpenCheckListModelListModal] =
-  useState(false)
-
+    useState(false)
 
   const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
-  const { 
-    setServiceSchedule, 
-    serviceScheduleState, 
-    setServiceScheduleIsCreated, 
-    setCheckList 
+  const {
+    setServiceSchedule,
+    serviceScheduleState,
+    setServiceScheduleIsCreated,
+    setCheckList,
   } = useContext(ServiceScheduleContext)
 
   const {
@@ -164,7 +157,7 @@ export default function ServiceSchedulesCreate() {
       'edit',
       'technical-consultant-list',
       'options',
-      companySelected
+      companySelected,
     ],
     async () => {
       const resp = await api.get(
@@ -177,8 +170,13 @@ export default function ServiceSchedulesCreate() {
 
   const { data: dataServiceSchedule, status: dataServiceScheduleStatus } =
     useQuery({
-      queryKey: ['service_schedule', 'by_id', 'edit',   router.query.id,
-      companySelected],
+      queryKey: [
+        'service_schedule',
+        'by_id',
+        'edit',
+        router.query.id,
+        companySelected,
+      ],
       queryFn: async () => {
         const { id } = router.query
         if (serviceScheduleState.serviceSchedule) {
@@ -191,10 +189,8 @@ export default function ServiceSchedulesCreate() {
       },
       // refetchOnMount: true,
       refetchOnWindowFocus: false,
-      enabled: !!router.query.id
+      enabled: !!router.query.id,
     })
-
-  
 
   const { data: checklistDefault, status: checklistDefaultStatus } =
     useQuery<ChecklistProps | null>(
@@ -230,7 +226,6 @@ export default function ServiceSchedulesCreate() {
   // function handleCheckListModelListModal() {
   //   setOpenCheckListModelListModal(false)
   // }
-
 
   function handleCloseModalClienteSearch() {
     setOpenModalClientSearch(false)
@@ -322,20 +317,21 @@ export default function ServiceSchedulesCreate() {
   }
 
   function handleRemoveClaimService(id: number) {
-    setClaimServiceList(prevState => prevState.filter((c) => c.id !== id))
+    setClaimServiceList((prevState) => prevState.filter((c) => c.id !== id))
   }
 
   async function handleSaveClaimService(data: string) {
-
     try {
-      if(data) {
+      if (data) {
         const resp = await api.post('/claim-service', {
           company_id: companySelected,
-          description: data
+          description: data,
         })
-        const isClaimService = claimServiceList.findIndex(r => r.id === resp.data.data.id)
-        if(isClaimService < 0) {
-          setClaimServiceList(prevState => [...prevState, resp.data.data])
+        const isClaimService = claimServiceList.findIndex(
+          (r) => r.id === resp.data.data.id,
+        )
+        if (isClaimService < 0) {
+          setClaimServiceList((prevState) => [...prevState, resp.data.data])
         }
       }
       // setActionAlerts({
@@ -353,7 +349,6 @@ export default function ServiceSchedulesCreate() {
   }
 
   async function onSave() {
-
     const dataFormatted: updateData = {
       code: null,
       promised_date: formatDateTimeTimezone(`${visitDate}`),
@@ -363,7 +358,8 @@ export default function ServiceSchedulesCreate() {
       company_id: `${companySelected}`,
       plate: clientVehicle?.plate,
       cpf: null,
-      claims_service: claimServiceList.map(c => ({ claim_service_id: c.id })) ?? [],
+      claims_service:
+        claimServiceList.map((c) => ({ claim_service_id: c.id })) ?? [],
       checklist_version_id: 14,
     }
 
@@ -406,7 +402,6 @@ export default function ServiceSchedulesCreate() {
     }
   }
 
-
   const closeChecklistModal = () => {
     setOpenChecklistModal(false)
   }
@@ -421,7 +416,7 @@ export default function ServiceSchedulesCreate() {
 
   useEffect(() => {
     // console.log('isCreated', serviceScheduleState)
-    if(serviceScheduleState.serviceScheduleIsCreated) {
+    if (serviceScheduleState.serviceScheduleIsCreated) {
       console.log('isCreated')
       setActionAlerts({
         isOpen: true,
@@ -430,12 +425,17 @@ export default function ServiceSchedulesCreate() {
       })
       setServiceScheduleIsCreated(false)
     }
-}, [])
+  }, [])
 
   useEffect(() => {
     if (dataServiceScheduleStatus === 'success') {
-      const { client, client_vehicle, technical_consultant, promised_date, claims_service } =
-        dataServiceSchedule
+      const {
+        client,
+        client_vehicle,
+        technical_consultant,
+        promised_date,
+        claims_service,
+      } = dataServiceSchedule
       setClient(client)
       setClientVehicle(client_vehicle)
       const promisedDate = dayjs(new Date(promised_date))
@@ -444,7 +444,7 @@ export default function ServiceSchedulesCreate() {
       setTechnicalConsultant({
         id: technical_consultant?.id ?? 'Não informado',
         name: technical_consultant?.name ?? 'Não informado',
-      })    
+      })
     }
   }, [dataServiceScheduleStatus, dataServiceSchedule])
 
@@ -509,7 +509,13 @@ export default function ServiceSchedulesCreate() {
                       </InfoCardText>
                     </ListItemCard>
                     <ListItemCard alignItems="flex-start">
-                      <InfoCardName>{client.cpf === null ? 'Documento:' : client.cpf === true? 'CPF:': 'CNPJ' }</InfoCardName>{' '}
+                      <InfoCardName>
+                        {client.cpf === null
+                          ? 'Documento:'
+                          : client.cpf === true
+                          ? 'CPF:'
+                          : 'CNPJ'}
+                      </InfoCardName>{' '}
                       <InfoCardText>
                         {client?.document
                           ? formatCNPJAndCPFNumber(client?.document, client.cpf)
@@ -573,37 +579,52 @@ export default function ServiceSchedulesCreate() {
                   </List>
                 ) : (
                   <List dense={false}>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>Nome:</InfoCardName>{' '}
-                    <InfoCardText sx={{width: '100%'}}>
-                      <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />
-                    </InfoCardText>
-                  </ListItemCard>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>CPF:</InfoCardName>{' '}
-                    <InfoCardText sx={{width: '100%'}}>
-                      <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />
-                    </InfoCardText>
-                  </ListItemCard>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>Telefone:</InfoCardName>{' '}
-                    <InfoCardText sx={{width: '100%'}}>
-                      <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />
-                    </InfoCardText>
-                  </ListItemCard>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>E-mail:</InfoCardName>{' '}
-                    <InfoCardText sx={{width: '100%'}}>
-                      <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />
-                    </InfoCardText>
-                  </ListItemCard>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>Endereço:</InfoCardName>{' '}
-                    <InfoCardText sx={{width: '100%'}}>
-                      <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />
-                    </InfoCardText>
-                  </ListItemCard>
-                </List>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Nome:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>CPF:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Telefone:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>E-mail:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Endereço:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
+                  </List>
                 )}
               </Paper>
               {/* Veículo */}
@@ -684,91 +705,112 @@ export default function ServiceSchedulesCreate() {
                   </List>
                 ) : (
                   <List dense={false}>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>Marca:</InfoCardName>{' '}
-                    <InfoCardText sx={{width: '100%'}}>
-                      <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />
-                    </InfoCardText>
-                  </ListItemCard>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>Modelo:</InfoCardName>{' '}
-                    <InfoCardText sx={{width: '100%'}}>
-                      <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />
-                    </InfoCardText>
-                  </ListItemCard>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>Veículo:</InfoCardName>{' '}
-                    <InfoCardText sx={{width: '100%'}}>
-                      <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />
-                    </InfoCardText>
-                  </ListItemCard>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>Cor:</InfoCardName>{' '}
-                    <InfoCardText sx={{width: '100%'}}>
-                      <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />
-                    </InfoCardText>
-                  </ListItemCard>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>Chassi:</InfoCardName>{' '}
-                    <InfoCardText sx={{width: '100%'}}>
-                      <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />
-                    </InfoCardText>
-                  </ListItemCard>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>Placa:</InfoCardName>{' '}
-                    <InfoCardText sx={{width: '100%'}}>
-                      <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />
-                    </InfoCardText>
-                  </ListItemCard>
-                  <ListItemCard alignItems="flex-start">
-                    <InfoCardName>KM:</InfoCardName>{' '}
-                    <InfoCardText sx={{width: '100%'}}>
-                      <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />
-                    </InfoCardText>
-                  </ListItemCard>
-                </List>
-                ) }
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Marca:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Modelo:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Veículo:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Cor:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Chassi:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Placa:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>KM:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
+                  </List>
+                )}
               </Paper>
             </Stack>
           </Grid>
 
           <Grid item xs={12} md={5} lg={5}>
             <Stack spacing={3}>
-            <Stack
-              spacing={2}
-              direction="row"
-              display="flex"
-              justifyContent="center"
-              
-            >
-              <ButtonLeft 
-                disabled={checklistDefault === null}
-                onClick={() => {
-                setOpenChecklistModal(true)
-                }}>
-                Listar Checklists
-              </ButtonLeft>
-              <ButtonCenter
-                disabled={checklistDefault === null}
-                onClick={() => {
-                  if (checklistDefaultStatus === 'success') {
-                   setCheckList(checklistDefault as ChecklistProps)
+              <Stack
+                spacing={2}
+                direction="row"
+                display="flex"
+                justifyContent="center"
+              >
+                <ButtonLeft
+                  disabled={checklistDefault === null}
+                  onClick={() => {
+                    setOpenChecklistModal(true)
+                  }}
+                >
+                  Listar Checklists
+                </ButtonLeft>
+                <ButtonCenter
+                  disabled={checklistDefault === null}
+                  onClick={() => {
+                    if (checklistDefaultStatus === 'success') {
+                      setCheckList(checklistDefault as ChecklistProps)
 
                       setOpenPrintInspectionModal(true)
-                  }
-                }}
-              >
-                <PrintIcon />
-              </ButtonCenter>
-              <ButtonRight
-                startIcon={<AddCircleOutlineIcon />}
-                onClick={() => {
-                  setOpenCheckListModelListModal(true)
-                }}
-              >
-                Novo
-              </ButtonRight>
-            </Stack>
+                    }
+                  }}
+                >
+                  <PrintIcon />
+                </ButtonCenter>
+                <ButtonRight
+                  startIcon={<AddCircleOutlineIcon />}
+                  onClick={() => {
+                    setOpenCheckListModelListModal(true)
+                  }}
+                >
+                  Novo
+                </ButtonRight>
+              </Stack>
               {/* Agendamento */}
               <Paper
                 sx={{
@@ -777,7 +819,6 @@ export default function ServiceSchedulesCreate() {
                   flexDirection: 'column',
                 }}
               >
-      
                 <Stack
                   direction="row"
                   alignItems="center"
@@ -839,8 +880,7 @@ export default function ServiceSchedulesCreate() {
                 </Stack>
                 <DividerCard />
 
-
-                <ClaimServiceTable 
+                <ClaimServiceTable
                   claimServiceList={claimServiceList}
                   handleSaveClaimService={handleSaveClaimService}
                   handleRemoveClaimService={handleRemoveClaimService}
@@ -987,7 +1027,7 @@ export default function ServiceSchedulesCreate() {
         handleAddClientVehicle={handleAddClientVehicle}
         vehicleData={clientVehicle}
       />
-      
+
       <TableModal
         isOpen={openChecklistModal}
         title="Lista de checklists"

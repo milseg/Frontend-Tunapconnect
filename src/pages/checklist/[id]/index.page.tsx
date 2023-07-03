@@ -1,4 +1,11 @@
-import { ReactNode, SyntheticEvent, useContext, useEffect, useRef, useState } from 'react'
+import {
+  ReactNode,
+  SyntheticEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -72,9 +79,12 @@ export default function ChecklistCreateById() {
 
   const router = useRouter()
 
-  const { serviceScheduleState, setCheckList, setServiceScheduleIsCreated, setServiceSchedule } = useContext(
-    ServiceScheduleContext,
-  )
+  const {
+    serviceScheduleState,
+    setCheckList,
+    setServiceScheduleIsCreated,
+    setServiceSchedule,
+  } = useContext(ServiceScheduleContext)
 
   const tabContentRef = useRef<RefTabContentRefType>(null)
 
@@ -122,8 +132,10 @@ export default function ChecklistCreateById() {
           return serviceScheduleState.checklist
         } else {
           const respChecklist = await api.get(`/checklist/${router?.query?.id}`)
-          if(!serviceScheduleState.serviceSchedule) {
-            const respServiceSchedule = await api.get(`/service-schedule/${respChecklist.data.data.service_schedule_id}`)
+          if (!serviceScheduleState.serviceSchedule) {
+            const respServiceSchedule = await api.get(
+              `/service-schedule/${respChecklist.data.data.service_schedule_id}`,
+            )
             setServiceSchedule(respServiceSchedule.data.data)
           }
 
@@ -200,8 +212,8 @@ export default function ChecklistCreateById() {
   }
 
   useEffect(() => {
-    console.log('isCreated ---',serviceScheduleState.serviceScheduleIsCreated)
-    if(serviceScheduleState.serviceScheduleIsCreated) {
+    console.log('isCreated ---', serviceScheduleState.serviceScheduleIsCreated)
+    if (serviceScheduleState.serviceScheduleIsCreated) {
       console.log('isCreated')
       setActionAlerts({
         isOpen: true,
@@ -225,8 +237,6 @@ export default function ChecklistCreateById() {
     )
   }
 
-
-
   if (isSuccess) {
     return (
       <>
@@ -236,7 +246,8 @@ export default function ChecklistCreateById() {
           >
             <Title variant="h6">
               Agenda:{checklist?.service_schedule_id} -{' '}
-              {serviceScheduleState.serviceSchedule?.client?.name ?? 'Não informado'}
+              {serviceScheduleState.serviceSchedule?.client?.name ??
+                'Não informado'}
             </Title>
           </LinkNext>
         </Box>
