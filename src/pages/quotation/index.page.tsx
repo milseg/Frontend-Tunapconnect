@@ -18,10 +18,7 @@ import TextField from '@mui/material/TextField'
 import SearchIcon from '@mui/icons-material/Search'
 
 import { ButtonAdd, ButtonIcon } from './style'
-import {
-  ServiceSchedulesListProps,
-  ServiceScheduleType,
-} from '@/types/service-schedule'
+
 import { api } from '@/lib/api'
 import IconButton from '@mui/material/IconButton'
 import Delete from '@mui/icons-material/Delete'
