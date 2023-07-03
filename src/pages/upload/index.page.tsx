@@ -15,13 +15,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import { IFileProps } from "@/types/upload-file";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 import uploadFileRequests from "../api/uploadFile.api";
 import { apiB } from "@/lib/api";
 import { ButtonPaginate } from "../service-schedule/create/styles";
 import { Loading } from "@/components/Loading";
 import { useUploadContext } from "@/contexts/UploadContext";
-
 
 import { formatDateTime } from "@/ultis/formatDate";
 import Link from "next/link";
@@ -37,7 +36,7 @@ export default function Upload() {
   );
 
   const queryClient = useQueryClient();
-  const router = useRouter()
+  const router = useRouter();
 
   const {
     data: filesListDTO,
@@ -107,31 +106,38 @@ export default function Upload() {
     updateFilesUploadMutation.mutate(stageData);
   }
 
-  const capitalizeFirstLetter = (w: string): string => w.charAt(0).toUpperCase() + w.slice(1)
+  const capitalizeFirstLetter = (w: string): string =>
+    w.charAt(0).toUpperCase() + w.slice(1);
 
   return (
     <>
-      <Container maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
+      <Container maxWidth="lg" sx={{ mt: 2, mb: 2, p: 1 }}>
         <Stack direction="column" spacing={6}>
           <Stack direction="column" spacing={2}>
             <Grid
               container
-              direction="row"
+              direction={{ xs: "column", sm: "row" }}
               justifyContent="space-between"
-              alignItems="center"
+              alignItems={{ xs: "flex-start", sm: "center" }}
             >
-              <Typography variant="h5" component="h2" fontWeight={700}>
-                {"Upload - "+capitalizeFirstLetter(router.query.status as string)}
+              <Typography
+                component="h2"
+                fontWeight={700}
+                sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }}
+              >
+                {"Upload - " +
+                  capitalizeFirstLetter(router.query.status as string)}
               </Typography>
-              <Typography>
-                {"TUNAP Connect > Intranet > Upload > Upload - "+capitalizeFirstLetter(router.query.status as string)}
+              <Typography sx={{ fontSize: { xs: "0.8rem", sm: "1rem" } }}>
+                {"TUNAP Connect > Intranet > Upload > Upload - " +
+                  capitalizeFirstLetter(router.query.status as string)}
               </Typography>
             </Grid>
             <Paper
               sx={{
-                p: 4,
+                p: { xs: 2, sm: 4 },
                 display: "flex",
-                flexDirection: "row",
+                flexDirection: { xs: "column", sm: "row" },
                 height: "fit-content",
               }}
             >
@@ -160,10 +166,13 @@ export default function Upload() {
                       justifyContent="flex-start"
                       columnGap={"40px"}
                       alignItems={"center"}
-                      sx={{ width: "180px" }}
+                      sx={{ width: { xs: "100%", sm: "180px" } }}
                     >
                       <AddCircleOutlineIcon />
-                      <Typography variant="h6" component="h5">
+                      <Typography
+                        component="h5"
+                        sx={{ fontSize: { xs: "1rem", sm: "1.5rem" } }}
+                      >
                         {"Upload"}
                       </Typography>
                     </Stack>
@@ -175,10 +184,14 @@ export default function Upload() {
           <Stack
             direction="column"
             justifyContent="flex-start"
-            spacing={2}
+            spacing={{ xs: 1, sm: 2 }}
             sx={{ width: "100%" }}
           >
-            <Typography variant="h5" component="h2" fontWeight={700}>
+            <Typography
+              component="h2"
+              fontWeight={700}
+              sx={{ fontSize: { xs: "1.2rem", sm: "1.8rem" } }}
+            >
               {"Listar Uploads"}
             </Typography>
             <TableTitles>
@@ -187,9 +200,15 @@ export default function Upload() {
                 sx={{ width: "100%" }}
                 justifyContent="space-between"
               >
-                <Typography>{"Data Upload"}</Typography>
-                <Typography>{"Status"}</Typography>
-                <Typography>{"Nome do arquivo"}</Typography>
+                <Typography sx={{ fontSize: { xs: "0.7rem", sm: "1.2rem" } }}>
+                  {"Data Upload"}
+                </Typography>
+                <Typography sx={{ fontSize: { xs: "0.7rem", sm: "1.2rem" } }}>
+                  {"Status"}
+                </Typography>
+                <Typography sx={{ fontSize: { xs: "0.7rem", sm: "1.2rem" } }}>
+                  {"Nome do arquivo"}
+                </Typography>
                 {/**<Typography>{"Ação"}</Typography>**/}
               </Stack>
             </TableTitles>
@@ -198,7 +217,7 @@ export default function Upload() {
             ) : (
               <Paper
                 sx={{
-                  p: 2,
+                  p: { xs: 0, sm: 2 },
                   display: "flex",
                   flexDirection: "column",
                   height: "fit-content",
@@ -206,14 +225,14 @@ export default function Upload() {
               >
                 {filesListDTO &&
                   filesListDTO.files.length > 0 &&
-                  filesListDTO.files.map((file: IFileProps) => (
+                  filesListDTO.files.map((file: IFileProps, index) => (
                     <Stack
                       key={file.id_file}
                       direction="row"
                       sx={{
                         width: "100%",
                         backgroundColor: `${
-                          file.id_file % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
+                          index % 2 == 0 ? "#FFFFFF" : "#F1F1F1"
                         }`,
                         p: 1,
                         borderRadius: "2px",
@@ -224,6 +243,8 @@ export default function Upload() {
                         variant="subtitle1"
                         color={"#1C4961"}
                         fontWeight={700}
+                        sx={{ fontSize: { xs: "0.6rem", sm: "1.2rem" } }}
+                        textOverflow={"ellipsis"}
                       >
                         {formatDateTime(file.created_at)}
                       </Typography>
@@ -234,14 +255,16 @@ export default function Upload() {
                         sx={{
                           width: "40%",
                           textAlign: "center",
+                          fontSize: { xs: "0.6rem", sm: "1.2rem" },
                         }}
+                        textOverflow={"ellipsis"}
                       >
                         {file.status}
                       </Typography>
                       <Link
                         key={file.id_file}
                         href={`https://b.tunapconnect.com/download_arquivo/${file.id_file}`}
-                        style={{textDecoration: 'none', width: "20%"}}
+                        style={{ textDecoration: "none", width: "20%" }}
                       >
                         <Typography
                           variant="subtitle1"
@@ -249,7 +272,10 @@ export default function Upload() {
                           fontWeight={700}
                           sx={{
                             textAlign: "right",
+                            fontSize: { xs: "0.6rem", sm: "1.2rem" },
+                            width: "fit-content",
                           }}
+                          textOverflow={"ellipsis"}
                         >
                           {file.original_name}
                         </Typography>
