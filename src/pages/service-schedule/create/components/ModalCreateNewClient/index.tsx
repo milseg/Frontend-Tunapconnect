@@ -30,7 +30,7 @@ import {
   TextMaskPHONE,
   TextMaskCNPJ,
 } from '@/components/InputMask'
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles'
 // import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 
 interface ModalCreateNewClientProps {
@@ -147,8 +147,8 @@ export default function ModalCreateNewClient({
     name: 'address',
   })
 
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
 
   async function onSubmit(data: any) {
     setIsLoading(true)
@@ -239,7 +239,7 @@ export default function ModalCreateNewClient({
             sx={{
               width: '100%',
               maxWidth: 550,
-              minWidth: fullScreen ? 300: 550,
+              minWidth: fullScreen ? 300 : 550,
               margin: '0 auto',
             }}
             onSubmit={handleSubmit(onSubmit)}

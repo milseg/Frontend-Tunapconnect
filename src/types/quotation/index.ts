@@ -52,16 +52,6 @@ interface ClientVehicle {
   vehicle: Vehicle
 }
 
-interface TechnicalConsultant {
-  id: number
-  company_id: number
-  user_id: number
-  active: boolean
-  name: string
-  integration_code: string
-  user: User
-}
-
 interface User {
   id: number
   user_id: any
@@ -74,6 +64,16 @@ interface User {
   privilege: string
   document: string
   user_tunap: boolean
+}
+
+interface TechnicalConsultant {
+  id: number
+  company_id: number
+  user_id: number
+  active: boolean
+  name: string
+  integration_code: string
+  user: User
 }
 
 interface Client {
@@ -90,7 +90,6 @@ interface Client {
   cpf: any
   fullName: string
 }
-
 
 export interface QuotationType {
   id: number
@@ -143,7 +142,7 @@ export interface QuotationResponseType {
   maintenance_review: any
   technical_consultant: TechnicalConsultant
   os_type: OsType
-  current_page: number,
-  total_pages: number,
-  total_results: number,
+  current_page: number
+  total_pages: number
+  total_results: number
 }

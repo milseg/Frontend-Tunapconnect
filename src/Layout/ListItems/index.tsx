@@ -111,6 +111,8 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
     setRouteActual(router.pathname)
   }, [router])
 
+  console.log(companySelected)
+
   return (
     <React.Fragment>
       <ButtonsMenuNav
@@ -118,7 +120,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
         opended={opended}
         routeActual={routeActual}
       />
-      {user?.userTunap && (
+      {user?.userTunap && !companySelected && (
         <ButtonsMenuNav
           menuList={menuListTunapIntranet}
           opended={opended}

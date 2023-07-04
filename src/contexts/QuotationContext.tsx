@@ -1,124 +1,75 @@
-import { ChecklistProps } from '@/pages/checklist/types'
-import { ChecklistModelType, ChecklistReturnType } from '@/types/checklist'
-import { ServiceScheduleType } from '@/types/service-schedule'
-import { createContext, ReactNode, useEffect, useReducer } from 'react'
+import { QuotationType } from '@/types/quotation'
+
+import { createContext, ReactNode, useReducer } from 'react'
 
 type StateType = {
-  serviceSchedule: ServiceScheduleType | null
-  checklist: ChecklistReturnType | null
-  checklistModel: ChecklistModelType | null
-  serviceScheduleIsCreated: boolean
+  quotations: QuotationType | null
+  quotationsIsCreated: boolean
 }
 
-type ServiceScheduleContextProps = {
-  serviceScheduleState: StateType
-  setServiceScheduleIsCreated: (value: boolean) => void
-  setServiceSchedule: (data: ServiceScheduleType, isCreated?: boolean) => void
-  setCheckList: (data: ChecklistProps) => void
-  setCheckListModel: (data: ChecklistModelType) => void
+type QuotationsContextProps = {
+  quotationsState: StateType
+  setQuotationsIsCreated: (value: boolean) => void
+  setQuotations: (data: QuotationType) => void
 }
-type ServiceScheduleProviderProps = {
+type QuotationsProviderProps = {
   children: ReactNode
 }
 
-export const ServiceScheduleContext = createContext(
-  {} as ServiceScheduleContextProps,
-)
+export const QuotationsContext = createContext({} as QuotationsContextProps)
 
-export function ServiceScheduleProvider({
-  children,
-}: ServiceScheduleProviderProps) {
-  const [serviceScheduleState, dispatch] = useReducer(
-    serviceScheduleListReducer,
-    {
-      serviceSchedule: null,
-      serviceScheduleIsCreated: false,
-      checklist: null,
-      checklistModel: null,
-    },
-  )
+export function QuotationsProvider({ children }: QuotationsProviderProps) {
+  const [quotationsState, dispatch] = useReducer(quotationsListReducer, {
+    quotations: null,
+    quotationsIsCreated: false,
+  })
 
-  function serviceScheduleListReducer(
-    state: StateType,
-    action: any,
-  ): StateType {
+  function quotationsListReducer(state: StateType, action: any): StateType {
     const { type, payload } = action
     switch (type) {
-      case 'ADD_NEW_SERVICE_SCHEDULE':
+      case 'ADD_NEW_QUOTATION':
         return {
           ...state,
-          serviceSchedule: payload,
+          quotations: payload,
         }
-      case 'IS_CREATED_NEW_SERVICE_SCHEDULE':
+      case 'IS_CREATED_NEW_QUOTATION':
         return {
           ...state,
-          serviceScheduleIsCreated: payload,
-        }
-      // case 'ADD_NEW_SERVICE_SCHEDULE':
-      //   return {
-      //     ...state,
-      //     serviceSchedule: payload.data,
-      //   }
-      case 'ADD_NEW_CHECKLIST':
-        return {
-          ...state,
-          checklist: payload,
-        }
-      case 'ADD_NEW_CHECKLIST_MODEL':
-        return {
-          ...state,
-          checklistModel: payload,
+          quotationsIsCreated: payload,
         }
       case 'DELETE_BY_ID':
         return {
           ...state,
-          serviceSchedule: payload,
+          quotations: payload,
         }
       default:
         return state
     }
   }
 
-  function setServiceSchedule(dataServiceSchedule: ServiceScheduleType) {
+  function setQuotations(dataQuotations: QuotationType) {
     dispatch({
-      type: 'ADD_NEW_SERVICE_SCHEDULE',
-      payload: dataServiceSchedule,
+      type: 'ADD_NEW_QUOTATION',
+      payload: dataQuotations,
     })
   }
 
-  function setServiceScheduleIsCreated(value: boolean) {
+  function setQuotationsIsCreated(value: boolean) {
     dispatch({
-      type: 'IS_CREATED_NEW_SERVICE_SCHEDULE',
+      type: 'IS_CREATED_NEW_QUOTATION',
       payload: value,
     })
   }
 
-  function setCheckList(data: ChecklistProps) {
-    dispatch({
-      type: 'ADD_NEW_CHECKLIST',
-      payload: data,
-    })
-  }
-  function setCheckListModel(data: ChecklistModelType) {
-    dispatch({
-      type: 'ADD_NEW_CHECKLIST_MODEL',
-      payload: data,
-    })
-  }
-
-  useEffect(() => {}, [])
-
   return (
-    <ServiceScheduleContext.Provider
+    <QuotationsContext.Provider
       value={{
-        setServiceSchedule,
-        setCheckList,
-        serviceScheduleState,
-        setCheckListModel,
-        setServiceScheduleIsCreated,
+        quotationsState,
+        setQuotations,
+        setQuotationsIsCreated,
       }}
     >
       {children}
-    </ServiceScheduleContext.Provider>
+    </QuotationsContext.Provider>
   )
 }

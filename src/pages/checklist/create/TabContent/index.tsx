@@ -373,7 +373,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 
     const dataFormatted = {
       ...stageData,
-      status: 'Rascunho',
+      status: typeSubmitForm,
       signatures:
         dataModals?.signatures.length > 0
           ? dataModals?.signatures
@@ -409,7 +409,6 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     const isAlreadyInspections = stageData?.itens.filter(
       (item) => item.rules.type === 'visual_inspect',
     )
-
     let defaultLabel: any
 
     if (isAlreadyInspections) {
@@ -574,6 +573,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
           variant="contained"
           // form={`form-${data?.stages[painelValue].name ?? ''}-${painelValue}`}
           onClick={() => setTypeSubmitForm('salvo')}
+          disabled={isClosed}
         >
           Salvar
         </ButtonsSave>
@@ -584,6 +584,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
           onClick={() => {
             setTypeSubmitForm('finalizado')
           }}
+          disabled={isClosed}
         >
           Finalizar
         </ButtonsFinalized>

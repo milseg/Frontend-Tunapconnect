@@ -230,7 +230,11 @@ export default function ServiceSchedulesList() {
           const onClick = (e: React.MouseEvent<HTMLElement>) => {
             e.stopPropagation()
             const id = params.id
-            ActionDeleteConfirmations(id as number, handleDelete, '/service-schedule/')
+            ActionDeleteConfirmations(
+              id as number,
+              handleDelete,
+              '/service-schedule/',
+            )
           }
           return (
             <IconButton

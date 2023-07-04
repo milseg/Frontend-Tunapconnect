@@ -1,4 +1,4 @@
-// @ts-nocheck
+/* eslint-disable no-unused-vars */
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { useContext, useState, useMemo, useEffect } from 'react'
@@ -40,23 +40,22 @@ import { Stack } from '@mui/system'
 import { useMediaQuery, useTheme } from '@mui/material'
 import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
 import { QuotationResponseType } from '@/types/quotation'
+import { QuotationsContext } from '@/contexts/QuotationContext'
 
 type SearchFormProps = {
   search: string
 }
 
 type QuotationListType = {
-  id: number | string,
-  client: string,
-  plate: string,
-  chassis: string,
-  technical_consultant:
-  string,
-  type_quotation: string,
-  discount: number | string,
-  total: number | string,
+  id: number | string
+  client: string
+  plate: string
+  chassis: string
+  technical_consultant: string
+  type_quotation: string
+  discount: number | string
+  total: number | string
 }
-
 
 type DataFetchProps = {
   paginate: {
@@ -65,7 +64,7 @@ type DataFetchProps = {
     total_results: number
   }
   quotationList: QuotationListType[] | []
-  quotationListData: QuotationResponseType[]
+  quotationListAllData: QuotationResponseType[]
 }
 
 type filterValuesProps = {
@@ -95,7 +94,7 @@ export default function QuotationList() {
   const [isMobile, setIsMobile] = useState(false)
 
   const { companySelected } = useContext(CompanyContext)
-  const { setServiceSchedule } = useContext(ServiceScheduleContext)
+  const { setQuotations } = useContext(QuotationsContext)
 
   const router = useRouter()
 
@@ -118,11 +117,12 @@ export default function QuotationList() {
     },
   })
 
- async function onSubmitSearch(data: SearchFormProps) {
+  async function onSubmitSearch(data: SearchFormProps) {
     await router.push(
-      `/quotations?${
-        data.search ? 'search=' + data.search : ''
-      }company_id=${companySelected}`,
+      `/quotations?company_id=${companySelected}${
+        data.search ? '&search=' + data.search : ''
+      }
+     `,
     )
   }
 
@@ -176,7 +176,7 @@ export default function QuotationList() {
         type: 'number',
         align: 'center',
         sortable: false,
-      }, 
+      },
       {
         field: 'client',
         headerName: 'Cliente',
@@ -196,7 +196,7 @@ export default function QuotationList() {
       },
       {
         field: 'chassis',
-        headerName: 'Chassis',
+        headerName: 'Chassi',
         headerClassName: 'super-app-theme--header',
         flex: 1,
         maxWidth: 240,
@@ -214,7 +214,7 @@ export default function QuotationList() {
       },
       {
         field: 'type_quotation',
-        headerName: 'Tipo de cotação',
+        headerName: 'Tipo',
         headerClassName: 'super-app-theme--header',
         width: 150,
         type: 'text',
@@ -223,21 +223,21 @@ export default function QuotationList() {
       },
       {
         field: 'discount',
-        headerName: 'Total de desconto',
+        headerName: 'Desconto',
         headerClassName: 'super-app-theme--header',
-        width: 150,
+        width: 120,
         sortable: false,
-        valueGetter: (params: GridValueGetterParams) =>{
+        valueGetter: (params: GridValueGetterParams) => {
           return `${formatMoneyPtBR(params.row.discount) || ''}`
         },
       },
       {
         field: 'total',
-        headerName: 'Total geral',
+        headerName: 'Total',
         headerClassName: 'super-app-theme--header',
-        width: 100,
+        width: 120,
         sortable: false,
-        valueGetter: (params: GridValueGetterParams) =>{
+        valueGetter: (params: GridValueGetterParams) => {
           return `${formatMoneyPtBR(params.row.total) || ''}`
         },
       },
@@ -253,7 +253,11 @@ export default function QuotationList() {
           const onClick = (e: React.MouseEvent<HTMLElement>) => {
             e.stopPropagation()
             const id = params.id
-            ActionDeleteConfirmations(id as number, handleDelete, '/quotations/')
+            ActionDeleteConfirmations(
+              id as number,
+              handleDelete,
+              '/quotations/',
+            )
           }
           return (
             <IconButton
@@ -280,8 +284,8 @@ export default function QuotationList() {
     refetch,
     isFetching,
   } = useQuery<DataFetchProps>(
-    ['quotation-list', companySelected, url], 
-      () => {
+    ['quotation-list', companySelected, url],
+    () => {
       return api.get(url).then((response) => {
         console.log(response)
         const resp = response.data.data.map((data: any) => {
@@ -366,9 +370,9 @@ export default function QuotationList() {
     )[0]
 
     if (filterSelected) {
-      setServiceSchedule(filterSelected)
+      setQuotations(filterSelected)
     }
-    await router.push(`/service-schedule/${idSelected}`)
+    // await router.push(`/service-schedule/${idSelected}`)
   }
 
   useEffect(() => {

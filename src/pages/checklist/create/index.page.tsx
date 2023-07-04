@@ -11,7 +11,7 @@ import { Backdrop, CircularProgress, Skeleton } from '@mui/material'
 import { ChecklistProps, StagesDataProps } from '../types'
 
 import { useRouter } from 'next/router'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { useMutation, useQuery } from 'react-query'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 import { ChecklistModelType } from '@/types/checklist'
@@ -69,7 +69,7 @@ export default function ChecklistCreateById() {
     type: 'success',
   })
   const [loading, setLoading] = useState(false)
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
 
   const router = useRouter()
   const {
@@ -87,14 +87,14 @@ export default function ChecklistCreateById() {
       try {
         setLoading(true)
         const resp = await api.post(`/checklist`, newDataChecklist)
-        // setCheckList(resp.data.data)
-        // router.push(`/checklist/${resp.data.data.id}`)
+        setCheckList(resp.data.data)
+        router.push(`/checklist/${resp.data.data.id}`)
         return resp.data.data
       } catch (error) {}
     },
 
     {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         // setActionAlerts({
         //   isOpen: true,
         //   title: 'Salvo com sucesso',
@@ -102,14 +102,14 @@ export default function ChecklistCreateById() {
         // })
         setCheckList(data)
         setServiceScheduleIsCreated(true)
-
-        router.push(`/checklist/${data.id}`)
-        queryClient.invalidateQueries([
-          'checklist-create',
-          router?.query?.service_schedule_id,
-          router.query.checklist_model_id,
-        ])
         setLoading(false)
+        await router.replace(`/checklist/${data.id}`)
+        // queryClient.invalidateQueries([
+        //   'checklist-create',
+        //   router?.query?.service_schedule_id,
+        //   router.query.checklist_model_id,
+        // ])
+
         return data
       },
       onError: () => {
@@ -183,7 +183,7 @@ export default function ChecklistCreateById() {
       return item.status
     })
     const isFinalized = isFinalizedArray?.every((item) => item === 'finalizado')
-
+    console.log(isFinalized)
     const dataForPost = {
       company_id: serviceSchedule?.company_id,
       brand_id: serviceSchedule?.client_vehicle.vehicle.brand_id,
