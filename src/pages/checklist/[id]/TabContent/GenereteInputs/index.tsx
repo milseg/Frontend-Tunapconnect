@@ -211,7 +211,7 @@ export function genereteInput(
           indexRegister={indexRegister}
           register={register}
           nameRegister={nameRegister}
-          isClosed={isClosed}
+          isClosed={false}
           onClick={() => handleOpenModalInspectCar(true)}
         />
       )

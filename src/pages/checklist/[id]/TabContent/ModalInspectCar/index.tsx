@@ -148,6 +148,7 @@ interface ModalInspectCarProps {
   closeModalInspectCar: () => void
   stageData: StagesDataProps | undefined
   handleInspectionData: (data: formattedDataType[]) => void
+  isClosed: boolean
   // handleSaveInspectionCarData: (data: formattedDataType[]) => void
 }
 
@@ -195,6 +196,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
       closeModalInspectCar,
       stageData,
       handleInspectionData,
+      isClosed,
     }: ModalInspectCarProps,
     ref,
   ) {
@@ -778,6 +780,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                       onClick={() => {
                         handleChangeMarkupValue(item as markupTypesEnum)
                       }}
+                      disabled={isClosed}
                     >
                       {markupTagTypes[item]}
                     </ButtonMarkupType>
@@ -959,6 +962,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                     handleAddImageUrlList={handleAddImageUrlList}
                     listImagesUpload={listImagesUpload}
                     positionsCar={positionsCar[tabsValue]}
+                    isClosed={isClosed}
                   />
                 </Box>
                 <Divider />
@@ -982,6 +986,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                     size="small"
                     value={observations[positionsCar[tabsValue]]}
                     onChange={handleObservation}
+                    disabled={isClosed}
                   />
                 </Box>
               </ContainerInformation>
@@ -991,6 +996,7 @@ const ModalInspectCar = forwardRef<RefType, ModalInspectCarProps>(
                   onClick={() => {
                     handleSave()
                   }}
+                  disabled={isClosed}
                 >
                   salvar
                 </ButtonLeft>
