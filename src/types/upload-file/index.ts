@@ -7,12 +7,6 @@ export interface UpdateFiles {
   status: string
 }
 
-export interface IFileListDTO {
-  files: IFileProps[]
-  page: number
-  total_pages: number
-  total_records: number
-}
 export interface IFileProps {
   cloud_url: string
   created_at: string
@@ -20,6 +14,13 @@ export interface IFileProps {
   id_file: number
   original_name: string
   status: string
+}
+
+export interface IFileListDTO {
+  files: IFileProps[]
+  page: number
+  total_pages: number
+  total_records: number
 }
 
 export interface IPostFile {

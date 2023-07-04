@@ -18,9 +18,10 @@ import { Backdrop, CircularProgress, Skeleton } from '@mui/material'
 import { ChecklistProps, StagesDataProps } from '../types'
 
 import { useRouter } from 'next/router'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
+import { CompanyContext } from '@/contexts/CompanyContext'
 
 interface TabPanelProps {
   children?: ReactNode
@@ -86,46 +87,48 @@ export default function ChecklistCreateById() {
     setServiceSchedule,
   } = useContext(ServiceScheduleContext)
 
+  const { companySelected } = useContext(CompanyContext)
+
   const tabContentRef = useRef<RefTabContentRefType>(null)
 
-  const updateChecklistMutations = useMutation(
-    (newDataChecklist: ChecklistProps) => {
-      setLoading(true)
-      return api
-        .put(`/checklist/${newDataChecklist.id}`, newDataChecklist)
-        .then((resp) => {
-          setActionAlerts({
-            isOpen: true,
-            title: 'Salvo com sucesso',
-            type: 'success',
-          })
-          return resp.data.data[0]
-        })
-    },
+  // const updateChecklistMutations = useMutation(
+  //   (newDataChecklist: ChecklistProps) => {
+  //     setLoading(true)
+  //     return api
+  //       .put(`/checklist/${newDataChecklist.id}`, newDataChecklist)
+  //       .then((resp) => {
+  //         return resp.data.data
+  //       })
+  //   },
 
-    {
-      onSuccess: (data) => {
-        queryClient.invalidateQueries('checklist-createByID')
-        setLoading(false)
-        setActionAlerts({
-          isOpen: true,
-          title: 'Salvo com sucesso',
-          type: 'error',
-        })
-        return data
-      },
-      onError: () => {
-        setActionAlerts({
-          isOpen: true,
-          title: 'Error ao salvar',
-          type: 'error',
-        })
-      },
-    },
-  )
+  //   {
+  //     onSuccess: (data) => {
+  //       queryClient.invalidateQueries([
+  //         'checklist-editByID',
+  //         router.query.id,
+  //         companySelected,
+  //       ])
 
-  const { data, isSuccess, isLoading, isFetching } = useQuery<ChecklistProps>(
-    ['checklist-createByID'],
+  //       setActionAlerts({
+  //         isOpen: true,
+  //         title: 'Salvo com sucesso',
+  //         type: 'error',
+  //       })
+  //       setLoading(false)
+  //       return data
+  //     },
+  //     onError: () => {
+  //       setActionAlerts({
+  //         isOpen: true,
+  //         title: 'Error ao salvar',
+  //         type: 'error',
+  //       })
+  //     },
+  //   },
+  // )
+
+  const { isSuccess, isLoading, isFetching } = useQuery<ChecklistProps>(
+    ['checklist-editByID', router.query.id, companySelected],
     async () => {
       try {
         if (serviceScheduleState.checklist) {
@@ -140,7 +143,6 @@ export default function ChecklistCreateById() {
           }
 
           setCheckList(respChecklist.data.data)
-
           return respChecklist.data.data
         }
       } catch (error) {
@@ -149,8 +151,8 @@ export default function ChecklistCreateById() {
     },
     {
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      enabled: !!router?.query?.id,
+      refetchOnMount: true,
+      // enabled: !!router?.query?.id,
     },
   )
   const { checklist } = serviceScheduleState
@@ -182,9 +184,34 @@ export default function ChecklistCreateById() {
     }
 
     // @ts-ignore
-    setCheckList(dataForPost as ChecklistProps)
+    // setCheckList(dataForPost as ChecklistProps)
     // @ts-ignore
-    updateChecklistMutations.mutate(dataForPost)
+    try {
+      setLoading(true)
+      const result = await api.put(`/checklist/${dataForPost.id}`, dataForPost)
+      setCheckList(result.data.data)
+      setActionAlerts({
+        isOpen: true,
+        title: 'Salvo com sucesso',
+        type: 'error',
+      })
+      queryClient.invalidateQueries([
+        'checklist-editByID',
+        router.query.id,
+        companySelected,
+      ])
+    } catch (err) {
+      setActionAlerts({
+        isOpen: true,
+        title: 'Error ao salvar',
+        type: 'error',
+      })
+      setLoading(false)
+    } finally {
+      setTimeout(() => setLoading(false), 1000)
+    }
+
+    // updateChecklistMutations.mutate(dataForPost)
   }
 
   const handleChange = async (event: SyntheticEvent, newValue: number) => {
@@ -192,13 +219,20 @@ export default function ChecklistCreateById() {
       const result = await tabContentRef.current.handleGetValuesForm()
 
       // @ts-ignore
-      const removedStageActual: ChecklistProps[] = checklist?.stages.filter(
-        (item) => item.name !== result.name,
-      )
+      // const removedStageActual: ChecklistProps[] = checklist?.stages.filter(
+      //   (item) => item.name !== result.name,
+      // )
+
+      // const newChecklist = {
+      //   ...checklist,
+      //   stages: [...removedStageActual, result],
+      // }
 
       const newChecklist = {
         ...checklist,
-        stages: [...removedStageActual, result],
+        stages: checklist?.stages.map((item) => {
+          return item.name === result.name ? result : item
+        }),
       }
       // @ts-ignore
       setCheckList(newChecklist as ChecklistProps)
@@ -212,9 +246,7 @@ export default function ChecklistCreateById() {
   }
 
   useEffect(() => {
-    console.log('isCreated ---', serviceScheduleState.serviceScheduleIsCreated)
     if (serviceScheduleState.serviceScheduleIsCreated) {
-      console.log('isCreated')
       setActionAlerts({
         isOpen: true,
         title: 'Criado com sucesso!',
@@ -275,8 +307,8 @@ export default function ChecklistCreateById() {
                     scrollButtons="auto"
                     aria-label="scrollable auto tabs example"
                   >
-                    {data && data?.stages?.length > 0
-                      ? data.stages.map((stage, index) => {
+                    {checklist && checklist?.stages?.length > 0
+                      ? checklist.stages.map((stage, index) => {
                           // const isDisabled = stage.status === 'finalizado'
                           return (
                             <TabItem
@@ -290,8 +322,8 @@ export default function ChecklistCreateById() {
                       : null}
                   </TabsContainer>
                 </Box>
-                {data && data?.stages?.length > 0
-                  ? data.stages.map((stage, index) => {
+                {checklist && checklist?.stages?.length > 0
+                  ? checklist.stages.map((stage, index) => {
                       return (
                         <TabPanel
                           key={`${Math.random() * 2000}-${stage.name}-${index}`}

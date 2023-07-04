@@ -17,7 +17,7 @@ import {
   TextField,
   useMediaQuery,
 } from '@mui/material'
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles'
 import ActionAlerts from '@/components/ActionAlerts'
 import { ClientVehicleResponseType } from '../ModalSearchClientVehicle/type'
 import { useQuery } from 'react-query'
@@ -101,8 +101,8 @@ export default function ModalCreateNewClientVehicle({
     },
   })
 
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
 
   const { data: dataVehicleBrandList } = useQuery<any[]>(
     [
@@ -260,7 +260,7 @@ export default function ModalCreateNewClientVehicle({
             sx={{
               width: '100%',
               maxWidth: 550,
-              minWidth: fullScreen ? 300: 550,
+              minWidth: fullScreen ? 300 : 550,
               margin: '0 auto',
             }}
           >

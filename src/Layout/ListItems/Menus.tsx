@@ -20,7 +20,7 @@ export function allRoutes(companySelected: number | null) {
     },
     {
       path: '/quotation',
-      href: `/quotation?company_id=${companySelected}`,
+      href: `/quotations?company_id=${companySelected}`,
       component: <RequestQuoteIcon />,
       title: 'Orçamento',
     },
@@ -58,12 +58,6 @@ export function allRoutesIntranetTunap() {
               component: null,
               title: 'Upload Newland',
               href: `/upload?status=newland`,
-            },
-            {
-              path: '/upload',
-              component: null,
-              title: 'Upload Canopus',
-              href: `/upload?status=canopus`,
             },
             {
               path: '/upload',

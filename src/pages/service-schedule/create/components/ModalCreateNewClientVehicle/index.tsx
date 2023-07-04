@@ -22,7 +22,7 @@ import { ClientVehicleResponseType } from '../ModalSearchClientVehicle/type'
 import { useQuery } from 'react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles'
 
 interface ModalCreateNewClientVehicleProps {
   handleClose: () => void
@@ -101,8 +101,8 @@ export default function ModalCreateNewClientVehicle({
     },
   })
 
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
 
   const { data: dataVehicleBrandList } = useQuery<any[]>(
     [
@@ -256,7 +256,7 @@ export default function ModalCreateNewClientVehicle({
             sx={{
               width: '100%',
               maxWidth: 550,
-              minWidth: fullScreen ? 300: 550,
+              minWidth: fullScreen ? 300 : 550,
               margin: '0 auto',
             }}
             gap={1}

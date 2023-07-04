@@ -21,6 +21,7 @@ import { CompanyContext } from '@/contexts/CompanyContext'
 import tunapLogoImg from '@/assets/images/tunap-login.svg'
 import Image from 'next/image'
 import useMediaQuery from '@mui/material/useMediaQuery'
+import Link from 'next/link'
 const drawerWidth: number = 240
 
 interface AppBarProps extends MuiAppBarProps {
@@ -157,12 +158,14 @@ export function DashboardContent({ children }: DashboardContentProps) {
               px: [1],
             }}
           >
-            <Image
-              src={tunapLogoImg}
-              height={30}
-              alt="Tunap connect"
-              style={{ marginRight: '10px' }}
-            />
+            <Link href="/">
+              <Image
+                src={tunapLogoImg}
+                height={30}
+                alt="Tunap connect"
+                style={{ marginRight: '10px' }}
+              />
+            </Link>
             <IconButton onClick={toggleDrawer}>
               <ChevronLeftIcon />
             </IconButton>

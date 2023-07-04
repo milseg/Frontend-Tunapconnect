@@ -19,6 +19,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { CompanyProvider } from '@/contexts/CompanyContext'
 import { ServiceScheduleProvider } from '@/contexts/ServiceScheduleContext'
 import { UploadProvider } from '@/contexts/UploadContext'
+import { QuotationsProvider } from '@/contexts/QuotationContext'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -44,47 +45,49 @@ const MyApp = (props: CustomAppProps) => {
       <AuthProvider>
         <CompanyProvider>
           <ServiceScheduleProvider>
-            <QueryClientProvider client={queryClient}>
-              <CacheProvider value={emotionCache}>
-                <Head>
-                  <meta
-                    name="viewport"
-                    content="initial-scale=1, width=device-width"
-                  />
-                </Head>
-                <ThemeProvider theme={theme}>
-                  <CssBaseline />
-                  <GlobalStyles styles={globals} />
-                  <UploadProvider>
-                    <CacheProvider value={emotionCache}>
-                      <Head>
-                        <meta
-                          name="viewport"
-                          content="initial-scale=1, width=device-width"
-                        />
-                      </Head>
-                      <CssBaseline />
-                      <GlobalStyles styles={globals} />
+            <QuotationsProvider>
+              <QueryClientProvider client={queryClient}>
+                <CacheProvider value={emotionCache}>
+                  <Head>
+                    <meta
+                      name="viewport"
+                      content="initial-scale=1, width=device-width"
+                    />
+                  </Head>
+                  <ThemeProvider theme={theme}>
+                    <CssBaseline />
+                    <GlobalStyles styles={globals} />
+                    <UploadProvider>
+                      <CacheProvider value={emotionCache}>
+                        <Head>
+                          <meta
+                            name="viewport"
+                            content="initial-scale=1, width=device-width"
+                          />
+                        </Head>
+                        <CssBaseline />
+                        <GlobalStyles styles={globals} />
 
-                      {Component.auth ? (
-                        // @ts-ignore
-                        <Auth>
-                          <Layout>
-                            <Component {...props.pageProps} />
-                          </Layout>
-                        </Auth>
-                      ) : (
-                        <Component {...pageProps} />
-                      )}
-                      {/* <Component {...pageProps} /> */}
-                      <ReactQueryDevtools initialIsOpen={false} />
-                    </CacheProvider>
-                  </UploadProvider>
-                  {/* <Component {...pageProps} /> */}
-                  <ReactQueryDevtools initialIsOpen={false} />
-                </ThemeProvider>
-              </CacheProvider>
-            </QueryClientProvider>
+                        {Component.auth ? (
+                          // @ts-ignore
+                          <Auth>
+                            <Layout>
+                              <Component {...props.pageProps} />
+                            </Layout>
+                          </Auth>
+                        ) : (
+                          <Component {...pageProps} />
+                        )}
+                        {/* <Component {...pageProps} /> */}
+                        <ReactQueryDevtools initialIsOpen={false} />
+                      </CacheProvider>
+                    </UploadProvider>
+                    {/* <Component {...pageProps} /> */}
+                    <ReactQueryDevtools initialIsOpen={false} />
+                  </ThemeProvider>
+                </CacheProvider>
+              </QueryClientProvider>
+            </QuotationsProvider>
           </ServiceScheduleProvider>
         </CompanyProvider>
       </AuthProvider>
