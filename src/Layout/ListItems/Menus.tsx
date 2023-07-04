@@ -65,6 +65,12 @@ export function allRoutesIntranetTunap() {
               title: 'Upload Canopus',
               href: `/upload?status=canopus`,
             },
+            {
+              path: '/upload',
+              component: null,
+              title: 'Upload Eurobike',
+              href: `/upload?status=eurobike`,
+            },
           ],
         },
       ],
