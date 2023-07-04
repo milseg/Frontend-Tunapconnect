@@ -17,7 +17,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import { ClientVehicleResponseType } from './type'
 import ClientVehicleTable from './Components/Table'
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles'
 
 interface ModalSearchClientVehicleProps {
   openMolal: boolean
@@ -59,8 +59,8 @@ export default function ModalSearchClientVehicle({
 
   const { companySelected } = useContext(CompanyContext)
 
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
 
   async function onSubmitSearch(data: SearchFormProps) {
     setIsLoading(true)
@@ -169,7 +169,7 @@ export default function ModalSearchClientVehicle({
             sx={{
               width: '100%',
               maxWidth: 550,
-              minWidth: fullScreen ? 300: 550,
+              minWidth: fullScreen ? 300 : 550,
               margin: '0 auto',
             }}
           >
@@ -189,7 +189,7 @@ export default function ModalSearchClientVehicle({
             sx={{
               width: '100%',
               maxWidth: 550,
-              minWidth: fullScreen ? 300: 550,
+              minWidth: fullScreen ? 300 : 550,
               margin: '0 auto',
               flexWrap: 'nowrap',
               display: 'flex',

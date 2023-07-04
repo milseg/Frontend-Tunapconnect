@@ -14,7 +14,7 @@ import { useContext, useEffect, useState } from 'react'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { ClientResponseType } from '@/types/service-schedule'
 import ClientsTable from './Components/Table'
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles'
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
@@ -57,9 +57,9 @@ export default function ModalSearchClient({
 
   const { companySelected } = useContext(CompanyContext)
 
-  const theme = useTheme();
-  const isWeb = useMediaQuery(theme.breakpoints.up('xs'));
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const theme = useTheme()
+  const isWeb = useMediaQuery(theme.breakpoints.up('xs'))
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
 
   async function onSubmitSearch(data: SearchFormProps) {
     setIsLoading(true)
@@ -167,7 +167,7 @@ export default function ModalSearchClient({
             sx={{
               width: '100%',
               maxWidth: 550,
-              minWidth: fullScreen ? 300: 550,
+              minWidth: fullScreen ? 300 : 550,
               margin: '0 auto',
             }}
           >
@@ -175,7 +175,7 @@ export default function ModalSearchClient({
             <Typography variant="h6">Buscar por cliente</Typography>
             {/* {clientList.length > 0 && ( */}
             <ButtonModalDialog onClick={handleClientModal}>
-              {isWeb? 'adicionar novo' : 'novo'}
+              {isWeb ? 'adicionar novo' : 'novo'}
             </ButtonModalDialog>
             {/* )} */}
           </Stack>

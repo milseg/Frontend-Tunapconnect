@@ -6,8 +6,6 @@ import Box from '@mui/material/Box'
 
 import Paper from '@mui/material/Paper'
 
-import { ServiceSchedulesListProps } from '@/types/service-schedule'
-
 import { TableDataGrid } from './styles'
 import { CustomNoRowsOverlay } from './NoRows'
 import { CustomFooterStatusComponent } from './FooterPaginate'
@@ -15,7 +13,7 @@ import { Loading } from '../Loading'
 
 interface TableAppProps {
   columns: GridColDef[]
-  rowsData: ServiceSchedulesListProps[] | []
+  rowsData: any[] | []
   handlePages: (nextPage: string) => void
   pages: { next: boolean; previous: boolean }
   loading: boolean
@@ -41,7 +39,7 @@ export function TableApp({
   companyId,
   handleSetServiceSchedule,
 }: TableAppProps) {
-  const [rows, setRows] = useState<ServiceSchedulesListProps[]>([])
+  const [rows, setRows] = useState<any[]>([])
 
   const apiRef = useGridApiRef()
 

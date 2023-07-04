@@ -172,8 +172,8 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
     })
   const [listImage, setListImage] = useState<ImageListProps>({})
   const [typeSubmitForm, setTypeSubmitForm] = useState<
-    'salvo' | 'finalizado' | 'rascunho'
-  >('rascunho')
+    'salvo' | 'finalizado' | null
+  >(null)
 
   const [dataModals, setDataModals] = useState<{
     signatures: CheckListSignatures[]
@@ -366,7 +366,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
 
     const dataFormatted = {
       ...stageData,
-      status: 'Rascunho',
+      // status: 'Rascunho',
       signatures:
         dataModals?.signatures.length > 0
           ? dataModals?.signatures
@@ -396,18 +396,21 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
       }),
     }
 
-    console.log(dataFormatted)
     return dataFormatted
   }
 
   async function onSubmitData(data: OnSubmitData) {
     const dataActual = await handleGetValuesForm()
-    console.log(dataActual)
 
-    handleAddListCheckList({
+    const dataActualFormatted = {
       ...dataActual,
       status: typeSubmitForm,
-    } as StagesDataProps)
+    } as StagesDataProps
+
+    if (typeSubmitForm) {
+      handleAddListCheckList(dataActualFormatted)
+    }
+    setTypeSubmitForm(null)
   }
 
   useEffect(() => {
@@ -549,6 +552,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
           variant="contained"
           // form={`form-${data?.stages[painelValue].name ?? ''}-${painelValue}`}
           onClick={() => setTypeSubmitForm('salvo')}
+          // disabled={isClosed}
         >
           Salvar
         </ButtonsSave>
@@ -559,6 +563,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
           onClick={() => {
             setTypeSubmitForm('finalizado')
           }}
+          // disabled={isClosed}
         >
           Finalizar
         </ButtonsFinalized>

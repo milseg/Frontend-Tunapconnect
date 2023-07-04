@@ -15,7 +15,7 @@ import { ClientVehicleResponseType } from '../ModalSearchClientVehicle/type'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles'
 
 interface ModalCreateEditClientVehicleProps {
   handleClose: () => void
@@ -79,8 +79,8 @@ export default function ModalEditClientVehicle({
       km: '',
     },
   })
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
   // const { data: dataVehicleBrandList, status: dataVehicleBrandListStatus } =
   //   useQuery<any[]>(
   //     [
@@ -261,8 +261,7 @@ export default function ModalEditClientVehicle({
 
   return (
     <>
-      <Dialog open={isOpen} onClose={handleClose} 
-        fullScreen={fullScreen}>
+      <Dialog open={isOpen} onClose={handleClose} fullScreen={fullScreen}>
         <DialogTitle>Edição de Veículo</DialogTitle>
         <DialogContent>
           <Stack
@@ -272,7 +271,7 @@ export default function ModalEditClientVehicle({
             sx={{
               width: '100%',
               maxWidth: 550,
-              minWidth: fullScreen ? 300: 550,
+              minWidth: fullScreen ? 300 : 550,
               margin: '0 auto',
             }}
             onSubmit={handleSubmitEditClientVehicle(onSubmit)}
