@@ -128,10 +128,9 @@ export interface ServiceScheduleType {
   claims_service: any[]
 }
 
-
 export type ClaimServiceResponseType = {
-  company_id: number,
-  integration_code: null,
+  company_id: number
+  integration_code: null
   id: number
   description: string
 }

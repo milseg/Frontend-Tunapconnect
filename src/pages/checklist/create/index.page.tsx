@@ -72,36 +72,43 @@ export default function ChecklistCreateById() {
   const queryClient = useQueryClient()
 
   const router = useRouter()
-  const { serviceScheduleState, setCheckListModel, setServiceSchedule, setCheckList } =
-    useContext(ServiceScheduleContext)
+  const {
+    serviceScheduleState,
+    setCheckListModel,
+    setServiceSchedule,
+    setCheckList,
+    setServiceScheduleIsCreated,
+  } = useContext(ServiceScheduleContext)
 
   const tabContentRef = useRef<RefTabContentRefType>(null)
 
   const updateChecklistMutations = useMutation(
     async (newDataChecklist: ChecklistProps) => {
-      
       try {
         setLoading(true)
         const resp = await api.post(`/checklist`, newDataChecklist)
         // setCheckList(resp.data.data)
         // router.push(`/checklist/${resp.data.data.id}`)
         return resp.data.data
-      } catch (error) {
-        
-      } 
+      } catch (error) {}
     },
 
     {
       onSuccess: (data) => {
-        setActionAlerts({
-          isOpen: true,
-          title: 'Salvo com sucesso',
-          type: 'success',
-        })
+        // setActionAlerts({
+        //   isOpen: true,
+        //   title: 'Salvo com sucesso',
+        //   type: 'success',
+        // })
         setCheckList(data)
-     
+        setServiceScheduleIsCreated(true)
+
         router.push(`/checklist/${data.id}`)
-        queryClient.invalidateQueries(['checklist-create', router?.query?.service_schedule_id,router.query.checklist_model_id])
+        queryClient.invalidateQueries([
+          'checklist-create',
+          router?.query?.service_schedule_id,
+          router.query.checklist_model_id,
+        ])
         setLoading(false)
         return data
       },
@@ -118,7 +125,11 @@ export default function ChecklistCreateById() {
 
   const { data, isSuccess, isLoading, isFetching } =
     useQuery<ChecklistModelType>(
-      ['checklist-create', router?.query?.service_schedule_id,router.query.checklist_model_id],
+      [
+        'checklist-create',
+        router?.query?.service_schedule_id,
+        router.query.checklist_model_id,
+      ],
       async () => {
         try {
           if (!serviceScheduleState.serviceSchedule) {

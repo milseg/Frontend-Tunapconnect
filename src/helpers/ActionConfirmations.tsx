@@ -18,7 +18,7 @@ export function ActionDeleteConfirmations(
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const resp = await api.delete('/service-schedule/' + id)
+        const resp = await api.delete(router + id)
         if (resp?.status === 200) {
           MySwal.fire('Salvo com sucesso!', '', 'success').then(() => {
             handleDelete(id)

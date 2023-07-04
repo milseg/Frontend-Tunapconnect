@@ -1,4 +1,4 @@
-import SearchIcon from "@mui/icons-material/Search";
+import SearchIcon from '@mui/icons-material/Search'
 import {
   Container,
   FormControl,
@@ -9,30 +9,30 @@ import {
   Stack,
   TextField,
   Typography,
-} from "@mui/material";
-import * as React from "react";
-import Paper from "@mui/material/Paper";
-import { FilterInput, SearchButton } from "./styles";
+} from '@mui/material'
+import * as React from 'react'
+import Paper from '@mui/material/Paper'
+import { FilterInput, SearchButton } from './styles'
 
 export default function Budget() {
   const currencies = [
     {
-      value: "USD",
-      label: "$",
+      value: 'USD',
+      label: '$',
     },
     {
-      value: "EUR",
-      label: "€",
+      value: 'EUR',
+      label: '€',
     },
     {
-      value: "BTC",
-      label: "฿",
+      value: 'BTC',
+      label: '฿',
     },
     {
-      value: "JPY",
-      label: "¥",
+      value: 'JPY',
+      label: '¥',
     },
-  ];
+  ]
   return (
     <>
       <Container maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
@@ -45,25 +45,25 @@ export default function Budget() {
               alignItems="center"
             >
               <Typography variant="h5" component="h2">
-                {"Orçamentos"}
+                {'Orçamentos'}
               </Typography>
               <Typography>
-                {"TUNAP Connect > Empresa > Oficina >Lista de orçamentos"}
+                {'TUNAP Connect > Empresa > Oficina >Lista de orçamentos'}
               </Typography>
             </Grid>
             <Paper
               sx={{
                 p: 2,
-                display: "flex",
-                flexDirection: "row",
-                height: "fit-content",
+                display: 'flex',
+                flexDirection: 'row',
+                height: 'fit-content',
               }}
             >
-              <Stack spacing={2} direction="row" sx={{ width: "100%" }}>
+              <Stack spacing={2} direction="row" sx={{ width: '100%' }}>
                 <TextField
                   label="Pesquisar"
                   InputProps={{
-                    type: "search",
+                    type: 'search',
                   }}
                 />
                 <SearchButton variant="contained" disableRipple>
@@ -71,7 +71,11 @@ export default function Budget() {
                 </SearchButton>
                 <FormControl>
                   <InputLabel id="demo-simple-select-label">Filtros</InputLabel>
-                  <Select id="outlined-select-currency" label="Filtros" input={<FilterInput/>}>
+                  <Select
+                    id="outlined-select-currency"
+                    label="Filtros"
+                    input={<FilterInput />}
+                  >
                     {currencies.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
@@ -89,13 +93,13 @@ export default function Budget() {
             alignItems="center"
           >
             <Typography variant="h5" component="h2">
-              {"Lista de orçamentos"}
+              {'Lista de orçamentos'}
             </Typography>
           </Grid>
         </Stack>
       </Container>
     </>
-  );
+  )
 }
 
-Budget.auth = true;
+Budget.auth = true

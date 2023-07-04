@@ -167,6 +167,7 @@ export const InputText = styled(TextField)(({ theme }) => ({
     border: '1px solid #e2e2e1',
     overflow: 'hidden',
     borderRadius: 4,
+    with: '100%',
     backgroundColor: theme.palette.mode === 'light' ? '#fcfcfb' : '#2b2b2b',
     transition: theme.transitions.create([
       'border-color',
@@ -210,5 +211,3 @@ export const ErrorContainer = styled(Typography)(({ theme }) => ({
   marginLeft: 5,
   color: 'red',
 }))
-
-

@@ -26,7 +26,7 @@ export default function ClientVehicleTable({
   handleModalNewClient,
   handleSelectedClientVehicle,
   isLoading,
-  handleDoubleClick
+  handleDoubleClick,
 }: ClientVehicleTableProps) {
   const [clientSelected, setClientSelected] = useState<number | null>(null)
   return (
@@ -53,7 +53,7 @@ export default function ClientVehicleTable({
                     '&:last-child td, &:last-child th': { border: 0 },
                   }}
                   onClick={(e) => {
-                    if(e.detail === 2) {
+                    if (e.detail === 2) {
                       handleDoubleClick()
                     }
                     handleSelectedClientVehicle(row)

@@ -63,10 +63,13 @@ const Drawer = styled(MuiDrawer, {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
-      width: theme.spacing(7),
-      [theme.breakpoints.up('sm')]: {
-        width: theme.spacing(9),
-      },
+      width: theme.spacing(0),
+      // [theme.breakpoints.up('xs')]: {
+      //   width: theme.spacing(9),
+      // },
+      // [theme.breakpoints.down('md')]: {
+      //   width: theme.spacing(0),
+      // },
     }),
   },
 }))
@@ -82,7 +85,7 @@ export function DashboardContent({ children }: DashboardContentProps) {
     setOpen(!open)
   }
   const theme = useTheme()
-  const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
+  const isWeb = useMediaQuery(theme.breakpoints.up('lg'))
   const { companyData } = useContext(CompanyContext)
 
   const company = useMemo(() => companyData, [companyData])
@@ -93,9 +96,9 @@ export function DashboardContent({ children }: DashboardContentProps) {
         setOpen(false)
       }
     } else {
-      if (!open) {
-        setOpen(true)
-      }
+      // if (!open) {
+      //   setOpen(true)
+      // }
     }
   }, [isWeb])
 
@@ -139,10 +142,11 @@ export function DashboardContent({ children }: DashboardContentProps) {
           </Toolbar>
         </AppBar>
         <Drawer
+          // variant="permanent"
           variant="permanent"
           open={open}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: false, // Better open performance on mobile.
           }}
         >
           <Toolbar
@@ -172,6 +176,12 @@ export function DashboardContent({ children }: DashboardContentProps) {
         </Drawer>
         <Box
           component="main"
+          onClick={(e) => {
+            if (open) {
+              e.stopPropagation()
+              setOpen(false)
+            }
+          }}
           sx={{
             backgroundColor: (theme) =>
               theme.palette.mode === 'light'
@@ -181,14 +191,14 @@ export function DashboardContent({ children }: DashboardContentProps) {
             height: '100vh',
             overflow: 'auto',
             maxWidth: {
-              sm: open
-                ? `calc(100vw - ${drawerWidth}px)`
-                : `calc(100vw - 71px)`,
+              // md: open
+              //   ? `calc(100vw - ${drawerWidth}px)`
+              //   : `calc(100vw - 71px)`,
               xs: `100vw`,
             },
             marginLeft: {
-              sm: open ? `${drawerWidth}px` : '71px',
-              xs: '71px',
+              // md: open ? `${drawerWidth}px` : '71px',
+              xs: 0,
             },
             transition: 'all 0.1s ease-in-out',
           }}

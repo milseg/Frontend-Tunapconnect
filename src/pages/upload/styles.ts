@@ -1,54 +1,54 @@
-import styled from "@emotion/styled";
-import { Paper } from "@mui/material";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
+import styled from '@emotion/styled'
+import { Paper } from '@mui/material'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
 
 export const SearchButton = styled(Button)({
-  boxShadow: "none",
-  textTransform: "none",
+  boxShadow: 'none',
+  textTransform: 'none',
   fontSize: 16,
-  padding: "6px 12px",
-  border: "1px solid",
+  padding: '6px 12px',
+  border: '1px solid',
   lineHeight: 1.5,
-  backgroundColor: "#0E948B",
-  borderColor: "#0E948B",
-});
+  backgroundColor: '#0E948B',
+  borderColor: '#0E948B',
+})
 
 export const paginationButton = styled(Button)({
-  boxShadow: "none",
-  textTransform: "none",
+  boxShadow: 'none',
+  textTransform: 'none',
   fontSize: 16,
-  padding: "12px 12px",
-  border: "1px solid",
+  padding: '12px 12px',
+  border: '1px solid',
   lineHeight: 1.5,
-  backgroundColor: "#F1F1F1",
-  borderColor: "#F1F1F1",
-  width: "52px",
-  height: "52px"
+  backgroundColor: '#F1F1F1',
+  borderColor: '#F1F1F1',
+  width: '52px',
+  height: '52px',
 })
 
 export const TableTitles = styled(Paper)({
-  boxShadow: "none",
-  textTransform: "none",
+  boxShadow: 'none',
+  textTransform: 'none',
   fontSize: 16,
-  padding: "8px 22px",
-  border: "1px solid",
+  padding: '8px 22px',
+  border: '1px solid',
   lineHeight: 1.5,
-  backgroundColor: "#1C4961",
-  borderColor: "#1C4961",
-  justifyItems: "flex-end",
-  alignItems: "center",
-  color: "white",
-});
+  backgroundColor: '#1C4961',
+  borderColor: '#1C4961',
+  justifyItems: 'flex-end',
+  alignItems: 'center',
+  color: 'white',
+})
 
 export const UploadFileField = styled(TextField)({
-  width: "0.1px",
-  height: "0.1px",
+  width: '0.1px',
+  height: '0.1px',
   opacity: 0,
-  overflow: "hidden",
-  position: "absolute",
+  overflow: 'hidden',
+  position: 'absolute',
   zIndex: -1,
-});
+})
 
 export const CustomLabel = styled.label`
   width: 60%;
