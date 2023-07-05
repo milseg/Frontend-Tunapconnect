@@ -5,7 +5,8 @@
   ],
   // "plugins": ["@tanstack/query", "react-hooks"],
   "rules": {
-    "camelcase": "off"
+    "camelcase": "off",
+    "prettier/prettier": ["off", { "singleQuote": false }]
     // "react-hooks/exhaustive-deps": "warn"
     // "react/jsx-no-target-blank": "off"
     // "@tanstack/query/exhaustive-deps": "error",
