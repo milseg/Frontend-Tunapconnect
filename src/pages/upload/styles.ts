@@ -60,7 +60,10 @@ export const CustomLabel = styled.label`
   border: 1px solid black;
   border-radius: 0.4rem;
   padding: 2px 3px;
-`
+  @media screen and (max-width: 780px) {
+    width: 100%;
+  }
+`;
 
 export const FormUpdate = styled.form`
   width: 100%;
@@ -68,4 +71,9 @@ export const FormUpdate = styled.form`
   justify-content: space-between;
   display: flex;
   flex-direction: row;
-`
+  @media screen and (max-width: 780px) {
+    flex-direction: column;
+    row-gap: 2rem;
+    align-items: flex-start;
+  }
+`;
