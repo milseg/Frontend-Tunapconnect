@@ -71,6 +71,7 @@ interface MyDropzoneProps {
   listImagesUpload: imagemList
   handleAddImageUrlList: (value: imageData[], position: positionsTypes) => void
   positionsCar: positionsTypes
+  isClosed: boolean
 }
 
 // async function savePathTemp(filesList = []) {
@@ -87,6 +88,7 @@ export function InspectionDropzone({
   handleAddImageUrlList,
   listImagesUpload,
   positionsCar,
+  isClosed,
 }: MyDropzoneProps) {
   const [list, setList] = useState<imageData[] | []>([])
   const [listProgress, setListProgress] = useState<
@@ -164,6 +166,7 @@ export function InspectionDropzone({
     useDropzone({
       onDrop,
       // maxFiles: 1,
+      disabled: isClosed,
       accept: {
         'image/png': ['.png'],
         'image/jpg': ['.jpg'],
@@ -182,6 +185,15 @@ export function InspectionDropzone({
 
   return (
     <>
+      {/* {!isClosed ? (
+        <div {...getRootProps({ style })}>
+          <input {...getInputProps()} />
+          <PhotoSizeSelectActualOutlinedIcon />
+          <p>Arraste e solte aqui ou click</p>
+        </div>
+      ) : (
+        
+      )} */}
       <div {...getRootProps({ style })}>
         <input {...getInputProps()} />
         <PhotoSizeSelectActualOutlinedIcon />

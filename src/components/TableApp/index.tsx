@@ -81,7 +81,7 @@ export function TableApp({
               onRowClick={(id) => {
                 handleSetServiceSchedule(Number(id.id))
               }}
-              pageSizeOptions={[7]}
+              // pageSizeOptions={[7]}
               // disableRowSelectionOnClick
               disableColumnFilter
               getRowClassName={(params) =>
