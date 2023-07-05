@@ -7,6 +7,8 @@ import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import SearchIcon from '@mui/icons-material/Search'
+import AddIcon from '@mui/icons-material/Add'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 import {
   ClaimServiceResponseType,
@@ -22,6 +24,8 @@ import List from '@mui/material/List'
 import Stack from '@mui/material/Stack'
 
 import {
+  ButtonAddItens,
+  ButtonRemoveItens,
   ButtonSubmit,
   DividerCard,
   InfoCardName,
@@ -58,6 +62,12 @@ import {
   IconButton,
   InputAdornment,
   OutlinedInput,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
 } from '@mui/material'
 import ModalCreateEditClientVehicle from './components/ModalEditClientVehicle'
@@ -65,6 +75,7 @@ import ClaimServiceTable from './components/ClaimServiceTable'
 
 import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
+import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
 // import { useForm } from 'react-hook-form'
 
 type updateData = {
@@ -107,6 +118,10 @@ export default function ServiceSchedulesCreate() {
       id: 0,
       name: '-',
     })
+  const [typeQuotation, setTypeQuotation] = useState({
+    id: 0,
+    name: '-',
+  })
   const [technicalConsultantsList, setTechnicalConsultantsList] = useState<
     TechnicalConsultant[]
   >([])
@@ -235,6 +250,11 @@ export default function ServiceSchedulesCreate() {
   function handleTechnicalConsultant(id: number) {
     setTechnicalConsultant((prevState) => {
       return technicalConsultantsList.filter((c) => c.id === id)[0]
+    })
+  }
+  function handleTypeQuotation(id: number) {
+    setTypeQuotation((prevState) => {
+      return prevState
     })
   }
 
@@ -379,7 +399,639 @@ export default function ServiceSchedulesCreate() {
               title="Agenda de Serviços"
             />
           </Grid>
+
           <Grid item xs={12} md={7} lg={7}>
+            <Stack spacing={3}>
+              {/* SERVICOS */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center"
+                  gap={2}
+                >
+                  <ButtonAddItens endIcon={<AddIcon />}>Kit</ButtonAddItens>
+                  <ButtonAddItens endIcon={<AddIcon />}>
+                    Serviços
+                  </ButtonAddItens>
+                  <ButtonAddItens endIcon={<AddIcon />}>Peças</ButtonAddItens>
+                </Stack>
+              </Paper>
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <TitleCard sx={{ flex: 1 }}>SERVIÇOS</TitleCard>
+                  {/* <Box sx={{ marginRight: 1 }}>
+                    <ButtonAddItens>
+                      <AddIcon />
+                    </ButtonAddItens>
+                  </Box> */}
+
+                  <MoreOptionsServiceScheduleCreate
+                    aria-label="options to quotation"
+                    disabledButton
+                    buttons={[
+                      {
+                        label: 'Editar',
+                        action: () => {},
+                      },
+                    ]}
+                  />
+                </Stack>
+                <DividerCard />
+                <TableContainer>
+                  <Table aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Descrição</TableCell>
+                        <TableCell align="center">Quantidade</TableCell>
+                        <TableCell align="center">Desconto</TableCell>
+                        <TableCell align="center">Valor</TableCell>
+                        <TableCell align="center">Ações</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Serviço 1</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          <ButtonRemoveItens>
+                            <DeleteIcon />
+                          </ButtonRemoveItens>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Serviço 2</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          <ButtonRemoveItens>
+                            <DeleteIcon />
+                          </ButtonRemoveItens>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+              {/* PEÇAS */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <TitleCard sx={{ flex: 1 }}>PEÇAS</TitleCard>
+
+                  {/* <Box sx={{ marginRight: 1 }}>
+                    <ButtonAddItens>
+                      <AddIcon />
+                    </ButtonAddItens>
+                  </Box> */}
+
+                  <MoreOptionsServiceScheduleCreate
+                    aria-label="options to quotation"
+                    disabledButton
+                    buttons={[
+                      {
+                        label: 'Editar',
+                        action: () => {},
+                      },
+                    ]}
+                  />
+                </Stack>
+                <DividerCard />
+                <TableContainer>
+                  <Table aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Descrição</TableCell>
+                        <TableCell align="center">Quantidade</TableCell>
+                        <TableCell align="center">Desconto</TableCell>
+                        <TableCell align="center">Valor</TableCell>
+                        <TableCell align="center">Ações</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Peça 1</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          <ButtonRemoveItens>
+                            <DeleteIcon />
+                          </ButtonRemoveItens>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Peça 2</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          <ButtonRemoveItens>
+                            <DeleteIcon />
+                          </ButtonRemoveItens>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+              {/* RESUMO DO ORÇAMENTO */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>RESUMO DO ORÇAMENTO</TitleCard>
+                  <MoreOptionsServiceScheduleCreate
+                    aria-label="options to quotation"
+                    disabledButton
+                    buttons={[
+                      {
+                        label: 'Editar',
+                        action: () => {},
+                      },
+                    ]}
+                  />
+                </Stack>
+                <DividerCard />
+                <TableContainer>
+                  <Table aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Descrição</TableCell>
+                        <TableCell align="center">Preço</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Valor dos itens:</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Descontos nos itens:</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Valor dos Serviços:</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Total de descontos:</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Total de líquido:</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+              {/* Reclamações */}
+              {/* <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Reclamações</TitleCard>
+                  <MoreOptionsServiceScheduleCreate
+                    aria-label="options claims service"
+                    buttons={[
+                      {
+                        label: 'Editar',
+                        action: () => {},
+                      },
+                      {
+                        label: 'Pesquisar',
+                        action: () => {},
+                      },
+                    ]}
+                    disabledButton
+                  />
+                </Stack>
+                <DividerCard />
+
+                <ClaimServiceTable
+                  claimServiceList={claimServiceList}
+                  handleSaveClaimService={handleSaveClaimService}
+                  handleRemoveClaimService={handleRemoveClaimService}
+                />
+              </Paper> */}
+              {/* cliente */}
+              {/* <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Cliente</TitleCard>
+                  <MoreOptionsServiceScheduleCreate
+                    aria-label="options to client"
+                    buttons={[
+                      {
+                        label: 'Editar',
+                        action: handleOpenModalEditClient,
+                      },
+                      {
+                        label: 'Pesquisar',
+                        action: handleOpenModalClientSearch,
+                      },
+                    ]}
+                  />
+                </Stack>
+                <DividerCard />
+                {client ? (
+                  <List dense={false}>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Nome:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {client?.name ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>
+                        {client.cpf === null
+                          ? 'Documento:'
+                          : client.cpf === true
+                          ? 'CPF:'
+                          : 'CNPJ'}
+                      </InfoCardName>{' '}
+                      <InfoCardText>
+                        {client?.document
+                          ? formatCNPJAndCPFNumber(client?.document, client.cpf)
+                          : 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    {client?.phone && client?.phone.length > 0 ? (
+                      client?.phone.map((phone: string, index: number) => (
+                        <ListItemCard
+                          key={index + '-' + phone}
+                          alignItems="flex-start"
+                        >
+                          <InfoCardName>Telefone:</InfoCardName>{' '}
+                          <InfoCardText>{phone}</InfoCardText>
+                        </ListItemCard>
+                      ))
+                    ) : (
+                      <ListItemCard>
+                        <InfoCardName>Telefone:</InfoCardName>{' '}
+                        <InfoCardText width="100%">
+                          {'Não informado'}
+                        </InfoCardText>
+                      </ListItemCard>
+                    )}
+                    {client?.email && client.email.length ? (
+                      client?.email.map((email: string, index: number) => (
+                        <ListItemCard
+                          key={index + '-' + email}
+                          alignItems="flex-start"
+                        >
+                          <InfoCardName>E-mail:</InfoCardName>{' '}
+                          <InfoCardText>{email}</InfoCardText>
+                        </ListItemCard>
+                      ))
+                    ) : (
+                      <ListItemCard alignItems="flex-start">
+                        <InfoCardName>E-mail:</InfoCardName>{' '}
+                        <InfoCardText width="100%">
+                          {'Não informado'}
+                        </InfoCardText>
+                      </ListItemCard>
+                    )}
+                    {client?.address && client?.address.length ? (
+                      client?.address.map((address, index) => (
+                        <ListItemCard
+                          key={index + '-' + address}
+                          alignItems="flex-start"
+                        >
+                          <InfoCardName>Endereço:</InfoCardName>{' '}
+                          <InfoCardText>{address}</InfoCardText>
+                        </ListItemCard>
+                      ))
+                    ) : (
+                      <ListItemCard alignItems="flex-start">
+                        <InfoCardName>Endereço:</InfoCardName>{' '}
+                        <InfoCardText width="100%">
+                          {'Não informado'}
+                        </InfoCardText>
+                      </ListItemCard>
+                    )}
+                  </List>
+                ) : (
+                  <Box
+                    sx={{
+                      with: '100%',
+                      height: 100,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      display: 'flex',
+                    }}
+                  >
+                    <Stack
+                      direction="column"
+                      alignItems="center"
+                      justifyContent="center"
+                      gap={1}
+                      sx={{
+                        py: 10,
+                      }}
+                      component="form"
+                      // onSubmit={handleSubmitClient(onSubmitClient)}
+                    >
+                      <Typography variant="h6">Adicione um Cliente</Typography>
+
+                      <OutlinedInput
+                        id="outlined-adornment-weight"
+                        size="small"
+                        placeholder="Digite um nome"
+                        onClick={() => {
+                          setOpenModalClientSearch(true)
+                        }}
+                        onKeyUp={(e) => {
+                          if (e.code === 'Enter') {
+                            setOpenModalClientSearch(true)
+                          }
+                        }}
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="sbumit seach client"
+                              edge="end"
+                              onClick={() => {
+                                setOpenModalClientSearch(true)
+                              }}
+                            >
+                              <SearchIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                        required
+                        aria-describedby="outlined-weight-helper-text"
+                        inputProps={{
+                          'aria-label': 'weight',
+                        }}
+                      />
+                    </Stack>
+                  </Box>
+                )}
+              </Paper> */}
+              {/* Veículo */}
+              {/* <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Veículo</TitleCard>
+                  <MoreOptionsServiceScheduleCreate
+                    aria-label="options to vehicle"
+                    buttons={[
+                      {
+                        label: 'Editar',
+                        action: handleOpenModalEditClientVehicle,
+                      },
+                      {
+                        label: 'Pesquisar',
+                        action: handleOpenModalClientVehicleSearch,
+                      },
+                    ]}
+                  />
+                </Stack>
+                <DividerCard />
+                {clientVehicle ? (
+                  <List dense={false}>
+                    <ListItemCard>
+                      <InfoCardName>Marca:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.vehicle?.model?.brand?.name ??
+                          'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard>
+                      <InfoCardName>Modelo:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.vehicle?.model?.name ?? 'Não informado'}{' '}
+                        -{clientVehicle.vehicle.model_year ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard>
+                      <InfoCardName>Veículo:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.vehicle?.name ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard>
+                      <InfoCardName>Cor:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.color ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard>
+                      <InfoCardName>Chassi:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.chasis ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard>
+                      <InfoCardName>Placa:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.plate ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                    <ListItemCard>
+                      <InfoCardName>KM:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {clientVehicle?.mileage ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
+                  </List>
+                ) : (
+                  <Box
+                    sx={{
+                      with: '100%',
+                      height: 100,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      display: 'flex',
+                    }}
+                  >
+                    <Stack
+                      direction="column"
+                      alignItems="center"
+                      justifyContent="center"
+                      gap={1}
+                      sx={{
+                        py: 10,
+                      }}
+                      // onSubmit={handleSubmitClientVehicle(
+                      //   onSubmitClientVehicle,
+                      // )}
+                    >
+                      <Typography variant="h6">Adicione um Veículo</Typography>
+
+                      <OutlinedInput
+                        id="outlined-adornment-weight"
+                        size="small"
+                        placeholder="Digite um nome"
+                        onClick={() => {
+                          setOpenModalClientVehicleSearch(true)
+                        }}
+                        onKeyUp={(e) => {
+                          if (e.code === 'Enter') {
+                            setOpenModalClientVehicleSearch(true)
+                          }
+                        }}
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="search submit"
+                              edge="end"
+                              onClick={() =>
+                                setOpenModalClientVehicleSearch(true)
+                              }
+                            >
+                              <SearchIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                        required
+                        aria-describedby="outlined-weight-helper-text"
+                        inputProps={{
+                          'aria-label': 'weight',
+                        }}
+                      />
+                    </Stack>
+                  </Box>
+                )}
+              </Paper> */}
+            </Stack>
+          </Grid>
+
+          <Grid item xs={12} md={5} lg={5}>
             <Stack spacing={3}>
               {/* cliente */}
               <Paper
@@ -680,13 +1332,8 @@ export default function ServiceSchedulesCreate() {
                   </Box>
                 )}
               </Paper>
-            </Stack>
-          </Grid>
-
-          <Grid item xs={12} md={5} lg={5}>
-            <Stack spacing={3}>
               {/* Agendamento */}
-              <Paper
+              {/* <Paper
                 sx={{
                   p: 2,
                   display: 'flex',
@@ -712,18 +1359,133 @@ export default function ServiceSchedulesCreate() {
                     />
                   </ListItemCard>
                 </List>
+              </Paper> */}
+
+              {/* Reclamações */}
+              {/* <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Reclamações</TitleCard>
+                  <MoreOptionsServiceScheduleCreate
+                    aria-label="options claims service"
+                    buttons={[
+                      {
+                        label: 'Editar',
+                        action: () => {},
+                      },
+                      {
+                        label: 'Pesquisar',
+                        action: () => {},
+                      },
+                    ]}
+                    disabledButton
+                  />
+                </Stack>
+                <DividerCard />
+
+                <ClaimServiceTable
+                  claimServiceList={claimServiceList}
+                  handleSaveClaimService={handleSaveClaimService}
+                  handleRemoveClaimService={handleRemoveClaimService}
+                />
+              </Paper> */}
+
+              {/* ORÇAMENTO TIPO */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Orçamento</TitleCard>
+                  <MoreOptionsServiceScheduleCreate disabledButton />
+                </Stack>
+                <DividerCard />
+                <List dense={false}>
+                  <ListItemCard>
+                    <InfoCardName>Data da emissão:</InfoCardName>
+
+                    <DataTimeInput
+                      dateSchedule={visitDate}
+                      handleDateSchedule={handleDateSchedule}
+                    />
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Responsável:</InfoCardName>{' '}
+                    <Box width="100%">
+                      <TextField
+                        id="standard-select-currency"
+                        select
+                        sx={{
+                          width: '100%',
+                        }}
+                        value={technicalConsultant?.id}
+                        variant="standard"
+                        onChange={(e) =>
+                          handleTechnicalConsultant(parseInt(e.target.value))
+                        }
+                      >
+                        <MenuItem value={technicalConsultant?.id}>
+                          {'Selecione um Consultor'}
+                        </MenuItem>
+                        {technicalConsultantsList.map((option) => (
+                          <MenuItem
+                            key={option.id + option.name}
+                            value={option.id}
+                          >
+                            {option.name}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Box>
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Tipo de orçamento:</InfoCardName>{' '}
+                    <Box width="100%">
+                      <TextField
+                        id="standard-select-currency"
+                        select
+                        sx={{
+                          width: '100%',
+                        }}
+                        value={typeQuotation?.id}
+                        variant="standard"
+                        onChange={(e) =>
+                          handleTypeQuotation(parseInt(e.target.value))
+                        }
+                      >
+                        <MenuItem value={technicalConsultant?.id}>
+                          {'Selecione um tipo'}
+                        </MenuItem>
+                        {/* {technicalConsultantsList.map((option) => (
+                          <MenuItem
+                            key={option.id + option.name}
+                            value={option.id}
+                          >
+                            {option.name}
+                          </MenuItem>
+                        ))} */}
+                      </TextField>
+                    </Box>
+                  </ListItemCard>
+                </List>
               </Paper>
-              {/* <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
-                <Paper
-                  sx={{
-                    p: '0 2',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    background: 'transparent',
-                  }}
-                  elevation={0}
-                ></Paper>
-              </Grid> */}
+              {/* Reclamações */}
               <Paper
                 sx={{
                   p: 2,
@@ -760,63 +1522,6 @@ export default function ServiceSchedulesCreate() {
                   handleRemoveClaimService={handleRemoveClaimService}
                 />
               </Paper>
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <TitleCard>Consultor técnico</TitleCard>
-                  <MoreOptionsServiceScheduleCreate disabledButton />
-                </Stack>
-                <DividerCard />
-                <List dense={false}>
-                  <ListItemCard>
-                    <InfoCardName>Nome:</InfoCardName>{' '}
-                    <Box width="100%">
-                      <TextField
-                        id="standard-select-currency"
-                        select
-                        sx={{
-                          width: '100%',
-                        }}
-                        value={technicalConsultant?.id}
-                        variant="standard"
-                        onChange={(e) =>
-                          handleTechnicalConsultant(parseInt(e.target.value))
-                        }
-                      >
-                        <MenuItem value={technicalConsultant?.id}>
-                          {'Selecione um Consultor'}
-                        </MenuItem>
-                        {technicalConsultantsList.map((option) => (
-                          <MenuItem
-                            key={option.id + option.name}
-                            value={option.id}
-                          >
-                            {option.name}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Box>
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Código consultor:</InfoCardName>{' '}
-                    <InfoCardText>
-                      {technicalConsultant?.id === 0
-                        ? null
-                        : technicalConsultant?.id}
-                    </InfoCardText>
-                  </ListItemCard>
-                </List>
-              </Paper>
-
               <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
                 <Paper
                   sx={{

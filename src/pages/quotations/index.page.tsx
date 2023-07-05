@@ -41,6 +41,7 @@ import { useMediaQuery, useTheme } from '@mui/material'
 import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
 import { QuotationResponseType } from '@/types/quotation'
 import { QuotationsContext } from '@/contexts/QuotationContext'
+import Link from 'next/link'
 
 type SearchFormProps = {
   search: string
@@ -424,18 +425,20 @@ export default function QuotationList() {
           >
             <HeaderBreadcrumb data={HeaderBreadcrumbData} title="Orçamentos" />
             {!isMobile ? (
-              <ButtonAdd
-                size="large"
-                variant="contained"
-                sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
-                startIcon={<AddCircleOutlineIcon />}
-                onClick={async () => {
-                  // await router.push(`/service-schedule/create`)
-                }}
-                // disabled
-              >
-                novo
-              </ButtonAdd>
+              <Link href={'/quotations/create'}>
+                <ButtonAdd
+                  size="large"
+                  variant="contained"
+                  sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
+                  startIcon={<AddCircleOutlineIcon />}
+                  // onClick={async () => {
+                  //   await router.push(`/service-schedule/create`)
+                  // }}
+                  // disabled
+                >
+                  novo
+                </ButtonAdd>
+              </Link>
             ) : (
               <ButtonIcon
                 sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
