@@ -299,7 +299,7 @@ export default function GroupsList() {
       }
     }
 
-    const newUrlPagination = `/groups${
+    const newUrlPagination = `/groups?${
       router.query.search ? "&search=" + router.query.search : ""
     }${"&current_page=" + newCurrent_page}${
       router.query.limit ? "&limit=" + router.query.limit : ""
