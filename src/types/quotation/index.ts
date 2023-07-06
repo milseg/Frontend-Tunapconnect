@@ -146,3 +146,21 @@ export interface QuotationResponseType {
   total_pages: number
   total_results: number
 }
+
+export interface ProductType {
+  id: number
+  company_id: number
+  name: string
+  product_code: string
+  sale_value: string
+  guarantee_value: string
+  tunap_code: any
+  active: boolean
+}
+
+export interface TypeQuotationType {
+  id: number
+  company_id: number
+  name: string
+  code: string
+}

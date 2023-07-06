@@ -15,15 +15,13 @@ import { CompanyContext } from '@/contexts/CompanyContext'
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import { ClientVehicleResponseType } from './type'
-import ClientVehicleTable from './Components/Table'
+import ProductTable from './Components/Table'
+import { ProductType } from '@/types/quotation'
 
-interface ModalSearchClientVehicleProps {
+interface ModalSearchProductProps {
   openMolal: boolean
   handleClose: () => void
-  handleOpenModalNewClientVehicle: () => void
-  handleAddClientVehicle: (data: ClientVehicleResponseType) => void
-  dataVehicleCreated: ClientVehicleResponseType | null
+  handleAddProduct: (data: ProductType) => void
 }
 
 type SearchFormProps = {
@@ -35,22 +33,19 @@ type paginationProps = {
   total: number
 }
 
-export default function ModalSearchClientVehicle({
+export default function ModalSearchProduct({
   openMolal,
   handleClose,
-  handleAddClientVehicle,
-  handleOpenModalNewClientVehicle,
-  dataVehicleCreated,
-}: ModalSearchClientVehicleProps) {
-  const [clientVehicleList, setClientVehicleList] = useState<
-    ClientVehicleResponseType[] | []
-  >([])
-  const [clientVehicleSelected, setClientVehicleSelected] =
-    useState<ClientVehicleResponseType | null>(null)
+  handleAddProduct,
+}: ModalSearchProductProps) {
+  const [productList, setProductList] = useState<ProductType[] | []>([])
+  const [productSelected, setProductSelected] = useState<ProductType | null>(
+    null,
+  )
   const [isLoading, setIsLoading] = useState(false)
   const [pagination, setPagination] = useState<paginationProps | null>(null)
 
-  const { register, handleSubmit, reset, setValue } = useForm({
+  const { register, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
       search: '',
     },
@@ -60,16 +55,21 @@ export default function ModalSearchClientVehicle({
 
   async function onSubmitSearch(data: SearchFormProps) {
     setIsLoading(true)
-    setClientVehicleList([])
+    setProductList([])
 
     try {
+      // const result = await api.get(
+      //   `/products?company_id=${companySelected}&search=${
+      //     data.search
+      //   }&limit=10${pagination ? '&current_page=' + pagination.actual : ''}`,
+      // )
       const result = await api.get(
-        `/client-vehicle?company_id=${companySelected}&search=${
-          data.search
-        }&limit=10${pagination ? '&current_page=' + pagination.actual : ''}`,
+        `/product?company_id=${companySelected}${
+          pagination ? '&current_page=' + pagination.actual : ''
+        }`,
       )
 
-      setClientVehicleList(result.data.data)
+      setProductList(result.data.data)
       if (!pagination) {
         setPagination((prevState) => {
           return {
@@ -85,13 +85,8 @@ export default function ModalSearchClientVehicle({
     }
   }
 
-  function handleClientVehicleModal() {
-    handleOpenModalNewClientVehicle()
-    handleClose()
-  }
-
-  function handleSelectedClientVehicle(client: ClientVehicleResponseType) {
-    setClientVehicleSelected(client)
+  function handleSelectedProduct(prod: ProductType) {
+    setProductSelected(prod)
   }
 
   function handlePaginateNext() {
@@ -125,12 +120,12 @@ export default function ModalSearchClientVehicle({
     })
   }
 
-  function handleDoubleClickClientVehicle() {
-    if (clientVehicleSelected) {
-      handleAddClientVehicle(clientVehicleSelected)
+  function handleDoubleClickProduct() {
+    if (productSelected) {
+      handleAddProduct(productSelected)
       handleClose()
-      setClientVehicleSelected(null)
-      setClientVehicleList([])
+      setProductList([])
+      setProductSelected(null)
       setValue('search', '')
     }
   }
@@ -140,12 +135,8 @@ export default function ModalSearchClientVehicle({
       reset({
         search: '',
       })
-      if (dataVehicleCreated) {
-        setClientVehicleList([dataVehicleCreated])
-      } else {
-        setClientVehicleList([])
-        setClientVehicleSelected(null)
-      }
+
+      setProductList([])
     }
   }, [openMolal])
 
@@ -164,11 +155,11 @@ export default function ModalSearchClientVehicle({
             direction="row"
           >
             {' '}
-            <Typography variant="h6">Buscar por veículo</Typography>
+            <Typography variant="h6">Buscar por peças</Typography>
             {/* {clientList.length > 0 && ( */}
-            <ButtonModalDialog onClick={handleClientVehicleModal}>
+            {/* <ButtonModalDialog onClick={handleProductModal}>
               adicionar novo
-            </ButtonModalDialog>
+            </ButtonModalDialog> */}
             {/* )} */}
           </Stack>
         </DialogTitle>
@@ -203,15 +194,14 @@ export default function ModalSearchClientVehicle({
               </ButtonIcon>
             </Stack>
 
-            <ClientVehicleTable
-              data={clientVehicleList}
-              handleModalNewClient={handleClientVehicleModal}
-              handleSelectedClientVehicle={handleSelectedClientVehicle}
+            <ProductTable
+              data={productList}
+              handleSelectedProduct={handleSelectedProduct}
               isLoading={isLoading}
-              handleDoubleClick={handleDoubleClickClientVehicle}
+              handleDoubleClick={handleDoubleClickProduct}
             />
 
-            {clientVehicleList.length > 0 && (
+            {productList.length > 0 && (
               <Stack
                 direction="row"
                 justifyContent="center"
@@ -240,8 +230,8 @@ export default function ModalSearchClientVehicle({
           <ButtonModalDialog
             onClick={() => {
               handleClose()
-              setClientVehicleList([])
-              setClientVehicleSelected(null)
+              setProductList([])
+              setProductSelected(null)
             }}
           >
             Cancel
@@ -249,11 +239,11 @@ export default function ModalSearchClientVehicle({
           <ButtonModalDialog
             // disabled={clientSelected === null}
             onClick={() => {
-              if (clientVehicleSelected) {
-                handleAddClientVehicle(clientVehicleSelected)
+              if (productSelected) {
+                handleAddProduct(productSelected)
                 handleClose()
-                setClientVehicleSelected(null)
-                setClientVehicleList([])
+                setProductList([])
+                setProductSelected(null)
                 setValue('search', '')
               }
             }}

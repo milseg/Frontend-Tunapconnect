@@ -11,37 +11,37 @@ import { TableCellHeader, TableRowSBody, TableRowSNoData } from './style'
 import { Stack } from '@mui/system'
 import { useState } from 'react'
 import { Box, CircularProgress } from '@mui/material'
-import { ClientVehicleResponseType } from '../../type'
 
-interface ClientVehicleTableProps {
-  handleModalNewClient: () => void
-  handleSelectedClientVehicle: (client: ClientVehicleResponseType) => void
-  data: ClientVehicleResponseType[] | []
+import { ProductType } from '@/types/quotation'
+import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
+
+interface ProductsTableProps {
+  handleSelectedProduct: (product: ProductType) => void
+  data: ProductType[]
   isLoading: boolean
   handleDoubleClick: () => void
 }
 
-export default function ClientVehicleTable({
+export default function ProductTable({
   data,
-  handleModalNewClient,
-  handleSelectedClientVehicle,
+  handleSelectedProduct,
   isLoading,
   handleDoubleClick,
-}: ClientVehicleTableProps) {
-  const [clientSelected, setClientSelected] = useState<number | null>(null)
+}: ProductsTableProps) {
+  const [productSelected, setProductSelected] = useState<number | null>(null)
   return (
     <>
       <TableContainer component={Paper}>
         <Table
           sx={{ minWidth: 350, maxHeight: 350 }}
           size="small"
-          aria-label="table vehicle"
+          aria-label="a dense table"
         >
           <TableHead>
             <TableRow>
-              <TableCellHeader>Veículo</TableCellHeader>
-              <TableCellHeader>CHASSIS:</TableCellHeader>
-              <TableCellHeader>Placa:</TableCellHeader>
+              <TableCellHeader>ID</TableCellHeader>
+              <TableCellHeader>name</TableCellHeader>
+              <TableCellHeader>preço</TableCellHeader>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -56,14 +56,16 @@ export default function ClientVehicleTable({
                     if (e.detail === 2) {
                       handleDoubleClick()
                     }
-                    handleSelectedClientVehicle(row)
-                    setClientSelected(row.id)
+                    handleSelectedProduct(row)
+                    setProductSelected(row.id)
                   }}
-                  selected={clientSelected === row.id}
+                  selected={productSelected === row.id}
                 >
-                  <TableCell>{`${row.vehicle.model.name} - ${row.vehicle.name}`}</TableCell>
-                  <TableCell align="right">{row.chasis}</TableCell>
-                  <TableCell align="right">{row.plate}</TableCell>
+                  <TableCell scope="row">{row.id}</TableCell>
+                  <TableCell scope="row">{row.name}</TableCell>
+                  <TableCell align="right">
+                    {formatMoneyPtBR(Number(row.guarantee_value))}
+                  </TableCell>
                 </TableRowSBody>
               ))
             ) : (
@@ -76,7 +78,7 @@ export default function ClientVehicleTable({
                       </Box>
                     ) : (
                       <>
-                        <p>Nenhuma cliente encontrado</p>
+                        <p>Nenhuma peça encontrada.</p>
                         {/* <ButtonModalNewClient
                           onClick={() => handleModalNewClient()}
                         >
