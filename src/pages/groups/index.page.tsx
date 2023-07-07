@@ -236,7 +236,6 @@ export default function GroupsList() {
     ["groups-list", url],
     () => {
       return apiB.get("/grupos").then((response) => {
-        console.log(response.data.groups);
         const resp = response.data.groups.map((data: GroupsType) => {
           return {
             id: data?.id_group,
@@ -261,7 +260,7 @@ export default function GroupsList() {
           paginate: {
             current_page: response.data.current_page,
             total_pages: response.data.total_pages,
-            total_results: response.data.total_results,
+            total_results: response.data.total_groups,
           },
           GroupsList: resp,
           GroupsListAllData: response.data.groups,
