@@ -3,6 +3,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
 import EditIcon from '@mui/icons-material/Edit'
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'
+import GroupsIcon from '@mui/icons-material/Groups'
 
 export function allRoutes(companySelected: number | null) {
   const routesPaths = [
@@ -72,6 +73,12 @@ export function allRoutesIntranetTunap() {
               href: `/upload?status=eurobike`,
             },
           ],
+        },
+        {
+          path: '/groups',
+          component: <GroupsIcon />,
+          title: 'Grupos',
+          href: `/groups`,
         },
       ],
     },

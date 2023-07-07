@@ -153,28 +153,51 @@ export const ButtonsMenuNav = ({
                         menu?.submenu.map((sub, index) => {
                           return (
                             <React.Fragment key={Math.random() * 20000}>
-                              <ListItemButton
-                                sx={{
-                                  pl: 4,
-                                  marginLeft: '40px',
-                                  width: 'fit-content',
-                                }}
-                                onClick={() => {
-                                  handleOpenSubmenu({
-                                    nivel1: true,
-                                    nivel2: sub.path,
-                                  })
-                                }}
-                                // selected={openSubmenu.nivel2 === sub.path}
-                              >
-                                <ListItemIcon>{menu.component}</ListItemIcon>
-                                <ListItemText primary={sub.title} />
-                                {openSubmenu.nivel2 === sub.path ? (
-                                  <ExpandMore />
-                                ) : (
-                                  <ChevronRight />
-                                )}
-                              </ListItemButton>
+                              {sub.path === '/groups' && sub.href ? (
+                                <Link
+                                  href={sub.href}
+                                  style={{ textDecoration: 'none' }}
+                                >
+                                  <ListItemButton
+                                    selected={routeActual.includes(sub.path)}
+                                    sx={{
+                                      pl: 4,
+                                      marginLeft: '40px',
+                                      width: 'fit-content',
+                                    }}
+                                  >
+                                    <ListItemIcon>{sub.component}</ListItemIcon>
+                                    <ListItemText
+                                      primary={sub.title}
+                                      style={{ color: 'white' }}
+                                    />
+                                  </ListItemButton>
+                                </Link>
+                              ) : (
+                                <ListItemButton
+                                  sx={{
+                                    pl: 4,
+                                    marginLeft: '40px',
+                                    width: 'fit-content',
+                                  }}
+                                  onClick={() => {
+                                    handleOpenSubmenu({
+                                      nivel1: true,
+                                      nivel2: sub.path,
+                                    })
+                                  }}
+                                  // selected={openSubmenu.nivel2 === sub.path}
+                                >
+                                  <ListItemIcon>{menu.component}</ListItemIcon>
+                                  <ListItemText primary={sub.title} />
+                                  {openSubmenu.nivel2 === sub.path ? (
+                                    <ExpandMore />
+                                  ) : (
+                                    <ChevronRight />
+                                  )}
+                                </ListItemButton>
+                              )}
+
                               {sub.submenu && sub?.submenu?.length > 0 && (
                                 <Collapse
                                   in={openSubmenu.nivel2 === sub.path}
