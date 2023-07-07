@@ -22,6 +22,7 @@ import { ButtonAdd, ButtonIcon } from './style'
 import { api, apiB } from '@/lib/api'
 import IconButton from '@mui/material/IconButton'
 import Delete from '@mui/icons-material/Delete'
+import EditIcon from '@mui/icons-material/Edit'
 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { ActionDeleteConfirmations } from '@/helpers/ActionConfirmations'
@@ -34,9 +35,8 @@ import { useQuery } from 'react-query'
 import Skeleton from '@mui/material/Skeleton'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 import ButtonFilterSelect from './components/ButtonFilterSelect'
-import { Stack } from '@mui/system'
 // import FilterListIcon from '@mui/icons-material/FilterList'
-import { useMediaQuery, useTheme } from '@mui/material'
+import { Stack, useMediaQuery, useTheme } from '@mui/material'
 import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
 import { QuotationResponseType } from '@/types/quotation'
 import { QuotationsContext } from '@/contexts/QuotationContext'
@@ -208,14 +208,23 @@ export default function GroupsList() {
             ActionDeleteConfirmations(id as number, handleDelete, '/groups/')
           }
           return (
-            <IconButton
-              aria-label="search"
-              color="warning"
-              onClick={onClick}
-              sx={{ marginLeft: 1, color: 'red' }}
-            >
-              <Delete />
-            </IconButton>
+            <Stack direction="row">
+              <IconButton
+                aria-label="search"
+                color="warning"
+                onClick={onClick}
+                sx={{ marginLeft: 1, color: 'red' }}
+              >
+                <Delete />
+              </IconButton>
+              <IconButton
+                aria-label="search"
+                color="warning"
+                sx={{ marginLeft: 1, color: 'red' }}
+              >
+                <EditIcon />
+              </IconButton>
+            </Stack>
           )
         },
       },
