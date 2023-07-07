@@ -355,7 +355,7 @@ export default function QuotationList() {
       }
     }
 
-    const newUrlPagination = `/service-schedule?company_id=${companySelected}${
+    const newUrlPagination = `/quotations?company_id=${companySelected}${
       router.query.search ? '&search=' + router.query.search : ''
     }${'&current_page=' + newCurrent_page}${
       router.query.limit ? '&limit=' + router.query.limit : ''

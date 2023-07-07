@@ -23,6 +23,7 @@ interface ModalInspectCarProps {
   signaturesData: Signature[] | undefined
   stageData: Signature[] | undefined
   handleSaveSignatures: (data: Signature[]) => void
+  isClosed: boolean
 }
 
 export default function ModalSignatures({
@@ -32,6 +33,7 @@ export default function ModalSignatures({
   signaturesData,
   handleSaveSignatures,
   stageData,
+  isClosed,
 }: ModalInspectCarProps) {
   const signatureRef = useRef<SignaturePad>(null)
   const [isSignature, setIsSignature] = useState<string | null>(null)
@@ -141,7 +143,7 @@ export default function ModalSignatures({
             height: 200,
           }}
         >
-          {!isSignature && (
+          {!isSignature && !isClosed && (
             <SignaturePad
               canvasProps={{ width: 400, height: 200, className: 'sigCanvas' }}
               ref={signatureRef}
@@ -154,7 +156,11 @@ export default function ModalSignatures({
               height={150}
               alt=" "
               style={{ margin: 20 }}
-              onClick={() => setIsSignature(null)}
+              onClick={() => {
+                if (!isClosed) {
+                  setIsSignature(null)
+                }
+              }}
             />
           )}
         </Box>
@@ -167,13 +173,18 @@ export default function ModalSignatures({
               handleSave()
               handleClose()
             }}
+            disabled={isClosed}
           >
             salvar
           </MyButton>
           <MyButton variant="contained" onClick={handleClose}>
             sair
           </MyButton>
-          <MyButton variant="contained" onClick={handleClear}>
+          <MyButton
+            variant="contained"
+            onClick={handleClear}
+            disabled={isClosed}
+          >
             limpar
           </MyButton>
         </Stack>

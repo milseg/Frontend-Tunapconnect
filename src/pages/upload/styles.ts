@@ -63,7 +63,7 @@ export const CustomLabel = styled.label`
   @media screen and (max-width: 780px) {
     width: 100%;
   }
-`;
+`
 
 export const FormUpdate = styled.form`
   width: 100%;
@@ -76,4 +76,4 @@ export const FormUpdate = styled.form`
     row-gap: 2rem;
     align-items: flex-start;
   }
-`;
+`

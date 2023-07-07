@@ -534,7 +534,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
                         color="primary"
                         size="small"
                         variant="contained"
-                        disabled={isClosed}
+                        // disabled={isClosed}
                         onClick={() =>
                           setOpenModalSignature({ id: index, open: true })
                         }
@@ -582,6 +582,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         isOpen={openModalInspectCar}
         closeModalInspectCar={closeModalInspectCar}
         stageData={stageActual}
+        isClosed={isClosed}
         // @ts-ignore
         handleInspectionData={handleInspectionData}
         ref={modalCarRef}
@@ -592,6 +593,7 @@ const TabContent = forwardRef<RefType, TabContentProps>(function TabContent(
         stageName={stageName}
         signaturesData={dataModals?.signatures}
         stageData={stageActual?.signatures}
+        isClosed={isClosed}
         handleSaveSignatures={handleSaveSignatures}
       />
     </>
