@@ -220,7 +220,7 @@ export default function GroupsList() {
               <IconButton
                 aria-label="search"
                 color="warning"
-                sx={{ marginLeft: 1, color: 'red' }}
+                sx={{ marginLeft: 1, color: 'blue' }}
               >
                 <EditIcon />
               </IconButton>
