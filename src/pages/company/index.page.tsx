@@ -36,7 +36,6 @@ export default function CompanyList() {
           return listCompanies
         } else {
           const resp = await api.get('/user/companies')
-          console.log(resp)
           addCompaniesList(resp.data.data)
           return resp.data.data
         }
@@ -118,4 +117,4 @@ export default function CompanyList() {
   )
 }
 
-CompanyList.auth = true
+CompanyList.auth = false

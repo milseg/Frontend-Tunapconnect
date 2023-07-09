@@ -57,7 +57,7 @@ import ModalSearchClient from './components/ModalSearchClient'
 import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle/type'
 import ModalCreateNewClient from './components/ModalCreateNewClient'
 import ModalCreateNewClientVehicle from './components/ModalCreateNewClientVehicle'
-import { MoreOptionsServiceScheduleCreate } from './components/MoreOptionsServiceScheduleCreate'
+import { MoreOptionsQuotation } from './components/MoreOptionsQuotation'
 import ModalEditClient from './components/ModalEditClient'
 import {
   IconButton,
@@ -71,6 +71,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
+
 import ModalCreateEditClientVehicle from './components/ModalEditClientVehicle'
 import ClaimServiceTable from './components/ClaimServiceTable'
 
@@ -79,6 +80,9 @@ import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
 import ModalSearchProduct from './components/ModalSearchProduct'
 import { ProductType, TypeQuotationType } from '@/types/quotation'
+
+import InputTableForEdit from '@/components/InputTableForEdit'
+import { useFieldArray, useForm } from 'react-hook-form'
 // import { useForm } from 'react-hook-form'
 
 type updateData = {
@@ -106,7 +110,7 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
 ]
 
 export default function QuotationsCreate() {
-  const [product, setProduct] = useState<ProductType[] | null>(null)
+  const [products, setProducts] = useState<ProductType[] | []>([])
   const [client, setClient] = useState<ClientResponseType | null>(null)
 
   const [clientForModalSearch, setClientForModalSearch] =
@@ -153,20 +157,46 @@ export default function QuotationsCreate() {
     useState(false)
   const [openModalEditClientVehicle, setOpenModalEditClientVehicle] =
     useState(false)
+
+  const [isEditingProduct, setIsEditingProduct] = useState(false)
+  const [isEditingService, setIsEditingService] = useState(false)
+  const [isEditingKit, setIsEditingKit] = useState(false)
+
   const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
   const { setServiceSchedule } = useContext(ServiceScheduleContext)
 
-  // const {
-  //   register: registerClient,
-  //   handleSubmit: handleSubmitClient,
-  //   reset: resetClient,
-  // } = useForm({
-  //   defaultValues: {
-  //     searchClient: '',
-  //   },
-  // })
+  const {
+    register: registerProduct,
+    handleSubmit: handleSubmitProduct,
+    setValue: setValueProduct,
+    control: controlProduct,
+  } = useForm()
+
+  const {
+    append: appendProduct,
+    remove: removeProduct,
+    update: updateProduct,
+  } = useFieldArray({
+    control: controlProduct,
+    name: 'product',
+  })
+
+  const {
+    register: registerService,
+    handleSubmit: handleSubmitService,
+    control: controlService,
+  } = useForm()
+
+  const {
+    append: appendService,
+    remove: removeService,
+    update: upadateService,
+  } = useFieldArray({
+    control: controlService,
+    name: 'service',
+  })
   // const {
   //   register: registerClientVehicle,
   //   handleSubmit: handleSubmitClientVehicle,
@@ -187,6 +217,24 @@ export default function QuotationsCreate() {
   //   setOpenModalClientVehicleSearch(true)
   //   // resetClientVehicle()
   // }
+
+  function onSubmitProduct(data: any) {
+    console.log(data)
+    setProducts((prevState) => {
+      return prevState.map((p, index) => {
+        if (p.id === data.product[index].id) {
+          return {
+            ...p,
+            quantity: data.product[index].quantity,
+            discount: data.product[index].discount,
+          }
+        } else {
+          return p
+        }
+      })
+    })
+    setIsEditingProduct(false)
+  }
 
   function handleCloseModalSearchProduct() {
     setOpenModalSearchProduct(false)
@@ -275,7 +323,44 @@ export default function QuotationsCreate() {
     })
   }
 
-  function handleCancelled() {}
+  function handleIsEditingOptions(type: string) {
+    switch (type) {
+      case 'service':
+        setIsEditingService(true)
+        break
+      case 'product':
+        setIsEditingProduct(true)
+        break
+      case 'kit':
+        setIsEditingKit(true)
+        break
+      default:
+    }
+  }
+
+  function handleRemoveProduct(id: number) {
+    setProducts((prevState) => {
+      return prevState.filter((p) => p.id !== id)
+    })
+  }
+
+  function handleCalcValueTotalPerItem(
+    price: string,
+    qtd: string,
+    discount: string,
+  ) {
+    const priceFormatted = Number(price)
+    const discountFormatted = Number(
+      discount.replace(/\./g, '').replace(/,/g, '.'),
+    )
+    const qtdFormatted = Number(qtd)
+    const result = (priceFormatted - discountFormatted) * qtdFormatted
+
+    return result
+  }
+  function handleCalcValueTotal(price: string, qtd: string, discount: string) {
+    products.reduce(acc, curr)
+  }
 
   function handleAlert(isOpen: boolean) {
     setActionAlerts({
@@ -284,6 +369,8 @@ export default function QuotationsCreate() {
       type: 'success',
     })
   }
+
+  function handleCancelled() {}
 
   // function handleDateSchedule(data: Dayjs | null) {
   //   setVisitDate(data)
@@ -358,11 +445,20 @@ export default function QuotationsCreate() {
   }
 
   function handleAddProduct(prod: ProductType) {
-    setProduct([prod])
+    setProducts((prevState) => [
+      ...prevState,
+      {
+        ...prod,
+        quantity: '1',
+        discount: '0',
+      },
+    ])
+
     if (openModalSearchProduct) {
       setOpenModalSearchProduct(false)
     }
   }
+
   function handleAddClient(client: ClientResponseType) {
     setClient(client)
     if (openModalEditClient) {
@@ -458,7 +554,7 @@ export default function QuotationsCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Orçamento</TitleCard>
-                  <MoreOptionsServiceScheduleCreate disabledButton />
+                  <MoreOptionsQuotation disabledButton />
                 </Stack>
                 <DividerCard />
                 <List dense={false}>
@@ -544,7 +640,7 @@ export default function QuotationsCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Reclamações</TitleCard>
-                  <MoreOptionsServiceScheduleCreate
+                  <MoreOptionsQuotation
                     aria-label="options claims service"
                     buttons={[
                       {
@@ -593,96 +689,206 @@ export default function QuotationsCreate() {
                   </ButtonAddItens>
                 </Stack>
               </Paper>
-              {/* SERVIÇOS */}
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <TitleCard sx={{ flex: 1 }}>SERVIÇOS</TitleCard>
-                  {/* <Box sx={{ marginRight: 1 }}>
-                    <ButtonAddItens>
-                      <AddIcon />
-                    </ButtonAddItens>
-                  </Box> */}
-
-                  <MoreOptionsServiceScheduleCreate
-                    aria-label="options to quotation"
-                    disabledButton
-                    buttons={[
-                      {
-                        label: 'Editar',
-                        action: () => {},
-                      },
-                    ]}
-                  />
-                </Stack>
-                <DividerCard />
-                <TableContainer>
-                  <Table aria-label="simple table">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Descrição</TableCell>
-                        <TableCell align="center">Quantidade</TableCell>
-                        <TableCell align="center">Desconto</TableCell>
-                        <TableCell align="center">Valor</TableCell>
-                        <TableCell align="center">Ações</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {product && product?.length > 0 ? (
-                        product.map((prod) => {
-                          return (
-                            <TableRow
-                              sx={{
-                                '&:last-child td, &:last-child th': {
-                                  border: 0,
-                                },
-                              }}
-                              key={prod.id}
-                            >
-                              <TableCell align="left">{prod.name}</TableCell>
-                              <TableCell align="center">{1}</TableCell>
-                              <TableCell align="center">
-                                {formatMoneyPtBR(0)}
-                              </TableCell>
-                              <TableCell align="center">
-                                {formatMoneyPtBR(0)}
-                              </TableCell>
-                              <TableCell align="center">
-                                <ButtonRemoveItens>
-                                  <DeleteIcon />
-                                </ButtonRemoveItens>
-                              </TableCell>
-                            </TableRow>
-                          )
-                        })
-                      ) : (
-                        <TableRow
-                          sx={{
-                            '&:last-child td, &:last-child th': {
-                              border: 0,
-                            },
-                          }}
-                          key={Math.random() * 2000000}
-                        >
-                          <TableCell align="center">
-                            Nenhum produto cadastrado
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
               {/* PEÇAS */}
+              <Stack
+                component="form"
+                gap={1}
+                onSubmit={handleSubmitProduct(onSubmitProduct)}
+              >
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <TitleCard sx={{ flex: 1 }}>Peças</TitleCard>
+                    {/* <Box sx={{ marginRight: 1 }}>
+                    <ButtonAddItens>
+                      <AddIcon />
+                    </ButtonAddItens>
+                  </Box> */}
+
+                    <MoreOptionsQuotation
+                      aria-label="options to quotation"
+                      disabledButton={!(products.length > 0)}
+                      buttons={[
+                        {
+                          label: 'Editar',
+                          action: handleIsEditingOptions,
+                          type: 'product',
+                        },
+                      ]}
+                    />
+                  </Stack>
+                  <DividerCard />
+                  <TableContainer>
+                    <Table aria-label="simple table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>COD.</TableCell>
+                          <TableCell>Descrição</TableCell>
+                          <TableCell align="center">Quantidade</TableCell>
+                          <TableCell align="center">Desconto</TableCell>
+                          <TableCell align="center">Valor</TableCell>
+                          <TableCell align="center">Total</TableCell>
+                          {isEditingProduct && (
+                            <TableCell align="center">Ações</TableCell>
+                          )}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {!(products?.length > 0) && (
+                          <TableRow
+                            sx={{
+                              '&:last-child td, &:last-child th': {
+                                border: 0,
+                              },
+                            }}
+                          >
+                            <TableCell
+                              align="center"
+                              colSpan={isEditingProduct ? 7 : 6}
+                              sx={{ paddingTop: 4 }}
+                            >
+                              Nenhuma peça cadastrada.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        {!isEditingProduct &&
+                          products?.length > 0 &&
+                          products.map((prod) => {
+                            return (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                                key={prod.id}
+                              >
+                                <TableCell align="left">{prod.id}</TableCell>
+                                <TableCell align="left">{prod.name}</TableCell>
+                                <TableCell align="center">
+                                  {prod.quantity}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {/* {prod.discount} */}
+                                  {formatMoneyPtBR(prod.discount)}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(Number(prod.sale_value))}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(
+                                    handleCalcValueTotalPerItem(
+                                      prod.sale_value,
+                                      prod.quantity,
+                                      prod.discount,
+                                    ),
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                        {isEditingProduct &&
+                          products?.length > 0 &&
+                          products.map((prod, index) => {
+                            setValueProduct(`product.${index}.id`, prod.id)
+                            setValueProduct(
+                              `product.${index}.quantity`,
+                              prod.quantity,
+                            )
+                            setValueProduct(
+                              `product.${index}.discount`,
+                              prod.discount,
+                            )
+                            return (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                                key={prod.id}
+                              >
+                                <TableCell align="left">
+                                  {prod.product_code}
+                                </TableCell>
+                                <TableCell align="left">{prod.name}</TableCell>
+                                <TableCell align="center">
+                                  <InputTableForEdit.number
+                                    control={controlProduct}
+                                    name={`product.${index}.quantity`}
+                                  />
+                                </TableCell>
+                                <TableCell align="center">
+                                  <InputTableForEdit.money
+                                    control={controlProduct}
+                                    name={`product.${index}.discount`}
+                                  />
+                                  {/* {formatMoneyPtBR(0)} */}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(Number(prod.sale_value))}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(0)}
+                                </TableCell>
+                                <TableCell align="center">
+                                  <ButtonRemoveItens
+                                    onClick={() => handleRemoveProduct(prod.id)}
+                                  >
+                                    <DeleteIcon />
+                                  </ButtonRemoveItens>
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Paper>
+                {isEditingProduct && products.length > 0 && (
+                  <Paper
+                    sx={{
+                      p: '0 2',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      background: 'transparent',
+                    }}
+                    elevation={0}
+                  >
+                    <Stack
+                      direction="row"
+                      alignSelf="flex-end"
+                      spacing={2}
+                      sx={{ width: 160 }}
+                    >
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        type="submit"
+                      >
+                        salvar
+                      </ButtonSubmit>
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        onClick={() => setIsEditingProduct(false)}
+                      >
+                        cancelar
+                      </ButtonSubmit>
+                    </Stack>
+                  </Paper>
+                )}
+              </Stack>
+              {/* Serviços */}
               <Paper
                 sx={{
                   p: 2,
@@ -695,7 +901,7 @@ export default function QuotationsCreate() {
                   alignItems="center"
                   justifyContent="center"
                 >
-                  <TitleCard sx={{ flex: 1 }}>PEÇAS</TitleCard>
+                  <TitleCard sx={{ flex: 1 }}>Serviços</TitleCard>
 
                   {/* <Box sx={{ marginRight: 1 }}>
                     <ButtonAddItens>
@@ -703,13 +909,14 @@ export default function QuotationsCreate() {
                     </ButtonAddItens>
                   </Box> */}
 
-                  <MoreOptionsServiceScheduleCreate
+                  <MoreOptionsQuotation
                     aria-label="options to quotation"
                     disabledButton
                     buttons={[
                       {
                         label: 'Editar',
-                        action: () => {},
+                        action: handleIsEditingOptions,
+                        type: 'service',
                       },
                     ]}
                   />
@@ -796,7 +1003,7 @@ export default function QuotationsCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Cliente</TitleCard>
-                  <MoreOptionsServiceScheduleCreate
+                  <MoreOptionsQuotation
                     aria-label="options to client"
                     buttons={[
                       {
@@ -960,7 +1167,7 @@ export default function QuotationsCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Veículo</TitleCard>
-                  <MoreOptionsServiceScheduleCreate
+                  <MoreOptionsQuotation
                     aria-label="options to vehicle"
                     buttons={[
                       {
@@ -1095,13 +1302,13 @@ export default function QuotationsCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>RESUMO DO ORÇAMENTO</TitleCard>
-                  <MoreOptionsServiceScheduleCreate
+                  <MoreOptionsQuotation
                     aria-label="options to quotation"
                     disabledButton
                     buttons={[
                       {
                         label: 'Editar',
-                        action: () => {},
+                        action: handleIsEditingOptions,
                       },
                     ]}
                   />

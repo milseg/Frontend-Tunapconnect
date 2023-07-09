@@ -8,19 +8,20 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 import { MenuItemButton } from './styles'
 
-export type MoreOptionsServiceScheduleCreateProps = {
+export type MoreOptionsQuotationProps = {
   disabledButton?: boolean
   buttons?: {
     label?: string
+    type?: string
     icon?: ReactNode
     action?: (value?: any) => void
   }[]
 }
 
-export function MoreOptionsServiceScheduleCreate({
+export function MoreOptionsQuotation({
   buttons,
   disabledButton,
-}: MoreOptionsServiceScheduleCreateProps) {
+}: MoreOptionsQuotationProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -80,12 +81,18 @@ export function MoreOptionsServiceScheduleCreate({
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         {buttons &&
-          buttons.map((button) => {
+          buttons.map((button: any) => {
             return (
               <MenuItemButton
                 onClick={() => {
                   setAnchorEl(null)
-                  if (button.action) button?.action()
+                  if (button.action) {
+                    if (button?.type) {
+                      button?.action(button?.type)
+                    } else {
+                      button?.action()
+                    }
+                  }
                 }}
                 key={button.label}
               >

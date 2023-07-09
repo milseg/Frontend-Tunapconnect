@@ -81,7 +81,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   useEffect(() => {
-    if (status === 'unauthenticated') Router.replace('/')
+    if (
+      status === 'unauthenticated' &&
+      !Router.asPath.includes('/checklist-factory-view')
+    )
+      Router.replace('/')
   }, [status])
 
   useEffect(() => {

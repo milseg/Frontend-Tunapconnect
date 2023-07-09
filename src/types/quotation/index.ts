@@ -156,6 +156,8 @@ export interface ProductType {
   guarantee_value: string
   tunap_code: any
   active: boolean
+  discount: string
+  quantity: string
 }
 
 export interface TypeQuotationType {
