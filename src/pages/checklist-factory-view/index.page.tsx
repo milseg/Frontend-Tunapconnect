@@ -38,8 +38,6 @@ interface ChecklistFactoryViewProps {
 export default function ChecklistFactoryView({
   data,
 }: ChecklistFactoryViewProps) {
-  console.log(data)
-
   const [openModalInspectCar, setOpenModalInspectCar] = useState<{
     isOpen: boolean
     stageName: string
@@ -66,6 +64,9 @@ export default function ChecklistFactoryView({
       isOpen: false,
       listImages: [],
     })
+  }
+  if (!data) {
+    return <p>Pagina Não encontrada</p>
   }
 
   const { client, vehicleclient: clientVehicle, serviceschedule, stages } = data
@@ -692,19 +693,24 @@ ChecklistFactoryView.auth = false
 
 export const getServerSideProps: GetServerSideProps<{
   data: CheckListResponseAxios | []
-}> = async () => {
+}> = async ({ query }) => {
+  console.log(query)
   const token =
     'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vdHVuYXBjb25uZWN0LWFwaS5oZXJva3VhcHAuY29tL2FwaS9sb2dpbiIsImlhdCI6MTY4OTAxNjA0NSwiZXhwIjoxNjg5MTAyNDQ1LCJuYmYiOjE2ODkwMTYwNDUsImp0aSI6InFpTTF2T21OclNtaFp3dmwiLCJzdWIiOiIxIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyIsInVzZXJuYW1lIjoibWNvbnRyZXJhcyIsIm5hbWUiOiJNaWd1ZWwgQ29udHJlcmFzIiwiaWQiOjEsImVtYWlsIjoibWlndWVsam9zZWNvbnRyZXJhc0BnbWFpbC5jb20iLCJwZXJtaXNzaW9ucyI6InRlc3RlIiwidHVuYXBfcGVybWlzc2lvbiI6W119.y5OVg6uh2Csjx9qa6Nl0LxkK5-Bo-sTH3L08pwuvCxI'
 
   try {
     const res = await axios.get(
-      `${process.env.APP_API_URL}/checklist/${584}?company_id=5`,
+      `${process.env.APP_API_URL}/checklist/${query.id}?company_id=5`,
       {
         headers: { Authorization: `Bearer ${token}` },
       },
     )
     return { props: { data: res.data.data } }
   } catch (e) {
-    return { props: { data: null } }
+    return {
+      props: {
+        data: null,
+      },
+    }
   }
 }
