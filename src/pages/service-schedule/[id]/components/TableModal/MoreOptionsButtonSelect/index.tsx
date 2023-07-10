@@ -113,14 +113,6 @@ export function MoreOptionsButtonSelect({
         >
           Imprimir
         </MenuItemButton>
-        <MenuItemButton
-          onClick={() => {
-            handlePrintChecklist(Number(checklistId))
-            setOpenPrintInspectionModal(true)
-          }}
-        >
-          Email
-        </MenuItemButton>
         
       </Menu>
       <PrintInspectionModal
