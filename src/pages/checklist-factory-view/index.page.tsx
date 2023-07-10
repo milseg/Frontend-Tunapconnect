@@ -1,15 +1,13 @@
+/* eslint-disable no-unused-vars */
+// @ts-nocheck
 import * as React from 'react'
 
-import { useContext, useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import Container from '@mui/material/Container'
 
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
-import PrintIcon from '@mui/icons-material/Print'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-
-import { ClientResponseType } from '@/types/service-schedule'
 
 import List from '@mui/material/List'
 
@@ -23,32 +21,13 @@ import {
   TitleCard,
 } from './styles'
 
-import MenuItem from '@mui/material/MenuItem'
-
-import TextField from '@mui/material/TextField'
-import Box from '@mui/material/Box'
-import { formatDateTimeTimezone } from '@/ultis/formatDate'
-
-import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
 import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
 
 import { Skeleton, Typography } from '@mui/material'
 
-import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 import { MoreOptionsServiceScheduleCreate } from '../service-schedule/[id]/components/MoreOptionsServiceScheduleCreate'
 
 // import { useForm } from 'react-hook-form'
-
-const HeaderBreadcrumbData: listBreadcrumb[] = [
-  {
-    label: 'Tunap',
-    href: '/company',
-  },
-  {
-    label: 'Edição de agendamento',
-    href: '/service-schedule/edit',
-  },
-]
 
 export default function ChecklistFactoryView() {
   const [client, setClient] = useState(null)
