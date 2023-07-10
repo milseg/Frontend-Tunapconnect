@@ -314,6 +314,7 @@ export default function ChecklistFactoryView({
                     <ListItemCard>
                       <InfoCardName>Marca:</InfoCardName>{' '}
                       <InfoCardText>
+                        {/* @ts-ignore */}
                         {clientVehicle?.vehicle?.model?.brand?.name ??
                           'Não informado'}
                       </InfoCardText>
@@ -321,13 +322,17 @@ export default function ChecklistFactoryView({
                     <ListItemCard>
                       <InfoCardName>Modelo:</InfoCardName>{' '}
                       <InfoCardText>
-                        {clientVehicle?.vehicle?.model?.name ?? 'Não informado'}{' '}
-                        -{clientVehicle.vehicle.model_year ?? 'Não informado'}
+                        {/* @ts-ignore */}
+                        {clientVehicle?.vehicle?.model?.name ??
+                          'Não informado'}{' '}
+                        {/* @ts-ignore */}-
+                        {clientVehicle.vehicle.model_year ?? 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Veículo:</InfoCardName>{' '}
                       <InfoCardText>
+                        {/* @ts-ignore */}
                         {clientVehicle?.vehicle?.name ?? 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
@@ -693,7 +698,7 @@ export const getServerSideProps: GetServerSideProps<{
 
   try {
     const res = await axios.get(
-      `${process.env.APP_API_URL}/checklist/${582}?company_id=5`,
+      `${process.env.APP_API_URL}/checklist/${584}?company_id=5`,
       {
         headers: { Authorization: `Bearer ${token}` },
       },
