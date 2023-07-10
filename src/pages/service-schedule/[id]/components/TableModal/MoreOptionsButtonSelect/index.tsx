@@ -113,9 +113,7 @@ export function MoreOptionsButtonSelect({
         >
           Imprimir
         </MenuItemButton>
-        <MenuItemButton
-          
-        >
+        <MenuItemButton>
           Email
         </MenuItemButton>
       </Menu>
