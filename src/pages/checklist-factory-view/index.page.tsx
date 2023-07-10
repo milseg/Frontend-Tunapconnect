@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-// @ts-nocheck
 import * as React from 'react'
 
 import { useState } from 'react'
@@ -14,6 +12,7 @@ import List from '@mui/material/List'
 import Stack from '@mui/material/Stack'
 
 import {
+  ButtonOpenModalSearch,
   DividerCard,
   InfoCardName,
   InfoCardText,
@@ -21,36 +20,68 @@ import {
   TitleCard,
 } from './styles'
 
-import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
-
 import { Skeleton, Typography } from '@mui/material'
 
 import { MoreOptionsServiceScheduleCreate } from '../service-schedule/[id]/components/MoreOptionsServiceScheduleCreate'
+import { GetServerSideProps } from 'next/types'
+import axios from 'axios'
+import { CheckListResponseAxios } from '@/types/checklist'
+import { formatDateTime } from '@/ultis/formatDate'
+import { Itens } from '../checklist/types'
+import ModalInspectCar from './components/ModalInspectCar'
+import { ModalImages } from './components/ModalImages'
 
-// import { useForm } from 'react-hook-form'
+interface ChecklistFactoryViewProps {
+  data: CheckListResponseAxios
+}
 
-export default function ChecklistFactoryView() {
-  const [client, setClient] = useState(null)
+export default function ChecklistFactoryView({
+  data,
+}: ChecklistFactoryViewProps) {
+  console.log(data)
 
-  const [clientVehicle, setClientVehicle] = useState(null)
+  const [openModalInspectCar, setOpenModalInspectCar] = useState<{
+    isOpen: boolean
+    stageName: string
+  }>({
+    isOpen: false,
+    stageName: '',
+  })
+  const [openModalImages, setOpenModalImages] = useState<{
+    isOpen: boolean
+    listImages: string[]
+  }>({
+    isOpen: false,
+    listImages: [],
+  })
 
-  // const { data: dataServiceSchedule, status: dataServiceScheduleStatus } =
-  //   useQuery({
-  //     queryKey: ['checklist-factory-view', 'by_id', 'view'],
-  //     queryFn: async () => {
-  //       const { id } = router.query
-  //       if (serviceScheduleState.serviceSchedule) {
-  //         return serviceScheduleState.serviceSchedule
-  //       } else {
-  //         const resp = await api.get(`/service-schedule/${id}`)
-  //         setServiceSchedule(resp.data.data)
-  //         return resp.data.data
-  //       }
-  //     },
-  //     // refetchOnMount: true,
-  //     refetchOnWindowFocus: false,
-  //     enabled: !!router.query.id,
-  //   })
+  function handleCloseModalInspectCar() {
+    setOpenModalInspectCar({
+      isOpen: false,
+      stageName: '',
+    })
+  }
+  function handleCloseModalImages() {
+    setOpenModalImages({
+      isOpen: false,
+      listImages: [],
+    })
+  }
+
+  const { client, vehicleclient: clientVehicle, serviceschedule, stages } = data
+
+  function handleGetTextItem(item: Itens) {
+    switch (item.rules.type) {
+      case 'boolean':
+        return item.values.value ? 'SIM' : 'NÃO'
+      case 'select':
+        return item.values.value === '-' ? 'Não informado' : item.values.value
+      case 'visual_inspect':
+        return null
+      default:
+        return 'Não informado'
+    }
+  }
 
   return (
     <>
@@ -62,7 +93,7 @@ export default function ChecklistFactoryView() {
             md={12}
             lg={12}
             sx={{
-              background: '#004D3F',
+              background: '#1C4961',
               marginLeft: 2,
               borderRadius: 1,
               display: 'flex',
@@ -119,7 +150,7 @@ export default function ChecklistFactoryView() {
                   />
                 </Stack>
                 <DividerCard />
-                {client ? (
+                {data.client ? (
                   <List dense={false}>
                     <ListItemCard alignItems="flex-start">
                       <InfoCardName>Nome:</InfoCardName>{' '}
@@ -207,15 +238,15 @@ export default function ChecklistFactoryView() {
                     <ListItemCard>
                       <InfoCardName>Data Prometida:</InfoCardName>{' '}
                       <InfoCardText>
-                        {clientVehicle?.vehicle?.model?.brand?.name ??
+                        {formatDateTime(serviceschedule?.promised_date) ??
                           'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Responsável:</InfoCardName>{' '}
                       <InfoCardText>
-                        {clientVehicle?.vehicle?.model?.name ?? 'Não informado'}{' '}
-                        -{clientVehicle.vehicle.model_year ?? 'Não informado'}
+                        {serviceschedule?.technical_consultant_id ??
+                          'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                   </List>
@@ -397,7 +428,140 @@ export default function ChecklistFactoryView() {
           </Grid>
           <Grid item xs={12} md={12} lg={12}>
             <Grid container spacing={2}>
-              <Grid item xs={12} md={4} lg={4}>
+              {stages.length > 0
+                ? stages.map((stage, index) => {
+                    return (
+                      <React.Fragment
+                        key={`${index} - ${Math.random() * 20000000}`}
+                      >
+                        <Grid
+                          item
+                          xs={12}
+                          md={12}
+                          lg={12}
+                          sx={{
+                            background: '#1C4961',
+                            color: '#FFFFFF',
+                            marginLeft: 2,
+                            marginTop: 2,
+                            borderRadius: 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            // justifyContent: 'center',
+                            paddingBottom: 2,
+                          }}
+                        >
+                          {stage.name}
+                        </Grid>
+                        {stage?.itens.length > 0 &&
+                          stage.itens.map((item, index) => {
+                            return (
+                              <Grid
+                                item
+                                xs={12}
+                                md={4}
+                                lg={4}
+                                key={`${index} - ${Math.random() * 200000}`}
+                              >
+                                <Paper
+                                  sx={{
+                                    p: 2,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                  }}
+                                >
+                                  <Stack
+                                    direction="row"
+                                    alignItems="center"
+                                    justifyContent="space-between"
+                                  >
+                                    <TitleCard>{item.name}</TitleCard>
+                                    <MoreOptionsServiceScheduleCreate
+                                      disabledButton
+                                      aria-label={'Cliente Acompanha inspeção?'}
+                                      buttons={
+                                        [
+                                          // {
+                                          //   label: 'Editar',
+                                          //   action: handleOpenModalEditClient,
+                                          // },
+                                          // {
+                                          //   label: 'Pesquisar',
+                                          //   action: handleOpenModalClientSearch,
+                                          // },
+                                        ]
+                                      }
+                                    />
+                                  </Stack>
+                                  <DividerCard />
+                                  {handleGetTextItem(item) !== null ? (
+                                    <>
+                                      <Typography
+                                        sx={{
+                                          fontWeight: 'bold',
+                                          fontSize: 18,
+                                        }}
+                                      >
+                                        {handleGetTextItem(item)}
+                                      </Typography>
+                                      <Typography
+                                        sx={{
+                                          marginTop: 2,
+                                          textAlign: 'justify',
+                                        }}
+                                      >
+                                        {item.comment}
+                                      </Typography>
+                                      {/* @ts-ignore */}
+                                      {item?.values?.images?.length > 0 && (
+                                        <ButtonOpenModalSearch
+                                          sx={{
+                                            width: 90,
+                                            marginTop: 2,
+                                          }}
+                                          onClick={
+                                            () => {}
+                                            // setOpenModalImages({
+                                            //   isOpen: true,
+                                            //   listImages: item.values.images
+                                            //     ?.map((image) => {
+                                            //       console.log(image.images)
+                                            //       return image.images
+                                            //     })
+                                            //     .map((item) => {
+                                            //       console.log(item)
+                                            //     }),
+                                            // })
+                                          }
+                                        >
+                                          imagens
+                                        </ButtonOpenModalSearch>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <ButtonOpenModalSearch
+                                      sx={{
+                                        width: 100,
+                                      }}
+                                      onClick={() =>
+                                        setOpenModalInspectCar({
+                                          isOpen: true,
+                                          stageName: stage.name,
+                                        })
+                                      }
+                                    >
+                                      visualizar
+                                    </ButtonOpenModalSearch>
+                                  )}
+                                </Paper>
+                              </Grid>
+                            )
+                          })}
+                      </React.Fragment>
+                    )
+                  })
+                : null}
+              {/* <Grid item xs={12} md={4} lg={4}>
                 <Paper
                   sx={{
                     p: 2,
@@ -498,13 +662,44 @@ export default function ChecklistFactoryView() {
                   </Stack>
                   <DividerCard />
                 </Paper>
-              </Grid>
+              </Grid> */}
             </Grid>
           </Grid>
         </Grid>
       </Container>
+      <ModalInspectCar
+        isOpen={openModalInspectCar.isOpen}
+        closeModalInspectCar={handleCloseModalInspectCar}
+        data={stages}
+        stageName={openModalInspectCar.stageName}
+        // @ts-ignore
+      />
+      <ModalImages
+        isOpen={openModalImages.isOpen}
+        closeModalImages={handleCloseModalImages}
+        data={openModalImages.listImages}
+      />
     </>
   )
 }
 
 ChecklistFactoryView.auth = false
+
+export const getServerSideProps: GetServerSideProps<{
+  data: CheckListResponseAxios | []
+}> = async () => {
+  const token =
+    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vdHVuYXBjb25uZWN0LWFwaS5oZXJva3VhcHAuY29tL2FwaS9sb2dpbiIsImlhdCI6MTY4OTAxNjA0NSwiZXhwIjoxNjg5MTAyNDQ1LCJuYmYiOjE2ODkwMTYwNDUsImp0aSI6InFpTTF2T21OclNtaFp3dmwiLCJzdWIiOiIxIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyIsInVzZXJuYW1lIjoibWNvbnRyZXJhcyIsIm5hbWUiOiJNaWd1ZWwgQ29udHJlcmFzIiwiaWQiOjEsImVtYWlsIjoibWlndWVsam9zZWNvbnRyZXJhc0BnbWFpbC5jb20iLCJwZXJtaXNzaW9ucyI6InRlc3RlIiwidHVuYXBfcGVybWlzc2lvbiI6W119.y5OVg6uh2Csjx9qa6Nl0LxkK5-Bo-sTH3L08pwuvCxI'
+
+  try {
+    const res = await axios.get(
+      `${process.env.APP_API_URL}/checklist/${582}?company_id=5`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    )
+    return { props: { data: res.data.data } }
+  } catch (e) {
+    return { props: { data: null } }
+  }
+}

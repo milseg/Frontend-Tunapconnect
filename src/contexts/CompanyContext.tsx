@@ -132,15 +132,13 @@ export function CompanyProvider({ children }: GeralProviderProps) {
           cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string],
         )
         if (!companySelectedCookie.companySelected) {
-          console.log('company context')
           router.push('/company')
         }
         setCompanySelected(parseInt(companySelectedCookie.companySelected))
         verifyCompany(companySelectedCookie.companySelected as string)
       } else {
         getSession().then((sessionData) => {
-          if (sessionData?.user.companies.length) {
-            console.log('company context')
+          if (sessionData?.user?.companies.length) {
             router.push('/company')
           }
         })
