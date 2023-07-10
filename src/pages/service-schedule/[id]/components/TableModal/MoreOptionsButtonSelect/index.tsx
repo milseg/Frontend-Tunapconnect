@@ -113,6 +113,11 @@ export function MoreOptionsButtonSelect({
         >
           Imprimir
         </MenuItemButton>
+        <MenuItemButton
+          
+        >
+          Email
+        </MenuItemButton>
       </Menu>
       <PrintInspectionModal
         isOpen={openPrintInspectionModal}
