@@ -358,9 +358,9 @@ export default function QuotationsCreate() {
 
     return result
   }
-  function handleCalcValueTotal(price: string, qtd: string, discount: string) {
-    products.reduce(acc, curr)
-  }
+  // function handleCalcValueTotal(price: string, qtd: string, discount: string) {
+  //   products.reduce(acc, curr)
+  // }
 
   function handleAlert(isOpen: boolean) {
     setActionAlerts({
