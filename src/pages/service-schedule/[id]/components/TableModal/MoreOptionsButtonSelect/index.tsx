@@ -115,6 +115,8 @@ export function MoreOptionsButtonSelect({
         </MenuItemButton>
         <MenuItemButton
           onClick={() => {
+            handlePrintChecklist(Number(checklistId))
+            setOpenPrintInspectionModal(true)
           }}
         >
           Email
