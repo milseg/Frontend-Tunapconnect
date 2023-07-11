@@ -1,50 +1,36 @@
-import React, { useState } from 'react'
+import React, { ReactNode, useState } from 'react'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
-
 import MoreVertIcon from '@mui/icons-material/MoreVert'
+// import Divider from "@mui/material/Divider";
+// import ListItemIcon from "@mui/material/ListItemIcon";
+// import { Settings } from "@mui/icons-material";
 
-import { MoreOptionsButtonSelectProps } from './types'
 import { MenuItemButton } from './styles'
 
-import { PrintInspectionModal } from '../../PrintInspectionModal'
+export type MoreOptionsQuotationProps = {
+  disabledButton?: boolean
+  buttons?: {
+    label?: string
+    type?: string
+    icon?: ReactNode
+    action?: (value?: any) => void
+  }[]
+}
 
-// const ITEM_HEIGHT = 38
-
-export function MoreOptionsButtonSelect({
+export function MoreOptionsQuotation({
+  buttons,
   disabledButton,
-  checklistId,
-  status,
-  handleDeleteChecklist,
-  handleEditChecklist,
-  handlePrintChecklist,
-}: MoreOptionsButtonSelectProps) {
+}: MoreOptionsQuotationProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation()
     setAnchorEl(event.currentTarget)
   }
-  const [openPrintInspectionModal, setOpenPrintInspectionModal] =
-    useState(false)
-
-  const closePrintInspectionModalModal = () => {
-    setOpenPrintInspectionModal(false)
-  }
-
   const handleClose = () => {
     setAnchorEl(null)
   }
 
-  const handleClickDelete = async () => {
-    try {
-      await handleDeleteChecklist(Number(checklistId))
-
-      alert(`Checklist${checklistId} excluído com sucesso`)
-    } catch (e) {
-      alert(`Erro ao excluir Checklist - ${checklistId}`)
-    }
-  }
   return (
     <div>
       <IconButton
@@ -94,31 +80,36 @@ export function MoreOptionsButtonSelect({
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItemButton
-          onClick={() => handleEditChecklist(Number(checklistId))}
-        >
+        {buttons &&
+          buttons.map((button: any) => {
+            return (
+              <MenuItemButton
+                onClick={() => {
+                  setAnchorEl(null)
+                  if (button.action) {
+                    if (button?.type) {
+                      button?.action(button?.type)
+                    } else {
+                      button?.action()
+                    }
+                  }
+                }}
+                key={button.label}
+              >
+                {/* <ListItemIcon>
+                  <Settings fontSize="small" />
+                </ListItemIcon> */}
+                {button.label}
+              </MenuItemButton>
+            )
+          })}
+        {/* <MenuItemButton onClick={handleButtonEdit}>
+          <ListItemIcon>
+            <Settings fontSize="small" />
+          </ListItemIcon>
           Editar
-        </MenuItemButton>
-        {/* <MenuItemButton onClick={() => {}}>Visualizar</MenuItemButton> */}
-        {status !== 'Finalizado' && (
-          <MenuItemButton onClick={handleClickDelete}>Excluir</MenuItemButton>
-        )}
-        {/* <MenuItemButton onClick={() => {}}>Enviar</MenuItemButton> */}
-        {/* <MenuItemButton onClick={() => {}}>Duplicar</MenuItemButton> */}
-        <MenuItemButton
-          onClick={() => {
-            handlePrintChecklist(Number(checklistId))
-            setOpenPrintInspectionModal(true)
-          }}
-        >
-          Imprimir
-        </MenuItemButton>
-        <MenuItemButton onClick={() => {}}>Email</MenuItemButton>
+        </MenuItemButton> */}
       </Menu>
-      <PrintInspectionModal
-        isOpen={openPrintInspectionModal}
-        handleCloseModal={closePrintInspectionModalModal}
-      />
     </div>
   )
 }

@@ -81,6 +81,7 @@ export interface Client {
   phone: string[]
   email: string[]
   fullName: string
+  cpf: null | boolean
 }
 
 export interface Checklistmodels {
@@ -146,4 +147,26 @@ export interface ChecklistModelType {
   created_at: string
   updated_at: string
   status: any
+}
+
+export interface CheckListResponseAxios {
+  id: number
+  company_id: number
+  brand_id: number
+  vehicle_id: number
+  vehicle_client_id: number
+  client_id: number
+  checklist_model: number
+  km: number
+  fuel: any
+  stages: StagesDataProps[]
+  created_at: string
+  updated_at: string
+  service_schedule_id: number
+  status: string
+  vehicle: Vehicle
+  vehicleclient: Vehicleclient
+  client: Client
+  brand: Brand
+  serviceschedule: Serviceschedule
 }

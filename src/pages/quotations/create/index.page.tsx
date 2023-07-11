@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import * as React from 'react'
 
 import { useContext, useEffect, useState } from 'react'
@@ -7,6 +8,8 @@ import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import SearchIcon from '@mui/icons-material/Search'
+import AddIcon from '@mui/icons-material/Add'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 import {
   ClaimServiceResponseType,
@@ -22,6 +25,8 @@ import List from '@mui/material/List'
 import Stack from '@mui/material/Stack'
 
 import {
+  ButtonAddItens,
+  ButtonRemoveItens,
   ButtonSubmit,
   DividerCard,
   InfoCardName,
@@ -52,19 +57,32 @@ import ModalSearchClient from './components/ModalSearchClient'
 import { ClientVehicleResponseType } from './components/ModalSearchClientVehicle/type'
 import ModalCreateNewClient from './components/ModalCreateNewClient'
 import ModalCreateNewClientVehicle from './components/ModalCreateNewClientVehicle'
-import { MoreOptionsServiceScheduleCreate } from './components/MoreOptionsServiceScheduleCreate'
+import { MoreOptionsQuotation } from './components/MoreOptionsQuotation'
 import ModalEditClient from './components/ModalEditClient'
 import {
   IconButton,
   InputAdornment,
   OutlinedInput,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
 } from '@mui/material'
+
 import ModalCreateEditClientVehicle from './components/ModalEditClientVehicle'
 import ClaimServiceTable from './components/ClaimServiceTable'
 
 import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
+import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
+import ModalSearchProduct from './components/ModalSearchProduct'
+import { ProductType, TypeQuotationType } from '@/types/quotation'
+
+import InputTableForEdit from '@/components/InputTableForEdit'
+import { useFieldArray, useForm } from 'react-hook-form'
 // import { useForm } from 'react-hook-form'
 
 type updateData = {
@@ -91,8 +109,10 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
   },
 ]
 
-export default function ServiceSchedulesCreate() {
+export default function QuotationsCreate() {
+  const [products, setProducts] = useState<ProductType[] | []>([])
   const [client, setClient] = useState<ClientResponseType | null>(null)
+
   const [clientForModalSearch, setClientForModalSearch] =
     useState<ClientResponseType | null>(null)
 
@@ -107,38 +127,76 @@ export default function ServiceSchedulesCreate() {
       id: 0,
       name: '-',
     })
+
+  const [typeQuotation, setTypeQuotation] = useState({
+    id: 0,
+    name: '-',
+  })
   const [technicalConsultantsList, setTechnicalConsultantsList] = useState<
     TechnicalConsultant[]
   >([])
 
   const [actionAlerts, setActionAlerts] =
     useState<ActionAlertsStateProps | null>(null)
+  const [openModalSearchProduct, setOpenModalSearchProduct] = useState(false)
+
   const [openModalClientSearch, setOpenModalClientSearch] = useState(false)
+
   const [openModalClientVehicleSearch, setOpenModalClientVehicleSearch] =
     useState(false)
+
   const [claimServiceList, setClaimServiceList] = useState<
     ClaimServiceResponseType[]
   >([])
+
   const [openModalNewClient, setOpenModalNewClient] = useState(false)
+
   const [openModalEditClient, setOpenModalEditClient] = useState(false)
+
   const [openModalNewClientVehicle, setOpenModalNewClientVehicle] =
     useState(false)
   const [openModalEditClientVehicle, setOpenModalEditClientVehicle] =
     useState(false)
+
+  const [isEditingProduct, setIsEditingProduct] = useState(false)
+  const [isEditingService, setIsEditingService] = useState(false)
+  const [isEditingKit, setIsEditingKit] = useState(false)
+
   const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
   const { setServiceSchedule } = useContext(ServiceScheduleContext)
 
-  // const {
-  //   register: registerClient,
-  //   handleSubmit: handleSubmitClient,
-  //   reset: resetClient,
-  // } = useForm({
-  //   defaultValues: {
-  //     searchClient: '',
-  //   },
-  // })
+  const {
+    register: registerProduct,
+    handleSubmit: handleSubmitProduct,
+    setValue: setValueProduct,
+    control: controlProduct,
+  } = useForm()
+
+  const {
+    append: appendProduct,
+    remove: removeProduct,
+    update: updateProduct,
+  } = useFieldArray({
+    control: controlProduct,
+    name: 'product',
+  })
+
+  const {
+    register: registerService,
+    handleSubmit: handleSubmitService,
+    control: controlService,
+  } = useForm()
+
+  const {
+    append: appendService,
+    remove: removeService,
+    update: upadateService,
+  } = useFieldArray({
+    control: controlService,
+    name: 'service',
+  })
   // const {
   //   register: registerClientVehicle,
   //   handleSubmit: handleSubmitClientVehicle,
@@ -160,6 +218,27 @@ export default function ServiceSchedulesCreate() {
   //   // resetClientVehicle()
   // }
 
+  function onSubmitProduct(data: any) {
+    console.log(data)
+    setProducts((prevState) => {
+      return prevState.map((p, index) => {
+        if (p.id === data.product[index].id) {
+          return {
+            ...p,
+            quantity: data.product[index].quantity,
+            discount: data.product[index].discount,
+          }
+        } else {
+          return p
+        }
+      })
+    })
+    setIsEditingProduct(false)
+  }
+
+  function handleCloseModalSearchProduct() {
+    setOpenModalSearchProduct(false)
+  }
   function handleCloseModalClienteSearch() {
     setOpenModalClientSearch(false)
   }
@@ -237,8 +316,51 @@ export default function ServiceSchedulesCreate() {
       return technicalConsultantsList.filter((c) => c.id === id)[0]
     })
   }
+  function handleTypeQuotation(id: number) {
+    // @ts-ignore
+    setTypeQuotation((prevState) => {
+      return dataTypeQuotationList?.filter((q) => q.id === id)[0]
+    })
+  }
 
-  function handleCancelled() {}
+  function handleIsEditingOptions(type: string) {
+    switch (type) {
+      case 'service':
+        setIsEditingService(true)
+        break
+      case 'product':
+        setIsEditingProduct(true)
+        break
+      case 'kit':
+        setIsEditingKit(true)
+        break
+      default:
+    }
+  }
+
+  function handleRemoveProduct(id: number) {
+    setProducts((prevState) => {
+      return prevState.filter((p) => p.id !== id)
+    })
+  }
+
+  function handleCalcValueTotalPerItem(
+    price: string,
+    qtd: string,
+    discount: string,
+  ) {
+    const priceFormatted = Number(price)
+    const discountFormatted = Number(
+      discount.replace(/\./g, '').replace(/,/g, '.'),
+    )
+    const qtdFormatted = Number(qtd)
+    const result = (priceFormatted - discountFormatted) * qtdFormatted
+
+    return result
+  }
+  // function handleCalcValueTotal(price: string, qtd: string, discount: string) {
+  //   products.reduce(acc, curr)
+  // }
 
   function handleAlert(isOpen: boolean) {
     setActionAlerts({
@@ -248,9 +370,11 @@ export default function ServiceSchedulesCreate() {
     })
   }
 
-  function handleDateSchedule(data: Dayjs | null) {
-    setVisitDate(data)
-  }
+  function handleCancelled() {}
+
+  // function handleDateSchedule(data: Dayjs | null) {
+  //   setVisitDate(data)
+  // }
 
   function handleRemoveClaimService(id: number) {
     setClaimServiceList((prevState) => prevState.filter((c) => c.id !== id))
@@ -299,11 +423,11 @@ export default function ServiceSchedulesCreate() {
     }
 
     try {
-      const respCreate: any = await api.post('/service-schedule', dataFormatted)
+      const respCreate: any = await api.post('/products', dataFormatted)
       const idCreatedResponse = respCreate.data.data
       setServiceSchedule(idCreatedResponse, true)
 
-      router.push('/service-schedule/' + idCreatedResponse.id)
+      // router.push('/service-schedule/' + idCreatedResponse.id)
 
       // setActionAlerts({
       //   isOpen: true,
@@ -317,6 +441,21 @@ export default function ServiceSchedulesCreate() {
         title: `${e.response.data.msg ?? 'Error inesperado'}!`,
         type: 'error',
       })
+    }
+  }
+
+  function handleAddProduct(prod: ProductType) {
+    setProducts((prevState) => [
+      ...prevState,
+      {
+        ...prod,
+        quantity: '1',
+        discount: '0',
+      },
+    ])
+
+    if (openModalSearchProduct) {
+      setOpenModalSearchProduct(false)
     }
   }
 
@@ -357,6 +496,25 @@ export default function ServiceSchedulesCreate() {
       refetchOnMount: false,
     },
   )
+  const { data: dataTypeQuotationList, status: dataTypeQuotationListStatus } =
+    useQuery<TypeQuotationType[]>(
+      [
+        'Quotation-create',
+        'edit',
+        'technical-consultant-list',
+        'options',
+        companySelected,
+      ],
+      async () => {
+        const resp = await api.get(`/os?company_id=${companySelected}`)
+        console.log(resp.data.data)
+        return resp.data.data
+      },
+      {
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+      },
+    )
 
   useEffect(() => {
     if (dataTechnicalConsultantListStatus === 'success') {
@@ -379,7 +537,457 @@ export default function ServiceSchedulesCreate() {
               title="Agenda de Serviços"
             />
           </Grid>
+
           <Grid item xs={12} md={7} lg={7}>
+            <Stack spacing={3}>
+              {/* ORÇAMENTO TIPO */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Orçamento</TitleCard>
+                  <MoreOptionsQuotation disabledButton />
+                </Stack>
+                <DividerCard />
+                <List dense={false}>
+                  {/* <ListItemCard>
+                    <InfoCardName>Data da emissão:</InfoCardName>
+
+                    <DataTimeInput
+                      dateSchedule={visitDate}
+                      handleDateSchedule={handleDateSchedule}
+                    />
+                  </ListItemCard> */}
+                  <ListItemCard>
+                    <InfoCardName>Responsável:</InfoCardName>{' '}
+                    <Box width="100%">
+                      <TextField
+                        id="standard-select-currency"
+                        select
+                        sx={{
+                          width: '100%',
+                        }}
+                        value={technicalConsultant?.id}
+                        variant="standard"
+                        onChange={(e) =>
+                          handleTechnicalConsultant(parseInt(e.target.value))
+                        }
+                      >
+                        <MenuItem value={technicalConsultant?.id}>
+                          {'Selecione um Consultor'}
+                        </MenuItem>
+                        {technicalConsultantsList.map((option) => (
+                          <MenuItem
+                            key={option.id + option.name}
+                            value={option.id}
+                          >
+                            {option.name}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Box>
+                  </ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Tipo de orçamento:</InfoCardName>{' '}
+                    <Box width="100%">
+                      <TextField
+                        id="standard-select-currency"
+                        select
+                        sx={{
+                          width: '100%',
+                        }}
+                        value={typeQuotation?.id}
+                        variant="standard"
+                        onChange={(e) =>
+                          handleTypeQuotation(parseInt(e.target.value))
+                        }
+                      >
+                        <MenuItem value={0}>{'Selecione um tipo'}</MenuItem>
+                        {dataTypeQuotationList &&
+                          dataTypeQuotationList.map((option) => (
+                            <MenuItem
+                              key={option.id + option.name}
+                              value={option.id}
+                            >
+                              {option.name}
+                            </MenuItem>
+                          ))}
+                      </TextField>
+                    </Box>
+                  </ListItemCard>
+                </List>
+              </Paper>
+
+              {/* Reclamações */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <TitleCard>Reclamações</TitleCard>
+                  <MoreOptionsQuotation
+                    aria-label="options claims service"
+                    buttons={[
+                      {
+                        label: 'Editar',
+                        action: () => {},
+                      },
+                      {
+                        label: 'Pesquisar',
+                        action: () => {},
+                      },
+                    ]}
+                    disabledButton
+                  />
+                </Stack>
+                <DividerCard />
+
+                <ClaimServiceTable
+                  claimServiceList={claimServiceList}
+                  handleSaveClaimService={handleSaveClaimService}
+                  handleRemoveClaimService={handleRemoveClaimService}
+                />
+              </Paper>
+              {/* BOTÕES ADICIONADOS  */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center"
+                  gap={2}
+                >
+                  <ButtonAddItens endIcon={<AddIcon />}>Kit</ButtonAddItens>
+                  <ButtonAddItens endIcon={<AddIcon />}>
+                    Serviços
+                  </ButtonAddItens>
+                  <ButtonAddItens
+                    endIcon={<AddIcon />}
+                    onClick={() => setOpenModalSearchProduct(true)}
+                  >
+                    Peças
+                  </ButtonAddItens>
+                </Stack>
+              </Paper>
+              {/* PEÇAS */}
+              <Stack
+                component="form"
+                gap={1}
+                onSubmit={handleSubmitProduct(onSubmitProduct)}
+              >
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <TitleCard sx={{ flex: 1 }}>Peças</TitleCard>
+                    {/* <Box sx={{ marginRight: 1 }}>
+                    <ButtonAddItens>
+                      <AddIcon />
+                    </ButtonAddItens>
+                  </Box> */}
+
+                    <MoreOptionsQuotation
+                      aria-label="options to quotation"
+                      disabledButton={!(products.length > 0)}
+                      buttons={[
+                        {
+                          label: 'Editar',
+                          action: handleIsEditingOptions,
+                          type: 'product',
+                        },
+                      ]}
+                    />
+                  </Stack>
+                  <DividerCard />
+                  <TableContainer>
+                    <Table aria-label="simple table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>COD.</TableCell>
+                          <TableCell>Descrição</TableCell>
+                          <TableCell align="center">Quantidade</TableCell>
+                          <TableCell align="center">Desconto</TableCell>
+                          <TableCell align="center">Valor</TableCell>
+                          <TableCell align="center">Total</TableCell>
+                          {isEditingProduct && (
+                            <TableCell align="center">Ações</TableCell>
+                          )}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {!(products?.length > 0) && (
+                          <TableRow
+                            sx={{
+                              '&:last-child td, &:last-child th': {
+                                border: 0,
+                              },
+                            }}
+                          >
+                            <TableCell
+                              align="center"
+                              colSpan={isEditingProduct ? 7 : 6}
+                              sx={{ paddingTop: 4 }}
+                            >
+                              Nenhuma peça cadastrada.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        {!isEditingProduct &&
+                          products?.length > 0 &&
+                          products.map((prod) => {
+                            return (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                                key={prod.id}
+                              >
+                                <TableCell align="left">{prod.id}</TableCell>
+                                <TableCell align="left">{prod.name}</TableCell>
+                                <TableCell align="center">
+                                  {prod.quantity}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {/* {prod.discount} */}
+                                  {formatMoneyPtBR(prod.discount)}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(Number(prod.sale_value))}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(
+                                    handleCalcValueTotalPerItem(
+                                      prod.sale_value,
+                                      prod.quantity,
+                                      prod.discount,
+                                    ),
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                        {isEditingProduct &&
+                          products?.length > 0 &&
+                          products.map((prod, index) => {
+                            setValueProduct(`product.${index}.id`, prod.id)
+                            setValueProduct(
+                              `product.${index}.quantity`,
+                              prod.quantity,
+                            )
+                            setValueProduct(
+                              `product.${index}.discount`,
+                              prod.discount,
+                            )
+                            return (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                                key={prod.id}
+                              >
+                                <TableCell align="left">
+                                  {prod.product_code}
+                                </TableCell>
+                                <TableCell align="left">{prod.name}</TableCell>
+                                <TableCell align="center">
+                                  <InputTableForEdit.number
+                                    control={controlProduct}
+                                    name={`product.${index}.quantity`}
+                                  />
+                                </TableCell>
+                                <TableCell align="center">
+                                  <InputTableForEdit.money
+                                    control={controlProduct}
+                                    name={`product.${index}.discount`}
+                                  />
+                                  {/* {formatMoneyPtBR(0)} */}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(Number(prod.sale_value))}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(0)}
+                                </TableCell>
+                                <TableCell align="center">
+                                  <ButtonRemoveItens
+                                    onClick={() => handleRemoveProduct(prod.id)}
+                                  >
+                                    <DeleteIcon />
+                                  </ButtonRemoveItens>
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Paper>
+                {isEditingProduct && products.length > 0 && (
+                  <Paper
+                    sx={{
+                      p: '0 2',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      background: 'transparent',
+                    }}
+                    elevation={0}
+                  >
+                    <Stack
+                      direction="row"
+                      alignSelf="flex-end"
+                      spacing={2}
+                      sx={{ width: 160 }}
+                    >
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        type="submit"
+                      >
+                        salvar
+                      </ButtonSubmit>
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        onClick={() => setIsEditingProduct(false)}
+                      >
+                        cancelar
+                      </ButtonSubmit>
+                    </Stack>
+                  </Paper>
+                )}
+              </Stack>
+              {/* Serviços */}
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <TitleCard sx={{ flex: 1 }}>Serviços</TitleCard>
+
+                  {/* <Box sx={{ marginRight: 1 }}>
+                    <ButtonAddItens>
+                      <AddIcon />
+                    </ButtonAddItens>
+                  </Box> */}
+
+                  <MoreOptionsQuotation
+                    aria-label="options to quotation"
+                    disabledButton
+                    buttons={[
+                      {
+                        label: 'Editar',
+                        action: handleIsEditingOptions,
+                        type: 'service',
+                      },
+                    ]}
+                  />
+                </Stack>
+                <DividerCard />
+                <TableContainer>
+                  <Table aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Descrição</TableCell>
+                        <TableCell align="center">Quantidade</TableCell>
+                        <TableCell align="center">Desconto</TableCell>
+                        <TableCell align="center">Valor</TableCell>
+                        <TableCell align="center">Total</TableCell>
+                        <TableCell align="center">Ações</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Peça 1</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          <ButtonRemoveItens>
+                            <DeleteIcon />
+                          </ButtonRemoveItens>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Peça 2</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                        <TableCell align="center">
+                          <ButtonRemoveItens>
+                            <DeleteIcon />
+                          </ButtonRemoveItens>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+            </Stack>
+          </Grid>
+
+          <Grid item xs={12} md={5} lg={5}>
             <Stack spacing={3}>
               {/* cliente */}
               <Paper
@@ -395,7 +1003,7 @@ export default function ServiceSchedulesCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Cliente</TitleCard>
-                  <MoreOptionsServiceScheduleCreate
+                  <MoreOptionsQuotation
                     aria-label="options to client"
                     buttons={[
                       {
@@ -559,7 +1167,7 @@ export default function ServiceSchedulesCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Veículo</TitleCard>
-                  <MoreOptionsServiceScheduleCreate
+                  <MoreOptionsQuotation
                     aria-label="options to vehicle"
                     buttons={[
                       {
@@ -680,12 +1288,7 @@ export default function ServiceSchedulesCreate() {
                   </Box>
                 )}
               </Paper>
-            </Stack>
-          </Grid>
-
-          <Grid item xs={12} md={5} lg={5}>
-            <Stack spacing={3}>
-              {/* Agendamento */}
+              {/* RESUMO DO ORÇAMENTO */}
               <Paper
                 sx={{
                   p: 2,
@@ -698,125 +1301,82 @@ export default function ServiceSchedulesCreate() {
                   alignItems="center"
                   justifyContent="space-between"
                 >
-                  <TitleCard>AGENDAMENTO</TitleCard>
-                  <MoreOptionsServiceScheduleCreate disabledButton />
-                </Stack>
-                <DividerCard />
-                <List dense={false}>
-                  <ListItemCard>
-                    <InfoCardName>Data da visita:</InfoCardName>
-
-                    <DataTimeInput
-                      dateSchedule={visitDate}
-                      handleDateSchedule={handleDateSchedule}
-                    />
-                  </ListItemCard>
-                </List>
-              </Paper>
-              {/* <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
-                <Paper
-                  sx={{
-                    p: '0 2',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    background: 'transparent',
-                  }}
-                  elevation={0}
-                ></Paper>
-              </Grid> */}
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <TitleCard>Reclamações</TitleCard>
-                  <MoreOptionsServiceScheduleCreate
-                    aria-label="options claims service"
+                  <TitleCard>RESUMO DO ORÇAMENTO</TitleCard>
+                  <MoreOptionsQuotation
+                    aria-label="options to quotation"
+                    disabledButton
                     buttons={[
                       {
                         label: 'Editar',
-                        action: () => {},
-                      },
-                      {
-                        label: 'Pesquisar',
-                        action: () => {},
+                        action: handleIsEditingOptions,
                       },
                     ]}
-                    disabledButton
                   />
                 </Stack>
                 <DividerCard />
-
-                <ClaimServiceTable
-                  claimServiceList={claimServiceList}
-                  handleSaveClaimService={handleSaveClaimService}
-                  handleRemoveClaimService={handleRemoveClaimService}
-                />
-              </Paper>
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <TitleCard>Consultor técnico</TitleCard>
-                  <MoreOptionsServiceScheduleCreate disabledButton />
-                </Stack>
-                <DividerCard />
-                <List dense={false}>
-                  <ListItemCard>
-                    <InfoCardName>Nome:</InfoCardName>{' '}
-                    <Box width="100%">
-                      <TextField
-                        id="standard-select-currency"
-                        select
+                <TableContainer>
+                  <Table aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Descrição</TableCell>
+                        <TableCell align="center">Preço</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow
                         sx={{
-                          width: '100%',
+                          '&:last-child td, &:last-child th': { border: 0 },
                         }}
-                        value={technicalConsultant?.id}
-                        variant="standard"
-                        onChange={(e) =>
-                          handleTechnicalConsultant(parseInt(e.target.value))
-                        }
                       >
-                        <MenuItem value={technicalConsultant?.id}>
-                          {'Selecione um Consultor'}
-                        </MenuItem>
-                        {technicalConsultantsList.map((option) => (
-                          <MenuItem
-                            key={option.id + option.name}
-                            value={option.id}
-                          >
-                            {option.name}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Box>
-                  </ListItemCard>
-                  <ListItemCard>
-                    <InfoCardName>Código consultor:</InfoCardName>{' '}
-                    <InfoCardText>
-                      {technicalConsultant?.id === 0
-                        ? null
-                        : technicalConsultant?.id}
-                    </InfoCardText>
-                  </ListItemCard>
-                </List>
+                        <TableCell align="left">Valor dos itens:</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Descontos nos itens:</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Valor dos Serviços:</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Total de descontos:</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">Total de líquido:</TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(0)}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </Paper>
-
               <Grid item xs={12} md={12} lg={12} alignSelf="flex-end">
                 <Paper
                   sx={{
@@ -857,6 +1417,12 @@ export default function ServiceSchedulesCreate() {
           )}
         </Grid>
       </Container>
+
+      <ModalSearchProduct
+        handleClose={handleCloseModalSearchProduct}
+        openMolal={openModalSearchProduct}
+        handleAddProduct={handleAddProduct}
+      />
 
       <ModalSearchClient
         handleClose={handleCloseModalClienteSearch}
@@ -905,4 +1471,4 @@ export default function ServiceSchedulesCreate() {
   )
 }
 
-ServiceSchedulesCreate.auth = true
+QuotationsCreate.auth = true
