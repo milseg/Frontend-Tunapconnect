@@ -217,6 +217,18 @@ export const ButtonRight = styled(Button)(({ theme }) => ({
     background: '#1ACABA',
   },
 }))
+export const ButtonCancel = styled(Button)(({ theme }) => ({
+  color: 'white',
+  background: '#93BE0F',
+  borderRadius: 6,
+
+  // padding: '5px 16px',
+  flex: 1,
+  textTransform: 'none',
+  '&:hover': {
+    background: '#1ACABA',
+  },
+}))
 
 export const ContainerInformation = styled(Stack)`
   border: 1px solid #acaaaa;

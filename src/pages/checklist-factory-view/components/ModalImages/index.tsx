@@ -52,6 +52,11 @@ export function ModalImages({
                   '_blank',
                 )
               }
+              sx={{
+                '&:hover': {
+                  cursor: 'pointer',
+                },
+              }}
             >
               <img
                 src={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${item}?w=164&h=164&fit=crop&auto=format`}

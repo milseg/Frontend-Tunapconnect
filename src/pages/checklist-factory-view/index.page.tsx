@@ -20,7 +20,7 @@ import {
   TitleCard,
 } from './styles'
 
-import { Skeleton, Typography } from '@mui/material'
+import { Box, IconButton, Skeleton, Typography } from '@mui/material'
 
 import { MoreOptionsServiceScheduleCreate } from '../service-schedule/[id]/components/MoreOptionsServiceScheduleCreate'
 import { GetServerSideProps } from 'next/types'
@@ -30,6 +30,7 @@ import { formatDateTime } from '@/ultis/formatDate'
 import { Itens } from '../checklist/types'
 import ModalInspectCar from './components/ModalInspectCar'
 import { ModalImages } from './components/ModalImages'
+import ImageIcon from '@mui/icons-material/Image'
 
 interface ChecklistFactoryViewProps {
   data: CheckListResponseAxios
@@ -52,6 +53,10 @@ export default function ChecklistFactoryView({
     isOpen: false,
     listImages: [],
   })
+
+  console.log(data)
+
+  // return <h1>ok</h1>
 
   function handleCloseModalInspectCar() {
     setOpenModalInspectCar({
@@ -504,45 +509,68 @@ export default function ChecklistFactoryView({
                                   <DividerCard />
                                   {handleGetTextItem(item) !== null ? (
                                     <>
-                                      <Typography
-                                        sx={{
-                                          fontWeight: 'bold',
-                                          fontSize: 18,
-                                        }}
+                                      <Stack
+                                        direction="row"
+                                        alignItems="center"
+                                        justifyContent="space-between"
                                       >
-                                        {handleGetTextItem(item)}
-                                      </Typography>
-                                      <Typography
-                                        sx={{
-                                          marginTop: 2,
-                                          textAlign: 'justify',
-                                        }}
-                                      >
-                                        {item.comment}
-                                      </Typography>
-                                      {/* @ts-ignore */}
-                                      {item?.values?.images?.length > 0 && (
-                                        <ButtonOpenModalSearch
+                                        <Typography
                                           sx={{
-                                            width: 90,
-                                            marginTop: 2,
-                                          }}
-                                          onClick={() => {
-                                            setOpenModalImages({
-                                              isOpen: true,
-                                              // @ts-ignore
-                                              listImages: item.values.images
-                                                ?.map((image) => {
-                                                  console.log(image.images)
-                                                  return image.images
-                                                })[0]
-                                                // @ts-ignore
-                                                .map((i) => i.url),
-                                            })
+                                            fontWeight: 'bold',
+                                            fontSize: 18,
                                           }}
                                         >
-                                          imagens
-                                        </ButtonOpenModalSearch>
+                                          {handleGetTextItem(item)}
+                                        </Typography>
+                                        {/* @ts-ignore */}
+                                        {item?.values?.images?.length > 0 && (
+                                          <IconButton
+                                            aria-label="images"
+                                            size="large"
+                                            onClick={() => {
+                                              setOpenModalImages({
+                                                isOpen: true,
+                                                // @ts-ignore
+                                                listImages: item.values.images
+                                                  ?.map((image) => {
+                                                    console.log(image.images)
+                                                    return image.images
+                                                  })[0]
+                                                  // @ts-ignore
+                                                  .map((i) => i.url),
+                                              })
+                                            }}
+                                          >
+                                            <ImageIcon />
+                                          </IconButton>
+                                        )}
+                                      </Stack>
+                                      {item.comment && (
+                                        <>
+                                          <Typography
+                                            sx={{
+                                              textAlign: 'justify',
+                                              marginTop: 1,
+                                            }}
+                                          >
+                                            Observação:
+                                          </Typography>
+                                          <Box
+                                            sx={{
+                                              border: '1px solid',
+                                              borderRadius: '4px',
+                                              padding: 1,
+                                            }}
+                                          >
+                                            <Typography
+                                              sx={{
+                                                textAlign: 'justify',
+                                              }}
+                                            >
+                                              {item.comment}
+                                            </Typography>
+                                          </Box>
+                                        </>
                                       )}
                                     </>
                                   ) : (
@@ -704,6 +732,13 @@ export const getServerSideProps: GetServerSideProps<{
     }
 
     try {
+      // const res = await axios.get(
+      //   `${process.env.APP_API_URL}/checklists/59a780af-a647-4391-9478-297458835da4?document=5573652877`,
+      //   {
+      //     headers: { Authorization: `Bearer ${token}` },
+      //   },
+      // )
+      // console.log(res.data.data)
       const res = await axios.get(
         `${process.env.APP_API_URL}/checklist/${query.id}?company_id=5`,
         {
