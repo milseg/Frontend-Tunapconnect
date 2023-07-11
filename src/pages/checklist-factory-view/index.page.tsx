@@ -76,7 +76,9 @@ export default function ChecklistFactoryView({
       case 'boolean':
         return item.values.value ? 'SIM' : 'NÃO'
       case 'select':
-        return item.values.value === '-' ? 'Não informado' : item.values.value
+        return item.values.value === '-' || item.values.value === null
+          ? 'Não informado'
+          : item.values.value
       case 'visual_inspect':
         return null
       default:
@@ -525,20 +527,19 @@ export default function ChecklistFactoryView({
                                             width: 90,
                                             marginTop: 2,
                                           }}
-                                          onClick={
-                                            () => {}
-                                            // setOpenModalImages({
-                                            //   isOpen: true,
-                                            //   listImages: item.values.images
-                                            //     ?.map((image) => {
-                                            //       console.log(image.images)
-                                            //       return image.images
-                                            //     })
-                                            //     .map((item) => {
-                                            //       console.log(item)
-                                            //     }),
-                                            // })
-                                          }
+                                          onClick={() => {
+                                            setOpenModalImages({
+                                              isOpen: true,
+                                              // @ts-ignore
+                                              listImages: item.values.images
+                                                ?.map((image) => {
+                                                  console.log(image.images)
+                                                  return image.images
+                                                })[0]
+                                                // @ts-ignore
+                                                .map((i) => i.url),
+                                            })
+                                          }}
                                         >
                                           imagens
                                         </ButtonOpenModalSearch>
@@ -695,22 +696,32 @@ export const getServerSideProps: GetServerSideProps<{
   data: CheckListResponseAxios | []
 }> = async ({ query }) => {
   console.log(query)
-  const token =
-    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vdHVuYXBjb25uZWN0LWFwaS5oZXJva3VhcHAuY29tL2FwaS9sb2dpbiIsImlhdCI6MTY4OTAxNjA0NSwiZXhwIjoxNjg5MTAyNDQ1LCJuYmYiOjE2ODkwMTYwNDUsImp0aSI6InFpTTF2T21OclNtaFp3dmwiLCJzdWIiOiIxIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyIsInVzZXJuYW1lIjoibWNvbnRyZXJhcyIsIm5hbWUiOiJNaWd1ZWwgQ29udHJlcmFzIiwiaWQiOjEsImVtYWlsIjoibWlndWVsam9zZWNvbnRyZXJhc0BnbWFpbC5jb20iLCJwZXJtaXNzaW9ucyI6InRlc3RlIiwidHVuYXBfcGVybWlzc2lvbiI6W119.y5OVg6uh2Csjx9qa6Nl0LxkK5-Bo-sTH3L08pwuvCxI'
-
-  try {
-    const res = await axios.get(
-      `${process.env.APP_API_URL}/checklist/${query.id}?company_id=5`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      },
-    )
-    return { props: { data: res.data.data } }
-  } catch (e) {
-    return {
-      props: {
-        data: null,
-      },
+  if (query.id) {
+    let token =
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vdHVuYXBjb25uZWN0LWFwaS5oZXJva3VhcHAuY29tL2FwaS9sb2dpbiIsImlhdCI6MTY4OTAxNjA0NSwiZXhwIjoxNjg5MTAyNDQ1LCJuYmYiOjE2ODkwMTYwNDUsImp0aSI6InFpTTF2T21OclNtaFp3dmwiLCJzdWIiOiIxIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyIsInVzZXJuYW1lIjoibWNvbnRyZXJhcyIsIm5hbWUiOiJNaWd1ZWwgQ29udHJlcmFzIiwiaWQiOjEsImVtYWlsIjoibWlndWVsam9zZWNvbnRyZXJhc0BnbWFpbC5jb20iLCJwZXJtaXNzaW9ucyI6InRlc3RlIiwidHVuYXBfcGVybWlzc2lvbiI6W119.y5OVg6uh2Csjx9qa6Nl0LxkK5-Bo-sTH3L08pwuvCxI'
+    if (query.token) {
+      token = query.token as string
     }
+
+    try {
+      const res = await axios.get(
+        `${process.env.APP_API_URL}/checklist/${query.id}?company_id=5`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
+      return { props: { data: res.data.data } }
+    } catch (e) {
+      return {
+        props: {
+          data: null,
+        },
+      }
+    }
+  }
+  return {
+    props: {
+      data: null,
+    },
   }
 }
