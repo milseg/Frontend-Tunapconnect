@@ -118,4 +118,4 @@ export default function CompanyList() {
   )
 }
 
-CompanyList.auth = false
+CompanyList.auth = true
