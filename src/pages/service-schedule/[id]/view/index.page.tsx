@@ -58,7 +58,7 @@ export default function ChecklistFactoryView() {
 
   const [dataChecklist, setDataChecklist] = useState(null)
 
-  // return <h1>ok</h1>
+  return <h1>ok</h1>
 
   function handleCloseModalInspectCar() {
     setOpenModalInspectCar({
