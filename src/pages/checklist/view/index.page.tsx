@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-// @ts-nocheck
 import * as React from 'react'
 
 import { useState } from 'react'
@@ -25,22 +23,26 @@ import {
 
 import { Box, Skeleton, Typography } from '@mui/material'
 
-import { MoreOptionsServiceScheduleCreate } from '../../../service-schedule/[id]/components/MoreOptionsServiceScheduleCreate'
-// import { GetServerSideProps } from 'next/types'
-// import axios from 'axios'
+import { MoreOptionsServiceScheduleCreate } from '../../service-schedule/[id]/components/MoreOptionsServiceScheduleCreate'
+import { GetServerSideProps } from 'next/types'
+import axios from 'axios'
 import { CheckListResponseAxios } from '@/types/checklist'
 import { formatDateTime } from '@/ultis/formatDate'
-import { Itens } from '../../../checklist/types'
+import { Itens } from '../types'
 import ModalInspectCar from './components/ModalInspectCar'
 import { ModalImages } from './components/ModalImages'
 // import ImageIcon from '@mui/icons-material/Image'
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined'
+import { authOptions } from '@/pages/api/auth/[...nextauth].api'
+import { getServerSession } from 'next-auth/next'
 
 interface ChecklistFactoryViewProps {
   data: CheckListResponseAxios
 }
 
-export default function ChecklistFactoryView() {
+export default function ChecklistView({
+  data: dataChecklist,
+}: ChecklistFactoryViewProps) {
   const [openModalInspectCar, setOpenModalInspectCar] = useState<{
     isOpen: boolean
     stageName: string
@@ -55,8 +57,6 @@ export default function ChecklistFactoryView() {
     isOpen: false,
     listImages: [],
   })
-
-  const [dataChecklist, setDataChecklist] = useState(null)
 
   function handleCloseModalInspectCar() {
     setOpenModalInspectCar({
@@ -88,9 +88,7 @@ export default function ChecklistFactoryView() {
 
   return (
     <>
-      {!dataChecklist ? (
-        <h1>Em contrução</h1>
-      ) : (
+      {dataChecklist && (
         <>
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={2}>
@@ -115,7 +113,8 @@ export default function ChecklistFactoryView() {
                   }}
                   variant="h6"
                 >
-                  Agenda
+                  Agenda - {dataChecklist.service_schedule_id} / Checklist -{' '}
+                  {dataChecklist.id}
                 </Typography>
 
                 {/* <HeaderBreadcrumb
@@ -263,6 +262,7 @@ export default function ChecklistFactoryView() {
                         <ListItemCard>
                           <InfoCardName>Responsável:</InfoCardName>{' '}
                           <InfoCardText>
+                            {/* @ts-ignore */}
                             {dataChecklist?.technicalconsultant?.name ??
                               'Não informado'}
                           </InfoCardText>
@@ -562,9 +562,6 @@ export default function ChecklistFactoryView() {
                                                       item.values.images
                                                         // @ts-ignore
                                                         ?.map((image) => {
-                                                          console.log(
-                                                            image.images,
-                                                          )
                                                           return image.images
                                                         })[0]
                                                         // @ts-ignore
@@ -652,45 +649,53 @@ export default function ChecklistFactoryView() {
   )
 }
 
-ChecklistFactoryView.auth = false
+ChecklistView.auth = false
 
-// export const getServerSideProps: GetServerSideProps<{
-//   data: CheckListResponseAxios | []
-// }> = async ({ query }) => {
-//   console.log(query)
-//   if (query.id) {
-//     let token =
-//       'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vdHVuYXBjb25uZWN0LWFwaS5oZXJva3VhcHAuY29tL2FwaS9sb2dpbiIsImlhdCI6MTY4OTAxNjA0NSwiZXhwIjoxNjg5MTAyNDQ1LCJuYmYiOjE2ODkwMTYwNDUsImp0aSI6InFpTTF2T21OclNtaFp3dmwiLCJzdWIiOiIxIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyIsInVzZXJuYW1lIjoibWNvbnRyZXJhcyIsIm5hbWUiOiJNaWd1ZWwgQ29udHJlcmFzIiwiaWQiOjEsImVtYWlsIjoibWlndWVsam9zZWNvbnRyZXJhc0BnbWFpbC5jb20iLCJwZXJtaXNzaW9ucyI6InRlc3RlIiwidHVuYXBfcGVybWlzc2lvbiI6W119.y5OVg6uh2Csjx9qa6Nl0LxkK5-Bo-sTH3L08pwuvCxI'
-//     if (query.token) {
-//       token = query.token as string
-//     }
+export const getServerSideProps: GetServerSideProps<{
+  data: CheckListResponseAxios | []
+}> = async (context) => {
+  const { query } = context
 
-//     try {
-//       // const res = await axios.get(
-//       //   `${process.env.APP_API_URL}/checklists/59a780af-a647-4391-9478-297458835da4?document=5573652877`,
-//       //   {
-//       //     headers: { Authorization: `Bearer ${token}` },
-//       //   },
-//       // )
-//       // console.log(res.data.data)
-//       const res = await axios.get(
-//         `${process.env.APP_API_URL}/checklist/${query.id}?company_id=5`,
-//         {
-//           headers: { Authorization: `Bearer ${token}` },
-//         },
-//       )
-//       return { props: { data: res.data.data } }
-//     } catch (e) {
-//       return {
-//         props: {
-//           data: null,
-//         },
-//       }
+  const session = await getServerSession(context.req, context.res, authOptions)
+
+  if (query.checklist_id && query.company_id && session?.user?.accessToken) {
+    try {
+      const res = await axios.get(
+        `${process.env.APP_API_URL}/checklist/${query.checklist_id}?company_id=${query.company_id}`,
+        {
+          headers: { Authorization: `Bearer ${session?.user?.accessToken}` },
+        },
+      )
+
+      return { props: { data: res.data.data } }
+    } catch (e) {
+      return {
+        props: {
+          data: null,
+        },
+      }
+    }
+  }
+  return {
+    props: {
+      data: null,
+    },
+  }
+}
+
+// export const getServerSideProps: GetServerSideProps = async (ctx: any) => {
+//   const { 'next-auth.session-token': token } = parseCookies(ctx)
+
+//   if (token) {
+//     return {
+//       redirect: {
+//         destination: '/company',
+//         permanent: false,
+//       },
 //     }
 //   }
+
 //   return {
-//     props: {
-//       data: null,
-//     },
+//     props: {},
 //   }
 // }

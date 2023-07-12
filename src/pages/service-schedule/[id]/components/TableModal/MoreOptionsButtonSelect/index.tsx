@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 
@@ -8,6 +8,9 @@ import { MoreOptionsButtonSelectProps } from './types'
 import { MenuItemButton } from './styles'
 
 import { PrintInspectionModal } from '../../PrintInspectionModal'
+import { CompanyContext } from '@/contexts/CompanyContext'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 // const ITEM_HEIGHT = 38
 
@@ -35,6 +38,10 @@ export function MoreOptionsButtonSelect({
   const handleClose = () => {
     setAnchorEl(null)
   }
+
+  const router = useRouter()
+
+  const { companySelected } = useContext(CompanyContext)
 
   const handleClickDelete = async () => {
     try {
@@ -114,6 +121,31 @@ export function MoreOptionsButtonSelect({
           Imprimir
         </MenuItemButton>
         <MenuItemButton onClick={() => {}}>Email</MenuItemButton>
+        <Link
+          href={`/checklist/view?checklist_id=${checklistId}&company_id=${companySelected}`}
+          passHref
+          target="_blank"
+          prefetch={false}
+          style={{
+            textDecoration: 'none',
+            color: '#000',
+          }}
+        >
+          <MenuItemButton
+          // onClick={() => {
+          //   router.push(
+          //     `/checklist/view?checklist_id=${checklistId}&company_id=${companySelected}`,
+          //   )
+          //   // window.open(
+          //   //   `${process.env.NEXTAUTH_URL}/checklist/view?checklist_id=${checklistId}&company_id=${companySelected}`,
+          //   //   '_blank',
+          //   // )
+          // }}
+          >
+            {/* Visualizar */}
+            Visualizar
+          </MenuItemButton>
+        </Link>
       </Menu>
       <PrintInspectionModal
         isOpen={openPrintInspectionModal}
