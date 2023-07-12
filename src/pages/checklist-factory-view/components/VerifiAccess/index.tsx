@@ -36,28 +36,28 @@ export function VerifiAccess({ handleSuccess }: VerifiAccessProps) {
 
   const router = useRouter()
 
-  const { register, handleSubmit } = useForm<Inputs>()
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<Inputs>()
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
+      // const res = await axios.get(
+      //   `${
+      //     process.env.NEXT_PUBLIC_APP_API_URL
+      //   }/checklists/${'59a780af-a647-4391-9478-297458835da4'}?document=${5573652877}`,
+      // )
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_APP_API_URL}/checklists/${router.query.id}?document=${data.password}`,
       )
-      console.log(res.data.data)
       handleSuccess(res.data.data)
     } catch (e) {
-      console.log(e)
+      setError('password', { type: 'custom', message: 'Digite sua senha!' })
     }
   }
   // 59a780af-a647-4391-9478-297458835da4?document={5573652877}`,
-
-  // const handleSubmit = (event: any) => {
-  //   event.preventDefault()
-  //   const data = new FormData(event.currentTarget)
-  //   console.log({
-  //     email: data.get('email'),
-  //     password: data.get('password'),
-  //   })
-  // }
 
   return (
     <Container
@@ -111,6 +111,17 @@ export function VerifiAccess({ handleSuccess }: VerifiAccessProps) {
               label="CPF/CNPJ"
               {...register('password', { required: true })}
             />
+            {errors.password && (
+              <span
+                style={{
+                  fontSize: '14px',
+                  color: 'red',
+                  marginTop: '5px',
+                }}
+              >
+                Digite sua senha!
+              </span>
+            )}
           </FormControl>
 
           <Button

@@ -59,7 +59,7 @@ export function ModalImages({
               }}
             >
               <img
-                src={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${item}?w=164&h=164&fit=crop&auto=format`}
+                src={`${process.env.NEXT_PUBLIC_APP_API_IMAGE_URL}${item}`}
                 alt={item}
                 loading="lazy"
               />

@@ -15,6 +15,7 @@ import Stack from '@mui/material/Stack'
 
 import {
   ButtonOpenModalSearch,
+  ButtonViewImage,
   DividerCard,
   InfoCardName,
   InfoCardText,
@@ -74,9 +75,11 @@ export default function ChecklistFactoryView() {
     })
   }
 
-  function handleSuccess(data: any) {
-    setDataChecklist(data)
-    setIsValidated(true)
+  function handleSuccess(data: any | null) {
+    if (data) {
+      setDataChecklist(data)
+      setIsValidated(true)
+    }
     console.log(data)
   }
 
@@ -258,14 +261,13 @@ export default function ChecklistFactoryView() {
                       />
                     </Stack>
                     <DividerCard />
-                    {dataChecklist.clientVehicle ? (
+                    {dataChecklist.serviceschedule ? (
                       <List dense={false}>
                         <ListItemCard>
                           <InfoCardName>Número do checklist:</InfoCardName>{' '}
                           <InfoCardText>
-                            {formatDateTime(
-                              dataChecklist.service_schedule_id,
-                            ) ?? 'Não informado'}
+                            {dataChecklist.service_schedule_id ??
+                              'Não informado'}
                           </InfoCardText>
                         </ListItemCard>
                         <ListItemCard>
@@ -279,8 +281,8 @@ export default function ChecklistFactoryView() {
                         <ListItemCard>
                           <InfoCardName>Responsável:</InfoCardName>{' '}
                           <InfoCardText>
-                            {dataChecklist.serviceschedule
-                              ?.technical_consultant_id ?? 'Não informado'}
+                            {dataChecklist?.technicalconsultant?.name ??
+                              'Não informado'}
                           </InfoCardText>
                         </ListItemCard>
                       </List>
@@ -352,24 +354,23 @@ export default function ChecklistFactoryView() {
                       />
                     </Stack>
                     <DividerCard />
-                    {dataChecklist.clientVehicle ? (
+                    {dataChecklist.vehicleclient ? (
                       <List dense={false}>
                         <ListItemCard>
                           <InfoCardName>Marca:</InfoCardName>{' '}
                           <InfoCardText>
                             {/* @ts-ignore */}
-                            {dataChecklist.clientVehicle?.vehicle?.model?.brand
-                              ?.name ?? 'Não informado'}
+                            {dataChecklist.brand?.name ?? 'Não informado'}
                           </InfoCardText>
                         </ListItemCard>
                         <ListItemCard>
                           <InfoCardName>Modelo:</InfoCardName>{' '}
                           <InfoCardText>
                             {/* @ts-ignore */}
-                            {dataChecklist.clientVehicle?.vehicle?.model
+                            {dataChecklist.vehicleclient?.vehicle?.model
                               ?.name ?? 'Não informado'}{' '}
                             {/* @ts-ignore */}-
-                            {dataChecklist.clientVehicle.vehicle.model_year ??
+                            {dataChecklist.vehicleclient.vehicle.model_year ??
                               'Não informado'}
                           </InfoCardText>
                         </ListItemCard>
@@ -377,28 +378,28 @@ export default function ChecklistFactoryView() {
                           <InfoCardName>Veículo:</InfoCardName>{' '}
                           <InfoCardText>
                             {/* @ts-ignore */}
-                            {dataChecklist.clientVehicle?.vehicle?.name ??
+                            {dataChecklist.vehicleclient?.vehicle?.name ??
                               'Não informado'}
                           </InfoCardText>
                         </ListItemCard>
                         <ListItemCard>
                           <InfoCardName>Cor:</InfoCardName>{' '}
                           <InfoCardText>
-                            {dataChecklist.clientVehicle?.color ??
+                            {dataChecklist.vehicleclient?.color ??
                               'Não informado'}
                           </InfoCardText>
                         </ListItemCard>
                         <ListItemCard>
                           <InfoCardName>Chassi:</InfoCardName>{' '}
                           <InfoCardText>
-                            {dataChecklist.clientVehicle?.chasis ??
+                            {dataChecklist.vehicleclient?.chasis ??
                               'Não informado'}
                           </InfoCardText>
                         </ListItemCard>
                         <ListItemCard>
                           <InfoCardName>Placa:</InfoCardName>{' '}
                           <InfoCardText>
-                            {dataChecklist.clientVehicle?.plate ??
+                            {dataChecklist.vehicleclient?.plate ??
                               'Não informado'}
                           </InfoCardText>
                         </ListItemCard>
@@ -568,7 +569,7 @@ export default function ChecklistFactoryView() {
                                             {/* @ts-ignore */}
                                             {item?.values?.images?.length >
                                               0 && (
-                                              <IconButton
+                                              <ButtonViewImage
                                                 aria-label="images"
                                                 size="large"
                                                 onClick={() => {
@@ -591,7 +592,7 @@ export default function ChecklistFactoryView() {
                                               >
                                                 {/* <ImageIcon /> */}
                                                 <InsertPhotoOutlinedIcon />
-                                              </IconButton>
+                                              </ButtonViewImage>
                                             )}
                                           </Stack>
                                           {item.comment && (
@@ -647,108 +648,6 @@ export default function ChecklistFactoryView() {
                         )
                       })
                     : null}
-                  {/* <Grid item xs={12} md={4} lg={4}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <TitleCard>Cliente Acompanha inspeção?</TitleCard>
-                    <MoreOptionsServiceScheduleCreate
-                      disabledButton
-                      aria-label={'Cliente Acompanha inspeção?'}
-                      buttons={
-                        [
-                          // {
-                          //   label: 'Editar',
-                          //   action: handleOpenModalEditClient,
-                          // },
-                          // {
-                          //   label: 'Pesquisar',
-                          //   action: handleOpenModalClientSearch,
-                          // },
-                        ]
-                      }
-                    />
-                  </Stack>
-                  <DividerCard />
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={4} lg={4}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <TitleCard>Cliente Acompanha inspeção?</TitleCard>
-                    <MoreOptionsServiceScheduleCreate
-                      disabledButton
-                      aria-label={'Cliente Acompanha inspeção?'}
-                      buttons={
-                        [
-                          // {
-                          //   label: 'Editar',
-                          //   action: handleOpenModalEditClient,
-                          // },
-                          // {
-                          //   label: 'Pesquisar',
-                          //   action: handleOpenModalClientSearch,
-                          // },
-                        ]
-                      }
-                    />
-                  </Stack>
-                  <DividerCard />
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={4} lg={4}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <TitleCard>Cliente Acompanha inspeção?</TitleCard>
-                    <MoreOptionsServiceScheduleCreate
-                      disabledButton
-                      aria-label={'Cliente Acompanha inspeção?'}
-                      buttons={
-                        [
-                          // {
-                          //   label: 'Editar',
-                          //   action: handleOpenModalEditClient,
-                          // },
-                          // {
-                          //   label: 'Pesquisar',
-                          //   action: handleOpenModalClientSearch,
-                          // },
-                        ]
-                      }
-                    />
-                  </Stack>
-                  <DividerCard />
-                </Paper>
-              </Grid> */}
                 </Grid>
               </Grid>
             </Grid>

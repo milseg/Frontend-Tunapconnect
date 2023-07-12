@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+// @ts-nocheck
 import * as React from 'react'
 
 import { useState } from 'react'
@@ -13,6 +15,7 @@ import Stack from '@mui/material/Stack'
 
 import {
   ButtonOpenModalSearch,
+  ButtonViewImage,
   DividerCard,
   InfoCardName,
   InfoCardText,
@@ -22,23 +25,23 @@ import {
 
 import { Box, IconButton, Skeleton, Typography } from '@mui/material'
 
-import { MoreOptionsServiceScheduleCreate } from '../../service-schedule/[id]/components/MoreOptionsServiceScheduleCreate'
-import { GetServerSideProps } from 'next/types'
-import axios from 'axios'
+import { MoreOptionsServiceScheduleCreate } from '../service-schedule/[id]/components/MoreOptionsServiceScheduleCreate'
+// import { GetServerSideProps } from 'next/types'
+// import axios from 'axios'
 import { CheckListResponseAxios } from '@/types/checklist'
 import { formatDateTime } from '@/ultis/formatDate'
-import { Itens } from '../../checklist/types'
+import { Itens } from '../checklist/types'
 import ModalInspectCar from './components/ModalInspectCar'
 import { ModalImages } from './components/ModalImages'
-import ImageIcon from '@mui/icons-material/Image'
+// import ImageIcon from '@mui/icons-material/Image'
+import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined'
+import { VerifiAccess } from './components/VerifiAccess'
 
 interface ChecklistFactoryViewProps {
   data: CheckListResponseAxios
 }
 
-export default function ChecklistFactoryView({
-  data,
-}: ChecklistFactoryViewProps) {
+export default function ChecklistFactoryView() {
   const [openModalInspectCar, setOpenModalInspectCar] = useState<{
     isOpen: boolean
     stageName: string
@@ -54,7 +57,8 @@ export default function ChecklistFactoryView({
     listImages: [],
   })
 
-  console.log(data)
+  const [dataChecklist, setDataChecklist] = useState(null)
+  const [isValidated, setIsValidated] = useState(false)
 
   // return <h1>ok</h1>
 
@@ -70,11 +74,12 @@ export default function ChecklistFactoryView({
       listImages: [],
     })
   }
-  if (!data) {
-    return <p>Pagina Não encontrada</p>
-  }
 
-  const { client, vehicleclient: clientVehicle, serviceschedule, stages } = data
+  function handleSuccess(data: any) {
+    setDataChecklist(data)
+    setIsValidated(true)
+    console.log(data)
+  }
 
   function handleGetTextItem(item: Itens) {
     switch (item.rules.type) {
@@ -158,24 +163,27 @@ export default function ChecklistFactoryView({
                   />
                 </Stack>
                 <DividerCard />
-                {data.client ? (
+                {dataChecklist && dataChecklist?.client ? (
                   <List dense={false}>
                     <ListItemCard alignItems="flex-start">
                       <InfoCardName>Nome:</InfoCardName>{' '}
                       <InfoCardText>
-                        {client?.name ?? 'Não informado'}
+                        {dataChecklist.client?.name ?? 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
-                    {client?.email && client.email.length ? (
-                      client?.email.map((email: string, index: number) => (
-                        <ListItemCard
-                          key={index + '-' + email}
-                          alignItems="flex-start"
-                        >
-                          <InfoCardName>E-mail:</InfoCardName>{' '}
-                          <InfoCardText>{email}</InfoCardText>
-                        </ListItemCard>
-                      ))
+                    {dataChecklist.client?.email &&
+                    dataChecklist.client.email.length ? (
+                      dataChecklist.client?.email.map(
+                        (email: string, index: number) => (
+                          <ListItemCard
+                            key={index + '-' + email}
+                            alignItems="flex-start"
+                          >
+                            <InfoCardName>E-mail:</InfoCardName>{' '}
+                            <InfoCardText>{email}</InfoCardText>
+                          </ListItemCard>
+                        ),
+                      )
                     ) : (
                       <ListItemCard alignItems="flex-start">
                         <InfoCardName>E-mail:</InfoCardName>{' '}
@@ -241,25 +249,41 @@ export default function ChecklistFactoryView({
                   />
                 </Stack>
                 <DividerCard />
-                {clientVehicle ? (
+                {dataChecklist.serviceschedule ? (
                   <List dense={false}>
+                    <ListItemCard>
+                      <InfoCardName>Número do checklist:</InfoCardName>{' '}
+                      <InfoCardText>
+                        {dataChecklist.service_schedule_id ?? 'Não informado'}
+                      </InfoCardText>
+                    </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Data Prometida:</InfoCardName>{' '}
                       <InfoCardText>
-                        {formatDateTime(serviceschedule?.promised_date) ??
-                          'Não informado'}
+                        {formatDateTime(
+                          dataChecklist.serviceschedule?.promised_date,
+                        ) ?? 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Responsável:</InfoCardName>{' '}
                       <InfoCardText>
-                        {serviceschedule?.technical_consultant_id ??
+                        {dataChecklist?.technicalconsultant?.name ??
                           'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                   </List>
                 ) : (
                   <List dense={false}>
+                    <ListItemCard alignItems="flex-start">
+                      <InfoCardName>Número do checklist:</InfoCardName>{' '}
+                      <InfoCardText sx={{ width: '100%' }}>
+                        <Skeleton
+                          variant="text"
+                          sx={{ fontSize: '1rem', width: '100%' }}
+                        />
+                      </InfoCardText>
+                    </ListItemCard>
                     <ListItemCard alignItems="flex-start">
                       <InfoCardName>Data Prometida:</InfoCardName>{' '}
                       <InfoCardText sx={{ width: '100%' }}>
@@ -317,49 +341,50 @@ export default function ChecklistFactoryView({
                   />
                 </Stack>
                 <DividerCard />
-                {clientVehicle ? (
+                {dataChecklist.vehicleclient ? (
                   <List dense={false}>
                     <ListItemCard>
                       <InfoCardName>Marca:</InfoCardName>{' '}
                       <InfoCardText>
                         {/* @ts-ignore */}
-                        {clientVehicle?.vehicle?.model?.brand?.name ??
-                          'Não informado'}
+                        {dataChecklist.brand?.name ?? 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Modelo:</InfoCardName>{' '}
                       <InfoCardText>
                         {/* @ts-ignore */}
-                        {clientVehicle?.vehicle?.model?.name ??
+                        {dataChecklist.vehicleclient?.vehicle?.model?.name ??
                           'Não informado'}{' '}
                         {/* @ts-ignore */}-
-                        {clientVehicle.vehicle.model_year ?? 'Não informado'}
+                        {dataChecklist.vehicleclient.vehicle.model_year ??
+                          'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Veículo:</InfoCardName>{' '}
                       <InfoCardText>
                         {/* @ts-ignore */}
-                        {clientVehicle?.vehicle?.name ?? 'Não informado'}
+                        {dataChecklist.vehicleclient?.vehicle?.name ??
+                          'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Cor:</InfoCardName>{' '}
                       <InfoCardText>
-                        {clientVehicle?.color ?? 'Não informado'}
+                        {dataChecklist.vehicleclient?.color ?? 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Chassi:</InfoCardName>{' '}
                       <InfoCardText>
-                        {clientVehicle?.chasis ?? 'Não informado'}
+                        {dataChecklist.vehicleclient?.chasis ?? 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                     <ListItemCard>
                       <InfoCardName>Placa:</InfoCardName>{' '}
                       <InfoCardText>
-                        {clientVehicle?.plate ?? 'Não informado'}
+                        {dataChecklist.vehicleclient?.plate ?? 'Não informado'}
                       </InfoCardText>
                     </ListItemCard>
                     {/* <ListItemCard>
@@ -441,8 +466,8 @@ export default function ChecklistFactoryView({
           </Grid>
           <Grid item xs={12} md={12} lg={12}>
             <Grid container spacing={2}>
-              {stages.length > 0
-                ? stages.map((stage, index) => {
+              {dataChecklist.stages.length > 0
+                ? dataChecklist.stages.map((stage, index) => {
                     return (
                       <React.Fragment
                         key={`${index} - ${Math.random() * 20000000}`}
@@ -467,6 +492,7 @@ export default function ChecklistFactoryView({
                           {stage.name}
                         </Grid>
                         {stage?.itens.length > 0 &&
+                          // @ts-ignore
                           stage.itens.map((item, index) => {
                             return (
                               <Grid
@@ -524,7 +550,7 @@ export default function ChecklistFactoryView({
                                         </Typography>
                                         {/* @ts-ignore */}
                                         {item?.values?.images?.length > 0 && (
-                                          <IconButton
+                                          <ButtonViewImage
                                             aria-label="images"
                                             size="large"
                                             onClick={() => {
@@ -532,6 +558,7 @@ export default function ChecklistFactoryView({
                                                 isOpen: true,
                                                 // @ts-ignore
                                                 listImages: item.values.images
+                                                  // @ts-ignore
                                                   ?.map((image) => {
                                                     console.log(image.images)
                                                     return image.images
@@ -541,8 +568,9 @@ export default function ChecklistFactoryView({
                                               })
                                             }}
                                           >
-                                            <ImageIcon />
-                                          </IconButton>
+                                            {/* <ImageIcon /> */}
+                                            <InsertPhotoOutlinedIcon />
+                                          </ButtonViewImage>
                                         )}
                                       </Stack>
                                       {item.comment && (
@@ -557,9 +585,11 @@ export default function ChecklistFactoryView({
                                           </Typography>
                                           <Box
                                             sx={{
-                                              border: '1px solid',
+                                              border:
+                                                '1px solid rgba(0, 0, 0, 0.2)',
                                               borderRadius: '4px',
                                               padding: 1,
+                                              marginTop: 1,
                                             }}
                                           >
                                             <Typography
@@ -596,108 +626,6 @@ export default function ChecklistFactoryView({
                     )
                   })
                 : null}
-              {/* <Grid item xs={12} md={4} lg={4}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <TitleCard>Cliente Acompanha inspeção?</TitleCard>
-                    <MoreOptionsServiceScheduleCreate
-                      disabledButton
-                      aria-label={'Cliente Acompanha inspeção?'}
-                      buttons={
-                        [
-                          // {
-                          //   label: 'Editar',
-                          //   action: handleOpenModalEditClient,
-                          // },
-                          // {
-                          //   label: 'Pesquisar',
-                          //   action: handleOpenModalClientSearch,
-                          // },
-                        ]
-                      }
-                    />
-                  </Stack>
-                  <DividerCard />
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={4} lg={4}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <TitleCard>Cliente Acompanha inspeção?</TitleCard>
-                    <MoreOptionsServiceScheduleCreate
-                      disabledButton
-                      aria-label={'Cliente Acompanha inspeção?'}
-                      buttons={
-                        [
-                          // {
-                          //   label: 'Editar',
-                          //   action: handleOpenModalEditClient,
-                          // },
-                          // {
-                          //   label: 'Pesquisar',
-                          //   action: handleOpenModalClientSearch,
-                          // },
-                        ]
-                      }
-                    />
-                  </Stack>
-                  <DividerCard />
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={4} lg={4}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <TitleCard>Cliente Acompanha inspeção?</TitleCard>
-                    <MoreOptionsServiceScheduleCreate
-                      disabledButton
-                      aria-label={'Cliente Acompanha inspeção?'}
-                      buttons={
-                        [
-                          // {
-                          //   label: 'Editar',
-                          //   action: handleOpenModalEditClient,
-                          // },
-                          // {
-                          //   label: 'Pesquisar',
-                          //   action: handleOpenModalClientSearch,
-                          // },
-                        ]
-                      }
-                    />
-                  </Stack>
-                  <DividerCard />
-                </Paper>
-              </Grid> */}
             </Grid>
           </Grid>
         </Grid>
@@ -705,7 +633,7 @@ export default function ChecklistFactoryView({
       <ModalInspectCar
         isOpen={openModalInspectCar.isOpen}
         closeModalInspectCar={handleCloseModalInspectCar}
-        data={stages}
+        data={dataChecklist.stages}
         stageName={openModalInspectCar.stageName}
         // @ts-ignore
       />
@@ -720,43 +648,43 @@ export default function ChecklistFactoryView({
 
 ChecklistFactoryView.auth = false
 
-export const getServerSideProps: GetServerSideProps<{
-  data: CheckListResponseAxios | []
-}> = async ({ query }) => {
-  console.log(query)
-  if (query.id) {
-    let token =
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vdHVuYXBjb25uZWN0LWFwaS5oZXJva3VhcHAuY29tL2FwaS9sb2dpbiIsImlhdCI6MTY4OTAxNjA0NSwiZXhwIjoxNjg5MTAyNDQ1LCJuYmYiOjE2ODkwMTYwNDUsImp0aSI6InFpTTF2T21OclNtaFp3dmwiLCJzdWIiOiIxIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyIsInVzZXJuYW1lIjoibWNvbnRyZXJhcyIsIm5hbWUiOiJNaWd1ZWwgQ29udHJlcmFzIiwiaWQiOjEsImVtYWlsIjoibWlndWVsam9zZWNvbnRyZXJhc0BnbWFpbC5jb20iLCJwZXJtaXNzaW9ucyI6InRlc3RlIiwidHVuYXBfcGVybWlzc2lvbiI6W119.y5OVg6uh2Csjx9qa6Nl0LxkK5-Bo-sTH3L08pwuvCxI'
-    if (query.token) {
-      token = query.token as string
-    }
+// export const getServerSideProps: GetServerSideProps<{
+//   data: CheckListResponseAxios | []
+// }> = async ({ query }) => {
+//   console.log(query)
+//   if (query.id) {
+//     let token =
+//       'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vdHVuYXBjb25uZWN0LWFwaS5oZXJva3VhcHAuY29tL2FwaS9sb2dpbiIsImlhdCI6MTY4OTAxNjA0NSwiZXhwIjoxNjg5MTAyNDQ1LCJuYmYiOjE2ODkwMTYwNDUsImp0aSI6InFpTTF2T21OclNtaFp3dmwiLCJzdWIiOiIxIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyIsInVzZXJuYW1lIjoibWNvbnRyZXJhcyIsIm5hbWUiOiJNaWd1ZWwgQ29udHJlcmFzIiwiaWQiOjEsImVtYWlsIjoibWlndWVsam9zZWNvbnRyZXJhc0BnbWFpbC5jb20iLCJwZXJtaXNzaW9ucyI6InRlc3RlIiwidHVuYXBfcGVybWlzc2lvbiI6W119.y5OVg6uh2Csjx9qa6Nl0LxkK5-Bo-sTH3L08pwuvCxI'
+//     if (query.token) {
+//       token = query.token as string
+//     }
 
-    try {
-      // const res = await axios.get(
-      //   `${process.env.APP_API_URL}/checklists/59a780af-a647-4391-9478-297458835da4?document=5573652877`,
-      //   {
-      //     headers: { Authorization: `Bearer ${token}` },
-      //   },
-      // )
-      // console.log(res.data.data)
-      const res = await axios.get(
-        `${process.env.APP_API_URL}/checklist/${query.id}?company_id=5`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      )
-      return { props: { data: res.data.data } }
-    } catch (e) {
-      return {
-        props: {
-          data: null,
-        },
-      }
-    }
-  }
-  return {
-    props: {
-      data: null,
-    },
-  }
-}
+//     try {
+//       // const res = await axios.get(
+//       //   `${process.env.APP_API_URL}/checklists/59a780af-a647-4391-9478-297458835da4?document=5573652877`,
+//       //   {
+//       //     headers: { Authorization: `Bearer ${token}` },
+//       //   },
+//       // )
+//       // console.log(res.data.data)
+//       const res = await axios.get(
+//         `${process.env.APP_API_URL}/checklist/${query.id}?company_id=5`,
+//         {
+//           headers: { Authorization: `Bearer ${token}` },
+//         },
+//       )
+//       return { props: { data: res.data.data } }
+//     } catch (e) {
+//       return {
+//         props: {
+//           data: null,
+//         },
+//       }
+//     }
+//   }
+//   return {
+//     props: {
+//       data: null,
+//     },
+//   }
+// }
