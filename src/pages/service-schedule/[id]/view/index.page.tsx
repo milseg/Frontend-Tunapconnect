@@ -23,19 +23,18 @@ import {
   TitleCard,
 } from './styles'
 
-import { Box, IconButton, Skeleton, Typography } from '@mui/material'
+import { Box, Skeleton, Typography } from '@mui/material'
 
-import { MoreOptionsServiceScheduleCreate } from '../service-schedule/[id]/components/MoreOptionsServiceScheduleCreate'
+import { MoreOptionsServiceScheduleCreate } from '../../../service-schedule/[id]/components/MoreOptionsServiceScheduleCreate'
 // import { GetServerSideProps } from 'next/types'
 // import axios from 'axios'
 import { CheckListResponseAxios } from '@/types/checklist'
 import { formatDateTime } from '@/ultis/formatDate'
-import { Itens } from '../checklist/types'
+import { Itens } from '../../../checklist/types'
 import ModalInspectCar from './components/ModalInspectCar'
 import { ModalImages } from './components/ModalImages'
 // import ImageIcon from '@mui/icons-material/Image'
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined'
-import { VerifiAccess } from './components/VerifiAccess'
 
 interface ChecklistFactoryViewProps {
   data: CheckListResponseAxios
@@ -58,7 +57,6 @@ export default function ChecklistFactoryView() {
   })
 
   const [dataChecklist, setDataChecklist] = useState(null)
-  const [isValidated, setIsValidated] = useState(false)
 
   // return <h1>ok</h1>
 
@@ -73,12 +71,6 @@ export default function ChecklistFactoryView() {
       isOpen: false,
       listImages: [],
     })
-  }
-
-  function handleSuccess(data: any) {
-    setDataChecklist(data)
-    setIsValidated(true)
-    console.log(data)
   }
 
   function handleGetTextItem(item: Itens) {
