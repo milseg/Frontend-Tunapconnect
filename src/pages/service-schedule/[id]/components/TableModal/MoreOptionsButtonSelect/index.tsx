@@ -9,7 +9,7 @@ import { MenuItemButton } from './styles'
 
 import { PrintInspectionModal } from '../../PrintInspectionModal'
 import { CompanyContext } from '@/contexts/CompanyContext'
-import { useRouter } from 'next/router'
+
 import Link from 'next/link'
 
 // const ITEM_HEIGHT = 38
@@ -38,8 +38,6 @@ export function MoreOptionsButtonSelect({
   const handleClose = () => {
     setAnchorEl(null)
   }
-
-  const router = useRouter()
 
   const { companySelected } = useContext(CompanyContext)
 
@@ -131,20 +129,7 @@ export function MoreOptionsButtonSelect({
             color: '#000',
           }}
         >
-          <MenuItemButton
-          // onClick={() => {
-          //   router.push(
-          //     `/checklist/view?checklist_id=${checklistId}&company_id=${companySelected}`,
-          //   )
-          //   // window.open(
-          //   //   `${process.env.NEXTAUTH_URL}/checklist/view?checklist_id=${checklistId}&company_id=${companySelected}`,
-          //   //   '_blank',
-          //   // )
-          // }}
-          >
-            {/* Visualizar */}
-            Visualizar
-          </MenuItemButton>
+          <MenuItemButton>Visualizar</MenuItemButton>
         </Link>
       </Menu>
       <PrintInspectionModal
