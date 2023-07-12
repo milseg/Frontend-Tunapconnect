@@ -58,8 +58,6 @@ export default function ChecklistFactoryView() {
 
   const [dataChecklist, setDataChecklist] = useState(null)
 
-  return <h1>ok</h1>
-
   function handleCloseModalInspectCar() {
     setOpenModalInspectCar({
       isOpen: false,
@@ -90,550 +88,566 @@ export default function ChecklistFactoryView() {
 
   return (
     <>
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Grid container spacing={2}>
-          <Grid
-            item
-            xs={12}
-            md={12}
-            lg={12}
-            sx={{
-              background: '#1C4961',
-              marginLeft: 2,
-              borderRadius: 1,
-              display: 'flex',
-              alignItems: 'center',
-              // justifyContent: 'center',
-              paddingBottom: 2,
-            }}
-          >
-            <Typography
-              sx={{
-                color: '#fff',
-              }}
-              variant="h6"
-            >
-              Agenda
-            </Typography>
-
-            {/* <HeaderBreadcrumb
-              data={HeaderBreadcrumbData}
-              title="Agenda de Serviços"
-            /> */}
-          </Grid>
-          <Grid item xs={12} md={6} lg={6}>
-            <Stack spacing={3}>
-              {/* cliente */}
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <TitleCard>Cliente</TitleCard>
-                  <MoreOptionsServiceScheduleCreate
-                    disabledButton
-                    aria-label="options to client"
-                    buttons={
-                      [
-                        // {
-                        //   label: 'Editar',
-                        //   action: handleOpenModalEditClient,
-                        // },
-                        // {
-                        //   label: 'Pesquisar',
-                        //   action: handleOpenModalClientSearch,
-                        // },
-                      ]
-                    }
-                  />
-                </Stack>
-                <DividerCard />
-                {dataChecklist && dataChecklist?.client ? (
-                  <List dense={false}>
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Nome:</InfoCardName>{' '}
-                      <InfoCardText>
-                        {dataChecklist.client?.name ?? 'Não informado'}
-                      </InfoCardText>
-                    </ListItemCard>
-                    {dataChecklist.client?.email &&
-                    dataChecklist.client.email.length ? (
-                      dataChecklist.client?.email.map(
-                        (email: string, index: number) => (
-                          <ListItemCard
-                            key={index + '-' + email}
-                            alignItems="flex-start"
-                          >
-                            <InfoCardName>E-mail:</InfoCardName>{' '}
-                            <InfoCardText>{email}</InfoCardText>
-                          </ListItemCard>
-                        ),
-                      )
-                    ) : (
-                      <ListItemCard alignItems="flex-start">
-                        <InfoCardName>E-mail:</InfoCardName>{' '}
-                        <InfoCardText width="100%">
-                          {'Não informado'}
-                        </InfoCardText>
-                      </ListItemCard>
-                    )}
-                  </List>
-                ) : (
-                  <List dense={false}>
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Nome:</InfoCardName>{' '}
-                      <InfoCardText sx={{ width: '100%' }}>
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', width: '100%' }}
-                        />
-                      </InfoCardText>
-                    </ListItemCard>
-
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>E-mail:</InfoCardName>{' '}
-                      <InfoCardText sx={{ width: '100%' }}>
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', width: '100%' }}
-                        />
-                      </InfoCardText>
-                    </ListItemCard>
-                  </List>
-                )}
-              </Paper>
-              {/* Veículo */}
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <TitleCard>Agenda</TitleCard>
-                  <MoreOptionsServiceScheduleCreate
-                    aria-label="options to vehicle"
-                    disabledButton
-                    buttons={
-                      [
-                        // {
-                        //   label: 'Editar',
-                        //   action: handleOpenModalEditClientVehicle,
-                        // },
-                        // {
-                        //   label: 'Pesquisar',
-                        //   action: handleOpenModalClientVehicleSearch,
-                        // },
-                      ]
-                    }
-                  />
-                </Stack>
-                <DividerCard />
-                {dataChecklist.serviceschedule ? (
-                  <List dense={false}>
-                    <ListItemCard>
-                      <InfoCardName>Número do checklist:</InfoCardName>{' '}
-                      <InfoCardText>
-                        {dataChecklist.service_schedule_id ?? 'Não informado'}
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard>
-                      <InfoCardName>Data Prometida:</InfoCardName>{' '}
-                      <InfoCardText>
-                        {formatDateTime(
-                          dataChecklist.serviceschedule?.promised_date,
-                        ) ?? 'Não informado'}
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard>
-                      <InfoCardName>Responsável:</InfoCardName>{' '}
-                      <InfoCardText>
-                        {dataChecklist?.technicalconsultant?.name ??
-                          'Não informado'}
-                      </InfoCardText>
-                    </ListItemCard>
-                  </List>
-                ) : (
-                  <List dense={false}>
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Número do checklist:</InfoCardName>{' '}
-                      <InfoCardText sx={{ width: '100%' }}>
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', width: '100%' }}
-                        />
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Data Prometida:</InfoCardName>{' '}
-                      <InfoCardText sx={{ width: '100%' }}>
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', width: '100%' }}
-                        />
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Responsável:</InfoCardName>{' '}
-                      <InfoCardText sx={{ width: '100%' }}>
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', width: '100%' }}
-                        />
-                      </InfoCardText>
-                    </ListItemCard>
-                  </List>
-                )}
-              </Paper>
-            </Stack>
-          </Grid>
-          <Grid item xs={12} md={6} lg={6}>
-            <Stack spacing={3}>
-              {/* Veículo */}
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <TitleCard>Veículo</TitleCard>
-                  <MoreOptionsServiceScheduleCreate
-                    aria-label="options to vehicle"
-                    disabledButton
-                    buttons={
-                      [
-                        // {
-                        //   label: 'Editar',
-                        //   action: handleOpenModalEditClientVehicle,
-                        // },
-                        // {
-                        //   label: 'Pesquisar',
-                        //   action: handleOpenModalClientVehicleSearch,
-                        // },
-                      ]
-                    }
-                  />
-                </Stack>
-                <DividerCard />
-                {dataChecklist.vehicleclient ? (
-                  <List dense={false}>
-                    <ListItemCard>
-                      <InfoCardName>Marca:</InfoCardName>{' '}
-                      <InfoCardText>
-                        {/* @ts-ignore */}
-                        {dataChecklist.brand?.name ?? 'Não informado'}
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard>
-                      <InfoCardName>Modelo:</InfoCardName>{' '}
-                      <InfoCardText>
-                        {/* @ts-ignore */}
-                        {dataChecklist.vehicleclient?.vehicle?.model?.name ??
-                          'Não informado'}{' '}
-                        {/* @ts-ignore */}-
-                        {dataChecklist.vehicleclient.vehicle.model_year ??
-                          'Não informado'}
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard>
-                      <InfoCardName>Veículo:</InfoCardName>{' '}
-                      <InfoCardText>
-                        {/* @ts-ignore */}
-                        {dataChecklist.vehicleclient?.vehicle?.name ??
-                          'Não informado'}
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard>
-                      <InfoCardName>Cor:</InfoCardName>{' '}
-                      <InfoCardText>
-                        {dataChecklist.vehicleclient?.color ?? 'Não informado'}
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard>
-                      <InfoCardName>Chassi:</InfoCardName>{' '}
-                      <InfoCardText>
-                        {dataChecklist.vehicleclient?.chasis ?? 'Não informado'}
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard>
-                      <InfoCardName>Placa:</InfoCardName>{' '}
-                      <InfoCardText>
-                        {dataChecklist.vehicleclient?.plate ?? 'Não informado'}
-                      </InfoCardText>
-                    </ListItemCard>
-                    {/* <ListItemCard>
-                      <InfoCardName>KM:</InfoCardName>{' '}
-                      <InfoCardText>
-                        {clientVehicle?.mileage ?? 'Não informado'}
-                      </InfoCardText>
-                    </ListItemCard> */}
-                  </List>
-                ) : (
-                  <List dense={false}>
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Marca:</InfoCardName>{' '}
-                      <InfoCardText sx={{ width: '100%' }}>
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', width: '100%' }}
-                        />
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Modelo:</InfoCardName>{' '}
-                      <InfoCardText sx={{ width: '100%' }}>
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', width: '100%' }}
-                        />
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Veículo:</InfoCardName>{' '}
-                      <InfoCardText sx={{ width: '100%' }}>
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', width: '100%' }}
-                        />
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Cor:</InfoCardName>{' '}
-                      <InfoCardText sx={{ width: '100%' }}>
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', width: '100%' }}
-                        />
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Chassi:</InfoCardName>{' '}
-                      <InfoCardText sx={{ width: '100%' }}>
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', width: '100%' }}
-                        />
-                      </InfoCardText>
-                    </ListItemCard>
-                    <ListItemCard alignItems="flex-start">
-                      <InfoCardName>Placa:</InfoCardName>{' '}
-                      <InfoCardText sx={{ width: '100%' }}>
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', width: '100%' }}
-                        />
-                      </InfoCardText>
-                    </ListItemCard>
-                    {/* <ListItemCard alignItems="flex-start">
-                      <InfoCardName>KM:</InfoCardName>{' '}
-                      <InfoCardText sx={{ width: '100%' }}>
-                        <Skeleton
-                          variant="text"
-                          sx={{ fontSize: '1rem', width: '100%' }}
-                        />
-                      </InfoCardText>
-                    </ListItemCard> */}
-                  </List>
-                )}
-              </Paper>
-            </Stack>
-          </Grid>
-          <Grid item xs={12} md={12} lg={12}>
+      {!dataChecklist ? (
+        <h1>Em contrução</h1>
+      ) : (
+        <>
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={2}>
-              {dataChecklist.stages.length > 0
-                ? dataChecklist.stages.map((stage, index) => {
-                    return (
-                      <React.Fragment
-                        key={`${index} - ${Math.random() * 20000000}`}
-                      >
-                        <Grid
-                          item
-                          xs={12}
-                          md={12}
-                          lg={12}
-                          sx={{
-                            background: '#1C4961',
-                            color: '#FFFFFF',
-                            marginLeft: 2,
-                            marginTop: 2,
-                            borderRadius: 1,
-                            display: 'flex',
-                            alignItems: 'center',
-                            // justifyContent: 'center',
-                            paddingBottom: 2,
-                          }}
-                        >
-                          {stage.name}
-                        </Grid>
-                        {stage?.itens.length > 0 &&
-                          // @ts-ignore
-                          stage.itens.map((item, index) => {
-                            return (
-                              <Grid
-                                item
-                                xs={12}
-                                md={4}
-                                lg={4}
-                                key={`${index} - ${Math.random() * 200000}`}
+              <Grid
+                item
+                xs={12}
+                md={12}
+                lg={12}
+                sx={{
+                  background: '#1C4961',
+                  marginLeft: 2,
+                  borderRadius: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  // justifyContent: 'center',
+                  paddingBottom: 2,
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: '#fff',
+                  }}
+                  variant="h6"
+                >
+                  Agenda
+                </Typography>
+
+                {/* <HeaderBreadcrumb
+                data={HeaderBreadcrumbData}
+                title="Agenda de Serviços"
+              /> */}
+              </Grid>
+              <Grid item xs={12} md={6} lg={6}>
+                <Stack spacing={3}>
+                  {/* cliente */}
+                  <Paper
+                    sx={{
+                      p: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                    >
+                      <TitleCard>Cliente</TitleCard>
+                      <MoreOptionsServiceScheduleCreate
+                        disabledButton
+                        aria-label="options to client"
+                        buttons={
+                          [
+                            // {
+                            //   label: 'Editar',
+                            //   action: handleOpenModalEditClient,
+                            // },
+                            // {
+                            //   label: 'Pesquisar',
+                            //   action: handleOpenModalClientSearch,
+                            // },
+                          ]
+                        }
+                      />
+                    </Stack>
+                    <DividerCard />
+                    {dataChecklist && dataChecklist?.client ? (
+                      <List dense={false}>
+                        <ListItemCard alignItems="flex-start">
+                          <InfoCardName>Nome:</InfoCardName>{' '}
+                          <InfoCardText>
+                            {dataChecklist.client?.name ?? 'Não informado'}
+                          </InfoCardText>
+                        </ListItemCard>
+                        {dataChecklist.client?.email &&
+                        dataChecklist.client.email.length ? (
+                          dataChecklist.client?.email.map(
+                            (email: string, index: number) => (
+                              <ListItemCard
+                                key={index + '-' + email}
+                                alignItems="flex-start"
                               >
-                                <Paper
-                                  sx={{
-                                    p: 2,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                  }}
-                                >
-                                  <Stack
-                                    direction="row"
-                                    alignItems="center"
-                                    justifyContent="space-between"
+                                <InfoCardName>E-mail:</InfoCardName>{' '}
+                                <InfoCardText>{email}</InfoCardText>
+                              </ListItemCard>
+                            ),
+                          )
+                        ) : (
+                          <ListItemCard alignItems="flex-start">
+                            <InfoCardName>E-mail:</InfoCardName>{' '}
+                            <InfoCardText width="100%">
+                              {'Não informado'}
+                            </InfoCardText>
+                          </ListItemCard>
+                        )}
+                      </List>
+                    ) : (
+                      <List dense={false}>
+                        <ListItemCard alignItems="flex-start">
+                          <InfoCardName>Nome:</InfoCardName>{' '}
+                          <InfoCardText sx={{ width: '100%' }}>
+                            <Skeleton
+                              variant="text"
+                              sx={{ fontSize: '1rem', width: '100%' }}
+                            />
+                          </InfoCardText>
+                        </ListItemCard>
+
+                        <ListItemCard alignItems="flex-start">
+                          <InfoCardName>E-mail:</InfoCardName>{' '}
+                          <InfoCardText sx={{ width: '100%' }}>
+                            <Skeleton
+                              variant="text"
+                              sx={{ fontSize: '1rem', width: '100%' }}
+                            />
+                          </InfoCardText>
+                        </ListItemCard>
+                      </List>
+                    )}
+                  </Paper>
+                  {/* Veículo */}
+                  <Paper
+                    sx={{
+                      p: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                    >
+                      <TitleCard>Agenda</TitleCard>
+                      <MoreOptionsServiceScheduleCreate
+                        aria-label="options to vehicle"
+                        disabledButton
+                        buttons={
+                          [
+                            // {
+                            //   label: 'Editar',
+                            //   action: handleOpenModalEditClientVehicle,
+                            // },
+                            // {
+                            //   label: 'Pesquisar',
+                            //   action: handleOpenModalClientVehicleSearch,
+                            // },
+                          ]
+                        }
+                      />
+                    </Stack>
+                    <DividerCard />
+                    {dataChecklist.serviceschedule ? (
+                      <List dense={false}>
+                        <ListItemCard>
+                          <InfoCardName>Número do checklist:</InfoCardName>{' '}
+                          <InfoCardText>
+                            {dataChecklist.service_schedule_id ??
+                              'Não informado'}
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard>
+                          <InfoCardName>Data Prometida:</InfoCardName>{' '}
+                          <InfoCardText>
+                            {formatDateTime(
+                              dataChecklist.serviceschedule?.promised_date,
+                            ) ?? 'Não informado'}
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard>
+                          <InfoCardName>Responsável:</InfoCardName>{' '}
+                          <InfoCardText>
+                            {dataChecklist?.technicalconsultant?.name ??
+                              'Não informado'}
+                          </InfoCardText>
+                        </ListItemCard>
+                      </List>
+                    ) : (
+                      <List dense={false}>
+                        <ListItemCard alignItems="flex-start">
+                          <InfoCardName>Número do checklist:</InfoCardName>{' '}
+                          <InfoCardText sx={{ width: '100%' }}>
+                            <Skeleton
+                              variant="text"
+                              sx={{ fontSize: '1rem', width: '100%' }}
+                            />
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard alignItems="flex-start">
+                          <InfoCardName>Data Prometida:</InfoCardName>{' '}
+                          <InfoCardText sx={{ width: '100%' }}>
+                            <Skeleton
+                              variant="text"
+                              sx={{ fontSize: '1rem', width: '100%' }}
+                            />
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard alignItems="flex-start">
+                          <InfoCardName>Responsável:</InfoCardName>{' '}
+                          <InfoCardText sx={{ width: '100%' }}>
+                            <Skeleton
+                              variant="text"
+                              sx={{ fontSize: '1rem', width: '100%' }}
+                            />
+                          </InfoCardText>
+                        </ListItemCard>
+                      </List>
+                    )}
+                  </Paper>
+                </Stack>
+              </Grid>
+              <Grid item xs={12} md={6} lg={6}>
+                <Stack spacing={3}>
+                  {/* Veículo */}
+                  <Paper
+                    sx={{
+                      p: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                    >
+                      <TitleCard>Veículo</TitleCard>
+                      <MoreOptionsServiceScheduleCreate
+                        aria-label="options to vehicle"
+                        disabledButton
+                        buttons={
+                          [
+                            // {
+                            //   label: 'Editar',
+                            //   action: handleOpenModalEditClientVehicle,
+                            // },
+                            // {
+                            //   label: 'Pesquisar',
+                            //   action: handleOpenModalClientVehicleSearch,
+                            // },
+                          ]
+                        }
+                      />
+                    </Stack>
+                    <DividerCard />
+                    {dataChecklist.vehicleclient ? (
+                      <List dense={false}>
+                        <ListItemCard>
+                          <InfoCardName>Marca:</InfoCardName>{' '}
+                          <InfoCardText>
+                            {/* @ts-ignore */}
+                            {dataChecklist.brand?.name ?? 'Não informado'}
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard>
+                          <InfoCardName>Modelo:</InfoCardName>{' '}
+                          <InfoCardText>
+                            {/* @ts-ignore */}
+                            {dataChecklist.vehicleclient?.vehicle?.model
+                              ?.name ?? 'Não informado'}{' '}
+                            {/* @ts-ignore */}-
+                            {dataChecklist.vehicleclient.vehicle.model_year ??
+                              'Não informado'}
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard>
+                          <InfoCardName>Veículo:</InfoCardName>{' '}
+                          <InfoCardText>
+                            {/* @ts-ignore */}
+                            {dataChecklist.vehicleclient?.vehicle?.name ??
+                              'Não informado'}
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard>
+                          <InfoCardName>Cor:</InfoCardName>{' '}
+                          <InfoCardText>
+                            {dataChecklist.vehicleclient?.color ??
+                              'Não informado'}
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard>
+                          <InfoCardName>Chassi:</InfoCardName>{' '}
+                          <InfoCardText>
+                            {dataChecklist.vehicleclient?.chasis ??
+                              'Não informado'}
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard>
+                          <InfoCardName>Placa:</InfoCardName>{' '}
+                          <InfoCardText>
+                            {dataChecklist.vehicleclient?.plate ??
+                              'Não informado'}
+                          </InfoCardText>
+                        </ListItemCard>
+                        {/* <ListItemCard>
+                        <InfoCardName>KM:</InfoCardName>{' '}
+                        <InfoCardText>
+                          {clientVehicle?.mileage ?? 'Não informado'}
+                        </InfoCardText>
+                      </ListItemCard> */}
+                      </List>
+                    ) : (
+                      <List dense={false}>
+                        <ListItemCard alignItems="flex-start">
+                          <InfoCardName>Marca:</InfoCardName>{' '}
+                          <InfoCardText sx={{ width: '100%' }}>
+                            <Skeleton
+                              variant="text"
+                              sx={{ fontSize: '1rem', width: '100%' }}
+                            />
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard alignItems="flex-start">
+                          <InfoCardName>Modelo:</InfoCardName>{' '}
+                          <InfoCardText sx={{ width: '100%' }}>
+                            <Skeleton
+                              variant="text"
+                              sx={{ fontSize: '1rem', width: '100%' }}
+                            />
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard alignItems="flex-start">
+                          <InfoCardName>Veículo:</InfoCardName>{' '}
+                          <InfoCardText sx={{ width: '100%' }}>
+                            <Skeleton
+                              variant="text"
+                              sx={{ fontSize: '1rem', width: '100%' }}
+                            />
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard alignItems="flex-start">
+                          <InfoCardName>Cor:</InfoCardName>{' '}
+                          <InfoCardText sx={{ width: '100%' }}>
+                            <Skeleton
+                              variant="text"
+                              sx={{ fontSize: '1rem', width: '100%' }}
+                            />
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard alignItems="flex-start">
+                          <InfoCardName>Chassi:</InfoCardName>{' '}
+                          <InfoCardText sx={{ width: '100%' }}>
+                            <Skeleton
+                              variant="text"
+                              sx={{ fontSize: '1rem', width: '100%' }}
+                            />
+                          </InfoCardText>
+                        </ListItemCard>
+                        <ListItemCard alignItems="flex-start">
+                          <InfoCardName>Placa:</InfoCardName>{' '}
+                          <InfoCardText sx={{ width: '100%' }}>
+                            <Skeleton
+                              variant="text"
+                              sx={{ fontSize: '1rem', width: '100%' }}
+                            />
+                          </InfoCardText>
+                        </ListItemCard>
+                        {/* <ListItemCard alignItems="flex-start">
+                        <InfoCardName>KM:</InfoCardName>{' '}
+                        <InfoCardText sx={{ width: '100%' }}>
+                          <Skeleton
+                            variant="text"
+                            sx={{ fontSize: '1rem', width: '100%' }}
+                          />
+                        </InfoCardText>
+                      </ListItemCard> */}
+                      </List>
+                    )}
+                  </Paper>
+                </Stack>
+              </Grid>
+              <Grid item xs={12} md={12} lg={12}>
+                <Grid container spacing={2}>
+                  {dataChecklist.stages.length > 0
+                    ? dataChecklist.stages.map((stage, index) => {
+                        return (
+                          <React.Fragment
+                            key={`${index} - ${Math.random() * 20000000}`}
+                          >
+                            <Grid
+                              item
+                              xs={12}
+                              md={12}
+                              lg={12}
+                              sx={{
+                                background: '#1C4961',
+                                color: '#FFFFFF',
+                                marginLeft: 2,
+                                marginTop: 2,
+                                borderRadius: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                // justifyContent: 'center',
+                                paddingBottom: 2,
+                              }}
+                            >
+                              {stage.name}
+                            </Grid>
+                            {stage?.itens.length > 0 &&
+                              // @ts-ignore
+                              stage.itens.map((item, index) => {
+                                return (
+                                  <Grid
+                                    item
+                                    xs={12}
+                                    md={4}
+                                    lg={4}
+                                    key={`${index} - ${Math.random() * 200000}`}
                                   >
-                                    <TitleCard>{item.name}</TitleCard>
-                                    <MoreOptionsServiceScheduleCreate
-                                      disabledButton
-                                      aria-label={'Cliente Acompanha inspeção?'}
-                                      buttons={
-                                        [
-                                          // {
-                                          //   label: 'Editar',
-                                          //   action: handleOpenModalEditClient,
-                                          // },
-                                          // {
-                                          //   label: 'Pesquisar',
-                                          //   action: handleOpenModalClientSearch,
-                                          // },
-                                        ]
-                                      }
-                                    />
-                                  </Stack>
-                                  <DividerCard />
-                                  {handleGetTextItem(item) !== null ? (
-                                    <>
+                                    <Paper
+                                      sx={{
+                                        p: 2,
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                      }}
+                                    >
                                       <Stack
                                         direction="row"
                                         alignItems="center"
                                         justifyContent="space-between"
                                       >
-                                        <Typography
-                                          sx={{
-                                            fontWeight: 'bold',
-                                            fontSize: 18,
-                                          }}
-                                        >
-                                          {handleGetTextItem(item)}
-                                        </Typography>
-                                        {/* @ts-ignore */}
-                                        {item?.values?.images?.length > 0 && (
-                                          <ButtonViewImage
-                                            aria-label="images"
-                                            size="large"
-                                            onClick={() => {
-                                              setOpenModalImages({
-                                                isOpen: true,
-                                                // @ts-ignore
-                                                listImages: item.values.images
-                                                  // @ts-ignore
-                                                  ?.map((image) => {
-                                                    console.log(image.images)
-                                                    return image.images
-                                                  })[0]
-                                                  // @ts-ignore
-                                                  .map((i) => i.url),
-                                              })
-                                            }}
-                                          >
-                                            {/* <ImageIcon /> */}
-                                            <InsertPhotoOutlinedIcon />
-                                          </ButtonViewImage>
-                                        )}
+                                        <TitleCard>{item.name}</TitleCard>
+                                        <MoreOptionsServiceScheduleCreate
+                                          disabledButton
+                                          aria-label={
+                                            'Cliente Acompanha inspeção?'
+                                          }
+                                          buttons={
+                                            [
+                                              // {
+                                              //   label: 'Editar',
+                                              //   action: handleOpenModalEditClient,
+                                              // },
+                                              // {
+                                              //   label: 'Pesquisar',
+                                              //   action: handleOpenModalClientSearch,
+                                              // },
+                                            ]
+                                          }
+                                        />
                                       </Stack>
-                                      {item.comment && (
+                                      <DividerCard />
+                                      {handleGetTextItem(item) !== null ? (
                                         <>
-                                          <Typography
-                                            sx={{
-                                              textAlign: 'justify',
-                                              marginTop: 1,
-                                            }}
-                                          >
-                                            Observação:
-                                          </Typography>
-                                          <Box
-                                            sx={{
-                                              border:
-                                                '1px solid rgba(0, 0, 0, 0.2)',
-                                              borderRadius: '4px',
-                                              padding: 1,
-                                              marginTop: 1,
-                                            }}
+                                          <Stack
+                                            direction="row"
+                                            alignItems="center"
+                                            justifyContent="space-between"
                                           >
                                             <Typography
                                               sx={{
-                                                textAlign: 'justify',
+                                                fontWeight: 'bold',
+                                                fontSize: 18,
                                               }}
                                             >
-                                              {item.comment}
+                                              {handleGetTextItem(item)}
                                             </Typography>
-                                          </Box>
+                                            {/* @ts-ignore */}
+                                            {item?.values?.images?.length >
+                                              0 && (
+                                              <ButtonViewImage
+                                                aria-label="images"
+                                                size="large"
+                                                onClick={() => {
+                                                  setOpenModalImages({
+                                                    isOpen: true,
+                                                    // @ts-ignore
+                                                    listImages:
+                                                      item.values.images
+                                                        // @ts-ignore
+                                                        ?.map((image) => {
+                                                          console.log(
+                                                            image.images,
+                                                          )
+                                                          return image.images
+                                                        })[0]
+                                                        // @ts-ignore
+                                                        .map((i) => i.url),
+                                                  })
+                                                }}
+                                              >
+                                                {/* <ImageIcon /> */}
+                                                <InsertPhotoOutlinedIcon />
+                                              </ButtonViewImage>
+                                            )}
+                                          </Stack>
+                                          {item.comment && (
+                                            <>
+                                              <Typography
+                                                sx={{
+                                                  textAlign: 'justify',
+                                                  marginTop: 1,
+                                                }}
+                                              >
+                                                Observação:
+                                              </Typography>
+                                              <Box
+                                                sx={{
+                                                  border:
+                                                    '1px solid rgba(0, 0, 0, 0.2)',
+                                                  borderRadius: '4px',
+                                                  padding: 1,
+                                                  marginTop: 1,
+                                                }}
+                                              >
+                                                <Typography
+                                                  sx={{
+                                                    textAlign: 'justify',
+                                                  }}
+                                                >
+                                                  {item.comment}
+                                                </Typography>
+                                              </Box>
+                                            </>
+                                          )}
                                         </>
+                                      ) : (
+                                        <ButtonOpenModalSearch
+                                          sx={{
+                                            width: 100,
+                                          }}
+                                          onClick={() =>
+                                            setOpenModalInspectCar({
+                                              isOpen: true,
+                                              stageName: stage.name,
+                                            })
+                                          }
+                                        >
+                                          visualizar
+                                        </ButtonOpenModalSearch>
                                       )}
-                                    </>
-                                  ) : (
-                                    <ButtonOpenModalSearch
-                                      sx={{
-                                        width: 100,
-                                      }}
-                                      onClick={() =>
-                                        setOpenModalInspectCar({
-                                          isOpen: true,
-                                          stageName: stage.name,
-                                        })
-                                      }
-                                    >
-                                      visualizar
-                                    </ButtonOpenModalSearch>
-                                  )}
-                                </Paper>
-                              </Grid>
-                            )
-                          })}
-                      </React.Fragment>
-                    )
-                  })
-                : null}
+                                    </Paper>
+                                  </Grid>
+                                )
+                              })}
+                          </React.Fragment>
+                        )
+                      })
+                    : null}
+                </Grid>
+              </Grid>
             </Grid>
-          </Grid>
-        </Grid>
-      </Container>
-      <ModalInspectCar
-        isOpen={openModalInspectCar.isOpen}
-        closeModalInspectCar={handleCloseModalInspectCar}
-        data={dataChecklist.stages}
-        stageName={openModalInspectCar.stageName}
-        // @ts-ignore
-      />
-      <ModalImages
-        isOpen={openModalImages.isOpen}
-        closeModalImages={handleCloseModalImages}
-        data={openModalImages.listImages}
-      />
+          </Container>
+          <ModalInspectCar
+            isOpen={openModalInspectCar.isOpen}
+            closeModalInspectCar={handleCloseModalInspectCar}
+            data={dataChecklist.stages}
+            stageName={openModalInspectCar.stageName}
+            // @ts-ignore
+          />
+          <ModalImages
+            isOpen={openModalImages.isOpen}
+            closeModalImages={handleCloseModalImages}
+            data={openModalImages.listImages}
+          />
+        </>
+      )}
     </>
   )
 }
