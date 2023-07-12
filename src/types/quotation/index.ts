@@ -160,6 +160,19 @@ export interface ProductType {
   quantity: string
 }
 
+export interface ServicesType {
+  id: number
+  company_id: number
+  service_code: string
+  integration_code: any
+  description: string
+  standard_quantity: string
+  standard_value: string
+  active: boolean
+  discount: string
+  quantity: string
+}
+
 export interface TypeQuotationType {
   id: number
   company_id: number

@@ -79,10 +79,11 @@ import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
 import ModalSearchProduct from './components/ModalSearchProduct'
-import { ProductType, TypeQuotationType } from '@/types/quotation'
+import { ProductType, ServicesType, TypeQuotationType } from '@/types/quotation'
 
 import InputTableForEdit from '@/components/InputTableForEdit'
 import { useFieldArray, useForm } from 'react-hook-form'
+import ModalSearchService from './components/ModalSearchService'
 // import { useForm } from 'react-hook-form'
 
 type updateData = {
@@ -111,6 +112,7 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
 
 export default function QuotationsCreate() {
   const [products, setProducts] = useState<ProductType[] | []>([])
+  const [services, setServices] = useState<ServicesType[] | []>([])
   const [client, setClient] = useState<ClientResponseType | null>(null)
 
   const [clientForModalSearch, setClientForModalSearch] =
@@ -139,6 +141,7 @@ export default function QuotationsCreate() {
   const [actionAlerts, setActionAlerts] =
     useState<ActionAlertsStateProps | null>(null)
   const [openModalSearchProduct, setOpenModalSearchProduct] = useState(false)
+  const [openModalSearchServices, setOpenModalSearchServices] = useState(false)
 
   const [openModalClientSearch, setOpenModalClientSearch] = useState(false)
 
@@ -187,6 +190,7 @@ export default function QuotationsCreate() {
     register: registerService,
     handleSubmit: handleSubmitService,
     control: controlService,
+    setValue: setValueService,
   } = useForm()
 
   const {
@@ -235,9 +239,29 @@ export default function QuotationsCreate() {
     })
     setIsEditingProduct(false)
   }
+  function onSubmitService(data: any) {
+    console.log(data)
+    setServices((prevState) => {
+      return prevState.map((serv, index) => {
+        if (serv.id === data.service[index].id) {
+          return {
+            ...serv,
+            quantity: data.service[index].quantity,
+            discount: data.service[index].discount,
+          }
+        } else {
+          return serv
+        }
+      })
+    })
+    setIsEditingService(false)
+  }
 
   function handleCloseModalSearchProduct() {
     setOpenModalSearchProduct(false)
+  }
+  function handleCloseModalSearchServices() {
+    setOpenModalSearchServices(false)
   }
   function handleCloseModalClienteSearch() {
     setOpenModalClientSearch(false)
@@ -445,14 +469,60 @@ export default function QuotationsCreate() {
   }
 
   function handleAddProduct(prod: ProductType) {
-    setProducts((prevState) => [
-      ...prevState,
-      {
-        ...prod,
-        quantity: '1',
-        discount: '0',
-      },
-    ])
+    console.log(prod)
+    setProducts((prevState) => {
+      const isExistsProduct = prevState.findIndex((p) => p.id === prod.id)
+
+      if (isExistsProduct > -1) {
+        return prevState.map((p) => {
+          if (p.id === prod.id) {
+            return {
+              ...p,
+              quantity: `${Number(p.quantity) + 1}`,
+            }
+          }
+          return p
+        })
+      }
+      return [
+        ...prevState,
+        {
+          ...prod,
+          quantity: '1',
+          discount: '0',
+        },
+      ]
+    })
+
+    if (openModalSearchProduct) {
+      setOpenModalSearchProduct(false)
+    }
+  }
+  function handleAddServices(serv: ServicesType) {
+    console.log(serv)
+    setServices((prevState) => {
+      const isExistsService = prevState.findIndex((p) => p.id === serv.id)
+
+      if (isExistsService > -1) {
+        return prevState.map((p) => {
+          if (p.id === serv.id) {
+            return {
+              ...p,
+              quantity: `${Number(p.quantity) + 1}`,
+            }
+          }
+          return p
+        })
+      }
+      return [
+        ...prevState,
+        {
+          ...serv,
+          quantity: '1',
+          discount: '0',
+        },
+      ]
+    })
 
     if (openModalSearchProduct) {
       setOpenModalSearchProduct(false)
@@ -678,7 +748,10 @@ export default function QuotationsCreate() {
                   gap={2}
                 >
                   <ButtonAddItens endIcon={<AddIcon />}>Kit</ButtonAddItens>
-                  <ButtonAddItens endIcon={<AddIcon />}>
+                  <ButtonAddItens
+                    endIcon={<AddIcon />}
+                    onClick={() => setOpenModalSearchServices(true)}
+                  >
                     Serviços
                   </ButtonAddItens>
                   <ButtonAddItens
@@ -889,101 +962,208 @@ export default function QuotationsCreate() {
                 )}
               </Stack>
               {/* Serviços */}
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
+              <Stack
+                component="form"
+                gap={1}
+                onSubmit={handleSubmitService(onSubmitService)}
               >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="center"
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
                 >
-                  <TitleCard sx={{ flex: 1 }}>Serviços</TitleCard>
-
-                  {/* <Box sx={{ marginRight: 1 }}>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <TitleCard sx={{ flex: 1 }}>Serviços</TitleCard>
+                    {/* <Box sx={{ marginRight: 1 }}>
                     <ButtonAddItens>
                       <AddIcon />
                     </ButtonAddItens>
                   </Box> */}
 
-                  <MoreOptionsQuotation
-                    aria-label="options to quotation"
-                    disabledButton
-                    buttons={[
-                      {
-                        label: 'Editar',
-                        action: handleIsEditingOptions,
-                        type: 'service',
-                      },
-                    ]}
-                  />
-                </Stack>
-                <DividerCard />
-                <TableContainer>
-                  <Table aria-label="simple table">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Descrição</TableCell>
-                        <TableCell align="center">Quantidade</TableCell>
-                        <TableCell align="center">Desconto</TableCell>
-                        <TableCell align="center">Valor</TableCell>
-                        <TableCell align="center">Total</TableCell>
-                        <TableCell align="center">Ações</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      <TableRow
-                        sx={{
-                          '&:last-child td, &:last-child th': { border: 0 },
-                        }}
+                    <MoreOptionsQuotation
+                      aria-label="options to quotation"
+                      disabledButton={!(services.length > 0)}
+                      buttons={[
+                        {
+                          label: 'Editar',
+                          action: handleIsEditingOptions,
+                          type: 'service',
+                        },
+                      ]}
+                    />
+                  </Stack>
+                  <DividerCard />
+                  <TableContainer>
+                    <Table aria-label="simple table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>COD.</TableCell>
+                          <TableCell>Descrição</TableCell>
+                          <TableCell align="center">Quantidade</TableCell>
+                          <TableCell align="center">Desconto</TableCell>
+                          <TableCell align="center">Valor</TableCell>
+                          <TableCell align="center">Total</TableCell>
+                          {isEditingService && (
+                            <TableCell align="center">Ações</TableCell>
+                          )}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {!(services?.length > 0) && (
+                          <TableRow
+                            sx={{
+                              '&:last-child td, &:last-child th': {
+                                border: 0,
+                              },
+                            }}
+                          >
+                            <TableCell
+                              align="center"
+                              colSpan={isEditingService ? 7 : 6}
+                              sx={{ paddingTop: 4 }}
+                            >
+                              Nenhuma peça cadastrada.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        {!isEditingService &&
+                          services?.length > 0 &&
+                          services.map((serv) => {
+                            return (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                                key={serv.id}
+                              >
+                                <TableCell align="left">{serv.id}</TableCell>
+                                <TableCell align="left">
+                                  {serv.description}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {serv.quantity}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {/* {prod.discount} */}
+                                  {formatMoneyPtBR(serv.discount)}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(Number(serv.standard_value))}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(
+                                    handleCalcValueTotalPerItem(
+                                      serv.standard_value,
+                                      serv.quantity,
+                                      serv.discount,
+                                    ),
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                        {isEditingService &&
+                          services?.length > 0 &&
+                          services.map((serv, index) => {
+                            setValueService(`service.${index}.id`, serv.id)
+                            setValueService(
+                              `service.${index}.quantity`,
+                              serv.quantity,
+                            )
+                            setValueService(
+                              `service.${index}.discount`,
+                              serv.discount,
+                            )
+                            return (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                                key={serv.id}
+                              >
+                                <TableCell align="left">
+                                  {serv.service_code}
+                                </TableCell>
+                                <TableCell align="left">
+                                  {serv.description}
+                                </TableCell>
+                                <TableCell align="center">
+                                  <InputTableForEdit.number
+                                    control={controlService}
+                                    name={`service.${index}.quantity`}
+                                  />
+                                </TableCell>
+                                <TableCell align="center">
+                                  <InputTableForEdit.money
+                                    control={controlService}
+                                    name={`service.${index}.discount`}
+                                  />
+                                  {/* {formatMoneyPtBR(0)} */}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(Number(serv.standard_value))}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(0)}
+                                </TableCell>
+                                <TableCell align="center">
+                                  <ButtonRemoveItens
+                                    onClick={() => handleRemoveProduct(serv.id)}
+                                  >
+                                    <DeleteIcon />
+                                  </ButtonRemoveItens>
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Paper>
+                {isEditingService && services.length > 0 && (
+                  <Paper
+                    sx={{
+                      p: '0 2',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      background: 'transparent',
+                    }}
+                    elevation={0}
+                  >
+                    <Stack
+                      direction="row"
+                      alignSelf="flex-end"
+                      spacing={2}
+                      sx={{ width: 160 }}
+                    >
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        type="submit"
                       >
-                        <TableCell align="left">Peça 1</TableCell>
-                        <TableCell align="center">
-                          {formatMoneyPtBR(0)}
-                        </TableCell>
-                        <TableCell align="center">
-                          {formatMoneyPtBR(0)}
-                        </TableCell>
-                        <TableCell align="center">
-                          {formatMoneyPtBR(0)}
-                        </TableCell>
-                        <TableCell align="center">
-                          {formatMoneyPtBR(0)}
-                        </TableCell>
-                        <TableCell align="center">
-                          <ButtonRemoveItens>
-                            <DeleteIcon />
-                          </ButtonRemoveItens>
-                        </TableCell>
-                      </TableRow>
-                      <TableRow
-                        sx={{
-                          '&:last-child td, &:last-child th': { border: 0 },
-                        }}
+                        salvar
+                      </ButtonSubmit>
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        onClick={() => setIsEditingService(false)}
                       >
-                        <TableCell align="left">Peça 2</TableCell>
-                        <TableCell align="center">
-                          {formatMoneyPtBR(0)}
-                        </TableCell>
-                        <TableCell align="center">
-                          {formatMoneyPtBR(0)}
-                        </TableCell>
-                        <TableCell align="center">
-                          {formatMoneyPtBR(0)}
-                        </TableCell>
-                        <TableCell align="center">
-                          <ButtonRemoveItens>
-                            <DeleteIcon />
-                          </ButtonRemoveItens>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
+                        cancelar
+                      </ButtonSubmit>
+                    </Stack>
+                  </Paper>
+                )}
+              </Stack>
             </Stack>
           </Grid>
 
@@ -1422,6 +1602,11 @@ export default function QuotationsCreate() {
         handleClose={handleCloseModalSearchProduct}
         openMolal={openModalSearchProduct}
         handleAddProduct={handleAddProduct}
+      />
+      <ModalSearchService
+        handleClose={handleCloseModalSearchServices}
+        openMolal={openModalSearchServices}
+        handleAddServices={handleAddServices}
       />
 
       <ModalSearchClient
