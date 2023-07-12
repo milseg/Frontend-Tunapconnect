@@ -125,7 +125,11 @@ export function CompanyProvider({ children }: GeralProviderProps) {
   )
 
   useEffect(() => {
-    if (companySelected === null) {
+    if (
+      companySelected === null &&
+      !router.asPath.includes('/checklist-factory-view')
+    ) {
+      console.log('company entry')
       const cookies = parseCookies()
       if (cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string]) {
         const companySelectedCookie: cookieCompany = JSON.parse(
