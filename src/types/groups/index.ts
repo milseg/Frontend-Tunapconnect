@@ -4,3 +4,8 @@ export interface GroupsType {
   name: string
   updated_at: string
 }
+
+export interface IGroupsEditDTO {
+  status: number
+  statusText: string
+}

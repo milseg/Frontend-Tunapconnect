@@ -50,7 +50,7 @@ import {
 import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
 import { QuotationResponseType } from '@/types/quotation'
 import { QuotationsContext } from '@/contexts/QuotationContext'
-import { GroupsType } from '@/types/groups'
+import { GroupsType, IGroupsEditDTO } from '@/types/groups'
 import { GroupContext } from '@/contexts/GroupsContext'
 import { formatDateTime } from '@/ultis/formatDate'
 
@@ -75,6 +75,14 @@ type filterValuesProps = {
   }
 }
 
+interface ModalEditProps {
+  open: boolean
+  handleClose: () => void
+  handleFormSubmit: (event: any) => Promise<void>
+  id: number
+  setName: React.Dispatch<React.SetStateAction<string>>
+}
+
 const HeaderBreadcrumbData: listBreadcrumb[] = [
   {
     label: 'Tunap',
@@ -95,6 +103,7 @@ export default function GroupsList() {
   const [isMobile, setIsMobile] = useState(false)
   const [open, setOpen] = useState(false)
   const [newName, setNewName] = useState('')
+  const [editNameId, setEditNameId] = useState<number>()
 
   const { setGroup } = useContext(GroupContext)
 
@@ -102,10 +111,6 @@ export default function GroupsList() {
 
   const theme = useTheme()
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
-
-  const openDialogEdit = () => {
-    setOpen(true)
-  }
 
   const handleCloseDialogEdit = () => {
     setOpen(false)
@@ -121,9 +126,14 @@ export default function GroupsList() {
     }
   }, [isWeb])
 
-  const handleFormEdit = (event: any) => {
+  const handleFormEdit = async (event: any) => {
     event.preventDefault()
-    console.log(newName)
+    const response = await apiB.put<IGroupsEditDTO>(`/grupos/${editNameId}`, {
+      name: newName,
+    })
+    if (response.status === 200) {
+      await router.push(url)
+    }
   }
 
   const { register, handleSubmit, setValue } = useForm({
@@ -231,6 +241,11 @@ export default function GroupsList() {
             e.stopPropagation()
             const id = params.id
             ActionDeleteConfirmations(id as number, handleDelete, '/groups/')
+          }
+
+          const openDialogEdit = () => {
+            setOpen(true)
+            setEditNameId(params.id as number)
           }
           return (
             <Stack direction="row">
