@@ -39,7 +39,7 @@ export default function ServicesTable({
         >
           <TableHead>
             <TableRow>
-              <TableCellHeader>ID</TableCellHeader>
+              <TableCellHeader>Código</TableCellHeader>
               <TableCellHeader>Nome</TableCellHeader>
               <TableCellHeader>QTD</TableCellHeader>
               <TableCellHeader>Preço</TableCellHeader>
@@ -62,17 +62,17 @@ export default function ServicesTable({
                   }}
                   selected={productSelected === row.id}
                 >
-                  <TableCell scope="row">{row.id}</TableCell>
+                  <TableCell scope="row">{row.service_code}</TableCell>
                   <TableCell scope="row">{row.description}</TableCell>
                   <TableCell scope="row">{row.standard_quantity}</TableCell>
-                  <TableCell align="right">
+                  <TableCell scope="row">
                     {formatMoneyPtBR(Number(row.standard_value))}
                   </TableCell>
                 </TableRowSBody>
               ))
             ) : (
               <TableRowSNoData>
-                <TableCell scope="row" colSpan={3} align="center">
+                <TableCell scope="row" colSpan={4} align="center">
                   <Stack gap={1} alignItems="center" justifyContent="center">
                     {isLoading ? (
                       <Box sx={{ display: 'flex' }}>

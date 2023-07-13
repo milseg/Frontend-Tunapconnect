@@ -59,16 +59,16 @@ export default function ModalSearchService({
     setServiceList([])
 
     try {
-      // const result = await api.get(
-      //   `/products?company_id=${companySelected}&search=${
-      //     data.search
-      //   }&limit=10${pagination ? '&current_page=' + pagination.actual : ''}`,
-      // )
       const result = await api.get(
-        `/service?company_id=${companySelected}${
+        `/service?company_id=${companySelected}&search=${data.search}&limit=10${
           pagination ? '&current_page=' + pagination.actual : ''
         }`,
       )
+      // const result = await api.get(
+      //   `/service?company_id=${companySelected}${
+      //     pagination ? '&current_page=' + pagination.actual : ''
+      //   }`,
+      // )
 
       setServiceList(result.data.data)
       if (!pagination) {
