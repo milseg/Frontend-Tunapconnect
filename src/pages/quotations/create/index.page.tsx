@@ -82,8 +82,10 @@ import ModalSearchProduct from './components/ModalSearchProduct'
 import { ProductType, ServicesType, TypeQuotationType } from '@/types/quotation'
 
 import InputTableForEdit from '@/components/InputTableForEdit'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import ModalSearchService from './components/ModalSearchService'
+import { CalcPerUnit } from './Calc'
+
 // import { useForm } from 'react-hook-form'
 
 type updateData = {
@@ -110,9 +112,29 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
   },
 ]
 
+interface productsProps {
+  list: ProductType[] | []
+  totalDiscount: number
+  total: number
+}
+interface servicesProps {
+  list: ServicesType[] | []
+  totalDiscount: number
+  total: number
+}
+
 export default function QuotationsCreate() {
-  const [products, setProducts] = useState<ProductType[] | []>([])
-  const [services, setServices] = useState<ServicesType[] | []>([])
+  const [products, setProducts] = useState<productsProps>({
+    list: [],
+    totalDiscount: 0,
+    total: 0,
+  })
+  const [services, setServices] = useState<servicesProps>({
+    list: [],
+    totalDiscount: 0,
+    total: 0,
+  })
+
   const [client, setClient] = useState<ClientResponseType | null>(null)
 
   const [clientForModalSearch, setClientForModalSearch] =
@@ -222,37 +244,83 @@ export default function QuotationsCreate() {
   //   // resetClientVehicle()
   // }
 
+  // const calcProduct = useWatch({
+  //   control: controlProduct,
+  //   name: 'product',
+  // })
+
   function onSubmitProduct(data: any) {
     console.log(data)
     setProducts((prevState) => {
-      return prevState.map((p, index) => {
+      const newList = prevState.list.map((p, index) => {
         if (p.id === data.product[index].id) {
           return {
             ...p,
             quantity: data.product[index].quantity,
-            discount: data.product[index].discount,
+            discount: data.product[index].discount
+              .replace(/\./g, '')
+              .replace(/,/g, '.'),
           }
         } else {
           return p
         }
       })
+
+      const totalDiscount = newList.reduce((acc, curr) => {
+        return acc + Number(curr.discount) * Number(curr.quantity)
+      }, 0)
+      const total = newList.reduce((acc, curr) => {
+        const totalItem = Number(curr.sale_value) * Number(curr.quantity)
+        return acc + totalItem
+      }, 0)
+
+      console.log(totalDiscount)
+      console.log(total)
+
+      return {
+        ...prevState,
+        list: newList,
+        totalDiscount,
+        total,
+      }
     })
     setIsEditingProduct(false)
   }
   function onSubmitService(data: any) {
     console.log(data)
+
     setServices((prevState) => {
-      return prevState.map((serv, index) => {
-        if (serv.id === data.service[index].id) {
+      const newList = prevState.list.map((p, index) => {
+        if (p.id === data.service[index].id) {
           return {
-            ...serv,
+            ...p,
             quantity: data.service[index].quantity,
-            discount: data.service[index].discount,
+            discount: data.service[index].discount
+              .replace(/\./g, '')
+              .replace(/,/g, '.'),
           }
         } else {
-          return serv
+          return p
         }
       })
+
+      const totalDiscount = newList.reduce((acc, curr) => {
+        return acc + Number(curr.discount) * Number(curr.quantity)
+      }, 0)
+      const total = newList.reduce((acc, curr) => {
+        const totalItem = Number(curr.standard_value) * Number(curr.quantity)
+        return acc + totalItem
+      }, 0)
+
+      console.log(totalDiscount)
+      console.log(total)
+
+      return {
+        ...prevState,
+        list: newList,
+        totalDiscount,
+        total,
+      }
     })
     setIsEditingService(false)
   }
@@ -364,7 +432,10 @@ export default function QuotationsCreate() {
 
   function handleRemoveProduct(id: number) {
     setProducts((prevState) => {
-      return prevState.filter((p) => p.id !== id)
+      return {
+        ...prevState,
+        list: prevState.list.filter((p) => p.id !== id),
+      }
     })
   }
 
@@ -469,12 +540,15 @@ export default function QuotationsCreate() {
   }
 
   function handleAddProduct(prod: ProductType) {
-    console.log(prod)
+    if (!isEditingProduct) {
+      setIsEditingProduct(true)
+    }
+
     setProducts((prevState) => {
-      const isExistsProduct = prevState.findIndex((p) => p.id === prod.id)
+      const isExistsProduct = prevState.list.findIndex((p) => p.id === prod.id)
 
       if (isExistsProduct > -1) {
-        return prevState.map((p) => {
+        const newList = prevState.list.map((p) => {
           if (p.id === prod.id) {
             return {
               ...p,
@@ -483,15 +557,22 @@ export default function QuotationsCreate() {
           }
           return p
         })
+        return {
+          ...prevState,
+          list: newList,
+        }
       }
-      return [
+      return {
         ...prevState,
-        {
-          ...prod,
-          quantity: '1',
-          discount: '0',
-        },
-      ]
+        list: [
+          ...prevState.list,
+          {
+            ...prod,
+            quantity: '1',
+            discount: '0',
+          },
+        ],
+      }
     })
 
     if (openModalSearchProduct) {
@@ -500,32 +581,43 @@ export default function QuotationsCreate() {
   }
   function handleAddServices(serv: ServicesType) {
     console.log(serv)
+    if (!isEditingService) {
+      setIsEditingService(true)
+    }
+
     setServices((prevState) => {
-      const isExistsService = prevState.findIndex((p) => p.id === serv.id)
+      const isExistsService = prevState.list.findIndex((s) => s.id === serv.id)
 
       if (isExistsService > -1) {
-        return prevState.map((p) => {
-          if (p.id === serv.id) {
+        const newList = prevState.list.map((s) => {
+          if (s.id === serv.id) {
             return {
-              ...p,
-              quantity: `${Number(p.quantity) + 1}`,
+              ...s,
+              quantity: `${Number(s.quantity) + 1}`,
             }
           }
-          return p
+          return s
         })
+        return {
+          ...prevState,
+          list: newList,
+        }
       }
-      return [
+      return {
         ...prevState,
-        {
-          ...serv,
-          quantity: '1',
-          discount: '0',
-        },
-      ]
+        list: [
+          ...prevState.list,
+          {
+            ...serv,
+            quantity: '1',
+            discount: '0',
+          },
+        ],
+      }
     })
 
-    if (openModalSearchProduct) {
-      setOpenModalSearchProduct(false)
+    if (openModalSearchServices) {
+      setOpenModalSearchServices(false)
     }
   }
 
@@ -789,7 +881,7 @@ export default function QuotationsCreate() {
 
                     <MoreOptionsQuotation
                       aria-label="options to quotation"
-                      disabledButton={!(products.length > 0)}
+                      disabledButton={!(products.list.length > 0)}
                       buttons={[
                         {
                           label: 'Editar',
@@ -806,8 +898,8 @@ export default function QuotationsCreate() {
                         <TableRow>
                           <TableCell>COD.</TableCell>
                           <TableCell>Descrição</TableCell>
-                          <TableCell align="center">Quantidade</TableCell>
-                          <TableCell align="center">Desconto</TableCell>
+                          <TableCell align="center">QTD</TableCell>
+                          <TableCell align="center">Desconto(UNID.)</TableCell>
                           <TableCell align="center">Valor</TableCell>
                           <TableCell align="center">Total</TableCell>
                           {isEditingProduct && (
@@ -816,7 +908,7 @@ export default function QuotationsCreate() {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {!(products?.length > 0) && (
+                        {!(products.list?.length > 0) && (
                           <TableRow
                             sx={{
                               '&:last-child td, &:last-child th': {
@@ -834,8 +926,8 @@ export default function QuotationsCreate() {
                           </TableRow>
                         )}
                         {!isEditingProduct &&
-                          products?.length > 0 &&
-                          products.map((prod) => {
+                          products.list?.length > 0 &&
+                          products.list.map((prod) => {
                             return (
                               <TableRow
                                 sx={{
@@ -870,8 +962,8 @@ export default function QuotationsCreate() {
                             )
                           })}
                         {isEditingProduct &&
-                          products?.length > 0 &&
-                          products.map((prod, index) => {
+                          products.list?.length > 0 &&
+                          products.list.map((prod, index) => {
                             setValueProduct(`product.${index}.id`, prod.id)
                             setValueProduct(
                               `product.${index}.quantity`,
@@ -911,7 +1003,13 @@ export default function QuotationsCreate() {
                                   {formatMoneyPtBR(Number(prod.sale_value))}
                                 </TableCell>
                                 <TableCell align="center">
-                                  {formatMoneyPtBR(0)}
+                                  {/* {formatMoneyPtBR(0)} */}
+                                  <CalcPerUnit
+                                    control={controlProduct}
+                                    index={index}
+                                    price={Number(prod.sale_value)}
+                                    name="product"
+                                  />
                                 </TableCell>
                                 <TableCell align="center">
                                   <ButtonRemoveItens
@@ -927,7 +1025,7 @@ export default function QuotationsCreate() {
                     </Table>
                   </TableContainer>
                 </Paper>
-                {isEditingProduct && products.length > 0 && (
+                {isEditingProduct && products.list.length > 0 && (
                   <Paper
                     sx={{
                       p: '0 2',
@@ -988,7 +1086,7 @@ export default function QuotationsCreate() {
 
                     <MoreOptionsQuotation
                       aria-label="options to quotation"
-                      disabledButton={!(services.length > 0)}
+                      disabledButton={!(services.list.length > 0)}
                       buttons={[
                         {
                           label: 'Editar',
@@ -1005,8 +1103,8 @@ export default function QuotationsCreate() {
                         <TableRow>
                           <TableCell>COD.</TableCell>
                           <TableCell>Descrição</TableCell>
-                          <TableCell align="center">Quantidade</TableCell>
-                          <TableCell align="center">Desconto</TableCell>
+                          <TableCell align="center">QTD</TableCell>
+                          <TableCell align="center">Desconto(UNID.)</TableCell>
                           <TableCell align="center">Valor</TableCell>
                           <TableCell align="center">Total</TableCell>
                           {isEditingService && (
@@ -1015,7 +1113,7 @@ export default function QuotationsCreate() {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {!(services?.length > 0) && (
+                        {!(services?.list.length > 0) && (
                           <TableRow
                             sx={{
                               '&:last-child td, &:last-child th': {
@@ -1033,8 +1131,8 @@ export default function QuotationsCreate() {
                           </TableRow>
                         )}
                         {!isEditingService &&
-                          services?.length > 0 &&
-                          services.map((serv) => {
+                          services?.list.length > 0 &&
+                          services.list.map((serv, index) => {
                             return (
                               <TableRow
                                 sx={{
@@ -1071,8 +1169,8 @@ export default function QuotationsCreate() {
                             )
                           })}
                         {isEditingService &&
-                          services?.length > 0 &&
-                          services.map((serv, index) => {
+                          services?.list.length > 0 &&
+                          services.list.map((serv, index) => {
                             setValueService(`service.${index}.id`, serv.id)
                             setValueService(
                               `service.${index}.quantity`,
@@ -1114,7 +1212,13 @@ export default function QuotationsCreate() {
                                   {formatMoneyPtBR(Number(serv.standard_value))}
                                 </TableCell>
                                 <TableCell align="center">
-                                  {formatMoneyPtBR(0)}
+                                  {/* {formatMoneyPtBR(0)} */}
+                                  <CalcPerUnit
+                                    control={controlService}
+                                    index={index}
+                                    price={Number(serv.standard_value)}
+                                    name="service"
+                                  />
                                 </TableCell>
                                 <TableCell align="center">
                                   <ButtonRemoveItens
@@ -1130,7 +1234,7 @@ export default function QuotationsCreate() {
                     </Table>
                   </TableContainer>
                 </Paper>
-                {isEditingService && services.length > 0 && (
+                {isEditingService && services.list.length > 0 && (
                   <Paper
                     sx={{
                       p: '0 2',
@@ -1510,7 +1614,7 @@ export default function QuotationsCreate() {
                       >
                         <TableCell align="left">Valor dos itens:</TableCell>
                         <TableCell align="center">
-                          {formatMoneyPtBR(0)}
+                          {formatMoneyPtBR(products.total)}
                         </TableCell>
                       </TableRow>
                       <TableRow
@@ -1520,7 +1624,7 @@ export default function QuotationsCreate() {
                       >
                         <TableCell align="left">Descontos nos itens:</TableCell>
                         <TableCell align="center">
-                          {formatMoneyPtBR(0)}
+                          {formatMoneyPtBR(products.totalDiscount)}
                         </TableCell>
                       </TableRow>
                       <TableRow
@@ -1530,7 +1634,19 @@ export default function QuotationsCreate() {
                       >
                         <TableCell align="left">Valor dos Serviços:</TableCell>
                         <TableCell align="center">
-                          {formatMoneyPtBR(0)}
+                          {formatMoneyPtBR(services.total)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell align="left">
+                          Descontos dos serviços:
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatMoneyPtBR(services.totalDiscount)}
                         </TableCell>
                       </TableRow>
                       <TableRow
@@ -1550,7 +1666,11 @@ export default function QuotationsCreate() {
                       >
                         <TableCell align="left">Total de líquido:</TableCell>
                         <TableCell align="center">
-                          {formatMoneyPtBR(0)}
+                          {formatMoneyPtBR(
+                            products.total -
+                              products.totalDiscount +
+                              (services.total - services.totalDiscount),
+                          )}
                         </TableCell>
                       </TableRow>
                     </TableBody>

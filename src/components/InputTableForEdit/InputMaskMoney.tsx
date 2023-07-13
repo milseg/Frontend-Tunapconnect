@@ -48,7 +48,8 @@ export function InputMoneyMask({ name, control }: InputMoneyMaskProps) {
         <TextField
           variant="standard"
           size="small"
-          sx={{ width: 105 }}
+          sx={{ width: '100%' }}
+          // sx={{ width: 105 }}
           // style={{ marginTop: 11 }}
           fullWidth
           {...field}

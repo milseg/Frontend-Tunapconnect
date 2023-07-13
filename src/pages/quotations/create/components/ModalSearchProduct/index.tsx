@@ -68,7 +68,7 @@ export default function ModalSearchProduct({
           pagination ? '&current_page=' + pagination.actual : ''
         }`,
       )
-
+      console.log(result)
       setProductList(result.data.data)
       if (!pagination) {
         setPagination((prevState) => {
