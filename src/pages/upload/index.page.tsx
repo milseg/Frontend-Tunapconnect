@@ -74,7 +74,6 @@ export default function Upload() {
       setCurrentFile(selectedFiles[0])
       setFileName(selectedFiles[0].name)
     }
-    console.log(filesListDTO)
   }
 
   const updateFilesUploadMutation = useMutation(

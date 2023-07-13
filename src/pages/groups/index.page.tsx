@@ -36,7 +36,17 @@ import Skeleton from '@mui/material/Skeleton'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 import ButtonFilterSelect from './components/ButtonFilterSelect'
 // import FilterListIcon from '@mui/icons-material/FilterList'
-import { Stack, useMediaQuery, useTheme } from '@mui/material'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Stack,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material'
 import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
 import { QuotationResponseType } from '@/types/quotation'
 import { QuotationsContext } from '@/contexts/QuotationContext'
@@ -83,6 +93,8 @@ export default function GroupsList() {
   }>({ next: true, previous: true })
   const [filterValues, setFilterValues] = useState<filterValuesProps>()
   const [isMobile, setIsMobile] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [newName, setNewName] = useState('')
 
   const { setGroup } = useContext(GroupContext)
 
@@ -90,6 +102,14 @@ export default function GroupsList() {
 
   const theme = useTheme()
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
+
+  const openDialogEdit = () => {
+    setOpen(true)
+  }
+
+  const handleCloseDialogEdit = () => {
+    setOpen(false)
+  }
 
   useEffect(() => {
     if (!isWeb) {
@@ -100,6 +120,11 @@ export default function GroupsList() {
       setIsMobile(false)
     }
   }, [isWeb])
+
+  const handleFormEdit = (event: any) => {
+    event.preventDefault()
+    console.log(newName)
+  }
 
   const { register, handleSubmit, setValue } = useForm({
     defaultValues: {
@@ -220,6 +245,7 @@ export default function GroupsList() {
               <IconButton
                 aria-label="search"
                 color="warning"
+                onClick={openDialogEdit}
                 sx={{ marginLeft: 1, color: 'blue' }}
               >
                 <EditIcon />
@@ -474,6 +500,30 @@ export default function GroupsList() {
           )}
         </Grid>
       </Grid>
+      <Dialog open={open} onClose={handleCloseDialogEdit}>
+        <DialogTitle>Editar Nome</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Para editar o nome do grupo, insira o nome novo no campo abaixo
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Nove nome"
+            type="email"
+            fullWidth
+            variant="standard"
+            onInput={(e: any) => setNewName(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialogEdit}>Cancelar</Button>
+          <Button type="submit" onClick={handleFormEdit}>
+            Atualizar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   )
 }
