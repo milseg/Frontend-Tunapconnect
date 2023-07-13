@@ -438,6 +438,14 @@ export default function QuotationsCreate() {
       }
     })
   }
+  function handleRemoveService(id: number) {
+    setServices((prevState) => {
+      return {
+        ...prevState,
+        list: prevState.list.filter((p) => p.id !== id),
+      }
+    })
+  }
 
   function handleCalcValueTotalPerItem(
     price: string,
@@ -609,7 +617,7 @@ export default function QuotationsCreate() {
           ...prevState.list,
           {
             ...serv,
-            quantity: '1',
+            quantity: serv.standard_quantity,
             discount: '0',
           },
         ],
@@ -1222,7 +1230,7 @@ export default function QuotationsCreate() {
                                 </TableCell>
                                 <TableCell align="center">
                                   <ButtonRemoveItens
-                                    onClick={() => handleRemoveProduct(serv.id)}
+                                    onClick={() => handleRemoveService(serv.id)}
                                   >
                                     <DeleteIcon />
                                   </ButtonRemoveItens>
@@ -1654,9 +1662,23 @@ export default function QuotationsCreate() {
                           '&:last-child td, &:last-child th': { border: 0 },
                         }}
                       >
-                        <TableCell align="left">Total de descontos:</TableCell>
-                        <TableCell align="center">
-                          {formatMoneyPtBR(0)}
+                        <TableCell
+                          align="left"
+                          sx={{
+                            color: '#1C4961',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          Total de Bruto:
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{
+                            color: '#1C4961',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          {formatMoneyPtBR(products.total + services.total)}
                         </TableCell>
                       </TableRow>
                       <TableRow
@@ -1664,8 +1686,49 @@ export default function QuotationsCreate() {
                           '&:last-child td, &:last-child th': { border: 0 },
                         }}
                       >
-                        <TableCell align="left">Total de líquido:</TableCell>
-                        <TableCell align="center">
+                        <TableCell
+                          align="left"
+                          sx={{
+                            color: '#1C4961',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          Total de descontos:
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{
+                            color: '#1C4961',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          {formatMoneyPtBR(
+                            products.totalDiscount + services.totalDiscount,
+                          )}
+                        </TableCell>
+                      </TableRow>
+
+                      <TableRow
+                        sx={{
+                          '&:last-child td, &:last-child th': { border: 0 },
+                        }}
+                      >
+                        <TableCell
+                          align="left"
+                          sx={{
+                            color: '#1C4961',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          Total de líquido:
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{
+                            color: '#1C4961',
+                            fontWeight: 'bold',
+                          }}
+                        >
                           {formatMoneyPtBR(
                             products.total -
                               products.totalDiscount +

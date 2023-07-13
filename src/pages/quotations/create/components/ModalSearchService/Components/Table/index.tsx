@@ -40,8 +40,9 @@ export default function ServicesTable({
           <TableHead>
             <TableRow>
               <TableCellHeader>ID</TableCellHeader>
-              <TableCellHeader>name</TableCellHeader>
-              <TableCellHeader>preço</TableCellHeader>
+              <TableCellHeader>Nome</TableCellHeader>
+              <TableCellHeader>QTD</TableCellHeader>
+              <TableCellHeader>Preço</TableCellHeader>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -63,6 +64,7 @@ export default function ServicesTable({
                 >
                   <TableCell scope="row">{row.id}</TableCell>
                   <TableCell scope="row">{row.description}</TableCell>
+                  <TableCell scope="row">{row.standard_quantity}</TableCell>
                   <TableCell align="right">
                     {formatMoneyPtBR(Number(row.standard_value))}
                   </TableCell>

@@ -64,7 +64,7 @@ export default function ProductTable({
                   <TableCell scope="row">{row.id}</TableCell>
                   <TableCell scope="row">{row.name}</TableCell>
                   <TableCell align="right">
-                    {formatMoneyPtBR(Number(row.guarantee_value))}
+                    {formatMoneyPtBR(Number(row.sale_value))}
                   </TableCell>
                 </TableRowSBody>
               ))
