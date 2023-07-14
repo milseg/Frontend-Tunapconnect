@@ -440,14 +440,16 @@ export default function QuotationList() {
                 </ButtonAdd>
               </Link>
             ) : (
-              <ButtonIcon
-                sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
-                onClick={async () => {
-                  // await router.push(`/service-schedule/create`)
-                }}
-              >
-                <AddCircleOutlineIcon />
-              </ButtonIcon>
+              <Link href={'/quotations/create'}>
+                <ButtonIcon
+                  sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
+                  onClick={async () => {
+                    // await router.push(`/service-schedule/create`)
+                  }}
+                >
+                  <AddCircleOutlineIcon />
+                </ButtonIcon>
+              </Link>
             )}
           </Stack>
           {/* <Grid
