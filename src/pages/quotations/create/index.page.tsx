@@ -552,12 +552,21 @@ export default function QuotationsCreate() {
       setIsEditingProduct(true)
     }
 
+    // setValueProduct(`product.${index}.id`, prod.id)
+    // setValueProduct(`product.${index}.quantity`, prod.quantity)
+    // setValueProduct(
+    //   `product.${index}.discount`,
+    //   prod.discount,
+    // )
+
     setProducts((prevState) => {
       const isExistsProduct = prevState.list.findIndex((p) => p.id === prod.id)
 
       if (isExistsProduct > -1) {
-        const newList = prevState.list.map((p) => {
+        const newList = prevState.list.map((p, index) => {
           if (p.id === prod.id) {
+            setValueProduct(`product.${index}.quantity`, Number(p.quantity) + 1)
+            setValueProduct(`product.${index}.discount`, p.discount)
             return {
               ...p,
               quantity: `${Number(p.quantity) + 1}`,
@@ -565,11 +574,16 @@ export default function QuotationsCreate() {
           }
           return p
         })
+
         return {
           ...prevState,
           list: newList,
         }
       }
+
+      setValueProduct(`product.${prevState.list.length}.id`, prod.id)
+      setValueProduct(`product.${prevState.list.length}.quantity`, 1)
+      setValueProduct(`product.${prevState.list.length}.discount`, 0)
       return {
         ...prevState,
         list: [
@@ -597,8 +611,13 @@ export default function QuotationsCreate() {
       const isExistsService = prevState.list.findIndex((s) => s.id === serv.id)
 
       if (isExistsService > -1) {
-        const newList = prevState.list.map((s) => {
+        const newList = prevState.list.map((s, index) => {
           if (s.id === serv.id) {
+            setValueService(
+              `service.${index}.quantity`,
+              Number(s.quantity) + serv.standard_quantity,
+            )
+            setValueService(`service.${index}.discount`, s.discount)
             return {
               ...s,
               quantity: `${Number(s.quantity) + 1}`,
@@ -611,6 +630,13 @@ export default function QuotationsCreate() {
           list: newList,
         }
       }
+
+      setValueService(`service.${prevState.list.length}.id`, serv.id)
+      setValueService(
+        `service.${prevState.list.length}.quantity`,
+        serv.standard_quantity,
+      )
+      setValueService(`service.${prevState.list.length}.discount`, '0')
       return {
         ...prevState,
         list: [
@@ -696,6 +722,30 @@ export default function QuotationsCreate() {
       )
     }
   }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList])
+
+  // useEffect(() => {
+  //   // products.list.forEach((p, index) => {
+  //   //   setValueProduct(`product.${index}.id`, p.id)
+  //   //   setValueProduct(`product.${index}.quantity`, Number(p.quantity))
+  //   //   setValueProduct(`product.${index}.discount`, p.discount)
+  //   // })
+
+  //   const lastProduct = products.list[products.list.length - 1]
+
+  //   setValueProduct(`product.${products.list.length - 1}.id`, lastProduct.id)
+  //   setValueProduct(
+  //     `product.${products.list.length - 1}.quantity`,
+  //     Number(lastProduct.quantity),
+  //   )
+  //   setValueProduct(`product.${products.list.length - 1}.discount`, p.discount)
+  // }, [products.list])
+  // useEffect(() => {
+  //   services.list.forEach((s, index) => {
+  //     setValueService(`service.${index}.id`, s.id)
+  //     setValueService(`service.${index}.quantity`, Number(s.quantity))
+  //     setValueService(`service.${index}.discount`, s.discount)
+  //   })
+  // }, [services.list])
 
   return (
     <>
@@ -904,7 +954,7 @@ export default function QuotationsCreate() {
                     <Table aria-label="simple table">
                       <TableHead>
                         <TableRow>
-                          <TableCell>COD.</TableCell>
+                          <TableCell>Código</TableCell>
                           <TableCell>Descrição</TableCell>
                           <TableCell align="center">QTD</TableCell>
                           <TableCell align="center">Desconto(UNID.)</TableCell>
@@ -945,7 +995,9 @@ export default function QuotationsCreate() {
                                 }}
                                 key={prod.id}
                               >
-                                <TableCell align="left">{prod.id}</TableCell>
+                                <TableCell align="left">
+                                  {prod.product_code}
+                                </TableCell>
                                 <TableCell align="left">{prod.name}</TableCell>
                                 <TableCell align="center">
                                   {prod.quantity}
@@ -973,14 +1025,14 @@ export default function QuotationsCreate() {
                           products.list?.length > 0 &&
                           products.list.map((prod, index) => {
                             setValueProduct(`product.${index}.id`, prod.id)
-                            setValueProduct(
-                              `product.${index}.quantity`,
-                              prod.quantity,
-                            )
-                            setValueProduct(
-                              `product.${index}.discount`,
-                              prod.discount,
-                            )
+                            // setValueProduct(
+                            //   `product.${index}.quantity`,
+                            //   prod.quantity,
+                            // )
+                            // setValueProduct(
+                            //   `product.${index}.discount`,
+                            //   prod.discount,
+                            // )
                             return (
                               <TableRow
                                 sx={{
@@ -1012,12 +1064,12 @@ export default function QuotationsCreate() {
                                 </TableCell>
                                 <TableCell align="center">
                                   {/* {formatMoneyPtBR(0)} */}
-                                  <CalcPerUnit
+                                  {/* <CalcPerUnit
                                     control={controlProduct}
                                     index={index}
                                     price={Number(prod.sale_value)}
                                     name="product"
-                                  />
+                                  /> */}
                                 </TableCell>
                                 <TableCell align="center">
                                   <ButtonRemoveItens
@@ -1109,7 +1161,7 @@ export default function QuotationsCreate() {
                     <Table aria-label="simple table">
                       <TableHead>
                         <TableRow>
-                          <TableCell>COD.</TableCell>
+                          <TableCell>Código</TableCell>
                           <TableCell>Descrição</TableCell>
                           <TableCell align="center">QTD</TableCell>
                           <TableCell align="center">Desconto(UNID.)</TableCell>
@@ -1150,7 +1202,9 @@ export default function QuotationsCreate() {
                                 }}
                                 key={serv.id}
                               >
-                                <TableCell align="left">{serv.id}</TableCell>
+                                <TableCell align="left">
+                                  {serv.service_code}
+                                </TableCell>
                                 <TableCell align="left">
                                   {serv.description}
                                 </TableCell>
@@ -1179,15 +1233,15 @@ export default function QuotationsCreate() {
                         {isEditingService &&
                           services?.list.length > 0 &&
                           services.list.map((serv, index) => {
-                            setValueService(`service.${index}.id`, serv.id)
-                            setValueService(
-                              `service.${index}.quantity`,
-                              serv.quantity,
-                            )
-                            setValueService(
-                              `service.${index}.discount`,
-                              serv.discount,
-                            )
+                            // setValueService(`service.${index}.id`, serv.id)
+                            // setValueService(
+                            //   `service.${index}.quantity`,
+                            //   serv.quantity,
+                            // )
+                            // setValueService(
+                            //   `service.${index}.discount`,
+                            //   serv.discount,
+                            // )
                             return (
                               <TableRow
                                 sx={{
@@ -1221,12 +1275,12 @@ export default function QuotationsCreate() {
                                 </TableCell>
                                 <TableCell align="center">
                                   {/* {formatMoneyPtBR(0)} */}
-                                  <CalcPerUnit
+                                  {/* <CalcPerUnit
                                     control={controlService}
                                     index={index}
                                     price={Number(serv.standard_value)}
                                     name="service"
-                                  />
+                                  /> */}
                                 </TableCell>
                                 <TableCell align="center">
                                   <ButtonRemoveItens
