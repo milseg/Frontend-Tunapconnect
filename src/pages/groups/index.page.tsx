@@ -488,12 +488,12 @@ export default function GroupsList() {
                     <SearchIcon />
                   </ButtonIcon>
                 </Box>
-                <Box>
+                {/* <Box>
                   <ButtonFilterSelect
                     handleFilterValues={handleFilterValues}
                     isMobile={isMobile}
                   />
-                </Box>
+                </Box> */}
               </Grid>
             </Grid>
           </Paper>
