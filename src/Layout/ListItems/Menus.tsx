@@ -75,10 +75,10 @@ export function allRoutesIntranetTunap() {
           ],
         },
         {
-          path: '/groups',
+          path: '/grupos',
           component: <GroupsIcon />,
           title: 'Grupos',
-          href: `/groups`,
+          href: `/grupos`,
         },
       ],
     },

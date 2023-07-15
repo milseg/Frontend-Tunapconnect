@@ -1,8 +1,8 @@
 import { apiB } from '@/lib/api'
-import { GroupsType } from '@/types/groups'
+import { IGroupsRequestDTO } from '@/types/groups'
 
-async function getGroupsList({ queryKey }: any): Promise<GroupsType[]> {
-  const response = await apiB.get<GroupsType[]>(
+async function getGroupsList({ queryKey }: any): Promise<IGroupsRequestDTO> {
+  const response = await apiB.get<IGroupsRequestDTO>(
     `/grupos?search=${queryKey[2]}&page=${queryKey[1]}&limit=5`,
   )
   return response.data
