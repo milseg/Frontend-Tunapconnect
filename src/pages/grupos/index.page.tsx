@@ -53,6 +53,7 @@ import groupsListRequests from '../api/groups.api'
 import theme from '@/styles/config/theme'
 import { GroupsType, IGroupsEditDTO } from '@/types/groups'
 import { Delete } from '@mui/icons-material'
+import { CustomNoRowsOverlay } from '@/components/TableApp/NoRows'
 
 type SearchFormProps = {
   search: string
@@ -64,6 +65,7 @@ export default function Groups() {
   const [newName, setNewName] = useState('')
   const [isMobile, setIsMobile] = useState(false)
   const [editNameId, setEditNameId] = useState<number>()
+  const [isLoadingEdit, setIsLoadingEdit] = useState<boolean>(false)
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
 
   const queryClient = useQueryClient()
@@ -89,7 +91,7 @@ export default function Groups() {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['groupsList', pageNumber, router.query.search],
+    queryKey: ['groupsList', pageNumber, router.query.nome],
     queryFn: groupsListRequests.getGroupsList,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -105,19 +107,21 @@ export default function Groups() {
 
   async function onSubmitSearch(data: SearchFormProps) {
     await router.push(
-      `/grupos?${data.search ? '&search=' + data.search : ''}
+      `/grupos?${data.search ? '&nome=' + data.search : ''}
      `,
     )
   }
 
   const handleFormEdit = async (event: any) => {
     event.preventDefault()
+    setIsLoadingEdit(true)
     const response = await apiB.put<IGroupsEditDTO>(`/grupos/${editNameId}`, {
       name: newName,
     })
     if (response.status === 200) {
       refetch()
       setOpen(false)
+      setIsLoadingEdit(false)
     }
   }
 
@@ -374,6 +378,9 @@ export default function Groups() {
                           </Stack>
                         </Stack>
                       ))}
+                    {filesListDTO && filesListDTO.groups.length === 0 && (
+                      <CustomNoRowsOverlay />
+                    )}
                   </Paper>
                 )}
               </Paper>
@@ -422,12 +429,26 @@ export default function Groups() {
               onInput={(e: any) => setNewName(e.target.value)}
             />
           </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialogEdit}>Cancelar</Button>
-            <Button type="submit" onClick={handleFormEdit}>
-              Atualizar
-            </Button>
-          </DialogActions>
+          {isLoadingEdit ? (
+            <Grid
+              sx={{
+                p: { xs: 0, sm: 2 },
+                display: 'flex',
+                flexDirection: 'column',
+                height: 'fit-content',
+                alignItems: 'flex-end',
+              }}
+            >
+              <Loading />
+            </Grid>
+          ) : (
+            <DialogActions>
+              <Button onClick={handleCloseDialogEdit}>Cancelar</Button>
+              <Button type="submit" onClick={handleFormEdit}>
+                Atualizar
+              </Button>
+            </DialogActions>
+          )}
         </Dialog>
       </Container>
     </>
