@@ -3,6 +3,8 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
 import EditIcon from '@mui/icons-material/Edit'
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'
+import GroupsIcon from '@mui/icons-material/Groups'
+import BusinessIcon from '@mui/icons-material/Business'
 
 export function allRoutes(companySelected: number | null) {
   const routesPaths = [
@@ -72,6 +74,18 @@ export function allRoutesIntranetTunap() {
               href: `/upload?status=eurobike`,
             },
           ],
+        },
+        {
+          path: '/grupos',
+          component: <GroupsIcon />,
+          title: 'Grupos',
+          href: `/grupos`,
+        },
+        {
+          path: '/empresas',
+          component: <BusinessIcon />,
+          title: 'Empresas',
+          href: `/empresas`,
         },
       ],
     },
