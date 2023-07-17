@@ -52,11 +52,11 @@ export default function Empresas() {
   const [open, setOpen] = useState(false)
   const [newName, setNewName] = useState<string>('')
   const [newCnpj, setNewCnpj] = useState<string>('')
-  const [newIdGroup, setNewIdGroup] = useState<number>()
   const [newIntegrationCode, setNewIntegrationCode] = useState<string>('')
   const [isMobile, setIsMobile] = useState<boolean>(false)
   const [editNameId, setEditNameId] = useState<number>()
   const [isLoadingEdit, setIsLoadingEdit] = useState<boolean>(false)
+  const [actualFormValues, setActualFormValues] = useState<CompaniesType>()
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
 
   const queryClient = useQueryClient()
@@ -129,9 +129,10 @@ export default function Empresas() {
     ActionDeleteConfirmations(selectId, handleDelete, '/groups/')
   }
 
-  const openDialogEdit = (selectId: number) => {
+  const openDialogEdit = (actualCompanyValues: CompaniesType) => {
     setOpen(true)
-    setEditNameId(selectId)
+    setEditNameId(actualCompanyValues.id)
+    setActualFormValues(actualCompanyValues)
   }
 
   return (
@@ -351,7 +352,17 @@ export default function Empresas() {
                               <IconButton
                                 aria-label="search"
                                 color="warning"
-                                onClick={() => openDialogEdit(company.id)}
+                                onClick={() =>
+                                  openDialogEdit({
+                                    cnpj: company.cnpj,
+                                    id: company.id,
+                                    created_at: company.created_at,
+                                    integration_code: company.integration_code,
+                                    name: company.name,
+                                    responsible_name: company.responsible_name,
+                                    updated_at: company.updated_at,
+                                  })
+                                }
                                 sx={{ marginLeft: 1, color: 'blue' }}
                               >
                                 <EditIcon />
@@ -407,9 +418,10 @@ export default function Empresas() {
               margin="dense"
               id="name"
               label="Novo nome"
-              type="email"
+              type="text"
               fullWidth
               variant="standard"
+              defaultValue={actualFormValues?.name}
               onInput={(e: any) => setNewName(e.target.value)}
             />
             <TextField
@@ -417,9 +429,10 @@ export default function Empresas() {
               margin="dense"
               id="cnpj"
               label="Novo cnpj"
-              type="email"
+              type="text"
               fullWidth
               variant="standard"
+              defaultValue={actualFormValues?.cnpj}
               onInput={(e: any) => setNewCnpj(e.target.value)}
             />
             <TextField
@@ -427,9 +440,10 @@ export default function Empresas() {
               margin="dense"
               id="integration_code"
               label="Novo código de integração"
-              type="email"
+              type="text"
               fullWidth
               variant="standard"
+              defaultValue={actualFormValues?.integration_code}
               onInput={(e: any) => setNewIntegrationCode(e.target.value)}
             />
           </DialogContent>

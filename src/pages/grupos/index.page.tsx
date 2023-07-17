@@ -51,6 +51,7 @@ export default function Groups() {
   const [newName, setNewName] = useState('')
   const [isMobile, setIsMobile] = useState(false)
   const [editNameId, setEditNameId] = useState<number>()
+  const [actualNameValue, setActualNameValue] = useState<string>()
   const [isLoadingEdit, setIsLoadingEdit] = useState<boolean>(false)
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
 
@@ -118,9 +119,10 @@ export default function Groups() {
     ActionDeleteConfirmations(selectId, handleDelete, '/groups/')
   }
 
-  const openDialogEdit = (selectId: number) => {
+  const openDialogEdit = (selectId: number, actualName: string) => {
     setOpen(true)
     setEditNameId(selectId)
+    setActualNameValue(actualName)
   }
 
   return (
@@ -355,7 +357,9 @@ export default function Groups() {
                             <IconButton
                               aria-label="search"
                               color="warning"
-                              onClick={() => openDialogEdit(group.id_group)}
+                              onClick={() =>
+                                openDialogEdit(group.id_group, group.name)
+                              }
                               sx={{ marginLeft: 1, color: 'blue' }}
                             >
                               <EditIcon />
@@ -407,10 +411,11 @@ export default function Groups() {
               autoFocus
               margin="dense"
               id="name"
-              label="Nove nome"
-              type="email"
+              label="Novo nome"
+              type="text"
               fullWidth
               variant="standard"
+              defaultValue={actualNameValue}
               onInput={(e: any) => setNewName(e.target.value)}
             />
           </DialogContent>
