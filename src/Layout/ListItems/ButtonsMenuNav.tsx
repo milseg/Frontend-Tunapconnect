@@ -153,7 +153,9 @@ export const ButtonsMenuNav = ({
                         menu?.submenu.map((sub, index) => {
                           return (
                             <React.Fragment key={Math.random() * 20000}>
-                              {sub.path === '/groups' && sub.href ? (
+                              {(sub.path === '/grupos' ||
+                                sub.path === '/empresas') &&
+                              sub.href ? (
                                 <Link
                                   href={sub.href}
                                   style={{ textDecoration: 'none' }}
