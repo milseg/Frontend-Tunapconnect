@@ -12,23 +12,22 @@ import { Stack } from '@mui/system'
 import { useState } from 'react'
 import { Box, CircularProgress } from '@mui/material'
 
-import { ProductType } from '@/types/quotation'
-import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
+import { KitType } from '@/types/quotation'
 
-interface ProductsTableProps {
-  handleSelectedProduct: (product: ProductType) => void
-  data: ProductType[]
+interface KitTableProps {
+  handleSelectedKit: (kit: KitType) => void
+  data: KitType[]
   isLoading: boolean
   handleDoubleClick: () => void
 }
 
-export default function ProductTable({
+export default function KitTable({
   data,
-  handleSelectedProduct,
+  handleSelectedKit,
   isLoading,
   handleDoubleClick,
-}: ProductsTableProps) {
-  const [productSelected, setProductSelected] = useState<number | null>(null)
+}: KitTableProps) {
+  const [kitSelected, setKitSelected] = useState<number | null>(null)
   return (
     <>
       <TableContainer component={Paper}>
@@ -48,7 +47,7 @@ export default function ProductTable({
             {data && data.length > 0 ? (
               data.map((row) => (
                 <TableRowSBody
-                  key={row.id}
+                  key={row.kit_id}
                   sx={{
                     '&:last-child td, &:last-child th': { border: 0 },
                   }}
@@ -56,16 +55,13 @@ export default function ProductTable({
                     if (e.detail === 2) {
                       handleDoubleClick()
                     }
-                    handleSelectedProduct(row)
-                    setProductSelected(row.id)
+                    handleSelectedKit(row)
+                    setKitSelected(row.kit_id)
                   }}
-                  selected={productSelected === row.id}
+                  selected={kitSelected === row.kit_id}
                 >
-                  <TableCell scope="row">{row.product_code}</TableCell>
+                  <TableCell scope="row">{row.kit_id}</TableCell>
                   <TableCell scope="row">{row.name}</TableCell>
-                  <TableCell scope="row">
-                    {formatMoneyPtBR(Number(row.sale_value))}
-                  </TableCell>
                 </TableRowSBody>
               ))
             ) : (

@@ -79,12 +79,18 @@ import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
 import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
 import ModalSearchProduct from './components/ModalSearchProduct'
-import { ProductType, ServicesType, TypeQuotationType } from '@/types/quotation'
+import {
+  KitType,
+  ProductType,
+  ServicesType,
+  TypeQuotationType,
+} from '@/types/quotation'
 
 import InputTableForEdit from '@/components/InputTableForEdit'
 import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import ModalSearchService from './components/ModalSearchService'
 import { CalcPerUnit } from './Calc'
+import ModalSearchKit from './components/ModalSearchKit'
 
 // import { useForm } from 'react-hook-form'
 
@@ -122,6 +128,11 @@ interface servicesProps {
   totalDiscount: number
   total: number
 }
+interface kitsProps {
+  list: KitType[] | []
+  totalDiscount: number
+  total: number
+}
 
 export default function QuotationsCreate() {
   const [products, setProducts] = useState<productsProps>({
@@ -130,6 +141,11 @@ export default function QuotationsCreate() {
     total: 0,
   })
   const [services, setServices] = useState<servicesProps>({
+    list: [],
+    totalDiscount: 0,
+    total: 0,
+  })
+  const [kits, setKits] = useState<kitsProps>({
     list: [],
     totalDiscount: 0,
     total: 0,
@@ -164,6 +180,7 @@ export default function QuotationsCreate() {
     useState<ActionAlertsStateProps | null>(null)
   const [openModalSearchProduct, setOpenModalSearchProduct] = useState(false)
   const [openModalSearchServices, setOpenModalSearchServices] = useState(false)
+  const [openModalSearchKit, setOpenModalSearchKit] = useState(false)
 
   const [openModalClientSearch, setOpenModalClientSearch] = useState(false)
 
@@ -330,6 +347,9 @@ export default function QuotationsCreate() {
   }
   function handleCloseModalSearchServices() {
     setOpenModalSearchServices(false)
+  }
+  function handleCloseModalSearchKit() {
+    setOpenModalSearchKit(false)
   }
   function handleCloseModalClienteSearch() {
     setOpenModalClientSearch(false)
@@ -547,7 +567,7 @@ export default function QuotationsCreate() {
     }
   }
 
-  function handleAddProduct(prod: ProductType) {
+  function handleAddProduct(prod: ProductType, qtd = '1') {
     if (!isEditingProduct) {
       setIsEditingProduct(true)
     }
@@ -582,16 +602,19 @@ export default function QuotationsCreate() {
       }
 
       setValueProduct(`product.${prevState.list.length}.id`, prod.id)
-      setValueProduct(`product.${prevState.list.length}.quantity`, 1)
-      setValueProduct(`product.${prevState.list.length}.discount`, 0)
+      setValueProduct(
+        `product.${prevState.list.length}.quantity`,
+        1 * Number(qtd),
+      )
+      setValueProduct(`product.${prevState.list.length}.discount`, '0,00')
       return {
         ...prevState,
         list: [
           ...prevState.list,
           {
             ...prod,
-            quantity: '1',
-            discount: '0',
+            quantity: `${Number('1') * Number(qtd)}`,
+            discount: '0,00',
           },
         ],
       }
@@ -652,6 +675,63 @@ export default function QuotationsCreate() {
 
     if (openModalSearchServices) {
       setOpenModalSearchServices(false)
+    }
+  }
+  function handleAddKits(kit: KitType) {
+    console.log(kit)
+    // if (!isEditingService) {
+    //   setIsEditingService(true)
+    // }
+
+    // setKits((prevState) => {
+    //   const isExistsService = prevState.list.findIndex((s) => s.id === serv.id)
+
+    //   if (isExistsService > -1) {
+    //     const newList = prevState.list.map((s, index) => {
+    //       if (s.id === serv.id) {
+    //         setValueService(
+    //           `service.${index}.quantity`,
+    //           Number(s.quantity) + serv.standard_quantity,
+    //         )
+    //         setValueService(`service.${index}.discount`, s.discount)
+    //         return {
+    //           ...s,
+    //           quantity: `${Number(s.quantity) + 1}`,
+    //         }
+    //       }
+    //       return s
+    //     })
+    //     return {
+    //       ...prevState,
+    //       list: newList,
+    //     }
+    //   }
+
+    //   setValueService(`service.${prevState.list.length}.id`, serv.id)
+    //   setValueService(
+    //     `service.${prevState.list.length}.quantity`,
+    //     serv.standard_quantity,
+    //   )
+    //   setValueService(`service.${prevState.list.length}.discount`, '0')
+    //   return {
+    //     ...prevState,
+    //     list: [
+    //       ...prevState.list,
+    //       {
+    //         ...serv,
+    //         quantity: serv.standard_quantity,
+    //         discount: '0',
+    //       },
+    //     ],
+    //   }
+    // })
+
+    kit.products.forEach((prod) => {
+      handleAddProduct(prod.product, prod.quantity)
+    })
+
+    if (openModalSearchKit) {
+      setOpenModalSearchKit(false)
     }
   }
 
@@ -897,15 +977,20 @@ export default function QuotationsCreate() {
                   justifyContent="center"
                   gap={2}
                 >
-                  <ButtonAddItens endIcon={<AddIcon />}>Kit</ButtonAddItens>
+                  {/* <ButtonAddItens
+                    startIcon={<AddIcon />}
+                    onClick={() => setOpenModalSearchKit(true)}
+                  >
+                    Kit
+                  </ButtonAddItens> */}
                   <ButtonAddItens
-                    endIcon={<AddIcon />}
+                    startIcon={<AddIcon />}
                     onClick={() => setOpenModalSearchServices(true)}
                   >
                     Serviços
                   </ButtonAddItens>
                   <ButtonAddItens
-                    endIcon={<AddIcon />}
+                    startIcon={<AddIcon />}
                     onClick={() => setOpenModalSearchProduct(true)}
                   >
                     Peças
@@ -998,7 +1083,9 @@ export default function QuotationsCreate() {
                                 <TableCell align="left">
                                   {prod.product_code}
                                 </TableCell>
-                                <TableCell align="left">{prod.name}</TableCell>
+                                <TableCell align="left">
+                                  {prod.name ? prod.name : 'Não informado'}
+                                </TableCell>
                                 <TableCell align="center">
                                   {prod.quantity}
                                 </TableCell>
@@ -1045,7 +1132,9 @@ export default function QuotationsCreate() {
                                 <TableCell align="left">
                                   {prod.product_code}
                                 </TableCell>
-                                <TableCell align="left">{prod.name}</TableCell>
+                                <TableCell align="left">
+                                  {prod.name ? prod.name : 'Não informado'}
+                                </TableCell>
                                 <TableCell align="center">
                                   <InputTableForEdit.number
                                     control={controlProduct}
@@ -1064,12 +1153,16 @@ export default function QuotationsCreate() {
                                 </TableCell>
                                 <TableCell align="center">
                                   {/* {formatMoneyPtBR(0)} */}
-                                  {/* <CalcPerUnit
-                                    control={controlProduct}
-                                    index={index}
-                                    price={Number(prod.sale_value)}
-                                    name="product"
-                                  /> */}
+                                  {prod.sale_value ? (
+                                    <CalcPerUnit
+                                      control={controlProduct}
+                                      index={index}
+                                      price={Number(prod.sale_value)}
+                                      name="product"
+                                    />
+                                  ) : (
+                                    formatMoneyPtBR(0)
+                                  )}
                                 </TableCell>
                                 <TableCell align="center">
                                   <ButtonRemoveItens
@@ -1206,7 +1299,9 @@ export default function QuotationsCreate() {
                                   {serv.service_code}
                                 </TableCell>
                                 <TableCell align="left">
-                                  {serv.description}
+                                  {serv.description
+                                    ? serv.description
+                                    : 'Não informado'}
                                 </TableCell>
                                 <TableCell align="center">
                                   {serv.quantity}
@@ -1255,7 +1350,9 @@ export default function QuotationsCreate() {
                                   {serv.service_code}
                                 </TableCell>
                                 <TableCell align="left">
-                                  {serv.description}
+                                  {serv.description
+                                    ? serv.description
+                                    : 'Não informado'}
                                 </TableCell>
                                 <TableCell align="center">
                                   <InputTableForEdit.number
@@ -1275,6 +1372,16 @@ export default function QuotationsCreate() {
                                 </TableCell>
                                 <TableCell align="center">
                                   {/* {formatMoneyPtBR(0)} */}
+                                  {serv.standard_value ? (
+                                    <CalcPerUnit
+                                      control={controlService}
+                                      index={index}
+                                      price={Number(serv.standard_value)}
+                                      name="service"
+                                    />
+                                  ) : (
+                                    formatMoneyPtBR(0)
+                                  )}
                                   {/* <CalcPerUnit
                                     control={controlService}
                                     index={index}
@@ -1330,6 +1437,204 @@ export default function QuotationsCreate() {
                   </Paper>
                 )}
               </Stack>
+
+              {/* Kits */}
+              {/* 
+              <Stack
+                // component="form"
+                gap={1}
+                // onSubmit={handleSubmit(onSubmitProduct)}
+              >
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <TitleCard sx={{ flex: 1 }}>Kits</TitleCard>
+
+                    <MoreOptionsQuotation
+                      aria-label="options to quotation"
+                      disabledButton={!(products.list.length > 0)}
+                      buttons={[
+                        {
+                          label: 'Editar',
+                          action: handleIsEditingOptions,
+                          type: 'kit',
+                        },
+                      ]}
+                    />
+                  </Stack>
+                  <DividerCard />
+                  <TableContainer>
+                    <Table aria-label="simple table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Código</TableCell>
+                          <TableCell>Descrição</TableCell>
+                          <TableCell align="center">QTD</TableCell>
+                          {isEditingProduct && (
+                            <TableCell align="center">Ações</TableCell>
+                          )}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {!(products.list?.length > 0) && (
+                          <TableRow
+                            sx={{
+                              '&:last-child td, &:last-child th': {
+                                border: 0,
+                              },
+                            }}
+                          >
+                            <TableCell
+                              align="center"
+                              colSpan={isEditingProduct ? 7 : 6}
+                              sx={{ paddingTop: 4 }}
+                            >
+                              Nenhuma Kit cadastrado.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        {!isEditingKit &&
+                          kits.list?.length > 0 &&
+                          kits.list.map((k) => {
+                            return (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                                key={k.kit_id}
+                              >
+                                <TableCell align="left">{k.kit_id}</TableCell>
+                                <TableCell align="left">
+                                  {k.name ? k.name : 'Não informado'}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {k.quantity}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(prod.discount)}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(Number(prod.sale_value))}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(
+                                    handleCalcValueTotalPerItem(
+                                      prod.sale_value,
+                                      prod.quantity,
+                                      prod.discount,
+                                    ),
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                        {isEditingProduct &&
+                          products.list?.length > 0 &&
+                          products.list.map((prod, index) => {
+                            setValueProduct(`product.${index}.id`, prod.id)
+                            return (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                                key={prod.id}
+                              >
+                                <TableCell align="left">
+                                  {prod.product_code}
+                                </TableCell>
+                                <TableCell align="left">
+                                  {prod.name ? prod.name : 'Não informado'}
+                                </TableCell>
+                                <TableCell align="center">
+                                  <InputTableForEdit.number
+                                    control={controlProduct}
+                                    name={`product.${index}.quantity`}
+                                  />
+                                </TableCell>
+                                <TableCell align="center">
+                                  <InputTableForEdit.money
+                                    control={controlProduct}
+                                    name={`product.${index}.discount`}
+                                  />
+                      
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(Number(prod.sale_value))}
+                                </TableCell>
+                                <TableCell align="center">
+                       
+                                  {prod.sale_value ? (
+                                    <CalcPerUnit
+                                      control={controlProduct}
+                                      index={index}
+                                      price={Number(prod.sale_value)}
+                                      name="product"
+                                    />
+                                  ) : (
+                                    formatMoneyPtBR(0)
+                                  )}
+                                </TableCell>
+                                <TableCell align="center">
+                                  <ButtonRemoveItens
+                                    onClick={() => handleRemoveProduct(prod.id)}
+                                  >
+                                    <DeleteIcon />
+                                  </ButtonRemoveItens>
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Paper>
+                {isEditingProduct && products.list.length > 0 && (
+                  <Paper
+                    sx={{
+                      p: '0 2',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      background: 'transparent',
+                    }}
+                    elevation={0}
+                  >
+                    <Stack
+                      direction="row"
+                      alignSelf="flex-end"
+                      spacing={2}
+                      sx={{ width: 160 }}
+                    >
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        type="submit"
+                      >
+                        salvar
+                      </ButtonSubmit>
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        onClick={() => setIsEditingProduct(false)}
+                      >
+                        cancelar
+                      </ButtonSubmit>
+                    </Stack>
+                  </Paper>
+                )}
+              </Stack> */}
             </Stack>
           </Grid>
 
@@ -1844,6 +2149,12 @@ export default function QuotationsCreate() {
         handleClose={handleCloseModalSearchServices}
         openMolal={openModalSearchServices}
         handleAddServices={handleAddServices}
+      />
+
+      <ModalSearchKit
+        handleClose={handleCloseModalSearchKit}
+        openMolal={openModalSearchKit}
+        handleAddKit={handleAddKits}
       />
 
       <ModalSearchClient

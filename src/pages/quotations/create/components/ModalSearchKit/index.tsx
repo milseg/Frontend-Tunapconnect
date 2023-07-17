@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import * as React from 'react'
 
 import TextField from '@mui/material/TextField'
@@ -15,13 +16,14 @@ import { CompanyContext } from '@/contexts/CompanyContext'
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import ProductTable from './Components/Table'
-import { ProductType } from '@/types/quotation'
 
-interface ModalSearchProductProps {
+import { KitType } from '@/types/quotation'
+import KitTable from './Components/Table'
+
+interface ModalSearchKitProps {
   openMolal: boolean
   handleClose: () => void
-  handleAddProduct: (data: ProductType) => void
+  handleAddKit: (data: KitType) => void
 }
 
 type SearchFormProps = {
@@ -33,15 +35,13 @@ type paginationProps = {
   total: number
 }
 
-export default function ModalSearchProduct({
+export default function ModalSearchKit({
   openMolal,
   handleClose,
-  handleAddProduct,
-}: ModalSearchProductProps) {
-  const [productList, setProductList] = useState<ProductType[] | []>([])
-  const [productSelected, setProductSelected] = useState<ProductType | null>(
-    null,
-  )
+  handleAddKit,
+}: ModalSearchKitProps) {
+  const [kitList, setKitList] = useState<KitType[] | []>([])
+  const [kitSelected, setKitSelected] = useState<KitType | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [pagination, setPagination] = useState<paginationProps | null>(null)
 
@@ -51,25 +51,22 @@ export default function ModalSearchProduct({
     },
   })
 
-  const { companySelected } = useContext(CompanyContext)
+  // const { companySelected } = useContext(CompanyContext)
 
   async function onSubmitSearch(data: SearchFormProps) {
     setIsLoading(true)
-    setProductList([])
+    setKitList([])
 
     try {
-      const result = await api.get(
-        `/product?company_id=${companySelected}&search=${data.search}&limit=10${
-          pagination ? '&current_page=' + pagination.actual : ''
-        }`,
-      )
       // const result = await api.get(
-      //   `/product?company_id=${companySelected}${
+      //   `/kit/?company_id=${companySelected}&search=${data.search}&limit=10${
       //     pagination ? '&current_page=' + pagination.actual : ''
       //   }`,
       // )
+      const result = await api.get('/kit?company_id=12')
+
       console.log(result)
-      setProductList(result.data.data)
+      setKitList(result.data.data)
       if (!pagination) {
         setPagination((prevState) => {
           return {
@@ -85,8 +82,8 @@ export default function ModalSearchProduct({
     }
   }
 
-  function handleSelectedProduct(prod: ProductType) {
-    setProductSelected(prod)
+  function handleSelectedKit(prod: KitType) {
+    setKitSelected(prod)
   }
 
   function handlePaginateNext() {
@@ -120,12 +117,12 @@ export default function ModalSearchProduct({
     })
   }
 
-  function handleDoubleClickProduct() {
-    if (productSelected) {
-      handleAddProduct(productSelected)
+  function handleDoubleClickKit() {
+    if (kitSelected) {
+      handleAddKit(kitSelected)
       handleClose()
-      setProductList([])
-      setProductSelected(null)
+      setKitList([])
+      setKitSelected(null)
       setValue('search', '')
     }
   }
@@ -136,7 +133,7 @@ export default function ModalSearchProduct({
         search: '',
       })
 
-      setProductList([])
+      setKitList([])
     }
   }, [openMolal])
 
@@ -155,9 +152,9 @@ export default function ModalSearchProduct({
             direction="row"
           >
             {' '}
-            <Typography variant="h6">Buscar por peças</Typography>
+            <Typography variant="h6">Buscar por kit</Typography>
             {/* {clientList.length > 0 && ( */}
-            {/* <ButtonModalDialog onClick={handleProductModal}>
+            {/* <ButtonModalDialog onClick={handlekitModal}>
               adicionar novo
             </ButtonModalDialog> */}
             {/* )} */}
@@ -194,14 +191,14 @@ export default function ModalSearchProduct({
               </ButtonIcon>
             </Stack>
 
-            <ProductTable
-              data={productList}
-              handleSelectedProduct={handleSelectedProduct}
+            <KitTable
+              data={kitList}
+              handleSelectedKit={handleSelectedKit}
               isLoading={isLoading}
-              handleDoubleClick={handleDoubleClickProduct}
+              handleDoubleClick={handleDoubleClickKit}
             />
 
-            {productList.length > 0 && (
+            {kitList.length > 0 && (
               <Stack
                 direction="row"
                 justifyContent="center"
@@ -230,8 +227,8 @@ export default function ModalSearchProduct({
           <ButtonModalDialog
             onClick={() => {
               handleClose()
-              setProductList([])
-              setProductSelected(null)
+              setKitList([])
+              setKitSelected(null)
             }}
           >
             Cancel
@@ -239,11 +236,11 @@ export default function ModalSearchProduct({
           <ButtonModalDialog
             // disabled={clientSelected === null}
             onClick={() => {
-              if (productSelected) {
-                handleAddProduct(productSelected)
+              if (kitSelected) {
+                handleAddKit(kitSelected)
                 handleClose()
-                setProductList([])
-                setProductSelected(null)
+                setKitList([])
+                setKitSelected(null)
                 setValue('search', '')
               }
             }}

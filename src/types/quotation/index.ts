@@ -179,3 +179,20 @@ export interface TypeQuotationType {
   name: string
   code: string
 }
+
+export interface KitType {
+  kit_id: number
+  name: string
+  products:
+    | {
+        quantity: string
+        product: ProductType
+      }[]
+    | []
+  services:
+    | {
+        quantity: string
+        service: ServicesType
+      }[]
+    | []
+}
