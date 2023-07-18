@@ -134,7 +134,7 @@ interface kitsProps {
   total: number
 }
 
-export default function QuotationsCreate() {
+export default function QuotationsEditById() {
   const [products, setProducts] = useState<productsProps>({
     list: [],
     totalDiscount: 0,
@@ -532,66 +532,31 @@ export default function QuotationsCreate() {
   }
 
   async function onSave() {
-    // const dataFormatted: updateData = {
-    //   code: null,
-    //   promised_date: formatDateTimeTimezone(`${visitDate}`),
-    //   technical_consultant_id: technicalConsultant?.id,
-    //   client_id: client?.id,
-    //   client_vehicle_id: clientVehicle?.id,
-    //   company_id: `${companySelected}`,
-    //   plate: clientVehicle?.plate,
-    //   claims_service:
-    //     claimServiceList.map((c) => ({ claim_service_id: c.id })) ?? [],
-    //   checklist_version_id: 14,
-    // }
-
-    const productListFormatted = products.list.map((item) => {
-      return {
-        service_id: null,
-        products_id: item.id,
-        price: `${item.sale_value}`,
-        price_discount: `${item.discount}`,
-        quantity: `${item.quantity}`,
-      }
-    })
-    const servicesListFormatted = services.list.map((item) => {
-      return {
-        service_id: item.id,
-        products_id: null,
-        price: `${item.standard_value}`,
-        price_discount: `${item.discount}`,
-        quantity: `${item.quantity}`,
-      }
-    })
-
-    const dataFormatted = {
-      company_id: companySelected,
-      client_vehicle_id: clientVehicle?.id,
+    const dataFormatted: updateData = {
+      code: null,
+      promised_date: formatDateTimeTimezone(`${visitDate}`),
+      technical_consultant_id: technicalConsultant?.id,
       client_id: client?.id,
-      os_type_id: typeQuotation.id,
-      maintenance_review_id: null,
-      consultant_id: technicalConsultant?.id,
-      mandatory_itens: [],
-      quotation_itens: [...productListFormatted, ...servicesListFormatted],
-      claim_services: claimServiceList.map((i) => ({ claim_service_id: i.id })),
+      client_vehicle_id: clientVehicle?.id,
+      company_id: `${companySelected}`,
+      plate: clientVehicle?.plate,
+      claims_service:
+        claimServiceList.map((c) => ({ claim_service_id: c.id })) ?? [],
+      checklist_version_id: 14,
     }
 
-    console.log(dataFormatted)
-
     try {
-      const respCreate: any = await api.post('/quotations', dataFormatted)
+      const respCreate: any = await api.post('/products', dataFormatted)
       const idCreatedResponse = respCreate.data.data
-      // setServiceSchedule(idCreatedResponse, true)
-
-      console.log(idCreatedResponse)
+      setServiceSchedule(idCreatedResponse, true)
 
       // router.push('/service-schedule/' + idCreatedResponse.id)
 
-      setActionAlerts({
-        isOpen: true,
-        title: `${respCreate?.data?.msg ?? 'Salvo com sucesso!'}!`,
-        type: 'success',
-      })
+      // setActionAlerts({
+      //   isOpen: true,
+      //   title: `${respCreate.data.msg ?? 'Salvo com sucesso!'}!`,
+      //   type: 'success',
+      // })
     } catch (e: any) {
       console.error(e)
       setActionAlerts({
@@ -867,7 +832,10 @@ export default function QuotationsCreate() {
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} lg={12}>
-            <HeaderBreadcrumb data={HeaderBreadcrumbData} title="Orçamento" />
+            <HeaderBreadcrumb
+              data={HeaderBreadcrumbData}
+              title={`Orçamento - ${router.query.id}`}
+            />
           </Grid>
 
           <Grid item xs={12} md={7} lg={7}>
@@ -1230,9 +1198,6 @@ export default function QuotationsCreate() {
                         variant="contained"
                         size="small"
                         type="submit"
-                        onKeyDown={(event) =>
-                          console.log('User pressed: ', event.key)
-                        }
                       >
                         salvar
                       </ButtonSubmit>
@@ -2239,4 +2204,4 @@ export default function QuotationsCreate() {
   )
 }
 
-QuotationsCreate.auth = true
+QuotationsEditById.auth = true
