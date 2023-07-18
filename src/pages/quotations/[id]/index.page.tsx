@@ -41,7 +41,7 @@ import MenuItem from '@mui/material/MenuItem'
 
 import TextField from '@mui/material/TextField'
 import Box from '@mui/material/Box'
-import { formatDateTimeTimezone } from '@/ultis/formatDate'
+import { formatDateTime, formatDateTimeTimezone } from '@/ultis/formatDate'
 import ActionAlerts from '@/components/ActionAlerts'
 import { DataTimeInput } from '@/components/DataTimeInput'
 import { ActionAlertsStateProps } from '@/components/ActionAlerts/ActionAlerts'
@@ -1016,14 +1016,20 @@ export default function QuotationsCreate() {
                 </Stack>
                 <DividerCard />
                 <List dense={false}>
-                  {/* <ListItemCard>
+                  <ListItemCard>
+                    <InfoCardName>Numero do Orçamento:</InfoCardName>
+                    {dataQuotationById?.id}
+                  </ListItemCard>
+                  <ListItemCard>
                     <InfoCardName>Data da emissão:</InfoCardName>
 
-                    <DataTimeInput
+                    {formatDateTime(dataQuotationById?.created_at as string)}
+
+                    {/* <DataTimeInput
                       dateSchedule={visitDate}
                       handleDateSchedule={handleDateSchedule}
-                    />
-                  </ListItemCard> */}
+                    /> */}
+                  </ListItemCard>
                   <ListItemCard>
                     <InfoCardName>Responsável:</InfoCardName>{' '}
                     <Box width="100%">

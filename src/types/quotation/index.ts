@@ -224,6 +224,16 @@ export interface Product {
   updated_at: string
 }
 
+export interface QuotationClaimService {
+  id: number
+  quotation_id: number
+  claim_service_id: number
+  created_at: string
+  updated_at: string
+  description: string
+  integration_code: any
+}
+
 export interface QuotationIten {
   id: number
   quotation_id: number
