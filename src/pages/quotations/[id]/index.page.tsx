@@ -82,6 +82,7 @@ import ModalSearchProduct from './components/ModalSearchProduct'
 import {
   KitType,
   ProductType,
+  QuotationByIdResponseType,
   ServicesType,
   TypeQuotationType,
 } from '@/types/quotation'
@@ -168,7 +169,10 @@ export default function QuotationsCreate() {
       name: '-',
     })
 
-  const [typeQuotation, setTypeQuotation] = useState({
+  const [typeQuotation, setTypeQuotation] = useState<{
+    id: number
+    name?: string
+  }>({
     id: 0,
     name: '-',
   })
@@ -790,11 +794,13 @@ export default function QuotationsCreate() {
     status: dataTechnicalConsultantListStatus,
   } = useQuery<TechnicalConsultant[]>(
     [
-      'service_schedule',
+      'Quotation-edit-by_id',
       'by_id',
       'edit',
       'technical-consultant-list',
       'options',
+      companySelected,
+      router.query.id,
     ],
     async () => {
       const resp = await api.get(
@@ -810,14 +816,35 @@ export default function QuotationsCreate() {
   const { data: dataTypeQuotationList, status: dataTypeQuotationListStatus } =
     useQuery<TypeQuotationType[]>(
       [
-        'Quotation-create',
+        'quotation-edit-by_id',
         'edit',
-        'technical-consultant-list',
+        'type-quotation-list',
         'options',
         companySelected,
+        router.query.id,
       ],
       async () => {
         const resp = await api.get(`/os?company_id=${companySelected}`)
+        console.log(resp.data.data)
+        return resp.data.data
+      },
+      {
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+      },
+    )
+
+  const { data: dataQuotationById, status: dataQuotationByIdStatus } =
+    useQuery<QuotationByIdResponseType>(
+      [
+        'quotation-edit-by_id',
+        'edit',
+        'data-quotation-by-id',
+        companySelected,
+        router.query.id,
+      ],
+      async () => {
+        const resp = await api.get(`/quotations/show/${router.query.id}`)
         console.log(resp.data.data)
         return resp.data.data
       },
@@ -838,29 +865,128 @@ export default function QuotationsCreate() {
     }
   }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList])
 
-  // useEffect(() => {
-  //   // products.list.forEach((p, index) => {
-  //   //   setValueProduct(`product.${index}.id`, p.id)
-  //   //   setValueProduct(`product.${index}.quantity`, Number(p.quantity))
-  //   //   setValueProduct(`product.${index}.discount`, p.discount)
-  //   // })
+  useEffect(() => {
+    if (dataQuotationByIdStatus === 'success') {
+      console.log(dataQuotationById)
+      setTypeQuotation({
+        id: dataQuotationById.os_type_id,
+      })
+      setTechnicalConsultant({
+        id: dataQuotationById.consultant_id,
+      })
 
-  //   const lastProduct = products.list[products.list.length - 1]
+      setClaimServiceList(
+        dataQuotationById.quotation_claim_service.map((i) => {
+          return {
+            company_id: dataQuotationById.company_id,
+            integration_code: i.integration_code,
+            id: i.id,
+            description: i.description,
+          }
+        }),
+      )
 
-  //   setValueProduct(`product.${products.list.length - 1}.id`, lastProduct.id)
-  //   setValueProduct(
-  //     `product.${products.list.length - 1}.quantity`,
-  //     Number(lastProduct.quantity),
-  //   )
-  //   setValueProduct(`product.${products.list.length - 1}.discount`, p.discount)
-  // }, [products.list])
-  // useEffect(() => {
-  //   services.list.forEach((s, index) => {
-  //     setValueService(`service.${index}.id`, s.id)
-  //     setValueService(`service.${index}.quantity`, Number(s.quantity))
-  //     setValueService(`service.${index}.discount`, s.discount)
-  //   })
-  // }, [services.list])
+      const listProducts: ProductType[] = []
+      const listServices: ServicesType[] = []
+
+      dataQuotationById.quotation_itens.forEach((i) => {
+        if (i.service === null && i.product !== null) {
+          listProducts.push({
+            id: i.product?.id as number,
+            company_id: i.product?.company_id as number,
+            name: i.product?.name as string,
+            product_code: i.product?.product_code as string,
+            sale_value: i.product?.sale_value as string,
+            guarantee_value: i.product?.guarantee_value as string,
+            tunap_code: i.product?.tunap_code,
+            active: i.product?.active as boolean,
+            discount: i.price_discount,
+            quantity: i.quantity,
+          })
+        }
+        if (i.service !== null && i.product === null) {
+          listServices.push({
+            id: i.service?.id as number,
+            company_id: i.service?.company_id as number,
+            service_code: i.service?.service_code as string,
+            integration_code: i.service?.integration_code,
+            description: i.service?.integration_code,
+            standard_quantity: i.service?.standard_quantity as string,
+            standard_value: i.service?.standard_value as string,
+            active: i.service?.active as boolean,
+            discount: i.price_discount,
+            quantity: i.quantity,
+          })
+        }
+      })
+
+      listProducts.forEach((i, index) => {
+        setValueProduct(`product.${index}.quantity`, i.quantity)
+        setValueProduct(`product.${index}.discount`, i.discount)
+      })
+
+      listServices.forEach((i, index) => {
+        setValueProduct(`service.${index}.quantity`, i.quantity)
+        setValueProduct(`service.${index}.discount`, i.discount)
+      })
+
+      const totalDiscountProducts = listProducts.reduce((acc, curr) => {
+        return acc + Number(curr.discount) * Number(curr.quantity)
+      }, 0)
+      const totalProducts = listProducts.reduce((acc, curr) => {
+        const totalItem = Number(curr.sale_value) * Number(curr.quantity)
+        return acc + totalItem
+      }, 0)
+
+      setProducts((prevState) => ({
+        ...prevState,
+        list: listProducts,
+        total: totalProducts,
+        totalDiscount: totalDiscountProducts,
+      }))
+
+      const totalDiscountServices = listServices.reduce((acc, curr) => {
+        return acc + Number(curr.discount) * Number(curr.quantity)
+      }, 0)
+      const totalServices = listServices.reduce((acc, curr) => {
+        const totalItem = Number(curr.standard_value) * Number(curr.quantity)
+        return acc + totalItem
+      }, 0)
+
+      setServices((prevState) => ({
+        ...prevState,
+        list: listServices,
+        total: totalServices,
+        totalDiscount: totalDiscountServices,
+      }))
+
+      setClient({
+        id: dataQuotationById.client.id,
+        company_id: dataQuotationById.client.company_id,
+        name: dataQuotationById.client.name,
+        cpf: dataQuotationById.client.cpf,
+        document: dataQuotationById.client.document,
+        address: dataQuotationById.client.address,
+        active: dataQuotationById.client.active,
+        phone: dataQuotationById.client.phone,
+        email: dataQuotationById.client.email,
+        fullName: dataQuotationById.client.fullName,
+      })
+
+      setClientVehicle({
+        id: dataQuotationById.client_vehicle.id,
+        company_id: dataQuotationById.client_vehicle.company_id,
+        vehicle_id: dataQuotationById.client_vehicle.vehicle.id,
+        chasis: dataQuotationById.client_vehicle.chasis,
+        color: dataQuotationById.client_vehicle.color,
+        number_motor: dataQuotationById.client_vehicle.number_motor,
+        renavan: dataQuotationById.client_vehicle.renavan,
+        plate: dataQuotationById.client_vehicle.plate,
+        mileage: dataQuotationById.client_vehicle.mileage,
+        vehicle: dataQuotationById.client_vehicle.vehicle,
+      })
+    }
+  }, [dataQuotationById, dataQuotationByIdStatus])
 
   return (
     <>
@@ -918,7 +1044,7 @@ export default function QuotationsCreate() {
                         </MenuItem>
                         {technicalConsultantsList.map((option) => (
                           <MenuItem
-                            key={option.id + option.name}
+                            key={option.id + (option.name ? option.name : '')}
                             value={option.id}
                           >
                             {option.name}
