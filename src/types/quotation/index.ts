@@ -172,6 +172,7 @@ export interface ServicesType {
   active: boolean
   discount: string
   quantity: string
+  isSaved?: boolean
 }
 
 export interface TypeQuotationType {

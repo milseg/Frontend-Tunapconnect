@@ -142,7 +142,7 @@ const productSchema = z.object({
       .object({
         id: z.number(),
         price: z.string(),
-        quantity: z.number(),
+        quantity: z.string(),
         discount: z.string(),
       })
       .refine(
@@ -159,7 +159,42 @@ const productSchema = z.object({
           }
           return true
         },
-        { message: 'Desconto invalido!' },
+        { message: 'Desconto inválido!' },
+      ),
+  ),
+  // discount: z.string().refine(
+  // (e) => {
+  //   console.log(e)
+  //   return false
+  // },
+  //   { message: 'Digite um valor valido!' },
+  // ),
+  // quantity: z.string(),
+})
+const serviceSchema = z.object({
+  service: z.array(
+    z
+      .object({
+        id: z.number(),
+        price: z.string(),
+        quantity: z.string(),
+        discount: z.string(),
+      })
+      .refine(
+        (e) => {
+          console.log(
+            Number(e.discount.replace(/\./g, '').replace(/,/g, '.')) >
+              Number(e.price),
+          )
+          if (
+            Number(e.discount.replace(/\./g, '').replace(/,/g, '.')) >=
+            Number(e.price)
+          ) {
+            return false
+          }
+          return true
+        },
+        { message: 'Desconto inválido!' },
       ),
   ),
   // discount: z.string().refine(
@@ -273,7 +308,10 @@ export default function QuotationsCreate() {
     handleSubmit: handleSubmitService,
     control: controlService,
     setValue: setValueService,
-  } = useForm()
+    formState: { errors: errorsService },
+  } = useForm({
+    resolver: zodResolver(serviceSchema),
+  })
 
   const {
     append: appendService,
@@ -358,6 +396,7 @@ export default function QuotationsCreate() {
         if (p.id === data.service[index].id) {
           return {
             ...p,
+            isSaved: true,
             quantity: data.service[index].quantity,
             discount: data.service[index].discount
               .replace(/\./g, '')
@@ -667,7 +706,10 @@ export default function QuotationsCreate() {
       if (isExistsProduct > -1) {
         const newList = prevState.list.map((p, index) => {
           if (p.id === prod.id) {
-            setValueProduct(`product.${index}.quantity`, Number(p.quantity) + 1)
+            setValueProduct(
+              `product.${index}.quantity`,
+              `${Number(p.quantity) + 1}`,
+            )
             setValueProduct(`product.${index}.discount`, p.discount)
             return {
               ...p,
@@ -686,7 +728,7 @@ export default function QuotationsCreate() {
       setValueProduct(`product.${prevState.list.length}.id`, prod.id)
       setValueProduct(
         `product.${prevState.list.length}.quantity`,
-        1 * Number(qtd),
+        `${1 * Number(qtd)}`,
       )
       setValueProduct(`product.${prevState.list.length}.discount`, '0,00')
       setValueProduct(`product.${prevState.list.length}.price`, prod.sale_value)
@@ -748,6 +790,10 @@ export default function QuotationsCreate() {
               Number(s.quantity) + serv.standard_quantity,
             )
             setValueService(`service.${index}.discount`, s.discount)
+            setValueService(
+              `service.${prevState.list.length}.price`,
+              s.standard_value,
+            )
             return {
               ...s,
               quantity: `${Number(s.quantity) + 1}`,
@@ -767,6 +813,11 @@ export default function QuotationsCreate() {
         serv.standard_quantity,
       )
       setValueService(`service.${prevState.list.length}.discount`, '0')
+      setValueService(
+        `service.${prevState.list.length}.price`,
+        serv.standard_value,
+      )
+
       return {
         ...prevState,
         list: [
@@ -784,6 +835,30 @@ export default function QuotationsCreate() {
       setOpenModalSearchServices(false)
     }
   }
+
+  function handleCancelServices() {
+    setServices((prevState) => {
+      const newList = prevState.list.filter((item) => item.isSaved)
+      newList.forEach((i, index) => {
+        console.log(i.discount)
+        setValueService(
+          `service.${index}.discount`,
+          i.discount.replace('.', ','),
+        )
+        setValueService(`service.${i}.quantity`, i.quantity)
+      })
+      return {
+        ...prevState,
+        list: newList,
+      }
+    })
+
+    // setValueProduct(`product.${prevState.list.length}.discount`, '0,00')
+    // setValueProduct(`product.${prevState.list.length}.price`, prod.sale_value)
+
+    setIsEditingService(false)
+  }
+
   function handleAddKits(kit: KitType) {
     console.log(kit)
     // if (!isEditingService) {
@@ -933,6 +1008,8 @@ export default function QuotationsCreate() {
   //     setValueService(`service.${index}.discount`, s.discount)
   //   })
   // }, [services.list])
+
+  console.log(errorsService)
 
   return (
     <>
@@ -1255,7 +1332,21 @@ export default function QuotationsCreate() {
                                     control={controlService}
                                     name={`service.${index}.discount`}
                                   />
-
+                                  {errorsService.service &&
+                                    // @ts-ignore
+                                    errorsService.service[index] &&
+                                    // @ts-ignore
+                                    errorsService.service[index].message && (
+                                      <span
+                                        style={{
+                                          fontSize: '12px',
+                                          color: 'red',
+                                        }}
+                                      >
+                                        {/* @ts-ignore */}
+                                        {errorsService.service[index].message}
+                                      </span>
+                                    )}
                                   {/* {formatMoneyPtBR(0)} */}
                                 </TableCell>
                                 <TableCell align="center">
@@ -1320,7 +1411,7 @@ export default function QuotationsCreate() {
                       <ButtonSubmit
                         variant="contained"
                         size="small"
-                        onClick={() => setIsEditingService(false)}
+                        onClick={handleCancelServices}
                       >
                         cancelar
                       </ButtonSubmit>
