@@ -43,8 +43,8 @@ export const CalcPerUnit = ({
   const results = useWatch({ control, name })
   const output = totalCalWithDiscount(results, index, price)
 
-  console.log(results)
-  console.log(output)
+  // console.log(results)
+  // console.log(output)
 
-  return <p>{formatMoneyPtBR(output)}</p>
+  return <p>{formatMoneyPtBR(output < 0 ? 0 : output)}</p>
 }

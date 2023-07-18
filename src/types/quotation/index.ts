@@ -158,6 +158,7 @@ export interface ProductType {
   active: boolean
   discount: string
   quantity: string
+  isSaved?: boolean
 }
 
 export interface ServicesType {

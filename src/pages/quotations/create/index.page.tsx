@@ -91,6 +91,8 @@ import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import ModalSearchService from './components/ModalSearchService'
 import { CalcPerUnit } from './Calc'
 import ModalSearchKit from './components/ModalSearchKit'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 
 // import { useForm } from 'react-hook-form'
 
@@ -133,6 +135,42 @@ interface kitsProps {
   totalDiscount: number
   total: number
 }
+
+const productSchema = z.object({
+  product: z.array(
+    z
+      .object({
+        id: z.number(),
+        price: z.string(),
+        quantity: z.number(),
+        discount: z.string(),
+      })
+      .refine(
+        (e) => {
+          console.log(
+            Number(e.discount.replace(/\./g, '').replace(/,/g, '.')) >
+              Number(e.price),
+          )
+          if (
+            Number(e.discount.replace(/\./g, '').replace(/,/g, '.')) >=
+            Number(e.price)
+          ) {
+            return false
+          }
+          return true
+        },
+        { message: 'Desconto invalido!' },
+      ),
+  ),
+  // discount: z.string().refine(
+  // (e) => {
+  //   console.log(e)
+  //   return false
+  // },
+  //   { message: 'Digite um valor valido!' },
+  // ),
+  // quantity: z.string(),
+})
 
 export default function QuotationsCreate() {
   const [products, setProducts] = useState<productsProps>({
@@ -214,7 +252,11 @@ export default function QuotationsCreate() {
     handleSubmit: handleSubmitProduct,
     setValue: setValueProduct,
     control: controlProduct,
-  } = useForm()
+    reset: resetProduct,
+    formState: { errors: errorsProduct },
+  } = useForm({
+    resolver: zodResolver(productSchema),
+  })
 
   const {
     append: appendProduct,
@@ -224,6 +266,7 @@ export default function QuotationsCreate() {
     control: controlProduct,
     name: 'product',
   })
+  console.log(errorsProduct)
 
   const {
     register: registerService,
@@ -271,8 +314,12 @@ export default function QuotationsCreate() {
     setProducts((prevState) => {
       const newList = prevState.list.map((p, index) => {
         if (p.id === data.product[index].id) {
+          console.log(
+            data.product[index].discount.replace(/\./g, '').replace(/,/g, '.'),
+          )
           return {
             ...p,
+            isSaved: true,
             quantity: data.product[index].quantity,
             discount: data.product[index].discount
               .replace(/\./g, '')
@@ -468,16 +515,16 @@ export default function QuotationsCreate() {
   }
 
   function handleCalcValueTotalPerItem(
-    price: string,
-    qtd: string,
-    discount: string,
+    price: number,
+    qtd: number,
+    discount: number,
   ) {
-    const priceFormatted = Number(price)
-    const discountFormatted = Number(
-      discount.replace(/\./g, '').replace(/,/g, '.'),
-    )
-    const qtdFormatted = Number(qtd)
-    const result = (priceFormatted - discountFormatted) * qtdFormatted
+    // const priceFormatted = Number(price)
+    // const discountFormatted = Number(
+    //   discount.replace(/\./g, '').replace(/,/g, '.'),
+    // )
+    // const qtdFormatted = Number(qtd)
+    const result = (price - discount) * qtd
 
     return result
   }
@@ -642,6 +689,7 @@ export default function QuotationsCreate() {
         1 * Number(qtd),
       )
       setValueProduct(`product.${prevState.list.length}.discount`, '0,00')
+      setValueProduct(`product.${prevState.list.length}.price`, prod.sale_value)
       return {
         ...prevState,
         list: [
@@ -659,6 +707,30 @@ export default function QuotationsCreate() {
       setOpenModalSearchProduct(false)
     }
   }
+
+  function handleCancelProducts() {
+    setProducts((prevState) => {
+      const newList = prevState.list.filter((item) => item.isSaved)
+      newList.forEach((i, index) => {
+        console.log(i.discount)
+        setValueProduct(
+          `product.${index}.discount`,
+          i.discount.replace('.', ','),
+        )
+        setValueProduct(`product.${i}.quantity`, i.quantity)
+      })
+      return {
+        ...prevState,
+        list: newList,
+      }
+    })
+
+    // setValueProduct(`product.${prevState.list.length}.discount`, '0,00')
+    // setValueProduct(`product.${prevState.list.length}.price`, prod.sale_value)
+
+    setIsEditingProduct(false)
+  }
+
   function handleAddServices(serv: ServicesType) {
     console.log(serv)
     if (!isEditingService) {
@@ -1029,224 +1101,7 @@ export default function QuotationsCreate() {
                   </ButtonAddItens>
                 </Stack>
               </Paper>
-              {/* PEÇAS */}
-              <Stack
-                component="form"
-                gap={1}
-                onSubmit={handleSubmitProduct(onSubmitProduct)}
-              >
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <TitleCard sx={{ flex: 1 }}>Peças</TitleCard>
-                    {/* <Box sx={{ marginRight: 1 }}>
-                    <ButtonAddItens>
-                      <AddIcon />
-                    </ButtonAddItens>
-                  </Box> */}
 
-                    <MoreOptionsQuotation
-                      aria-label="options to quotation"
-                      disabledButton={!(products.list.length > 0)}
-                      buttons={[
-                        {
-                          label: 'Editar',
-                          action: handleIsEditingOptions,
-                          type: 'product',
-                        },
-                      ]}
-                    />
-                  </Stack>
-                  <DividerCard />
-                  <TableContainer>
-                    <Table aria-label="simple table">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Código</TableCell>
-                          <TableCell>Descrição</TableCell>
-                          <TableCell align="center">QTD</TableCell>
-                          <TableCell align="center">Desconto(UNID.)</TableCell>
-                          <TableCell align="center">Valor</TableCell>
-                          <TableCell align="center">Total</TableCell>
-                          {isEditingProduct && (
-                            <TableCell align="center">Ações</TableCell>
-                          )}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {!(products.list?.length > 0) && (
-                          <TableRow
-                            sx={{
-                              '&:last-child td, &:last-child th': {
-                                border: 0,
-                              },
-                            }}
-                          >
-                            <TableCell
-                              align="center"
-                              colSpan={isEditingProduct ? 7 : 6}
-                              sx={{ paddingTop: 4 }}
-                            >
-                              Nenhuma peça cadastrada.
-                            </TableCell>
-                          </TableRow>
-                        )}
-                        {!isEditingProduct &&
-                          products.list?.length > 0 &&
-                          products.list.map((prod) => {
-                            return (
-                              <TableRow
-                                sx={{
-                                  '&:last-child td, &:last-child th': {
-                                    border: 0,
-                                  },
-                                }}
-                                key={prod.id}
-                              >
-                                <TableCell align="left">
-                                  {prod.product_code}
-                                </TableCell>
-                                <TableCell align="left">
-                                  {prod.name ? prod.name : 'Não informado'}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {prod.quantity}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {/* {prod.discount} */}
-                                  {formatMoneyPtBR(prod.discount)}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {formatMoneyPtBR(Number(prod.sale_value))}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {formatMoneyPtBR(
-                                    handleCalcValueTotalPerItem(
-                                      prod.sale_value,
-                                      prod.quantity,
-                                      prod.discount,
-                                    ),
-                                  )}
-                                </TableCell>
-                              </TableRow>
-                            )
-                          })}
-                        {isEditingProduct &&
-                          products.list?.length > 0 &&
-                          products.list.map((prod, index) => {
-                            setValueProduct(`product.${index}.id`, prod.id)
-                            // setValueProduct(
-                            //   `product.${index}.quantity`,
-                            //   prod.quantity,
-                            // )
-                            // setValueProduct(
-                            //   `product.${index}.discount`,
-                            //   prod.discount,
-                            // )
-                            return (
-                              <TableRow
-                                sx={{
-                                  '&:last-child td, &:last-child th': {
-                                    border: 0,
-                                  },
-                                }}
-                                key={prod.id}
-                              >
-                                <TableCell align="left">
-                                  {prod.product_code}
-                                </TableCell>
-                                <TableCell align="left">
-                                  {prod.name ? prod.name : 'Não informado'}
-                                </TableCell>
-                                <TableCell align="center">
-                                  <InputTableForEdit.number
-                                    control={controlProduct}
-                                    name={`product.${index}.quantity`}
-                                  />
-                                </TableCell>
-                                <TableCell align="center">
-                                  <InputTableForEdit.money
-                                    control={controlProduct}
-                                    name={`product.${index}.discount`}
-                                  />
-                                  {/* {formatMoneyPtBR(0)} */}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {formatMoneyPtBR(Number(prod.sale_value))}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {/* {formatMoneyPtBR(0)} */}
-                                  {prod.sale_value ? (
-                                    <CalcPerUnit
-                                      control={controlProduct}
-                                      index={index}
-                                      price={Number(prod.sale_value)}
-                                      name="product"
-                                    />
-                                  ) : (
-                                    formatMoneyPtBR(0)
-                                  )}
-                                </TableCell>
-                                <TableCell align="center">
-                                  <ButtonRemoveItens
-                                    onClick={() => handleRemoveProduct(prod.id)}
-                                  >
-                                    <DeleteIcon />
-                                  </ButtonRemoveItens>
-                                </TableCell>
-                              </TableRow>
-                            )
-                          })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Paper>
-                {isEditingProduct && products.list.length > 0 && (
-                  <Paper
-                    sx={{
-                      p: '0 2',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      background: 'transparent',
-                    }}
-                    elevation={0}
-                  >
-                    <Stack
-                      direction="row"
-                      alignSelf="flex-end"
-                      spacing={2}
-                      sx={{ width: 160 }}
-                    >
-                      <ButtonSubmit
-                        variant="contained"
-                        size="small"
-                        type="submit"
-                        onKeyDown={(event) =>
-                          console.log('User pressed: ', event.key)
-                        }
-                      >
-                        salvar
-                      </ButtonSubmit>
-                      <ButtonSubmit
-                        variant="contained"
-                        size="small"
-                        onClick={() => setIsEditingProduct(false)}
-                      >
-                        cancelar
-                      </ButtonSubmit>
-                    </Stack>
-                  </Paper>
-                )}
-              </Stack>
               {/* Serviços */}
               <Stack
                 component="form"
@@ -1351,9 +1206,9 @@ export default function QuotationsCreate() {
                                 <TableCell align="center">
                                   {formatMoneyPtBR(
                                     handleCalcValueTotalPerItem(
-                                      serv.standard_value,
-                                      serv.quantity,
-                                      serv.discount,
+                                      Number(serv.standard_value),
+                                      Number(serv.quantity),
+                                      Number(serv.discount),
                                     ),
                                   )}
                                 </TableCell>
@@ -1400,6 +1255,7 @@ export default function QuotationsCreate() {
                                     control={controlService}
                                     name={`service.${index}.discount`}
                                   />
+
                                   {/* {formatMoneyPtBR(0)} */}
                                 </TableCell>
                                 <TableCell align="center">
@@ -1465,6 +1321,239 @@ export default function QuotationsCreate() {
                         variant="contained"
                         size="small"
                         onClick={() => setIsEditingService(false)}
+                      >
+                        cancelar
+                      </ButtonSubmit>
+                    </Stack>
+                  </Paper>
+                )}
+              </Stack>
+
+              {/* PEÇAS */}
+              <Stack
+                component="form"
+                gap={1}
+                onSubmit={handleSubmitProduct(onSubmitProduct)}
+              >
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <TitleCard sx={{ flex: 1 }}>Peças</TitleCard>
+                    {/* <Box sx={{ marginRight: 1 }}>
+                    <ButtonAddItens>
+                      <AddIcon />
+                    </ButtonAddItens>
+                  </Box> */}
+
+                    <MoreOptionsQuotation
+                      aria-label="options to quotation"
+                      disabledButton={!(products.list.length > 0)}
+                      buttons={[
+                        {
+                          label: 'Editar',
+                          action: handleIsEditingOptions,
+                          type: 'product',
+                        },
+                      ]}
+                    />
+                  </Stack>
+                  <DividerCard />
+                  <TableContainer>
+                    <Table aria-label="simple table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Código</TableCell>
+                          <TableCell>Descrição</TableCell>
+                          <TableCell align="center">QTD</TableCell>
+                          <TableCell align="center">Desconto(UNID.)</TableCell>
+                          <TableCell align="center">Valor</TableCell>
+                          <TableCell align="center">Total</TableCell>
+                          {isEditingProduct && (
+                            <TableCell align="center">Ações</TableCell>
+                          )}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {!(products.list?.length > 0) && (
+                          <TableRow
+                            sx={{
+                              '&:last-child td, &:last-child th': {
+                                border: 0,
+                              },
+                            }}
+                          >
+                            <TableCell
+                              align="center"
+                              colSpan={isEditingProduct ? 7 : 6}
+                              sx={{ paddingTop: 4 }}
+                            >
+                              Nenhuma peça cadastrada.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        {!isEditingProduct &&
+                          products.list?.length > 0 &&
+                          products.list.map((prod) => {
+                            return (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                                key={prod.id}
+                              >
+                                <TableCell align="left">
+                                  {prod.product_code}
+                                </TableCell>
+                                <TableCell align="left">
+                                  {prod.name ? prod.name : 'Não informado'}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {prod.quantity}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(Number(prod.discount))}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(Number(prod.sale_value))}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(
+                                    handleCalcValueTotalPerItem(
+                                      Number(prod.sale_value),
+                                      Number(prod.quantity),
+                                      Number(prod.discount),
+                                    ),
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                        {isEditingProduct &&
+                          products.list?.length > 0 &&
+                          products.list.map((prod, index) => {
+                            setValueProduct(`product.${index}.id`, prod.id)
+                            // setValueProduct(
+                            //   `product.${index}.quantity`,
+                            //   prod.quantity,
+                            // )
+                            // setValueProduct(
+                            //   `product.${index}.discount`,
+                            //   prod.discount,
+                            // )
+                            return (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                                key={prod.id}
+                              >
+                                <TableCell align="left">
+                                  {prod.product_code}
+                                </TableCell>
+                                <TableCell align="left">
+                                  {prod.name ? prod.name : 'Não informado'}
+                                </TableCell>
+                                <TableCell align="center">
+                                  <InputTableForEdit.number
+                                    control={controlProduct}
+                                    name={`product.${index}.quantity`}
+                                  />
+                                </TableCell>
+                                <TableCell align="center">
+                                  <InputTableForEdit.money
+                                    control={controlProduct}
+                                    name={`product.${index}.discount`}
+                                  />
+                                  {errorsProduct.product &&
+                                    // @ts-ignore
+                                    errorsProduct.product[index] &&
+                                    // @ts-ignore
+                                    errorsProduct.product[index].message && (
+                                      <span
+                                        style={{
+                                          fontSize: '12px',
+                                          color: 'red',
+                                        }}
+                                      >
+                                        {/* @ts-ignore */}
+                                        {errorsProduct.product[index].message}
+                                      </span>
+                                    )}
+                                  {/* {formatMoneyPtBR(0)} */}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(Number(prod.sale_value))}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {/* {formatMoneyPtBR(0)} */}
+                                  {prod.sale_value ? (
+                                    <CalcPerUnit
+                                      control={controlProduct}
+                                      index={index}
+                                      price={Number(prod.sale_value)}
+                                      name="product"
+                                    />
+                                  ) : (
+                                    formatMoneyPtBR(0)
+                                  )}
+                                </TableCell>
+                                <TableCell align="center">
+                                  <ButtonRemoveItens
+                                    onClick={() => handleRemoveProduct(prod.id)}
+                                  >
+                                    <DeleteIcon />
+                                  </ButtonRemoveItens>
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Paper>
+                {isEditingProduct && products.list.length > 0 && (
+                  <Paper
+                    sx={{
+                      p: '0 2',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      background: 'transparent',
+                    }}
+                    elevation={0}
+                  >
+                    <Stack
+                      direction="row"
+                      alignSelf="flex-end"
+                      spacing={2}
+                      sx={{ width: 160 }}
+                    >
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        type="submit"
+                        onKeyDown={(event) =>
+                          console.log('User pressed: ', event.key)
+                        }
+                      >
+                        salvar
+                      </ButtonSubmit>
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        onClick={handleCancelProducts}
                       >
                         cancelar
                       </ButtonSubmit>

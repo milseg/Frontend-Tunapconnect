@@ -12,7 +12,7 @@ const defaultMaskOptions = {
   integerLimit: 7, // limit length of integer numbers
   allowNegative: false,
   allowDecimal: true,
-  decimalSymbol: '.',
+  decimalSymbol: ',',
   decimalLimit: 2, // how many digits allowed after the decimal
 }
 
