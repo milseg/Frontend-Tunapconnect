@@ -163,11 +163,13 @@ export default function QuotationsCreate() {
   const [clientVehicle, setClientVehicle] =
     useState<ClientVehicleResponseType | null>()
   const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
-  const [technicalConsultant, setTechnicalConsultant] =
-    useState<TechnicalConsultant | null>({
-      id: 0,
-      name: '-',
-    })
+  const [technicalConsultant, setTechnicalConsultant] = useState<{
+    id: number
+    name?: string
+  }>({
+    id: 0,
+    name: '-',
+  })
 
   const [typeQuotation, setTypeQuotation] = useState<{
     id: number

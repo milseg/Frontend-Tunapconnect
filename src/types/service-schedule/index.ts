@@ -42,7 +42,7 @@ export interface ClientVehicle {
 }
 export interface TechnicalConsultant {
   id: number
-  name?: string
+  name: string
 }
 
 // =================================================
