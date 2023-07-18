@@ -111,6 +111,8 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
     setRouteActual(router.pathname)
   }, [router])
 
+  console.timeLog(router.asPath)
+
   return (
     <React.Fragment>
       <ButtonsMenuNav
@@ -118,14 +120,14 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
         opended={opended}
         routeActual={routeActual}
       />
-      {user?.userTunap && !companySelected && (
+      {user?.user_tunap && router.asPath === '/company' && (
         <ButtonsMenuNav
           menuList={menuListTunapIntranet}
           opended={opended}
           routeActual={routeActual}
         />
       )}
-      {/* {user?.userTunap &&
+      {/* {user?.user_tunap &&
         menuListTunapIntranet.map((menu, index) => {
           console.log(menu)
           return (

@@ -365,7 +365,7 @@ export default function QuotationList() {
     router.push(newUrlPagination)
   }
 
-  async function handleSetServiceSchedule(idSelected: number) {
+  async function handleClickRow(idSelected: number) {
     const filterSelected = rows?.quotationListAllData.filter(
       (i) => i.id === idSelected,
     )[0]
@@ -373,7 +373,7 @@ export default function QuotationList() {
     if (filterSelected) {
       setQuotations(filterSelected)
     }
-    // await router.push(`/service-schedule/${idSelected}`)
+    await router.push(`/quotations/${idSelected}`)
   }
 
   useEffect(() => {
@@ -431,22 +431,13 @@ export default function QuotationList() {
                   variant="contained"
                   sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
                   startIcon={<AddCircleOutlineIcon />}
-                  // onClick={async () => {
-                  //   await router.push(`/service-schedule/create`)
-                  // }}
-                  // disabled
                 >
                   novo
                 </ButtonAdd>
               </Link>
             ) : (
               <Link href={'/quotations/create'}>
-                <ButtonIcon
-                  sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
-                  onClick={async () => {
-                    // await router.push(`/service-schedule/create`)
-                  }}
-                >
+                <ButtonIcon sx={{ alignSelf: 'flex-end', marginRight: '20px' }}>
                   <AddCircleOutlineIcon />
                 </ButtonIcon>
               </Link>
@@ -521,7 +512,7 @@ export default function QuotationList() {
               pages={pages}
               loading={isFetching}
               companyId={companySelected}
-              handleSetServiceSchedule={handleSetServiceSchedule}
+              handleClickRow={handleClickRow}
             />
           ) : (
             <Skeleton variant="rounded" sx={{ width: '100%' }} height={150} />
