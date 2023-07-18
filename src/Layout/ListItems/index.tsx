@@ -111,8 +111,6 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
     setRouteActual(router.pathname)
   }, [router])
 
-  console.timeLog(router.asPath)
-
   return (
     <React.Fragment>
       <ButtonsMenuNav

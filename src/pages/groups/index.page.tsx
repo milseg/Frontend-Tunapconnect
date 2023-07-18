@@ -467,7 +467,7 @@ export default function GroupsList() {
               pages={pages}
               loading={isFetching}
               companyId={null}
-              handleSetServiceSchedule={handleSetServiceSchedule}
+              handleClickRow={handleSetServiceSchedule}
             />
           ) : (
             <Skeleton variant="rounded" sx={{ width: '100%' }} height={150} />
