@@ -301,7 +301,6 @@ export default function QuotationsCreate() {
     control: controlProduct,
     name: 'product',
   })
-  console.log(errorsProduct)
 
   const {
     register: registerService,
@@ -787,7 +786,7 @@ export default function QuotationsCreate() {
           if (s.id === serv.id) {
             setValueService(
               `service.${index}.quantity`,
-              Number(s.quantity) + serv.standard_quantity,
+              Number(s.quantity) + serv.standard_quantity.replace('.', ','),
             )
             setValueService(`service.${index}.discount`, s.discount)
             setValueService(
@@ -796,7 +795,9 @@ export default function QuotationsCreate() {
             )
             return {
               ...s,
-              quantity: `${Number(s.quantity) + 1}`,
+              quantity: `${
+                Number(s.quantity) + Number(serv.standard_quantity)
+              }`.replace('.', ','),
             }
           }
           return s
@@ -810,14 +811,14 @@ export default function QuotationsCreate() {
       setValueService(`service.${prevState.list.length}.id`, serv.id)
       setValueService(
         `service.${prevState.list.length}.quantity`,
-        serv.standard_quantity,
+        serv.standard_quantity.replace('.', ','),
       )
       setValueService(`service.${prevState.list.length}.discount`, '0')
       setValueService(
         `service.${prevState.list.length}.price`,
         serv.standard_value,
       )
-
+      console.log(serv.standard_quantity.replace('.', ','))
       return {
         ...prevState,
         list: [
@@ -965,7 +966,6 @@ export default function QuotationsCreate() {
       ],
       async () => {
         const resp = await api.get(`/os?company_id=${companySelected}`)
-        console.log(resp.data.data)
         return resp.data.data
       },
       {
@@ -984,32 +984,6 @@ export default function QuotationsCreate() {
       )
     }
   }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList])
-
-  // useEffect(() => {
-  //   // products.list.forEach((p, index) => {
-  //   //   setValueProduct(`product.${index}.id`, p.id)
-  //   //   setValueProduct(`product.${index}.quantity`, Number(p.quantity))
-  //   //   setValueProduct(`product.${index}.discount`, p.discount)
-  //   // })
-
-  //   const lastProduct = products.list[products.list.length - 1]
-
-  //   setValueProduct(`product.${products.list.length - 1}.id`, lastProduct.id)
-  //   setValueProduct(
-  //     `product.${products.list.length - 1}.quantity`,
-  //     Number(lastProduct.quantity),
-  //   )
-  //   setValueProduct(`product.${products.list.length - 1}.discount`, p.discount)
-  // }, [products.list])
-  // useEffect(() => {
-  //   services.list.forEach((s, index) => {
-  //     setValueService(`service.${index}.id`, s.id)
-  //     setValueService(`service.${index}.quantity`, Number(s.quantity))
-  //     setValueService(`service.${index}.discount`, s.discount)
-  //   })
-  // }, [services.list])
-
-  console.log(errorsService)
 
   return (
     <>
