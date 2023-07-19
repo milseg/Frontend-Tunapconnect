@@ -797,7 +797,7 @@ export default function QuotationsCreate() {
               ...s,
               quantity: `${
                 Number(s.quantity) + Number(serv.standard_quantity)
-              }`.replace('.', ','),
+              }`,
             }
           }
           return s
