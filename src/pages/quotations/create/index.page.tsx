@@ -357,7 +357,9 @@ export default function QuotationsCreate() {
           return {
             ...p,
             isSaved: true,
-            quantity: data.product[index].quantity,
+            quantity: data.product[index].quantity
+              .replace(/\./g, '')
+              .replace(/,/g, '.'),
             discount: data.product[index].discount
               .replace(/\./g, '')
               .replace(/,/g, '.'),
@@ -396,7 +398,9 @@ export default function QuotationsCreate() {
           return {
             ...p,
             isSaved: true,
-            quantity: data.service[index].quantity,
+            quantity: data.service[index].quantity
+              .replace(/\./g, '')
+              .replace(/,/g, '.'),
             discount: data.service[index].discount
               .replace(/\./g, '')
               .replace(/,/g, '.'),
