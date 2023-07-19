@@ -790,7 +790,10 @@ export default function QuotationsCreate() {
           if (s.id === serv.id) {
             setValueService(
               `service.${index}.quantity`,
-              Number(s.quantity) + serv.standard_quantity.replace('.', ','),
+              `${Number(s.quantity) + Number(serv.standard_quantity)}`.replace(
+                '.',
+                ',',
+              ),
             )
             setValueService(`service.${index}.discount`, s.discount)
             setValueService(
