@@ -8,3 +8,10 @@ export interface IProductsRequestDTO {
   limit: number
   total_groups: number
 }
+
+export interface ProductType {
+  id: number
+  sale_value: number
+  guarantee_value: number
+  tunap_code: string
+}

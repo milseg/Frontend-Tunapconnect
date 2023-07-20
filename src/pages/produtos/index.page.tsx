@@ -42,6 +42,7 @@ import { Delete } from '@mui/icons-material'
 import { CustomNoRowsOverlay } from '@/components/TableApp/NoRows'
 import productsListRequests from '../api/products.api'
 import { CompanyContext } from '@/contexts/CompanyContext'
+import { ProductType } from '@/types/products'
 
 type SearchFormProps = {
   search: string
@@ -55,6 +56,14 @@ export default function Products() {
 
   const queryClient = useQueryClient()
   const router = useRouter()
+
+  const exampleReturn = [
+    { id: 1, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
+    { id: 1, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
+    { id: 1, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
+    { id: 1, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
+    { id: 1, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
+  ]
 
   React.useEffect(() => {
     if (!isWeb) {
@@ -239,7 +248,70 @@ export default function Products() {
                       height: 'fit-content',
                     }}
                   >
-                    <h2>aaaaaa</h2>
+                    {exampleReturn.map((product: ProductType, index) => (
+                      <Stack
+                        key={product.id}
+                        direction="row"
+                        sx={{
+                          width: '100%',
+                          backgroundColor: `${
+                            index % 2 == 0 ? '#FFFFFF' : '#F1F1F1'
+                          }`,
+                          p: 1,
+                          borderRadius: '2px',
+                        }}
+                        justifyContent="space-between"
+                      >
+                        <Typography
+                          variant="subtitle1"
+                          color={'#1C4961'}
+                          fontWeight={700}
+                          sx={{ fontSize: { xs: '0.5rem', sm: '1.2rem' } }}
+                          textOverflow={'ellipsis'}
+                        >
+                          {product.id}
+                        </Typography>
+                        <Typography
+                          variant="subtitle1"
+                          color={'#1C4961'}
+                          fontWeight={700}
+                          sx={{
+                            width: '100%',
+                            textAlign: 'center',
+                            fontSize: { xs: '0.5rem', sm: '1.2rem' },
+                          }}
+                          textOverflow={'ellipsis'}
+                        >
+                          {product.tunap_code}
+                        </Typography>
+                        <Typography
+                          variant="subtitle1"
+                          color={'#1C4961'}
+                          fontWeight={700}
+                          sx={{
+                            width: '100%',
+                            textAlign: 'center',
+                            fontSize: { xs: '0.5rem', sm: '1.2rem' },
+                          }}
+                          textOverflow={'ellipsis'}
+                        >
+                          {product.guarantee_value}
+                        </Typography>
+                        <Typography
+                          variant="subtitle1"
+                          color={'#1C4961'}
+                          fontWeight={700}
+                          sx={{
+                            width: '100%',
+                            textAlign: 'center',
+                            fontSize: { xs: '0.5rem', sm: '1.2rem' },
+                          }}
+                          textOverflow={'ellipsis'}
+                        >
+                          {product.sale_value}
+                        </Typography>
+                      </Stack>
+                    ))}
                   </Paper>
                 )}
               </Paper>
