@@ -27,7 +27,7 @@ import Paper from '@mui/material/Paper'
 import IconButton from '@mui/material/IconButton'
 import { ButtonAdd, ButtonIcon, TableTitles } from './styles'
 
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { useQuery, useQueryClient } from 'react-query'
 import { useRouter } from 'next/router'
 import { ButtonPaginate } from '../service-schedule/create/styles'
@@ -41,6 +41,7 @@ import { GroupsType, IGroupsEditDTO } from '@/types/groups'
 import { Delete } from '@mui/icons-material'
 import { CustomNoRowsOverlay } from '@/components/TableApp/NoRows'
 import productsListRequests from '../api/products.api'
+import { CompanyContext } from '@/contexts/CompanyContext'
 
 type SearchFormProps = {
   search: string
@@ -48,19 +49,12 @@ type SearchFormProps = {
 
 export default function Products() {
   const [pageNumber, setPageNumber] = React.useState(1)
-  const [open, setOpen] = useState(false)
-  const [newName, setNewName] = useState('')
   const [isMobile, setIsMobile] = useState(false)
-  const [editNameId, setEditNameId] = useState<number>()
-  const [actualNameValue, setActualNameValue] = useState<string>()
-  const [isLoadingEdit, setIsLoadingEdit] = useState<boolean>(false)
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
+  const { companySelected } = useContext(CompanyContext)
 
   const queryClient = useQueryClient()
   const router = useRouter()
-  const handleCloseDialogEdit = () => {
-    setOpen(false)
-  }
 
   React.useEffect(() => {
     if (!isWeb) {
@@ -100,31 +94,12 @@ export default function Products() {
     )
   }
 
-  const handleFormEdit = async (event: any) => {
-    event.preventDefault()
-    setIsLoadingEdit(true)
-    const response = await apiB.put<IGroupsEditDTO>(`/grupos/${editNameId}`, {
-      name: newName,
-    })
-    if (response.status === 200) {
-      refetch()
-      setOpen(false)
-      setIsLoadingEdit(false)
-    }
-  }
-
   const handleDelete = (id: number) => {
     refetch()
   }
 
   const handleDeleteAction = (selectId: number) => {
-    ActionDeleteConfirmations(selectId, handleDelete, '/groups/')
-  }
-
-  const openDialogEdit = (selectId: number, actualName: string) => {
-    setOpen(true)
-    setEditNameId(selectId)
-    setActualNameValue(actualName)
+    ActionDeleteConfirmations(selectId, handleDelete, '/produtos/')
   }
 
   return (
@@ -228,19 +203,13 @@ export default function Products() {
                   {'Número'}
                 </Typography>
                 <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
-                  {'Nome'}
+                  {'Código Tunap'}
                 </Typography>
                 <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
-                  {'Criado em'}
+                  {'Valor de revenda'}
                 </Typography>
                 <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
-                  {'Atualizado em'}
-                </Typography>
-                <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
-                  {'Qtd de Empresas'}
-                </Typography>
-                <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
-                  {'Ação'}
+                  {'Valor de venda'}
                 </Typography>
               </Stack>
             </TableTitles>
@@ -302,45 +271,6 @@ export default function Products() {
             </ButtonPaginate>
           </Stack>
         </Stack>
-        <Dialog open={open} onClose={handleCloseDialogEdit}>
-          <DialogTitle>Editar Nome</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Para editar o nome do grupo, insira o nome novo no campo abaixo
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="name"
-              label="Novo nome"
-              type="text"
-              fullWidth
-              variant="standard"
-              defaultValue={actualNameValue}
-              onInput={(e: any) => setNewName(e.target.value)}
-            />
-          </DialogContent>
-          {isLoadingEdit ? (
-            <Grid
-              sx={{
-                p: { xs: 0, sm: 2 },
-                display: 'flex',
-                flexDirection: 'column',
-                height: 'fit-content',
-                alignItems: 'flex-end',
-              }}
-            >
-              <Loading />
-            </Grid>
-          ) : (
-            <DialogActions>
-              <Button onClick={handleCloseDialogEdit}>Cancelar</Button>
-              <Button type="submit" onClick={handleFormEdit}>
-                Atualizar
-              </Button>
-            </DialogActions>
-          )}
-        </Dialog>
       </Container>
     </>
   )
