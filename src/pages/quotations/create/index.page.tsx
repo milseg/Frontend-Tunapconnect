@@ -229,7 +229,7 @@ export default function QuotationsCreate() {
     useState<ClientVehicleResponseType | null>(null)
 
   const [clientVehicle, setClientVehicle] =
-    useState<ClientVehicleResponseType | null>()
+    useState<ClientVehicleResponseType | null>(null)
   const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
   const [technicalConsultant, setTechnicalConsultant] =
     useState<TechnicalConsultant | null>({
