@@ -777,7 +777,7 @@ export default function QuotationsCreate() {
 
   function handleCancelServices() {
     setServices((prevState) => {
-      const newList = prevState.list.filter((item) => item.isSaved)
+      const newList = prevState.list.filter((item) => item.status)
       newList.forEach((i, index) => {
         console.log(i.discount)
         setValueService(
@@ -986,36 +986,36 @@ export default function QuotationsCreate() {
       const listProducts: ProductType[] = []
       const listServices: ServicesType[] = []
 
-      dataQuotationById.quotation_itens.forEach((i) => {
-        if (i.service === null && i.product !== null) {
-          listProducts.push({
-            id: i.product?.id as number,
-            company_id: i.product?.company_id as number,
-            name: i.product?.name as string,
-            product_code: i.product?.product_code as string,
-            sale_value: i.product?.sale_value as string,
-            guarantee_value: i.product?.guarantee_value as string,
-            tunap_code: i.product?.tunap_code,
-            active: i.product?.active as boolean,
-            discount: i.price_discount,
-            quantity: i.quantity,
-          })
-        }
-        if (i.service !== null && i.product === null) {
-          listServices.push({
-            id: i.service?.id as number,
-            company_id: i.service?.company_id as number,
-            service_code: i.service?.service_code as string,
-            integration_code: i.service?.integration_code,
-            description: i.service?.integration_code,
-            standard_quantity: i.service?.standard_quantity as string,
-            standard_value: i.service?.standard_value as string,
-            active: i.service?.active as boolean,
-            discount: i.price_discount,
-            quantity: i.quantity,
-          })
-        }
-      })
+      // dataQuotationById.quotation_itens.forEach((i) => {
+      //   if (i.service === null && i.product !== null) {
+      //     listProducts.push({
+      //       id: i.product?.id as number,
+      //       company_id: i.product?.company_id as number,
+      //       name: i.product?.name as string,
+      //       product_code: i.product?.product_code as string,
+      //       sale_value: i.product?.sale_value as string,
+      //       guarantee_value: i.product?.guarantee_value as string,
+      //       tunap_code: i.product?.tunap_code,
+      //       active: i.product?.active as boolean,
+      //       discount: i.price_discount,
+      //       quantity: i.quantity,
+      //     })
+      //   }
+      //   if (i.service !== null && i.product === null) {
+      //     listServices.push({
+      //       id: i.service?.id as number,
+      //       company_id: i.service?.company_id as number,
+      //       service_code: i.service?.service_code as string,
+      //       integration_code: i.service?.integration_code,
+      //       description: i.service?.integration_code,
+      //       standard_quantity: i.service?.standard_quantity as string,
+      //       standard_value: i.service?.standard_value as string,
+      //       active: i.service?.active as boolean,
+      //       discount: i.price_discount,
+      //       quantity: i.quantity,
+      //     })
+      //   }
+      // })
 
       listProducts.forEach((i, index) => {
         setValueProduct(`product.${index}.quantity`, i.quantity)
