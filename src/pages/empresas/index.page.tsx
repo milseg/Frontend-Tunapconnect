@@ -345,7 +345,11 @@ export default function Empresas() {
                                 aria-label="search"
                                 color="warning"
                                 onClick={() => handleDeleteAction(company.id)}
-                                sx={{ marginLeft: 1, color: 'red' }}
+                                sx={{
+                                  marginLeft: 1,
+                                  color: 'red',
+                                  padding: { xs: '0rem', sm: '8px' },
+                                }}
                               >
                                 <Delete />
                               </IconButton>
@@ -363,7 +367,11 @@ export default function Empresas() {
                                     updated_at: company.updated_at,
                                   })
                                 }
-                                sx={{ marginLeft: 1, color: 'blue' }}
+                                sx={{
+                                  marginLeft: 1,
+                                  color: 'blue',
+                                  padding: { xs: '0rem', sm: '8px' },
+                                }}
                               >
                                 <EditIcon />
                               </IconButton>
