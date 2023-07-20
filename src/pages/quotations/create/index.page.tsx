@@ -378,45 +378,7 @@ export default function QuotationsCreate() {
       total,
       totalDiscount,
     }))
-    // setProducts((prevState) => {
-    //   const newList = prevState.list.map((p, index) => {
-    //     if (p.id === data.product[index].id) {
-    //       console.log(
-    //         data.product[index].discount.replace(/\./g, '').replace(/,/g, '.'),
-    //       )
-    //       return {
-    //         ...p,
-    //         status: 'saved',
-    //         quantity: data.product[index].quantity
-    //           .replace(/\./g, '')
-    //           .replace(/,/g, '.'),
-    //         discount: data.product[index].discount
-    //           .replace(/\./g, '')
-    //           .replace(/,/g, '.'),
-    //       }
-    //     } else {
-    //       return p
-    //     }
-    //   })
 
-    //   const totalDiscount = newList.reduce((acc, curr) => {
-    //     return acc + Number(curr.discount) * Number(curr.quantity)
-    //   }, 0)
-    //   const total = newList.reduce((acc, curr) => {
-    //     const totalItem = Number(curr.sale_value) * Number(curr.quantity)
-    //     return acc + totalItem
-    //   }, 0)
-
-    //   console.log(totalDiscount)
-    //   console.log(total)
-
-    //   return {
-    //     ...prevState,
-    //     list: newList,
-    //     totalDiscount,
-    //     total,
-    //   }
-    // })
     setIsEditingProduct(false)
   }
 
