@@ -296,7 +296,7 @@ export default function Empresas() {
                               variant="subtitle1"
                               color={'#1C4961'}
                               fontWeight={700}
-                              sx={{ fontSize: { xs: '0.6rem', sm: '1.2rem' } }}
+                              sx={{ fontSize: { xs: '0.5rem', sm: '1.2rem' } }}
                               textOverflow={'ellipsis'}
                             >
                               {company.id}
@@ -308,7 +308,7 @@ export default function Empresas() {
                               sx={{
                                 width: '40%',
                                 textAlign: 'center',
-                                fontSize: { xs: '0.6rem', sm: '1.2rem' },
+                                fontSize: { xs: '0.5rem', sm: '1.2rem' },
                               }}
                               textOverflow={'ellipsis'}
                             >
@@ -321,7 +321,7 @@ export default function Empresas() {
                               sx={{
                                 width: '40%',
                                 textAlign: 'center',
-                                fontSize: { xs: '0.6rem', sm: '1.2rem' },
+                                fontSize: { xs: '0.5rem', sm: '1.2rem' },
                               }}
                               textOverflow={'ellipsis'}
                             >
@@ -334,7 +334,7 @@ export default function Empresas() {
                               sx={{
                                 width: '40%',
                                 textAlign: 'center',
-                                fontSize: { xs: '0.6rem', sm: '1.2rem' },
+                                fontSize: { xs: '0.5rem', sm: '1.2rem' },
                               }}
                               textOverflow={'ellipsis'}
                             >
