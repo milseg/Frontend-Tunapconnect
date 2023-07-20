@@ -147,6 +147,13 @@ export interface QuotationResponseType {
   total_results: number
 }
 
+type StatusProductType =
+  | 'saved'
+  | 'excluded'
+  | 'adding'
+  | 'cancelled'
+  | undefined
+
 export interface ProductType {
   id: number
   company_id: number
@@ -158,8 +165,15 @@ export interface ProductType {
   active: boolean
   discount: string
   quantity: string
-  isSaved?: boolean
+  status: StatusProductType
 }
+
+type StatusServicesType =
+  | 'saved'
+  | 'excluded'
+  | 'adding'
+  | 'cancelled'
+  | undefined
 
 export interface ServicesType {
   id: number
@@ -172,7 +186,7 @@ export interface ServicesType {
   active: boolean
   discount: string
   quantity: string
-  isSaved?: boolean
+  status: StatusServicesType
 }
 
 export interface TypeQuotationType {

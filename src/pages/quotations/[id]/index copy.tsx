@@ -465,45 +465,10 @@ export default function QuotationsCreate() {
     })
   }
   function handleRemoveService(id: number) {
-    const serviceIndex = services.list.findIndex((p) => p.id !== id)
-
-    removeService(serviceIndex)
     setServices((prevState) => {
-      const serviceId = prevState.list.findIndex((p) => p.id !== id)
-
-      const newList = prevState.list.filter((p) => p.id !== id)
-
-      newList.forEach((i, index) => {
-        console.log(i)
-        setValueService(`service.${index}.id`, i.id)
-        setValueService(
-          `service.${index}.quantity`,
-          i.quantity.replace('.', ','),
-        )
-        setValueService(
-          `service.${index}.discount`,
-          i.discount.replace('.', ','),
-        )
-        // setValueService(
-        //   `service.${index}.discount`,
-        //   i.discount.replace('.', ','),
-        // )
-        // setValueService(`service.${i}.quantity`, i.quantity)
-      })
-
-      const totalDiscount = newList.reduce((acc, curr) => {
-        return acc + Number(curr.discount) * Number(curr.quantity)
-      }, 0)
-      const total = newList.reduce((acc, curr) => {
-        const totalItem = Number(curr.standard_value) * Number(curr.quantity)
-        return acc + totalItem
-      }, 0)
-
       return {
         ...prevState,
-        list: newList,
-        totalDiscount,
-        total,
+        list: prevState.list.filter((p) => p.id !== id),
       }
     })
   }
@@ -717,25 +682,12 @@ export default function QuotationsCreate() {
           if (s.id === serv.id) {
             setValueService(
               `service.${index}.quantity`,
-              `${Number(s.quantity) + Number(serv.standard_quantity)}`.replace(
-                '.',
-                ',',
-              ),
+              Number(s.quantity) + serv.standard_quantity,
             )
-
-            setValueService(
-              `service.${index}.discount`,
-              s.discount.replace('.', ','),
-            )
-            setValueService(
-              `service.${prevState.list.length}.price`,
-              s.standard_value,
-            )
+            setValueService(`service.${index}.discount`, s.discount)
             return {
               ...s,
-              quantity: `${
-                Number(s.quantity) + Number(serv.standard_quantity)
-              }`,
+              quantity: `${Number(s.quantity) + 1}`,
             }
           }
           return s
@@ -749,14 +701,9 @@ export default function QuotationsCreate() {
       setValueService(`service.${prevState.list.length}.id`, serv.id)
       setValueService(
         `service.${prevState.list.length}.quantity`,
-        serv.standard_quantity.replace('.', ','),
+        serv.standard_quantity,
       )
       setValueService(`service.${prevState.list.length}.discount`, '0')
-      setValueService(
-        `service.${prevState.list.length}.price`,
-        serv.standard_value,
-      )
-
       return {
         ...prevState,
         list: [
@@ -774,45 +721,6 @@ export default function QuotationsCreate() {
       setOpenModalSearchServices(false)
     }
   }
-
-  function handleCancelServices() {
-    setServices((prevState) => {
-      const newList = prevState.list.filter((item) => item.isSaved)
-      newList.forEach((i, index) => {
-        console.log(i.discount)
-        setValueService(
-          `service.${index}.discount`,
-          i.discount.replace('.', ','),
-        )
-        setValueService(`service.${i}.quantity`, i.quantity)
-        setValueService(
-          `service.${i}.total`,
-          `${Number(i.quantity) * Number(i.standard_value)}`,
-        )
-      })
-
-      const totalDiscount = newList.reduce((acc, curr) => {
-        return acc + Number(curr.discount) * Number(curr.quantity)
-      }, 0)
-      const total = newList.reduce((acc, curr) => {
-        const totalItem = Number(curr.standard_value) * Number(curr.quantity)
-        return acc + totalItem
-      }, 0)
-
-      return {
-        ...prevState,
-        list: newList,
-        totalDiscount,
-        total,
-      }
-    })
-
-    // setValueProduct(`product.${prevState.list.length}.discount`, '0,00')
-    // setValueProduct(`product.${prevState.list.length}.price`, prod.sale_value)
-
-    setIsEditingService(false)
-  }
-
   function handleAddKits(kit: KitType) {
     console.log(kit)
     // if (!isEditingService) {
@@ -1476,7 +1384,7 @@ export default function QuotationsCreate() {
                       <ButtonSubmit
                         variant="contained"
                         size="small"
-                        onClick={handleCancelServices}
+                        onClick={() => setIsEditingService(false)}
                       >
                         cancelar
                       </ButtonSubmit>

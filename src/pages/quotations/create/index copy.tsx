@@ -41,7 +41,7 @@ import MenuItem from '@mui/material/MenuItem'
 
 import TextField from '@mui/material/TextField'
 import Box from '@mui/material/Box'
-import { formatDateTime, formatDateTimeTimezone } from '@/ultis/formatDate'
+import { formatDateTimeTimezone } from '@/ultis/formatDate'
 import ActionAlerts from '@/components/ActionAlerts'
 import { DataTimeInput } from '@/components/DataTimeInput'
 import { ActionAlertsStateProps } from '@/components/ActionAlerts/ActionAlerts'
@@ -82,7 +82,6 @@ import ModalSearchProduct from './components/ModalSearchProduct'
 import {
   KitType,
   ProductType,
-  QuotationByIdResponseType,
   ServicesType,
   TypeQuotationType,
 } from '@/types/quotation'
@@ -92,6 +91,8 @@ import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import ModalSearchService from './components/ModalSearchService'
 import { CalcPerUnit } from './Calc'
 import ModalSearchKit from './components/ModalSearchKit'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 
 // import { useForm } from 'react-hook-form'
 
@@ -135,6 +136,77 @@ interface kitsProps {
   total: number
 }
 
+const productSchema = z.object({
+  product: z.array(
+    z
+      .object({
+        id: z.number(),
+        price: z.string(),
+        quantity: z.string(),
+        discount: z.string(),
+      })
+      .refine(
+        (e) => {
+          console.log(
+            Number(e.discount.replace(/\./g, '').replace(/,/g, '.')) >
+              Number(e.price),
+          )
+          if (
+            Number(e.discount.replace(/\./g, '').replace(/,/g, '.')) >=
+            Number(e.price)
+          ) {
+            return false
+          }
+          return true
+        },
+        { message: 'Desconto inválido!' },
+      ),
+  ),
+  // discount: z.string().refine(
+  // (e) => {
+  //   console.log(e)
+  //   return false
+  // },
+  //   { message: 'Digite um valor valido!' },
+  // ),
+  // quantity: z.string(),
+})
+const serviceSchema = z.object({
+  service: z.array(
+    z
+      .object({
+        id: z.number(),
+        price: z.string(),
+        quantity: z.string(),
+        discount: z.string(),
+      })
+      .refine(
+        (e) => {
+          console.log(
+            Number(e.discount.replace(/\./g, '').replace(/,/g, '.')) >
+              Number(e.price),
+          )
+          if (
+            Number(e.discount.replace(/\./g, '').replace(/,/g, '.')) >=
+            Number(e.price)
+          ) {
+            return false
+          }
+          return true
+        },
+        { message: 'Desconto inválido!' },
+      ),
+  ),
+  // discount: z.string().refine(
+  // (e) => {
+  //   console.log(e)
+  //   return false
+  // },
+  //   { message: 'Digite um valor valido!' },
+  // ),
+  // quantity: z.string(),
+})
+
 export default function QuotationsCreate() {
   const [products, setProducts] = useState<productsProps>({
     list: [],
@@ -163,18 +235,13 @@ export default function QuotationsCreate() {
   const [clientVehicle, setClientVehicle] =
     useState<ClientVehicleResponseType | null>()
   const [visitDate, setVisitDate] = useState<Dayjs | null>(dayjs(new Date()))
-  const [technicalConsultant, setTechnicalConsultant] = useState<{
-    id: number
-    name?: string
-  }>({
-    id: 0,
-    name: '-',
-  })
+  const [technicalConsultant, setTechnicalConsultant] =
+    useState<TechnicalConsultant | null>({
+      id: 0,
+      name: '-',
+    })
 
-  const [typeQuotation, setTypeQuotation] = useState<{
-    id: number
-    name?: string
-  }>({
+  const [typeQuotation, setTypeQuotation] = useState({
     id: 0,
     name: '-',
   })
@@ -220,7 +287,11 @@ export default function QuotationsCreate() {
     handleSubmit: handleSubmitProduct,
     setValue: setValueProduct,
     control: controlProduct,
-  } = useForm()
+    reset: resetProduct,
+    formState: { errors: errorsProduct },
+  } = useForm({
+    resolver: zodResolver(productSchema),
+  })
 
   const {
     append: appendProduct,
@@ -236,12 +307,16 @@ export default function QuotationsCreate() {
     handleSubmit: handleSubmitService,
     control: controlService,
     setValue: setValueService,
-  } = useForm()
+    formState: { errors: errorsService },
+  } = useForm({
+    resolver: zodResolver(serviceSchema),
+  })
 
   const {
     append: appendService,
     remove: removeService,
     update: upadateService,
+    fields: fieldsService,
   } = useFieldArray({
     control: controlService,
     name: 'service',
@@ -277,9 +352,15 @@ export default function QuotationsCreate() {
     setProducts((prevState) => {
       const newList = prevState.list.map((p, index) => {
         if (p.id === data.product[index].id) {
+          console.log(
+            data.product[index].discount.replace(/\./g, '').replace(/,/g, '.'),
+          )
           return {
             ...p,
-            quantity: data.product[index].quantity,
+            isSaved: true,
+            quantity: data.product[index].quantity
+              .replace(/\./g, '')
+              .replace(/,/g, '.'),
             discount: data.product[index].discount
               .replace(/\./g, '')
               .replace(/,/g, '.'),
@@ -317,7 +398,10 @@ export default function QuotationsCreate() {
         if (p.id === data.service[index].id) {
           return {
             ...p,
-            quantity: data.service[index].quantity,
+            isSaved: true,
+            quantity: data.service[index].quantity
+              .replace(/\./g, '')
+              .replace(/,/g, '.'),
             discount: data.service[index].discount
               .replace(/\./g, '')
               .replace(/,/g, '.'),
@@ -458,38 +542,45 @@ export default function QuotationsCreate() {
 
   function handleRemoveProduct(id: number) {
     setProducts((prevState) => {
+      const newList = prevState.list.filter((p) => p.id !== id)
+
+      newList.forEach((i, index) => {
+        console.log(i.discount)
+        setValueProduct(
+          `product.${index}.discount`,
+          i.discount.replace('.', ','),
+        )
+        setValueProduct(`product.${i}.quantity`, i.quantity)
+      })
+
+      const totalDiscount = newList.reduce((acc, curr) => {
+        return acc + Number(curr.discount) * Number(curr.quantity)
+      }, 0)
+      const total = newList.reduce((acc, curr) => {
+        const totalItem = Number(curr.sale_value) * Number(curr.quantity)
+        return acc + totalItem
+      }, 0)
+
       return {
         ...prevState,
         list: prevState.list.filter((p) => p.id !== id),
+        total,
+        totalDiscount,
       }
     })
   }
   function handleRemoveService(id: number) {
-    const serviceIndex = services.list.findIndex((p) => p.id !== id)
-
-    removeService(serviceIndex)
     setServices((prevState) => {
       const serviceId = prevState.list.findIndex((p) => p.id !== id)
-
       const newList = prevState.list.filter((p) => p.id !== id)
-
-      newList.forEach((i, index) => {
-        console.log(i)
-        setValueService(`service.${index}.id`, i.id)
-        setValueService(
-          `service.${index}.quantity`,
-          i.quantity.replace('.', ','),
-        )
-        setValueService(
-          `service.${index}.discount`,
-          i.discount.replace('.', ','),
-        )
-        // setValueService(
-        //   `service.${index}.discount`,
-        //   i.discount.replace('.', ','),
-        // )
-        // setValueService(`service.${i}.quantity`, i.quantity)
-      })
+      // newList.forEach((i, index) => {
+      //   console.log(i)
+      //   setValueService(
+      //     `service.${index}.discount`,
+      //     i.discount.replace('.', ','),
+      //   )
+      //   setValueService(`service.${i}.quantity`, i.quantity)
+      // })
 
       const totalDiscount = newList.reduce((acc, curr) => {
         return acc + Number(curr.discount) * Number(curr.quantity)
@@ -509,16 +600,16 @@ export default function QuotationsCreate() {
   }
 
   function handleCalcValueTotalPerItem(
-    price: string,
-    qtd: string,
-    discount: string,
+    price: number,
+    qtd: number,
+    discount: number,
   ) {
-    const priceFormatted = Number(price)
-    const discountFormatted = Number(
-      discount.replace(/\./g, '').replace(/,/g, '.'),
-    )
-    const qtdFormatted = Number(qtd)
-    const result = (priceFormatted - discountFormatted) * qtdFormatted
+    // const priceFormatted = Number(price)
+    // const discountFormatted = Number(
+    //   discount.replace(/\./g, '').replace(/,/g, '.'),
+    // )
+    // const qtdFormatted = Number(qtd)
+    const result = (price - discount) * qtd
 
     return result
   }
@@ -620,10 +711,7 @@ export default function QuotationsCreate() {
     console.log(dataFormatted)
 
     try {
-      const respCreate: any = await api.put(
-        `/quotations/${router.query.id}`,
-        dataFormatted,
-      )
+      const respCreate: any = await api.post('/quotations', dataFormatted)
       const idCreatedResponse = respCreate.data.data
       // setServiceSchedule(idCreatedResponse, true)
 
@@ -664,7 +752,10 @@ export default function QuotationsCreate() {
       if (isExistsProduct > -1) {
         const newList = prevState.list.map((p, index) => {
           if (p.id === prod.id) {
-            setValueProduct(`product.${index}.quantity`, Number(p.quantity) + 1)
+            setValueProduct(
+              `product.${index}.quantity`,
+              `${Number(p.quantity) + 1}`,
+            )
             setValueProduct(`product.${index}.discount`, p.discount)
             return {
               ...p,
@@ -683,9 +774,10 @@ export default function QuotationsCreate() {
       setValueProduct(`product.${prevState.list.length}.id`, prod.id)
       setValueProduct(
         `product.${prevState.list.length}.quantity`,
-        1 * Number(qtd),
+        `${1 * Number(qtd)}`,
       )
       setValueProduct(`product.${prevState.list.length}.discount`, '0,00')
+      setValueProduct(`product.${prevState.list.length}.price`, prod.sale_value)
       return {
         ...prevState,
         list: [
@@ -703,6 +795,41 @@ export default function QuotationsCreate() {
       setOpenModalSearchProduct(false)
     }
   }
+
+  function handleCancelProducts() {
+    setProducts((prevState) => {
+      const newList = prevState.list.filter((item) => item.isSaved)
+      newList.forEach((i, index) => {
+        console.log(i.discount)
+        setValueProduct(
+          `product.${index}.discount`,
+          i.discount.replace('.', ','),
+        )
+        setValueProduct(`product.${i}.quantity`, i.quantity)
+      })
+
+      const totalDiscount = newList.reduce((acc, curr) => {
+        return acc + Number(curr.discount) * Number(curr.quantity)
+      }, 0)
+      const total = newList.reduce((acc, curr) => {
+        const totalItem = Number(curr.sale_value) * Number(curr.quantity)
+        return acc + totalItem
+      }, 0)
+
+      return {
+        ...prevState,
+        list: newList,
+        total,
+        totalDiscount,
+      }
+    })
+
+    // setValueProduct(`product.${prevState.list.length}.discount`, '0,00')
+    // setValueProduct(`product.${prevState.list.length}.price`, prod.sale_value)
+
+    setIsEditingProduct(false)
+  }
+
   function handleAddServices(serv: ServicesType) {
     console.log(serv)
     if (!isEditingService) {
@@ -723,10 +850,7 @@ export default function QuotationsCreate() {
               ),
             )
 
-            setValueService(
-              `service.${index}.discount`,
-              s.discount.replace('.', ','),
-            )
+            setValueService(`service.${index}.discount`, s.discount)
             setValueService(
               `service.${prevState.list.length}.price`,
               s.standard_value,
@@ -756,7 +880,7 @@ export default function QuotationsCreate() {
         `service.${prevState.list.length}.price`,
         serv.standard_value,
       )
-
+      console.log(serv.standard_quantity.replace('.', ','))
       return {
         ...prevState,
         list: [
@@ -891,13 +1015,11 @@ export default function QuotationsCreate() {
     status: dataTechnicalConsultantListStatus,
   } = useQuery<TechnicalConsultant[]>(
     [
-      'Quotation-edit-by_id',
+      'service_schedule',
       'by_id',
       'edit',
       'technical-consultant-list',
       'options',
-      companySelected,
-      router.query.id,
     ],
     async () => {
       const resp = await api.get(
@@ -913,36 +1035,14 @@ export default function QuotationsCreate() {
   const { data: dataTypeQuotationList, status: dataTypeQuotationListStatus } =
     useQuery<TypeQuotationType[]>(
       [
-        'quotation-edit-by_id',
+        'Quotation-create',
         'edit',
-        'type-quotation-list',
+        'technical-consultant-list',
         'options',
         companySelected,
-        router.query.id,
       ],
       async () => {
         const resp = await api.get(`/os?company_id=${companySelected}`)
-        console.log(resp.data.data)
-        return resp.data.data
-      },
-      {
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-      },
-    )
-
-  const { data: dataQuotationById, status: dataQuotationByIdStatus } =
-    useQuery<QuotationByIdResponseType>(
-      [
-        'quotation-edit-by_id',
-        'edit',
-        'data-quotation-by-id',
-        companySelected,
-        router.query.id,
-      ],
-      async () => {
-        const resp = await api.get(`/quotations/show/${router.query.id}`)
-        console.log(resp.data.data)
         return resp.data.data
       },
       {
@@ -961,129 +1061,6 @@ export default function QuotationsCreate() {
       )
     }
   }, [dataTechnicalConsultantListStatus, dataTechnicalConsultantList])
-
-  useEffect(() => {
-    if (dataQuotationByIdStatus === 'success') {
-      console.log(dataQuotationById)
-      setTypeQuotation({
-        id: dataQuotationById.os_type_id,
-      })
-      setTechnicalConsultant({
-        id: dataQuotationById.consultant_id,
-      })
-
-      setClaimServiceList(
-        dataQuotationById.quotation_claim_service.map((i) => {
-          return {
-            company_id: dataQuotationById.company_id,
-            integration_code: i.integration_code,
-            id: i.id,
-            description: i.description,
-          }
-        }),
-      )
-
-      const listProducts: ProductType[] = []
-      const listServices: ServicesType[] = []
-
-      dataQuotationById.quotation_itens.forEach((i) => {
-        if (i.service === null && i.product !== null) {
-          listProducts.push({
-            id: i.product?.id as number,
-            company_id: i.product?.company_id as number,
-            name: i.product?.name as string,
-            product_code: i.product?.product_code as string,
-            sale_value: i.product?.sale_value as string,
-            guarantee_value: i.product?.guarantee_value as string,
-            tunap_code: i.product?.tunap_code,
-            active: i.product?.active as boolean,
-            discount: i.price_discount,
-            quantity: i.quantity,
-          })
-        }
-        if (i.service !== null && i.product === null) {
-          listServices.push({
-            id: i.service?.id as number,
-            company_id: i.service?.company_id as number,
-            service_code: i.service?.service_code as string,
-            integration_code: i.service?.integration_code,
-            description: i.service?.integration_code,
-            standard_quantity: i.service?.standard_quantity as string,
-            standard_value: i.service?.standard_value as string,
-            active: i.service?.active as boolean,
-            discount: i.price_discount,
-            quantity: i.quantity,
-          })
-        }
-      })
-
-      listProducts.forEach((i, index) => {
-        setValueProduct(`product.${index}.quantity`, i.quantity)
-        setValueProduct(`product.${index}.discount`, i.discount)
-      })
-
-      listServices.forEach((i, index) => {
-        setValueProduct(`service.${index}.quantity`, i.quantity)
-        setValueProduct(`service.${index}.discount`, i.discount)
-      })
-
-      const totalDiscountProducts = listProducts.reduce((acc, curr) => {
-        return acc + Number(curr.discount) * Number(curr.quantity)
-      }, 0)
-      const totalProducts = listProducts.reduce((acc, curr) => {
-        const totalItem = Number(curr.sale_value) * Number(curr.quantity)
-        return acc + totalItem
-      }, 0)
-
-      setProducts((prevState) => ({
-        ...prevState,
-        list: listProducts,
-        total: totalProducts,
-        totalDiscount: totalDiscountProducts,
-      }))
-
-      const totalDiscountServices = listServices.reduce((acc, curr) => {
-        return acc + Number(curr.discount) * Number(curr.quantity)
-      }, 0)
-      const totalServices = listServices.reduce((acc, curr) => {
-        const totalItem = Number(curr.standard_value) * Number(curr.quantity)
-        return acc + totalItem
-      }, 0)
-
-      setServices((prevState) => ({
-        ...prevState,
-        list: listServices,
-        total: totalServices,
-        totalDiscount: totalDiscountServices,
-      }))
-
-      setClient({
-        id: dataQuotationById.client.id,
-        company_id: dataQuotationById.client.company_id,
-        name: dataQuotationById.client.name,
-        cpf: dataQuotationById.client.cpf,
-        document: dataQuotationById.client.document,
-        address: dataQuotationById.client.address,
-        active: dataQuotationById.client.active,
-        phone: dataQuotationById.client.phone,
-        email: dataQuotationById.client.email,
-        fullName: dataQuotationById.client.fullName,
-      })
-
-      setClientVehicle({
-        id: dataQuotationById.client_vehicle.id,
-        company_id: dataQuotationById.client_vehicle.company_id,
-        vehicle_id: dataQuotationById.client_vehicle.vehicle.id,
-        chasis: dataQuotationById.client_vehicle.chasis,
-        color: dataQuotationById.client_vehicle.color,
-        number_motor: dataQuotationById.client_vehicle.number_motor,
-        renavan: dataQuotationById.client_vehicle.renavan,
-        plate: dataQuotationById.client_vehicle.plate,
-        mileage: dataQuotationById.client_vehicle.mileage,
-        vehicle: dataQuotationById.client_vehicle.vehicle,
-      })
-    }
-  }, [dataQuotationById, dataQuotationByIdStatus])
 
   return (
     <>
@@ -1113,20 +1090,14 @@ export default function QuotationsCreate() {
                 </Stack>
                 <DividerCard />
                 <List dense={false}>
-                  <ListItemCard>
-                    <InfoCardName>Numero do Orçamento:</InfoCardName>
-                    {dataQuotationById?.id}
-                  </ListItemCard>
-                  <ListItemCard>
+                  {/* <ListItemCard>
                     <InfoCardName>Data da emissão:</InfoCardName>
 
-                    {formatDateTime(dataQuotationById?.created_at as string)}
-
-                    {/* <DataTimeInput
+                    <DataTimeInput
                       dateSchedule={visitDate}
                       handleDateSchedule={handleDateSchedule}
-                    /> */}
-                  </ListItemCard>
+                    />
+                  </ListItemCard> */}
                   <ListItemCard>
                     <InfoCardName>Responsável:</InfoCardName>{' '}
                     <Box width="100%">
@@ -1147,7 +1118,7 @@ export default function QuotationsCreate() {
                         </MenuItem>
                         {technicalConsultantsList.map((option) => (
                           <MenuItem
-                            key={option.id + (option.name ? option.name : '')}
+                            key={option.id + option.name}
                             value={option.id}
                           >
                             {option.name}
@@ -1363,9 +1334,9 @@ export default function QuotationsCreate() {
                                 <TableCell align="center">
                                   {formatMoneyPtBR(
                                     handleCalcValueTotalPerItem(
-                                      serv.standard_value,
-                                      serv.quantity,
-                                      serv.discount,
+                                      Number(serv.standard_value),
+                                      Number(serv.quantity),
+                                      Number(serv.discount),
                                     ),
                                   )}
                                 </TableCell>
@@ -1412,17 +1383,32 @@ export default function QuotationsCreate() {
                                     control={controlService}
                                     name={`service.${index}.discount`}
                                   />
+                                  {errorsService.service &&
+                                    // @ts-ignore
+                                    errorsService.service[index] &&
+                                    // @ts-ignore
+                                    errorsService.service[index].message && (
+                                      <span
+                                        style={{
+                                          fontSize: '12px',
+                                          color: 'red',
+                                        }}
+                                      >
+                                        {/* @ts-ignore */}
+                                        {errorsService.service[index].message}
+                                      </span>
+                                    )}
                                   {/* {formatMoneyPtBR(0)} */}
                                 </TableCell>
                                 <TableCell align="center">
                                   {formatMoneyPtBR(Number(serv.standard_value))}
                                 </TableCell>
                                 <TableCell align="center">
-                                  {/* {formatMoneyPtBR(0)} */}
                                   {serv.standard_value ? (
                                     <CalcPerUnit
                                       control={controlService}
                                       index={index}
+                                      id={serv.id}
                                       price={Number(serv.standard_value)}
                                       name="service"
                                     />
@@ -1484,6 +1470,7 @@ export default function QuotationsCreate() {
                   </Paper>
                 )}
               </Stack>
+
               {/* PEÇAS */}
               <Stack
                 component="form"
@@ -1577,8 +1564,7 @@ export default function QuotationsCreate() {
                                   {prod.quantity}
                                 </TableCell>
                                 <TableCell align="center">
-                                  {/* {prod.discount} */}
-                                  {formatMoneyPtBR(prod.discount)}
+                                  {formatMoneyPtBR(Number(prod.discount))}
                                 </TableCell>
                                 <TableCell align="center">
                                   {formatMoneyPtBR(Number(prod.sale_value))}
@@ -1586,9 +1572,9 @@ export default function QuotationsCreate() {
                                 <TableCell align="center">
                                   {formatMoneyPtBR(
                                     handleCalcValueTotalPerItem(
-                                      prod.sale_value,
-                                      prod.quantity,
-                                      prod.discount,
+                                      Number(prod.sale_value),
+                                      Number(prod.quantity),
+                                      Number(prod.discount),
                                     ),
                                   )}
                                 </TableCell>
@@ -1633,6 +1619,21 @@ export default function QuotationsCreate() {
                                     control={controlProduct}
                                     name={`product.${index}.discount`}
                                   />
+                                  {errorsProduct.product &&
+                                    // @ts-ignore
+                                    errorsProduct.product[index] &&
+                                    // @ts-ignore
+                                    errorsProduct.product[index].message && (
+                                      <span
+                                        style={{
+                                          fontSize: '12px',
+                                          color: 'red',
+                                        }}
+                                      >
+                                        {/* @ts-ignore */}
+                                        {errorsProduct.product[index].message}
+                                      </span>
+                                    )}
                                   {/* {formatMoneyPtBR(0)} */}
                                 </TableCell>
                                 <TableCell align="center">
@@ -1644,6 +1645,7 @@ export default function QuotationsCreate() {
                                     <CalcPerUnit
                                       control={controlProduct}
                                       index={index}
+                                      id={prod.id}
                                       price={Number(prod.sale_value)}
                                       name="product"
                                     />
@@ -1694,7 +1696,7 @@ export default function QuotationsCreate() {
                       <ButtonSubmit
                         variant="contained"
                         size="small"
-                        onClick={() => setIsEditingProduct(false)}
+                        onClick={handleCancelProducts}
                       >
                         cancelar
                       </ButtonSubmit>

@@ -8,7 +8,6 @@ import {
 } from 'react-hook-form'
 
 function removeMask(item: string) {
-  console.log(item)
   return Number(item.replace(/\./g, '').replace(/,/g, '.'))
 }
 
@@ -18,7 +17,7 @@ function totalCalWithDiscount(
   price: string | number,
 ) {
   const discountFormatted = removeMask(results[index].discount)
-  console.log(discountFormatted)
+
   const priceFormatted = Number(price)
   const quantityFormatted = results[index].quantity
     .replace(/\./g, '')
