@@ -48,7 +48,7 @@ import { ActionAlertsStateProps } from '@/components/ActionAlerts/ActionAlerts'
 import HeaderBreadcrumb from '@/components/HeaderBreadcrumb'
 import { listBreadcrumb } from '@/components/HeaderBreadcrumb/types'
 
-import { useQuery } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 
 import { CompanyContext } from '@/contexts/CompanyContext'
 
@@ -247,6 +247,8 @@ export default function QuotationsCreate() {
     control: controlService,
     name: 'service',
   })
+
+  const queryClient = useQueryClient()
   // const {
   //   register: registerClientVehicle,
   //   handleSubmit: handleSubmitClientVehicle,
@@ -657,6 +659,15 @@ export default function QuotationsCreate() {
         isOpen: true,
         title: `${respCreate?.data?.msg ?? 'Salvo com sucesso!'}!`,
         type: 'success',
+      })
+      queryClient.invalidateQueries({
+        queryKey: [
+          'quotation-edit-by_id',
+          'edit',
+          'data-quotation-by-id',
+          companySelected,
+          router.query.id,
+        ],
       })
     } catch (e: any) {
       console.error(e)
@@ -2678,9 +2689,9 @@ export default function QuotationsCreate() {
               title={actionAlerts.title}
               type={actionAlerts.type}
               handleAlert={handleAlert}
-              redirectTo={
-                actionAlerts.type === 'success' ? '/quotations' : undefined
-              }
+              // redirectTo={
+              //   actionAlerts.type === 'success' ? '/quotations' : undefined
+              // }
             />
           )}
         </Grid>
