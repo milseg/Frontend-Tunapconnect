@@ -59,10 +59,10 @@ export default function Products() {
 
   const exampleReturn = [
     { id: 1, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
-    { id: 1, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
-    { id: 1, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
-    { id: 1, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
-    { id: 1, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
+    { id: 2, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
+    { id: 3, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
+    { id: 4, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
+    { id: 5, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
   ]
 
   React.useEffect(() => {
@@ -73,7 +73,6 @@ export default function Products() {
     } else {
       setIsMobile(false)
     }
-    console.log(productsListDto)
   }, [isWeb])
 
   const {
@@ -82,7 +81,7 @@ export default function Products() {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['productsList', pageNumber, router.query.nome],
+    queryKey: ['productsList', pageNumber, router.query.nome, companySelected],
     queryFn: productsListRequests.getProductsList,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -105,10 +104,6 @@ export default function Products() {
 
   const handleDelete = (id: number) => {
     refetch()
-  }
-
-  const handleDeleteAction = (selectId: number) => {
-    ActionDeleteConfirmations(selectId, handleDelete, '/produtos/')
   }
 
   return (
@@ -246,6 +241,9 @@ export default function Products() {
                       display: 'flex',
                       flexDirection: 'column',
                       height: 'fit-content',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      alignContent: 'center',
                     }}
                   >
                     {exampleReturn.map((product: ProductType, index) => (
@@ -259,8 +257,8 @@ export default function Products() {
                           }`,
                           p: 1,
                           borderRadius: '2px',
+                          justifyContent: 'space-between',
                         }}
-                        justifyContent="space-between"
                       >
                         <Typography
                           variant="subtitle1"
@@ -276,7 +274,7 @@ export default function Products() {
                           color={'#1C4961'}
                           fontWeight={700}
                           sx={{
-                            width: '100%',
+                            width: 'fit-content',
                             textAlign: 'center',
                             fontSize: { xs: '0.5rem', sm: '1.2rem' },
                           }}
@@ -289,7 +287,7 @@ export default function Products() {
                           color={'#1C4961'}
                           fontWeight={700}
                           sx={{
-                            width: '100%',
+                            width: 'fit-content',
                             textAlign: 'center',
                             fontSize: { xs: '0.5rem', sm: '1.2rem' },
                           }}
@@ -302,7 +300,7 @@ export default function Products() {
                           color={'#1C4961'}
                           fontWeight={700}
                           sx={{
-                            width: '100%',
+                            width: 'fit-content',
                             textAlign: 'center',
                             fontSize: { xs: '0.5rem', sm: '1.2rem' },
                           }}
