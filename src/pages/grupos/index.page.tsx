@@ -298,7 +298,7 @@ export default function Groups() {
                             color={'#1C4961'}
                             fontWeight={700}
                             sx={{
-                              width: '40%',
+                              width: { xs: 'fit-content', sm: '40%' },
                               textAlign: 'center',
                               fontSize: { xs: '0.6rem', sm: '1.2rem' },
                             }}
@@ -311,7 +311,7 @@ export default function Groups() {
                             color={'#1C4961'}
                             fontWeight={700}
                             sx={{
-                              width: '40%',
+                              width: { xs: 'fit-content', sm: '40%' },
                               textAlign: 'center',
                               fontSize: { xs: '0.6rem', sm: '1.2rem' },
                             }}
@@ -324,7 +324,7 @@ export default function Groups() {
                             color={'#1C4961'}
                             fontWeight={700}
                             sx={{
-                              width: '40%',
+                              width: { xs: 'fit-content', sm: '40%' },
                               textAlign: 'center',
                               fontSize: { xs: '0.6rem', sm: '1.2rem' },
                             }}
@@ -337,7 +337,7 @@ export default function Groups() {
                             color={'#1C4961'}
                             fontWeight={700}
                             sx={{
-                              width: '40%',
+                              width: { xs: 'fit-content', sm: '40%' },
                               textAlign: 'center',
                               fontSize: { xs: '0.6rem', sm: '1.2rem' },
                             }}
@@ -345,14 +345,22 @@ export default function Groups() {
                           >
                             {group.qtd_empresas}
                           </Typography>
-                          <Stack direction="row">
+                          <Stack direction="row" sx={{ width: '15%' }}>
                             <IconButton
                               aria-label="search"
                               color="warning"
                               onClick={() => handleDeleteAction(group.id_group)}
-                              sx={{ marginLeft: 1, color: 'red' }}
+                              sx={{
+                                marginLeft: 1,
+                                color: 'red',
+                                padding: { xs: '0rem', sm: '8px' },
+                              }}
                             >
-                              <Delete />
+                              <Delete
+                                sx={{
+                                  width: { xs: '80%', sm: '100%' },
+                                }}
+                              />
                             </IconButton>
                             <IconButton
                               aria-label="search"
@@ -360,9 +368,17 @@ export default function Groups() {
                               onClick={() =>
                                 openDialogEdit(group.id_group, group.name)
                               }
-                              sx={{ marginLeft: 1, color: 'blue' }}
+                              sx={{
+                                marginLeft: 1,
+                                color: 'blue',
+                                padding: { xs: '0rem', sm: '8px' },
+                              }}
                             >
-                              <EditIcon />
+                              <EditIcon
+                                sx={{
+                                  width: { xs: '80%', sm: '100%' },
+                                }}
+                              />
                             </IconButton>
                           </Stack>
                         </Stack>

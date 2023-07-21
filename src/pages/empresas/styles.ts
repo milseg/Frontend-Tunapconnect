@@ -29,19 +29,22 @@ export const paginationButton = styled(Button)({
   height: '52px',
 })
 
-export const TableTitles = styled(Paper)({
-  boxShadow: 'none',
-  textTransform: 'none',
-  fontSize: 16,
-  padding: '8px 22px',
-  border: '1px solid',
-  lineHeight: 1.5,
-  backgroundColor: '#1C4961',
-  borderColor: '#1C4961',
-  justifyItems: 'flex-end',
-  alignItems: 'center',
-  color: 'white',
-})
+export const TableTitles = styled(Paper)`
+  box-shadow: none;
+  text-transform: none;
+  font-size: 16;
+  padding: 8px 22px;
+  border: 1px solid;
+  line-height: 1.5;
+  background-color: #1c4961;
+  border-color: #1c4961;
+  justify-items: flex-end;
+  align-items: center;
+  color: white;
+  @media screen and (max-width: 780px) {
+    padding: 8px 12px;
+  }
+`
 
 export const UploadFileField = styled(TextField)({
   width: '0.1px',
