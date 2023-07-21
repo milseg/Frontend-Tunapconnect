@@ -17,11 +17,15 @@ function totalCalWithDiscount(
   price: string | number,
 ) {
   const discountFormatted = removeMask(results[index].discount)
+
   const priceFormatted = Number(price)
+  const quantityFormatted = results[index].quantity
+    .replace(/\./g, '')
+    .replace(/,/g, '.')
 
   const totalValue =
-    (Number(priceFormatted) - discountFormatted) *
-    Number(results[index].quantity)
+    (Number(priceFormatted) - Number(discountFormatted)) *
+    Number(quantityFormatted)
 
   return totalValue
 }
@@ -42,9 +46,10 @@ export const CalcPerUnit = ({
 }: CalcPerUnitProps) => {
   const results = useWatch({ control, name })
   const output = totalCalWithDiscount(results, index, price)
+  // const output = 0
 
   console.log(results)
-  console.log(output)
+  // console.log(output)
 
-  return <p>{formatMoneyPtBR(output)}</p>
+  return <p>{formatMoneyPtBR(output < 0 ? 0 : output)}</p>
 }

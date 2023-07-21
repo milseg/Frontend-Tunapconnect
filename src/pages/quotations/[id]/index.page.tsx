@@ -273,78 +273,78 @@ export default function QuotationsCreate() {
   // })
 
   function onSubmitProduct(data: any) {
-    console.log(data)
-    setProducts((prevState) => {
-      const newList = prevState.list.map((p, index) => {
-        if (p.id === data.product[index].id) {
-          return {
-            ...p,
-            quantity: data.product[index].quantity,
-            discount: data.product[index].discount
-              .replace(/\./g, '')
-              .replace(/,/g, '.'),
-          }
-        } else {
-          return p
-        }
-      })
+    const listProductsSaved = [...products.list]
 
-      const totalDiscount = newList.reduce((acc, curr) => {
+    listProductsSaved.forEach((i) => {
+      const findIndexData = data.product.findIndex(
+        (d: ProductType) => d.id === i.id,
+      )
+      if (findIndexData > -1) {
+        i.quantity = data.product[findIndexData].quantity
+          .replace(/\./g, '')
+          .replace(/,/g, '.')
+        i.discount = data.product[findIndexData].discount
+          .replace(/\./g, '')
+          .replace(/,/g, '.')
+        i.status = i.status === 'adding' ? 'saved' : i.status
+      }
+    })
+
+    const totalDiscount = listProductsSaved
+      .filter((i) => i.status !== 'excluded' && i.status !== 'cancelled')
+      .reduce((acc, curr) => {
         return acc + Number(curr.discount) * Number(curr.quantity)
       }, 0)
-      const total = newList.reduce((acc, curr) => {
+    const total = listProductsSaved
+      .filter((i) => i.status !== 'excluded' && i.status !== 'cancelled')
+      .reduce((acc, curr) => {
         const totalItem = Number(curr.sale_value) * Number(curr.quantity)
         return acc + totalItem
       }, 0)
-
-      console.log(totalDiscount)
-      console.log(total)
-
-      return {
-        ...prevState,
-        list: newList,
-        totalDiscount,
-        total,
-      }
-    })
+    setProducts((prevState) => ({
+      ...prevState,
+      list: listProductsSaved,
+      total,
+      totalDiscount,
+    }))
     setIsEditingProduct(false)
   }
   function onSubmitService(data: any) {
-    console.log(data)
+    const listServicesSaved = [...services.list]
 
-    setServices((prevState) => {
-      const newList = prevState.list.map((p, index) => {
-        if (p.id === data.service[index].id) {
-          return {
-            ...p,
-            quantity: data.service[index].quantity,
-            discount: data.service[index].discount
-              .replace(/\./g, '')
-              .replace(/,/g, '.'),
-          }
-        } else {
-          return p
-        }
-      })
+    listServicesSaved.forEach((i) => {
+      const findIndexData = data.service.findIndex(
+        (d: ServicesType) => d.id === i.id,
+      )
+      if (findIndexData > -1) {
+        i.quantity = data.service[findIndexData].quantity
+          .replace(/\./g, '')
+          .replace(/,/g, '.')
+        i.discount = data.service[findIndexData].discount
+          .replace(/\./g, '')
+          .replace(/,/g, '.')
+        i.status = i.status === 'adding' ? 'saved' : i.status
+      }
+    })
 
-      const totalDiscount = newList.reduce((acc, curr) => {
+    const totalDiscount = listServicesSaved
+      .filter((i) => i.status !== 'excluded' && i.status !== 'cancelled')
+      .reduce((acc, curr) => {
         return acc + Number(curr.discount) * Number(curr.quantity)
       }, 0)
-      const total = newList.reduce((acc, curr) => {
+    const total = listServicesSaved
+      .filter((i) => i.status !== 'excluded' && i.status !== 'cancelled')
+      .reduce((acc, curr) => {
         const totalItem = Number(curr.standard_value) * Number(curr.quantity)
         return acc + totalItem
       }, 0)
 
-      console.log(totalDiscount)
-      console.log(total)
-
-      return {
-        ...prevState,
-        list: newList,
-        totalDiscount,
-        total,
-      }
-    })
+    setServices((prevState) => ({
+      ...prevState,
+      list: listServicesSaved,
+      totalDiscount,
+      total,
+    }))
     setIsEditingService(false)
   }
 
@@ -458,52 +458,69 @@ export default function QuotationsCreate() {
 
   function handleRemoveProduct(id: number) {
     setProducts((prevState) => {
-      return {
-        ...prevState,
-        list: prevState.list.filter((p) => p.id !== id),
-      }
-    })
-  }
-  function handleRemoveService(id: number) {
-    const serviceIndex = services.list.findIndex((p) => p.id !== id)
+      const newList = prevState.list.map((p) => {
+        if (p.id === id) {
+          const newStatus = { ...p }
+          newStatus.status = 'excluded'
+          return newStatus
+        }
 
-    removeService(serviceIndex)
-    setServices((prevState) => {
-      const serviceId = prevState.list.findIndex((p) => p.id !== id)
-
-      const newList = prevState.list.filter((p) => p.id !== id)
-
-      newList.forEach((i, index) => {
-        console.log(i)
-        setValueService(`service.${index}.id`, i.id)
-        setValueService(
-          `service.${index}.quantity`,
-          i.quantity.replace('.', ','),
-        )
-        setValueService(
-          `service.${index}.discount`,
-          i.discount.replace('.', ','),
-        )
-        // setValueService(
-        //   `service.${index}.discount`,
-        //   i.discount.replace('.', ','),
-        // )
-        // setValueService(`service.${i}.quantity`, i.quantity)
+        return p
       })
-
-      const totalDiscount = newList.reduce((acc, curr) => {
-        return acc + Number(curr.discount) * Number(curr.quantity)
-      }, 0)
-      const total = newList.reduce((acc, curr) => {
-        const totalItem = Number(curr.standard_value) * Number(curr.quantity)
-        return acc + totalItem
-      }, 0)
 
       return {
         ...prevState,
         list: newList,
-        totalDiscount,
-        total,
+      }
+    })
+
+    // const productIndex = products.list.findIndex((p) => p.id !== id)
+    // removeProduct(productIndex)
+    // setProducts((prevState) => {
+    //   const newList = prevState.list.filter((p) => p.id !== id)
+
+    //   newList.forEach((i, index) => {
+    //     console.log(i.discount)
+    //     setValueProduct(`product.${index}.id`, i.id)
+    //     setValueProduct(
+    //       `product.${index}.discount`,
+    //       i.discount.replace('.', ','),
+    //     )
+    //     setValueProduct(`product.${i}.quantity`, i.quantity.replace('.', ','))
+    //   })
+
+    //   const totalDiscount = newList.reduce((acc, curr) => {
+    //     return acc + Number(curr.discount) * Number(curr.quantity)
+    //   }, 0)
+    //   const total = newList.reduce((acc, curr) => {
+    //     const totalItem = Number(curr.sale_value) * Number(curr.quantity)
+    //     return acc + totalItem
+    //   }, 0)
+
+    //   return {
+    //     ...prevState,
+    //     list: prevState.list.filter((p) => p.id !== id),
+    //     total,
+    //     totalDiscount,
+    //   }
+    // })
+  }
+
+  function handleRemoveService(id: number) {
+    setServices((prevState) => {
+      const newList = prevState.list.map((s) => {
+        if (s.id === id) {
+          const newStatus = { ...s }
+          newStatus.status = 'excluded'
+          return newStatus
+        }
+
+        return s
+      })
+
+      return {
+        ...prevState,
+        list: newList,
       }
     })
   }
@@ -586,24 +603,28 @@ export default function QuotationsCreate() {
     //   checklist_version_id: 14,
     // }
 
-    const productListFormatted = products.list.map((item) => {
-      return {
-        service_id: null,
-        products_id: item.id,
-        price: `${item.sale_value}`,
-        price_discount: `${item.discount}`,
-        quantity: `${item.quantity}`,
-      }
-    })
-    const servicesListFormatted = services.list.map((item) => {
-      return {
-        service_id: item.id,
-        products_id: null,
-        price: `${item.standard_value}`,
-        price_discount: `${item.discount}`,
-        quantity: `${item.quantity}`,
-      }
-    })
+    const productListFormatted = products.list
+      .filter((i) => i.status === 'saved')
+      .map((item) => {
+        return {
+          service_id: null,
+          products_id: item.id,
+          price: `${item.sale_value}`,
+          price_discount: `${item.discount}`,
+          quantity: `${item.quantity}`,
+        }
+      })
+    const servicesListFormatted = services.list
+      .filter((i) => i.status === 'saved')
+      .map((item) => {
+        return {
+          service_id: item.id,
+          products_id: null,
+          price: `${item.standard_value}`,
+          price_discount: `${item.discount}`,
+          quantity: `${item.quantity}`,
+        }
+      })
 
     const dataFormatted = {
       company_id: companySelected,
@@ -650,86 +671,106 @@ export default function QuotationsCreate() {
     if (!isEditingProduct) {
       setIsEditingProduct(true)
     }
+    const newList = [...products.list]
 
-    // setValueProduct(`product.${index}.id`, prod.id)
-    // setValueProduct(`product.${index}.quantity`, prod.quantity)
-    // setValueProduct(
-    //   `product.${index}.discount`,
-    //   prod.discount,
-    // )
+    const isExistsProduct = newList.findIndex((p) => p.id === prod.id)
 
-    setProducts((prevState) => {
-      const isExistsProduct = prevState.list.findIndex((p) => p.id === prod.id)
-
-      if (isExistsProduct > -1) {
-        const newList = prevState.list.map((p, index) => {
-          if (p.id === prod.id) {
-            setValueProduct(`product.${index}.quantity`, Number(p.quantity) + 1)
+    if (isExistsProduct > -1) {
+      newList.map((p, index) => {
+        if (p.id === prod.id) {
+          if (p.status === 'saved') {
             setValueProduct(`product.${index}.discount`, p.discount)
+            setValueProduct(
+              `product.${index}.quantity`,
+              `${Number(p.quantity) + 1}`.replace('.', ','),
+            )
             return {
               ...p,
               quantity: `${Number(p.quantity) + 1}`,
             }
           }
-          return p
-        })
 
+          if (p.status === 'excluded' || p.status === 'cancelled') {
+            p.status = 'adding'
+            setValueProduct(`product.${index}.discount`, '0,00')
+            setValueProduct(`product.${index}.quantity`, '1')
+            return {
+              ...p,
+              quantity: `1`,
+            }
+          }
+
+          p.status = 'adding'
+          const newQuantity = Number(p.quantity) + 1
+          setValueProduct(`product.${index}.quantity`, `${newQuantity}`)
+          setValueProduct(
+            `product.${index}.quantity`,
+            `${Number(p.quantity) + 1}`.replace('.', ','),
+          )
+          return {
+            ...p,
+            quantity: `${newQuantity}`,
+          }
+        }
+        return p
+      })
+      setProducts((prevState) => {
         return {
           ...prevState,
           list: newList,
         }
-      }
+      })
+    } else {
+      const newProduct = { ...prod }
 
-      setValueProduct(`product.${prevState.list.length}.id`, prod.id)
+      setValueProduct(`product.${products.list.length}.id`, newProduct.id)
       setValueProduct(
-        `product.${prevState.list.length}.quantity`,
-        1 * Number(qtd),
+        `product.${products.list.length}.quantity`,
+        `${1}`.replace('.', ','),
       )
-      setValueProduct(`product.${prevState.list.length}.discount`, '0,00')
-      return {
-        ...prevState,
-        list: [
-          ...prevState.list,
-          {
-            ...prod,
-            quantity: `${Number('1') * Number(qtd)}`,
-            discount: '0,00',
-          },
-        ],
-      }
-    })
+
+      setValueProduct(`product.${products.list.length}.discount`, '0,00')
+      setValueProduct(
+        `product.${products.list.length}.price`,
+        newProduct.sale_value,
+      )
+      console.log('adding product')
+      newProduct.status = 'adding'
+      newProduct.discount = '0,00'
+      newProduct.quantity = `${1}`
+      setProducts((prevState) => {
+        return {
+          ...prevState,
+          list: [...prevState.list, newProduct],
+        }
+      })
+    }
 
     if (openModalSearchProduct) {
       setOpenModalSearchProduct(false)
     }
   }
+
   function handleAddServices(serv: ServicesType) {
-    console.log(serv)
     if (!isEditingService) {
       setIsEditingService(true)
     }
 
-    setServices((prevState) => {
-      const isExistsService = prevState.list.findIndex((s) => s.id === serv.id)
+    const newList = [...services.list]
 
-      if (isExistsService > -1) {
-        const newList = prevState.list.map((s, index) => {
-          if (s.id === serv.id) {
+    const isExistsService = newList.findIndex((s) => s.id === serv.id)
+
+    if (isExistsService > -1) {
+      newList.map((s, index) => {
+        if (s.id === serv.id) {
+          if (s.status === 'saved') {
+            setValueService(`service.${index}.discount`, s.discount)
             setValueService(
               `service.${index}.quantity`,
               `${Number(s.quantity) + Number(serv.standard_quantity)}`.replace(
                 '.',
                 ',',
               ),
-            )
-
-            setValueService(
-              `service.${index}.discount`,
-              s.discount.replace('.', ','),
-            )
-            setValueService(
-              `service.${prevState.list.length}.price`,
-              s.standard_value,
             )
             return {
               ...s,
@@ -738,66 +779,237 @@ export default function QuotationsCreate() {
               }`,
             }
           }
-          return s
-        })
+
+          if (s.status === 'excluded' || s.status === 'cancelled') {
+            s.status = 'adding'
+            setValueService(`service.${index}.discount`, '0,00')
+            setValueService(
+              `service.${index}.quantity`,
+              serv.standard_quantity.replace('.', ','),
+            )
+            console.log(serv.standard_quantity)
+            return {
+              ...s,
+              quantity: `${Number(serv.standard_quantity)}`,
+            }
+          }
+
+          s.status = 'adding'
+          const newQuantity =
+            Number(s.quantity) + Number(serv.standard_quantity)
+          setValueService(
+            `service.${index}.quantity`,
+            serv.standard_quantity.replace('.', ','),
+          )
+          setValueService(
+            `service.${index}.quantity`,
+            `${Number(s.quantity) + Number(serv.standard_quantity)}`.replace(
+              '.',
+              ',',
+            ),
+          )
+          return {
+            ...s,
+            quantity: `${newQuantity}`,
+          }
+        }
+        return s
+      })
+      setServices((prevState) => {
         return {
           ...prevState,
           list: newList,
         }
-      }
+      })
+    } else {
+      const newService = { ...serv }
 
-      setValueService(`service.${prevState.list.length}.id`, serv.id)
+      setValueService(`service.${services.list.length}.id`, newService.id)
       setValueService(
-        `service.${prevState.list.length}.quantity`,
-        serv.standard_quantity.replace('.', ','),
-      )
-      setValueService(`service.${prevState.list.length}.discount`, '0')
-      setValueService(
-        `service.${prevState.list.length}.price`,
-        serv.standard_value,
+        `service.${services.list.length}.quantity`,
+        `${Number(newService.standard_quantity)}`.replace('.', ','),
       )
 
-      return {
-        ...prevState,
-        list: [
-          ...prevState.list,
-          {
-            ...serv,
-            quantity: serv.standard_quantity,
-            discount: '0',
-          },
-        ],
-      }
-    })
+      setValueService(`service.${services.list.length}.discount`, '0,00')
+      setValueService(
+        `service.${services.list.length}.price`,
+        newService.standard_value,
+      )
+      console.log('adding service')
+      newService.status = 'adding'
+      newService.discount = '0,00'
+      newService.quantity = `${Number(newService.standard_quantity)}`
+      setServices((prevState) => {
+        return {
+          ...prevState,
+          list: [...prevState.list, newService],
+        }
+      })
+    }
+
+    // setServices((prevState) => {
+    //   const isExistsService = prevState.list.findIndex((s) => s.id === serv.id)
+
+    //   if (isExistsService > -1) {
+    //     const newList = [...prevState.list].map((s, index) => {
+    //       if (s.id === serv.id) {
+    //         setValueService(
+    //           `service.${index}.quantity`,
+    //           `${Number(s.quantity) + Number(serv.standard_quantity)}`.replace(
+    //             '.',
+    //             ',',
+    //           ),
+    //         )
+
+    //         setValueService(`service.${index}.discount`, s.discount)
+    //         setValueService(
+    //           `service.${prevState.list.length}.price`,
+    //           s.standard_value,
+    //         )
+    //         if (s.status === 'saved') {
+    //           setValueService(`service.${index}.discount`, s.discount)
+    //           setValueService(
+    //             `service.${index}.quantity`,
+    //             `${
+    //               Number(s.quantity) + Number(serv.standard_quantity)
+    //             }`.replace('.', ','),
+    //           )
+    //           return {
+    //             ...s,
+    //             quantity: `${
+    //               Number(s.quantity) + Number(serv.standard_quantity)
+    //             }`,
+    //           }
+    //         }
+
+    //         if (s.status === 'excluded' || s.status === 'cancelled') {
+    //           s.status = 'adding'
+    //           setValueService(`service.${index}.discount`, '0,00')
+    //           setValueService(
+    //             `service.${index}.quantity`,
+    //             serv.standard_quantity.replace('.', ','),
+    //           )
+    //           console.log(serv.standard_quantity)
+    //           return {
+    //             ...s,
+    //             quantity: `${Number(serv.standard_quantity)}`,
+    //           }
+    //         }
+    //         s.status = 'adding'
+    //         const newQuantity =
+    //           Number(s.quantity) + Number(serv.standard_quantity)
+    //         setValueService(
+    //           `service.${index}.quantity`,
+    //           serv.standard_quantity.replace('.', ','),
+    //         )
+    //         setValueService(
+    //           `service.${index}.quantity`,
+    //           `${Number(s.quantity) + Number(serv.standard_quantity)}`.replace(
+    //             '.',
+    //             ',',
+    //           ),
+    //         )
+    //         return {
+    //           ...s,
+    //           quantity: `${newQuantity}`.replace('.', ','),
+    //         }
+    //       }
+    //       return s
+    //     })
+    //     return {
+    //       ...prevState,
+    //       list: newList,
+    //     }
+    //   }
+
+    //   setValueService(`service.${prevState.list.length}.id`, serv.id)
+    //   setValueService(
+    //     `service.${prevState.list.length}.quantity`,
+    //     serv.standard_quantity.replace('.', ','),
+    //   )
+    //   setValueService(`service.${prevState.list.length}.discount`, '0')
+    //   setValueService(
+    //     `service.${prevState.list.length}.price`,
+    //     serv.standard_value,
+    //   )
+    //   console.log(serv.standard_quantity.replace('.', ','))
+    //   return {
+    //     ...prevState,
+    //     list: [
+    //       ...prevState.list,
+    //       {
+    //         ...serv,
+    //         quantity: serv.standard_quantity,
+    //         discount: '0',
+    //         status: 'adding',
+    //       },
+    //     ],
+    //   }
+    // })
 
     if (openModalSearchServices) {
       setOpenModalSearchServices(false)
     }
   }
 
-  function handleCancelServices() {
-    setServices((prevState) => {
-      const newList = prevState.list.filter((item) => item.status)
-      newList.forEach((i, index) => {
-        console.log(i.discount)
-        setValueService(
-          `service.${index}.discount`,
-          i.discount.replace('.', ','),
-        )
-        setValueService(`service.${i}.quantity`, i.quantity)
-        setValueService(
-          `service.${i}.total`,
-          `${Number(i.quantity) * Number(i.standard_value)}`,
-        )
-      })
+  function handleCancelProducts() {
+    const newList = [...products.list]
+    console.log(newList)
+    newList.forEach((i, index) => {
+      setValueProduct(`product.${index}.discount`, i.discount.replace('.', ','))
+      setValueProduct(`product.${index}.quantity`, i.quantity.replace('.', ','))
+      if (i.status === 'adding') {
+        i.status = 'cancelled'
+      }
+    })
 
-      const totalDiscount = newList.reduce((acc, curr) => {
-        return acc + Number(curr.discount) * Number(curr.quantity)
-      }, 0)
-      const total = newList.reduce((acc, curr) => {
-        const totalItem = Number(curr.standard_value) * Number(curr.quantity)
-        return acc + totalItem
-      }, 0)
+    setProducts((prevState) => {
+      const totalDiscount = newList
+        .filter((i) => i.status === 'saved')
+        .reduce((acc, curr) => {
+          return acc + Number(curr.discount) * Number(curr.quantity)
+        }, 0)
+      const total = newList
+        .filter((i) => i.status === 'saved')
+        .reduce((acc, curr) => {
+          const totalItem = Number(curr.sale_value) * Number(curr.quantity)
+          return acc + totalItem
+        }, 0)
+
+      return {
+        ...prevState,
+        list: newList,
+        totalDiscount,
+        total,
+      }
+    })
+
+    setIsEditingProduct(false)
+  }
+
+  function handleCancelServices() {
+    const newList = [...services.list]
+    console.log(newList)
+    newList.forEach((i, index) => {
+      setValueService(`service.${index}.discount`, i.discount.replace('.', ','))
+      setValueService(`service.${index}.quantity`, i.quantity.replace('.', ','))
+      if (i.status === 'adding') {
+        i.status = 'cancelled'
+      }
+    })
+
+    setServices((prevState) => {
+      const totalDiscount = newList
+        .filter((i) => i.status === 'saved')
+        .reduce((acc, curr) => {
+          return acc + Number(curr.discount) * Number(curr.quantity)
+        }, 0)
+      const total = newList
+        .filter((i) => i.status === 'saved')
+        .reduce((acc, curr) => {
+          const totalItem = Number(curr.standard_value) * Number(curr.quantity)
+          return acc + totalItem
+        }, 0)
 
       return {
         ...prevState,
@@ -986,46 +1198,60 @@ export default function QuotationsCreate() {
       const listProducts: ProductType[] = []
       const listServices: ServicesType[] = []
 
-      // dataQuotationById.quotation_itens.forEach((i) => {
-      //   if (i.service === null && i.product !== null) {
-      //     listProducts.push({
-      //       id: i.product?.id as number,
-      //       company_id: i.product?.company_id as number,
-      //       name: i.product?.name as string,
-      //       product_code: i.product?.product_code as string,
-      //       sale_value: i.product?.sale_value as string,
-      //       guarantee_value: i.product?.guarantee_value as string,
-      //       tunap_code: i.product?.tunap_code,
-      //       active: i.product?.active as boolean,
-      //       discount: i.price_discount,
-      //       quantity: i.quantity,
-      //     })
-      //   }
-      //   if (i.service !== null && i.product === null) {
-      //     listServices.push({
-      //       id: i.service?.id as number,
-      //       company_id: i.service?.company_id as number,
-      //       service_code: i.service?.service_code as string,
-      //       integration_code: i.service?.integration_code,
-      //       description: i.service?.integration_code,
-      //       standard_quantity: i.service?.standard_quantity as string,
-      //       standard_value: i.service?.standard_value as string,
-      //       active: i.service?.active as boolean,
-      //       discount: i.price_discount,
-      //       quantity: i.quantity,
-      //     })
-      //   }
+      dataQuotationById.quotation_itens.forEach((i) => {
+        if (i.service === null && i.product !== null) {
+          listProducts.push({
+            id: i.product?.id as number,
+            company_id: i.product?.company_id as number,
+            name: i.product?.name as string,
+            product_code: i.product?.product_code as string,
+            sale_value: i.product?.sale_value as string,
+            guarantee_value: i.product?.guarantee_value as string,
+            tunap_code: i.product?.tunap_code,
+            active: i.product?.active as boolean,
+            discount: i.price_discount,
+            quantity: i.quantity,
+            status: 'saved',
+          })
+        }
+        if (i.service !== null && i.product === null) {
+          listServices.push({
+            id: i.service?.id as number,
+            company_id: i.service?.company_id as number,
+            service_code: i.service?.service_code as string,
+            integration_code: i.service?.integration_code,
+            description: i.service?.description as string,
+            standard_quantity: i.service?.standard_quantity as string,
+            standard_value: i.service?.standard_value as string,
+            active: i.service?.active as boolean,
+            discount: i.price_discount,
+            quantity: i.quantity,
+            status: 'saved',
+          })
+        }
+      })
+
+      // listProducts.forEach((i, index) => {
+      //   setValueProduct(
+      //     `product.${index}.quantity`,
+      //     i.quantity.replace('.', ','),
+      //   )
+      //   setValueProduct(
+      //     `product.${index}.discount`,
+      //     i.discount.replace('.', ','),
+      //   )
       // })
 
-      listProducts.forEach((i, index) => {
-        setValueProduct(`product.${index}.quantity`, i.quantity)
-        setValueProduct(`product.${index}.discount`, i.discount)
-      })
-
-      listServices.forEach((i, index) => {
-        setValueProduct(`service.${index}.quantity`, i.quantity)
-        setValueProduct(`service.${index}.discount`, i.discount)
-      })
+      // listServices.forEach((i, index) => {
+      //   setValueProduct(
+      //     `service.${index}.quantity`,
+      //     i.quantity.replace('.', ','),
+      //   )
+      //   setValueProduct(
+      //     `service.${index}.discount`,
+      //     i.discount.replace('.', ','),
+      //   )
+      // })
 
       const totalDiscountProducts = listProducts.reduce((acc, curr) => {
         return acc + Number(curr.discount) * Number(curr.quantity)
@@ -1035,12 +1261,42 @@ export default function QuotationsCreate() {
         return acc + totalItem
       }, 0)
 
-      setProducts((prevState) => ({
-        ...prevState,
-        list: listProducts,
-        total: totalProducts,
-        totalDiscount: totalDiscountProducts,
-      }))
+      setProducts((prevState) => {
+        listProducts.forEach((i, index) => {
+          setValueProduct(`product.${index}.id`, i.id)
+
+          setValueProduct(
+            `product.${index}.quantity`,
+            i.quantity.replace('.', ','),
+          )
+          setValueProduct(
+            `product.${index}.discount`,
+            i.discount.replace('.', ','),
+          )
+        })
+
+        listServices.forEach((i, index) => {
+          setValueService(`service.${index}.id`, i.id)
+          setValueService(
+            `service.${index}.quantity`,
+            i.quantity.replace('.', ','),
+          )
+          setValueService(
+            `service.${index}.discount`,
+            i.discount.replace('.', ','),
+          )
+          setValueService(
+            `service.${index}.price`,
+            i.discount.replace('.', ','),
+          )
+        })
+        return {
+          ...prevState,
+          list: listProducts,
+          total: totalProducts,
+          totalDiscount: totalDiscountProducts,
+        }
+      })
 
       const totalDiscountServices = listServices.reduce((acc, curr) => {
         return acc + Number(curr.discount) * Number(curr.quantity)
@@ -1313,26 +1569,37 @@ export default function QuotationsCreate() {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {!(services?.list.length > 0) && (
-                          <TableRow
-                            sx={{
-                              '&:last-child td, &:last-child th': {
-                                border: 0,
-                              },
-                            }}
-                          >
-                            <TableCell
-                              align="center"
-                              colSpan={isEditingService ? 7 : 6}
-                              sx={{ paddingTop: 4 }}
+                        {!(
+                          services?.list.filter(
+                            (s) =>
+                              s.status === 'saved' || s.status === 'adding',
+                          ).length > 0
+                        ) &&
+                          !isEditingService && (
+                            <TableRow
+                              sx={{
+                                '&:last-child td, &:last-child th': {
+                                  border: 0,
+                                },
+                              }}
                             >
-                              Nenhuma peça cadastrada.
-                            </TableCell>
-                          </TableRow>
-                        )}
+                              <TableCell
+                                align="center"
+                                colSpan={isEditingService ? 7 : 6}
+                                sx={{ paddingTop: 4 }}
+                              >
+                                Nenhuma peça cadastrada.
+                              </TableCell>
+                            </TableRow>
+                          )}
                         {!isEditingService &&
                           services?.list.length > 0 &&
                           services.list.map((serv, index) => {
+                            if (
+                              serv.status === 'excluded' ||
+                              serv.status === 'cancelled'
+                            )
+                              return null
                             return (
                               <TableRow
                                 sx={{
@@ -1373,17 +1640,17 @@ export default function QuotationsCreate() {
                             )
                           })}
                         {isEditingService &&
-                          services?.list.length > 0 &&
+                          services?.list.filter(
+                            (s) =>
+                              s.status === 'saved' || s.status === 'adding',
+                          ).length > 0 &&
+                          isEditingService &&
                           services.list.map((serv, index) => {
-                            // setValueService(`service.${index}.id`, serv.id)
-                            // setValueService(
-                            //   `service.${index}.quantity`,
-                            //   serv.quantity,
-                            // )
-                            // setValueService(
-                            //   `service.${index}.discount`,
-                            //   serv.discount,
-                            // )
+                            if (
+                              serv.status === 'excluded' ||
+                              serv.status === 'cancelled'
+                            )
+                              return null
                             return (
                               <TableRow
                                 sx={{
@@ -2400,6 +2667,9 @@ export default function QuotationsCreate() {
               title={actionAlerts.title}
               type={actionAlerts.type}
               handleAlert={handleAlert}
+              redirectTo={
+                actionAlerts.type === 'success' ? '/quotations' : undefined
+              }
             />
           )}
         </Grid>

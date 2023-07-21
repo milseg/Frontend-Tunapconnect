@@ -2677,6 +2677,9 @@ export default function QuotationsCreate() {
               title={actionAlerts.title}
               type={actionAlerts.type}
               handleAlert={handleAlert}
+              redirectTo={
+                actionAlerts.type === 'success' ? '/quotations' : undefined
+              }
             />
           )}
         </Grid>
