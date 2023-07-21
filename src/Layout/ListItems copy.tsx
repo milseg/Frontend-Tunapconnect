@@ -13,6 +13,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
 import EditIcon from '@mui/icons-material/Edit'
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'
+import InventoryIcon from '@mui/icons-material/Inventory'
 
 import ChevronRight from '@mui/icons-material/ChevronRight'
 import ExpandMore from '@mui/icons-material/ExpandMore'
@@ -74,6 +75,12 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
       href: `/quotation?company_id=${companySelected}`,
       component: <RequestQuoteIcon />,
       title: 'Orçamento',
+    })
+    ret.push({
+      path: '/produtos',
+      href: `/produtos?company_id=${companySelected}`,
+      component: <InventoryIcon />,
+      title: 'Produtos',
     })
     // }
     if (user?.userTunap) {
