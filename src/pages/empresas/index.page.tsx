@@ -296,7 +296,7 @@ export default function Empresas() {
                               variant="subtitle1"
                               color={'#1C4961'}
                               fontWeight={700}
-                              sx={{ fontSize: { xs: '0.5rem', sm: '1.2rem' } }}
+                              sx={{ fontSize: { xs: '0.48rem', sm: '1.2rem' } }}
                               textOverflow={'ellipsis'}
                             >
                               {company.id}
@@ -308,7 +308,7 @@ export default function Empresas() {
                               sx={{
                                 width: '40%',
                                 textAlign: 'center',
-                                fontSize: { xs: '0.5rem', sm: '1.2rem' },
+                                fontSize: { xs: '0.48rem', sm: '1.2rem' },
                               }}
                               textOverflow={'ellipsis'}
                             >
@@ -321,7 +321,7 @@ export default function Empresas() {
                               sx={{
                                 width: '40%',
                                 textAlign: 'center',
-                                fontSize: { xs: '0.5rem', sm: '1.2rem' },
+                                fontSize: { xs: '0.48rem', sm: '1.2rem' },
                               }}
                               textOverflow={'ellipsis'}
                             >
@@ -334,7 +334,7 @@ export default function Empresas() {
                               sx={{
                                 width: '40%',
                                 textAlign: 'center',
-                                fontSize: { xs: '0.5rem', sm: '1.2rem' },
+                                fontSize: { xs: '0.48rem', sm: '1.2rem' },
                               }}
                               textOverflow={'ellipsis'}
                             >
@@ -345,9 +345,16 @@ export default function Empresas() {
                                 aria-label="search"
                                 color="warning"
                                 onClick={() => handleDeleteAction(company.id)}
-                                sx={{ marginLeft: 1, color: 'red' }}
+                                sx={{
+                                  color: 'red',
+                                  padding: { xs: '0rem', sm: '8px' },
+                                }}
                               >
-                                <Delete />
+                                <Delete
+                                  sx={{
+                                    width: { xs: '60%', sm: '100%' },
+                                  }}
+                                />
                               </IconButton>
                               <IconButton
                                 aria-label="search"
@@ -363,9 +370,16 @@ export default function Empresas() {
                                     updated_at: company.updated_at,
                                   })
                                 }
-                                sx={{ marginLeft: 1, color: 'blue' }}
+                                sx={{
+                                  color: 'blue',
+                                  padding: { xs: '0rem', sm: '8px' },
+                                }}
                               >
-                                <EditIcon />
+                                <EditIcon
+                                  sx={{
+                                    width: { xs: '60%', sm: '100%' },
+                                  }}
+                                />
                               </IconButton>
                             </Stack>
                           </Stack>
