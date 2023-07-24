@@ -73,6 +73,12 @@ export function allRoutesIntranetTunap() {
               title: 'Upload Eurobike',
               href: `/upload?status=eurobike`,
             },
+            {
+              path: '/upload',
+              component: null,
+              title: 'Upload Rodobens Auto',
+              href: `/upload?status=rodobens_auto`,
+            },
           ],
         },
         {
