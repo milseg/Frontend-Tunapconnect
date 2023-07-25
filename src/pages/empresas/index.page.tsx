@@ -37,7 +37,7 @@ import { ActionDeleteConfirmations } from '@/helpers/ActionConfirmations'
 import { formatDateTime } from '@/ultis/formatDate'
 import groupsListRequests from '../api/groups.api'
 import theme from '@/styles/config/theme'
-import { GroupsType, IGroupsEditDTO } from '@/types/groups'
+import { GroupsType } from '@/types/groups'
 import { Delete } from '@mui/icons-material'
 import { CustomNoRowsOverlay } from '@/components/TableApp/NoRows'
 import companiesListRequests from '../api/companies.api'
@@ -107,14 +107,11 @@ export default function Empresas() {
   const handleFormEdit = async (event: any) => {
     event.preventDefault()
     setIsLoadingEdit(true)
-    const response = await apiB.put<IGroupsEditDTO>(
-      `/companies/${editNameId}`,
-      {
-        name: newName,
-        cnpj: newCnpj,
-        integration_code: newIntegrationCode,
-      },
-    )
+    const response = await apiB.put(`/companies/${editNameId}`, {
+      name: newName,
+      cnpj: newCnpj,
+      integration_code: newIntegrationCode,
+    })
     if (response.status === 200) {
       refetch()
       setOpen(false)
