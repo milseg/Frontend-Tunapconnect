@@ -95,6 +95,7 @@ export default function KitTable({
                           // justifyContent: 'space-between',
                           background:
                             expanded === row.kit_id ? '#1ACABA' : '#fff',
+                          color: expanded === row.kit_id ? '#fff' : '#000',
                         }}
                       >
                         <Typography
@@ -112,13 +113,13 @@ export default function KitTable({
                           size="small"
                           aria-label="a dense table"
                         >
-                          <TableHead>
+                          {/* <TableHead>
                             <TableRow>
                               <TableCell>Cod.</TableCell>
                               <TableCell align="left">Nome</TableCell>
                               <TableCell align="right">QTD</TableCell>
                             </TableRow>
-                          </TableHead>
+                          </TableHead> */}
                           <TableBody>
                             {row.products.length > 0 &&
                               row.products.length > 0 && (
