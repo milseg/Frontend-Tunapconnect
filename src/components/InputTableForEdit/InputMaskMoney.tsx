@@ -38,26 +38,39 @@ const MoneyMask = forwardRef(function textMaskCustom(props, ref) {
 
 type InputMoneyMaskProps = {
   name: string
+  maxValue?: number
+  minValue?: number
   control: Control<any, any> | undefined
 } & TextFieldProps
 
-export function InputMoneyMask({ name, control }: InputMoneyMaskProps) {
+export function InputMoneyMask({
+  name,
+  control,
+  maxValue,
+  minValue,
+}: InputMoneyMaskProps) {
   return (
     <Controller
-      render={({ field }) => (
-        <TextField
-          variant="standard"
-          size="small"
-          sx={{ width: 105 }}
-          // style={{ marginTop: 11 }}
-          fullWidth
-          {...field}
-          InputProps={{
-            // @ts-ignore
-            inputComponent: MoneyMask,
-          }}
-        />
-      )}
+      render={({ field: { onChange, onBlur, value } }) => {
+        return (
+          <TextField
+            variant="standard"
+            size="small"
+            sx={{ width: '100%' }}
+            // sx={{ width: 105 }}
+            // style={{ marginTop: 11 }}
+            fullWidth
+            value={value}
+            onBlur={onBlur}
+            onChange={onChange}
+            // {...field}
+            InputProps={{
+              // @ts-ignore
+              inputComponent: MoneyMask,
+            }}
+          />
+        )
+      }}
       name={name}
       control={control}
     />
