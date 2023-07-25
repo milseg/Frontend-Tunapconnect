@@ -1,23 +1,18 @@
-import Dialog from '@mui/material/Dialog'
+import { useForm } from 'react-hook-form'
 
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 
 import { Stack } from '@mui/system'
-import DeleteIcon from '@mui/icons-material/Delete'
-import AddCircleIcon from '@mui/icons-material/AddCircle'
+
 import {
   ButtonModalActions,
   InputText,
   ErrorContainer,
   ButtonIcon,
 } from './styles'
-import { useContext, useEffect, useState } from 'react'
-import { api, apiB } from '@/lib/api'
-import { CompanyContext } from '@/contexts/CompanyContext'
+import { useEffect, useState } from 'react'
+import { apiB } from '@/lib/api'
+
 import {
   Backdrop,
   Box,
@@ -27,8 +22,7 @@ import {
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import ActionAlerts from '@/components/ActionAlerts'
-import { ClientResponseType } from '@/types/service-schedule'
-import { validateCNPJ, validateCPF } from '@/ultis/validation'
+
 import SearchIcon from '@mui/icons-material/Search'
 import {
   conformedCNPJNumber,
@@ -38,8 +32,7 @@ import {
 } from '@/components/InputMask'
 import { useRouter } from 'next/router'
 import ModalSearchGroup from './components/ModalSearchGroup'
-import { ro } from 'date-fns/locale'
-import { AxiosError } from 'axios'
+
 // import { formatCNPJAndCPFNumber } from '@/ultis/formatCNPJAndCPF'
 
 interface actionAlertsProps {
@@ -95,8 +88,6 @@ newClientFormSchema.required({
   document: true,
 })
 
-type newClientFormData = z.infer<typeof newClientFormSchema>
-
 export default function EditCompanyById() {
   const [data, setData] = useState<CompanyResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -114,7 +105,7 @@ export default function EditCompanyById() {
     setValue,
     // reset,
     formState: { errors },
-  } = useForm<newClientFormData>({
+  } = useForm({
     // resolver: zodResolver(newClientFormSchema),
     defaultValues: {
       name: '',
