@@ -147,6 +147,13 @@ export interface QuotationResponseType {
   total_results: number
 }
 
+type StatusProductType =
+  | 'saved'
+  | 'excluded'
+  | 'adding'
+  | 'cancelled'
+  | undefined
+
 export interface ProductType {
   id: number
   company_id: number
@@ -158,6 +165,32 @@ export interface ProductType {
   active: boolean
   discount: string
   quantity: string
+  status: StatusProductType
+  lastQuantity?: string
+  lastDiscount?: string
+}
+
+type StatusServicesType =
+  | 'saved'
+  | 'excluded'
+  | 'adding'
+  | 'cancelled'
+  | undefined
+
+export interface ServicesType {
+  id: number
+  company_id: number
+  service_code: string
+  integration_code: any
+  description: string
+  standard_quantity: string
+  standard_value: string
+  active: boolean
+  discount: string
+  quantity: string
+  status: StatusServicesType
+  lastQuantity?: string
+  lastDiscount?: string
 }
 
 export interface TypeQuotationType {
@@ -165,4 +198,94 @@ export interface TypeQuotationType {
   company_id: number
   name: string
   code: string
+}
+
+export interface KitType {
+  kit_id: number
+  name: string
+  products:
+    | {
+        quantity: string
+        product: ProductType
+      }[]
+    | []
+  services:
+    | {
+        quantity: string
+        service: ServicesType
+      }[]
+    | []
+}
+
+export interface Service {
+  id: number
+  company_id: number
+  service_code: string
+  integration_code: any
+  description: string
+  standard_quantity: string
+  standard_value: string
+  active: boolean
+  deleted_at: any
+  created_at: string
+  updated_at: string
+}
+
+export interface Product {
+  id: number
+  company_id: number
+  name: string
+  product_code: string
+  sale_value: string
+  guarantee_value: string
+  tunap_code: any
+  active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface QuotationClaimService {
+  id: number
+  quotation_id: number
+  claim_service_id: number
+  created_at: string
+  updated_at: string
+  description: string
+  integration_code: any
+}
+
+export interface QuotationIten {
+  id: number
+  quotation_id: number
+  service_id?: number
+  products_id?: number
+  price: string
+  price_discount: string
+  quantity: string
+  created_at: string
+  updated_at: string
+  service?: Service
+  product?: Product
+  total: number
+}
+
+export interface QuotationByIdResponseType {
+  id: number
+  company_id: number
+  vehicle_id: any
+  client_id: number
+  maintenance_review_id: any
+  consultant_id: number
+  created_at: string
+  updated_at: string
+  client_vehicle_id: number
+  user_id: number
+  os_type_id: number
+  client_vehicle: ClientVehicle
+  technical_consultant: TechnicalConsultant
+  client: Client
+  maintenance_review: any
+  quotation_itens: QuotationIten[]
+  quotation_claim_service: QuotationClaimService[]
+  quotation_mandatory_itens: any[]
 }
