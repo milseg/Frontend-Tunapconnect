@@ -118,7 +118,7 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
         opended={opended}
         routeActual={routeActual}
       />
-      {user?.userTunap && !companySelected && (
+      {user?.user_tunap && !companySelected && (
         <ButtonsMenuNav
           menuList={menuListTunapIntranet}
           opended={opended}
