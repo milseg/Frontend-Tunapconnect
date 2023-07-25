@@ -48,7 +48,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.username = user.name
         token.privilege = user.privilege
-        token.user_tunap = user.user_tunap
+        token.userTunap = user.user_tunap
         token.accessToken = user.token
         token.id = user.id
         token.companies = user.companies
@@ -61,7 +61,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id
         session.user.accessToken = token.accessToken
         session.user.privilege = token.privilege
-        session.user.user_tunap = token.user_tunap
+        session.user.userTunap = token.userTunap
         session.user.email = 'não informado'
         session.user.image = 'não informado'
         session.user.companies = token.companies ?? []

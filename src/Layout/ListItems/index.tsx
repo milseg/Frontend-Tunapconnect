@@ -118,14 +118,14 @@ export const MainListItems = ({ opended }: { opended: boolean }) => {
         opended={opended}
         routeActual={routeActual}
       />
-      {user?.user_tunap && router.asPath === '/company' && (
+      {user?.userTunap && !companySelected && (
         <ButtonsMenuNav
           menuList={menuListTunapIntranet}
           opended={opended}
           routeActual={routeActual}
         />
       )}
-      {/* {user?.user_tunap &&
+      {/* {user?.userTunap &&
         menuListTunapIntranet.map((menu, index) => {
           console.log(menu)
           return (

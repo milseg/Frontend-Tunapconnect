@@ -16,7 +16,7 @@ type User = {
   id: string | undefined
   name: string | undefined
   privilege: string | undefined
-  user_tunap: boolean | undefined
+  userTunap: boolean | undefined
 }
 
 interface companyProps {
@@ -61,12 +61,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // console.log("signin ok")
       const session = await getSession()
       // console.log("[AuthContext] saving user", session?.user)
-      console.log(session)
       setUser({
         id: session?.user.id,
         name: session?.user.name,
         privilege: session?.user.privilege,
-        user_tunap: session?.user.user_tunap,
+        userTunap: session?.user.userTunap,
       })
       setListCompanies(session?.user.companies as companyProps[])
       Router.push('/company')
@@ -85,10 +84,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (
       status === 'unauthenticated' &&
       !Router.asPath.includes('/checklist-factory-view')
-    ) {
-      console.log(Router.asPath.includes('/checklist-factory-view'))
+    )
       Router.replace('/')
-    }
   }, [status])
 
   useEffect(() => {
@@ -97,7 +94,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         id: session?.user.id,
         name: session?.user.name,
         privilege: session?.user.privilege,
-        user_tunap: session?.user.user_tunap,
+        userTunap: session?.user.userTunap,
       })
     })
   }, [])

@@ -494,7 +494,7 @@ export default function ServiceSchedulesList() {
               pages={pages}
               loading={isFetching}
               companyId={companySelected}
-              handleClickRow={handleSetServiceSchedule}
+              handleSetServiceSchedule={handleSetServiceSchedule}
             />
           ) : (
             <Skeleton variant="rounded" sx={{ width: '100%' }} height={150} />

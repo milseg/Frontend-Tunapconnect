@@ -20,8 +20,8 @@ import {
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import {
-  ButtonCancel,
   ButtonMarkup,
+  ButtonRight,
   ClickableArea,
   ContainerButtonsInformation,
   ContainerClickableArea,
@@ -677,9 +677,9 @@ export function ModalInspectCar({
               </Box>
             </ContainerInformation>
             <ContainerButtonsInformation direction="row" spacing={2}>
-              <ButtonCancel variant="contained" onClick={handleClose}>
+              <ButtonRight variant="contained" onClick={handleClose}>
                 sair
-              </ButtonCancel>
+              </ButtonRight>
             </ContainerButtonsInformation>
           </Grid>
         </Grid>
