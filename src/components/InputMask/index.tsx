@@ -1,5 +1,29 @@
 import React, { forwardRef } from 'react'
-import MaskedInput from 'react-text-mask'
+import MaskedInput, { conformToMask } from 'react-text-mask'
+
+const maskCNPJ = [
+  /\d/,
+  /\d/,
+  '.',
+  /\d/,
+  /\d/,
+  /\d/,
+  '.',
+  /\d/,
+  /\d/,
+  /\d/,
+  '/',
+  /\d/,
+  /\d/,
+  /\d/,
+  /\d/,
+  '-',
+  /\d/,
+  /\d/,
+]
+
+export const conformedCNPJNumber = (cnpjNumber: string) =>
+  conformToMask(cnpjNumber, maskCNPJ, { guide: false }).conformedValue
 
 export const TextMaskPHONE = forwardRef(function textMaskCustom(props, ref) {
   const { ...other } = props
