@@ -108,31 +108,57 @@ export default function KitTable({
                       </MuiAccordionSummary>
                       <MuiAccordionDetails>
                         <p>
+                          <span
+                            style={{
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                            }}
+                          >
+                            Peças
+                          </span>
+                          <br />
                           {row.products.map((p, index) => (
                             <span
                               key={p.product.name + p.product.id}
                               style={{
-                                fontSize: '14px',
+                                fontSize: '12px',
                                 fontWeight: 'bold',
                               }}
                             >
-                              {p.quantity} x {p.product.name ?? 'Não informado'}
-                              {index < row.products.length - 1 ? ', ' : '. '}
+                              {p.product.product_code} -{' '}
+                              {p.product.name ?? 'Não informado'} QTD{' '}
+                              {p.quantity}
+                              {/* {index < row.products.length - 1 ? ', ' : '. '} */}
+                              <br />
                             </span>
                           ))}
                         </p>
-                        <p>
+                        <p
+                          style={{
+                            marginTop: 4,
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                            }}
+                          >
+                            Serviços
+                          </span>
+                          <br />
                           {row.services.map((s, index) => (
                             <span
                               key={s.service.description + s.service.id}
                               style={{
-                                fontSize: '14px',
+                                fontSize: '12px',
                                 fontWeight: 'bold',
                               }}
                             >
-                              {s.quantity} x{' '}
-                              {s.service.description ?? 'Não informado'}
-                              {index < row.services.length - 1 ? ', ' : '. '}
+                              {s.service.service_code} -{' '}
+                              {s.service.description ?? 'Não informado'}{' '}
+                              {/* {index < row.services.length - 1 ? ', ' : '. '} */}
+                              QTD {s.quantity}
                             </span>
                           ))}
                         </p>
