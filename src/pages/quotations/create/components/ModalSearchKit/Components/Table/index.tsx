@@ -120,26 +120,27 @@ export default function KitTable({
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            {row.products.length > 0 && (
-                              <TableRow
-                                sx={{
-                                  '&:last-child td, &:last-child th': {
-                                    border: 0,
-                                  },
-                                }}
-                              >
-                                <TableCell
-                                  colSpan={3}
-                                  component="th"
-                                  scope="row"
+                            {row.products.length > 0 &&
+                              row.products.length > 0 && (
+                                <TableRow
                                   sx={{
-                                    fontWeight: 'bold',
+                                    '&:last-child td, &:last-child th': {
+                                      border: 0,
+                                    },
                                   }}
                                 >
-                                  Peças
-                                </TableCell>
-                              </TableRow>
-                            )}
+                                  <TableCell
+                                    colSpan={3}
+                                    component="th"
+                                    scope="row"
+                                    sx={{
+                                      fontWeight: 'bold',
+                                    }}
+                                  >
+                                    Peças
+                                  </TableCell>
+                                </TableRow>
+                              )}
                             {row.products.map((p, index) => (
                               <TableRow
                                 key={
@@ -183,26 +184,27 @@ export default function KitTable({
                                 </TableCell>
                               </TableRow>
                             )}
-                            {row.services.map((s, index) => (
-                              <TableRow
-                                key={s.service.description + s.service.id}
-                                sx={{
-                                  '&:last-child td, &:last-child th': {
-                                    border: 0,
-                                  },
-                                }}
-                              >
-                                <TableCell component="th" scope="row">
-                                  {s.service.service_code}
-                                </TableCell>
-                                <TableCell component="th" align="left">
-                                  {s.service.description ?? 'Não informado'}
-                                </TableCell>
-                                <TableCell component="th" align="right">
-                                  {s.quantity}
-                                </TableCell>
-                              </TableRow>
-                            ))}
+                            {row.services.length > 0 &&
+                              row.services.map((s, index) => (
+                                <TableRow
+                                  key={s.service.description + s.service.id}
+                                  sx={{
+                                    '&:last-child td, &:last-child th': {
+                                      border: 0,
+                                    },
+                                  }}
+                                >
+                                  <TableCell component="th" scope="row">
+                                    {s.service.service_code}
+                                  </TableCell>
+                                  <TableCell component="th" align="left">
+                                    {s.service.description ?? 'Não informado'}
+                                  </TableCell>
+                                  <TableCell component="th" align="right">
+                                    {s.quantity}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
                           </TableBody>
                         </Table>
                       </MuiAccordionDetails>
