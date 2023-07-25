@@ -39,9 +39,9 @@ export default function ProductTable({
         >
           <TableHead>
             <TableRow>
-              <TableCellHeader>Código</TableCellHeader>
-              <TableCellHeader>Nome</TableCellHeader>
-              <TableCellHeader>Preço</TableCellHeader>
+              <TableCellHeader>ID</TableCellHeader>
+              <TableCellHeader>name</TableCellHeader>
+              <TableCellHeader>preço</TableCellHeader>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -61,10 +61,10 @@ export default function ProductTable({
                   }}
                   selected={productSelected === row.id}
                 >
-                  <TableCell scope="row">{row.product_code}</TableCell>
+                  <TableCell scope="row">{row.id}</TableCell>
                   <TableCell scope="row">{row.name}</TableCell>
-                  <TableCell scope="row">
-                    {formatMoneyPtBR(Number(row.sale_value))}
+                  <TableCell align="right">
+                    {formatMoneyPtBR(Number(row.guarantee_value))}
                   </TableCell>
                 </TableRowSBody>
               ))

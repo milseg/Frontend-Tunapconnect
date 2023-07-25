@@ -58,17 +58,17 @@ export default function ModalSearchProduct({
     setProductList([])
 
     try {
+      // const result = await api.get(
+      //   `/products?company_id=${companySelected}&search=${
+      //     data.search
+      //   }&limit=10${pagination ? '&current_page=' + pagination.actual : ''}`,
+      // )
       const result = await api.get(
-        `/product?company_id=${companySelected}&search=${data.search}&limit=10${
+        `/product?company_id=${companySelected}${
           pagination ? '&current_page=' + pagination.actual : ''
         }`,
       )
-      // const result = await api.get(
-      //   `/product?company_id=${companySelected}${
-      //     pagination ? '&current_page=' + pagination.actual : ''
-      //   }`,
-      // )
-      console.log(result)
+
       setProductList(result.data.data)
       if (!pagination) {
         setPagination((prevState) => {

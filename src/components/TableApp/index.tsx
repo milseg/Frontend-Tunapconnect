@@ -18,7 +18,7 @@ interface TableAppProps {
   pages: { next: boolean; previous: boolean }
   loading: boolean
   companyId: number | null | undefined
-  handleClickRow: (id: number) => void
+  handleSetServiceSchedule: (id: number) => void
 }
 
 declare module '@mui/x-data-grid' {
@@ -37,7 +37,7 @@ export function TableApp({
   pages,
   loading,
   companyId,
-  handleClickRow,
+  handleSetServiceSchedule,
 }: TableAppProps) {
   const [rows, setRows] = useState<any[]>([])
 
@@ -79,7 +79,7 @@ export function TableApp({
               apiRef={apiRef}
               loading={loading}
               onRowClick={(id) => {
-                handleClickRow(Number(id.id))
+                handleSetServiceSchedule(Number(id.id))
               }}
               // pageSizeOptions={[7]}
               // disableRowSelectionOnClick

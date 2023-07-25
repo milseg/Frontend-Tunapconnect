@@ -365,7 +365,7 @@ export default function QuotationList() {
     router.push(newUrlPagination)
   }
 
-  async function handleClickRow(idSelected: number) {
+  async function handleSetServiceSchedule(idSelected: number) {
     const filterSelected = rows?.quotationListAllData.filter(
       (i) => i.id === idSelected,
     )[0]
@@ -373,7 +373,7 @@ export default function QuotationList() {
     if (filterSelected) {
       setQuotations(filterSelected)
     }
-    await router.push(`/quotations/${idSelected}`)
+    // await router.push(`/service-schedule/${idSelected}`)
   }
 
   useEffect(() => {
@@ -431,16 +431,23 @@ export default function QuotationList() {
                   variant="contained"
                   sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
                   startIcon={<AddCircleOutlineIcon />}
+                  // onClick={async () => {
+                  //   await router.push(`/service-schedule/create`)
+                  // }}
+                  // disabled
                 >
                   novo
                 </ButtonAdd>
               </Link>
             ) : (
-              <Link href={'/quotations/create'}>
-                <ButtonIcon sx={{ alignSelf: 'flex-end', marginRight: '20px' }}>
-                  <AddCircleOutlineIcon />
-                </ButtonIcon>
-              </Link>
+              <ButtonIcon
+                sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
+                onClick={async () => {
+                  // await router.push(`/service-schedule/create`)
+                }}
+              >
+                <AddCircleOutlineIcon />
+              </ButtonIcon>
             )}
           </Stack>
           {/* <Grid
@@ -512,7 +519,7 @@ export default function QuotationList() {
               pages={pages}
               loading={isFetching}
               companyId={companySelected}
-              handleClickRow={handleClickRow}
+              handleSetServiceSchedule={handleSetServiceSchedule}
             />
           ) : (
             <Skeleton variant="rounded" sx={{ width: '100%' }} height={150} />
