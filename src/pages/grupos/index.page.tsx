@@ -1,5 +1,6 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable no-unused-vars */
+// @ts-nocheck
 import { useForm } from 'react-hook-form'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
