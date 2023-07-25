@@ -11,9 +11,6 @@ const defaultMaskOptions = {
   thousandsSeparatorSymbol: '.',
   integerLimit: 7, // limit length of integer numbers
   allowNegative: false,
-  allowDecimal: true,
-  decimalSymbol: ',',
-  decimalLimit: 2, // how many digits allowed after the decimal
 }
 
 const numberMask = forwardRef(function textMaskCustom(props, ref) {
@@ -46,7 +43,7 @@ export function InputNumber({ name, control, ...rest }: InputMoneyMaskProps) {
           // label="TELEFONE"
           variant="standard"
           size="small"
-          sx={{ width: '100%' }}
+          sx={{ width: 75 }}
           {...rest}
           // style={{ marginTop: 11 }}
           fullWidth

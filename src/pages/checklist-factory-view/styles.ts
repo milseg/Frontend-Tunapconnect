@@ -145,25 +145,6 @@ export const ButtonAddInputs = styled(IconButton)(({ theme }) => ({
     background: '#e0f2f1',
   },
 }))
-export const ButtonViewImage = styled(IconButton)(({ theme }) => ({
-  height: 50,
-  width: 50,
-
-  color: '#000',
-
-  '& > svg': {
-    height: 35,
-    width: 35,
-  },
-
-  '&:hover': {
-    color: '#1ACABA',
-    background: 'rgba(26, 202, 186,0.1)',
-  },
-  '&:disabled': {
-    background: '#e0f2f1',
-  },
-}))
 
 export const ButtonModalActions = styled(Button)(({ theme }) => ({
   color: 'white',
