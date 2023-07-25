@@ -107,61 +107,104 @@ export default function KitTable({
                         </Typography>
                       </MuiAccordionSummary>
                       <MuiAccordionDetails>
-                        <p>
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              fontWeight: 'bold',
-                            }}
-                          >
-                            Peças
-                          </span>
-                          <br />
-                          {row.products.map((p, index) => (
-                            <span
-                              key={p.product.name + p.product.id}
-                              style={{
-                                fontSize: '12px',
-                                fontWeight: 'bold',
-                              }}
-                            >
-                              {p.product.product_code} -{' '}
-                              {p.product.name ?? 'Não informado'} QTD{' '}
-                              {p.quantity}
-                              {/* {index < row.products.length - 1 ? ', ' : '. '} */}
-                              <br />
-                            </span>
-                          ))}
-                        </p>
-                        <p
-                          style={{
-                            marginTop: 4,
-                          }}
+                        <Table
+                          // sx={{ minWidth: 650 }}
+                          size="small"
+                          aria-label="a dense table"
                         >
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              fontWeight: 'bold',
-                            }}
-                          >
-                            Serviços
-                          </span>
-                          <br />
-                          {row.services.map((s, index) => (
-                            <span
-                              key={s.service.description + s.service.id}
-                              style={{
-                                fontSize: '12px',
-                                fontWeight: 'bold',
-                              }}
-                            >
-                              {s.service.service_code} -{' '}
-                              {s.service.description ?? 'Não informado'}{' '}
-                              {/* {index < row.services.length - 1 ? ', ' : '. '} */}
-                              QTD {s.quantity}
-                            </span>
-                          ))}
-                        </p>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Cod.</TableCell>
+                              <TableCell align="left">Nome</TableCell>
+                              <TableCell align="right">QTD</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {row.products.length > 0 && (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                              >
+                                <TableCell
+                                  colSpan={3}
+                                  component="th"
+                                  scope="row"
+                                  sx={{
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  Peças
+                                </TableCell>
+                              </TableRow>
+                            )}
+                            {row.products.map((p, index) => (
+                              <TableRow
+                                key={
+                                  p.product.id + '-' + p.product.product_code
+                                }
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                              >
+                                <TableCell component="th" scope="row">
+                                  {p.product.product_code}
+                                </TableCell>
+                                <TableCell component="th" align="left">
+                                  {p.product.name ?? 'Não informado'}
+                                </TableCell>
+                                <TableCell component="th" align="right">
+                                  {p.quantity}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+
+                            {row.services.length > 0 && (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                              >
+                                <TableCell
+                                  colSpan={3}
+                                  component="th"
+                                  scope="row"
+                                  sx={{
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  Serviços
+                                </TableCell>
+                              </TableRow>
+                            )}
+                            {row.services.map((s, index) => (
+                              <TableRow
+                                key={s.service.description + s.service.id}
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                              >
+                                <TableCell component="th" scope="row">
+                                  {s.service.service_code}
+                                </TableCell>
+                                <TableCell component="th" align="left">
+                                  {s.service.description ?? 'Não informado'}
+                                </TableCell>
+                                <TableCell component="th" align="right">
+                                  {s.quantity}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
                       </MuiAccordionDetails>
                     </MuiAccordionStyled>
                   </TableCell>
