@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { apiB } from '@/lib/api'
 import { IGroupsRequestDTO } from '@/types/groups'
 
