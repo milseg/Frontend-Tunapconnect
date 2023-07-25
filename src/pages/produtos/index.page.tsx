@@ -58,11 +58,41 @@ export default function Products() {
   const router = useRouter()
 
   const exampleReturn = [
-    { id: 1, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
-    { id: 2, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
-    { id: 3, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
-    { id: 4, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
-    { id: 5, guarantee_value: 20, sale_value: 40, tunap_code: 'teste' },
+    {
+      id: 1,
+      guarantee_value: 20,
+      sale_value: 40,
+      tunap_code: 'teste',
+      product_code: 'harina-pan',
+    },
+    {
+      id: 2,
+      guarantee_value: 20,
+      sale_value: 40,
+      tunap_code: 'teste',
+      product_code: 'harina-pan',
+    },
+    {
+      id: 3,
+      guarantee_value: 20,
+      sale_value: 40,
+      tunap_code: 'teste',
+      product_code: 'harina-pan',
+    },
+    {
+      id: 4,
+      guarantee_value: 20,
+      sale_value: 40,
+      tunap_code: 'teste',
+      product_code: 'harina-pan',
+    },
+    {
+      id: 5,
+      guarantee_value: 20,
+      sale_value: 40,
+      tunap_code: 'teste',
+      product_code: 'harina-pan',
+    },
   ]
 
   React.useEffect(() => {
@@ -73,6 +103,7 @@ export default function Products() {
     } else {
       setIsMobile(false)
     }
+    console.log(productsListDto)
   }, [isWeb])
 
   const {
@@ -207,7 +238,7 @@ export default function Products() {
                   {'Número'}
                 </Typography>
                 <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
-                  {'Código Tunap'}
+                  {'Nome'}
                 </Typography>
                 <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
                   {'Valor de revenda'}
@@ -246,70 +277,73 @@ export default function Products() {
                       alignContent: 'center',
                     }}
                   >
-                    {exampleReturn.map((product: ProductType, index) => (
-                      <Stack
-                        key={product.id}
-                        direction="row"
-                        sx={{
-                          width: '100%',
-                          backgroundColor: `${
-                            index % 2 == 0 ? '#FFFFFF' : '#F1F1F1'
-                          }`,
-                          p: 1,
-                          borderRadius: '2px',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <Typography
-                          variant="subtitle1"
-                          color={'#1C4961'}
-                          fontWeight={700}
-                          sx={{ fontSize: { xs: '0.5rem', sm: '1.2rem' } }}
-                          textOverflow={'ellipsis'}
-                        >
-                          {product.id}
-                        </Typography>
-                        <Typography
-                          variant="subtitle1"
-                          color={'#1C4961'}
-                          fontWeight={700}
-                          sx={{
-                            width: 'fit-content',
-                            textAlign: 'center',
-                            fontSize: { xs: '0.5rem', sm: '1.2rem' },
-                          }}
-                          textOverflow={'ellipsis'}
-                        >
-                          {product.tunap_code}
-                        </Typography>
-                        <Typography
-                          variant="subtitle1"
-                          color={'#1C4961'}
-                          fontWeight={700}
-                          sx={{
-                            width: 'fit-content',
-                            textAlign: 'center',
-                            fontSize: { xs: '0.5rem', sm: '1.2rem' },
-                          }}
-                          textOverflow={'ellipsis'}
-                        >
-                          {product.guarantee_value}
-                        </Typography>
-                        <Typography
-                          variant="subtitle1"
-                          color={'#1C4961'}
-                          fontWeight={700}
-                          sx={{
-                            width: 'fit-content',
-                            textAlign: 'center',
-                            fontSize: { xs: '0.5rem', sm: '1.2rem' },
-                          }}
-                          textOverflow={'ellipsis'}
-                        >
-                          {product.sale_value}
-                        </Typography>
-                      </Stack>
-                    ))}
+                    {productsListDto &&
+                      productsListDto.products.map(
+                        (product: ProductType, index) => (
+                          <Stack
+                            key={product.id}
+                            direction="row"
+                            sx={{
+                              width: '100%',
+                              backgroundColor: `${
+                                index % 2 == 0 ? '#FFFFFF' : '#F1F1F1'
+                              }`,
+                              p: 1,
+                              borderRadius: '2px',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <Typography
+                              variant="subtitle1"
+                              color={'#1C4961'}
+                              fontWeight={700}
+                              sx={{ fontSize: { xs: '0.5rem', sm: '1.2rem' } }}
+                              textOverflow={'ellipsis'}
+                            >
+                              {product.id}
+                            </Typography>
+                            <Typography
+                              variant="subtitle1"
+                              color={'#1C4961'}
+                              fontWeight={700}
+                              sx={{
+                                width: 'fit-content',
+                                textAlign: 'center',
+                                fontSize: { xs: '0.5rem', sm: '1.2rem' },
+                              }}
+                              textOverflow={'ellipsis'}
+                            >
+                              {product.name}
+                            </Typography>
+                            <Typography
+                              variant="subtitle1"
+                              color={'#1C4961'}
+                              fontWeight={700}
+                              sx={{
+                                width: 'fit-content',
+                                textAlign: 'center',
+                                fontSize: { xs: '0.5rem', sm: '1.2rem' },
+                              }}
+                              textOverflow={'ellipsis'}
+                            >
+                              {product.guarantee_value}
+                            </Typography>
+                            <Typography
+                              variant="subtitle1"
+                              color={'#1C4961'}
+                              fontWeight={700}
+                              sx={{
+                                width: 'fit-content',
+                                textAlign: 'center',
+                                fontSize: { xs: '0.5rem', sm: '1.2rem' },
+                              }}
+                              textOverflow={'ellipsis'}
+                            >
+                              {product.sale_value}
+                            </Typography>
+                          </Stack>
+                        ),
+                      )}
                   </Paper>
                 )}
               </Paper>
@@ -335,7 +369,7 @@ export default function Products() {
               type="submit"
               disableRipple
               onClick={() => setPageNumber((pageNumber) => pageNumber + 1)}
-              disabled={pageNumber === productsListDto?.total_groups}
+              disabled={pageNumber === productsListDto?.total_products}
             >
               <ArrowForwardIosIcon />
             </ButtonPaginate>
