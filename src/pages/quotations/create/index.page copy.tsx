@@ -138,17 +138,15 @@ const productSchema = z.object({
   product: z.array(
     z
       .object({
-        idProduct: z.number(),
+        id: z.number(),
         price: z.string(),
         quantity: z.string(),
         discount: z.string(),
-        product_code: z.string(),
-        name: z.string().optional(),
       })
       .refine(
         (e) => {
           if (
-            Number(e.discount.replace(/\./g, '').replace(/,/g, '.')) >
+            Number(e.discount.replace(/\./g, '').replace(/,/g, '.')) >=
             Number(e.price)
           ) {
             return false
@@ -167,19 +165,14 @@ const productSchema = z.object({
   // ),
   // quantity: z.string(),
 })
-
-type ProductFormData = z.infer<typeof productSchema>
-
 const serviceSchema = z.object({
   service: z.array(
     z
       .object({
-        idService: z.number(),
+        id: z.number(),
         price: z.string(),
         quantity: z.string(),
         discount: z.string(),
-        service_code: z.string(),
-        name: z.string().optional(),
       })
       .refine(
         (e) => {
@@ -207,8 +200,6 @@ const serviceSchema = z.object({
   // ),
   // quantity: z.string(),
 })
-
-type ServiceFormData = z.infer<typeof serviceSchema>
 
 export default function QuotationsCreate() {
   const [products, setProducts] = useState<productsProps>({
@@ -278,6 +269,7 @@ export default function QuotationsCreate() {
 
   const [isEditingProduct, setIsEditingProduct] = useState(false)
   const [isEditingService, setIsEditingService] = useState(false)
+  const [isEditingKit, setIsEditingKit] = useState(false)
 
   const router = useRouter()
 
@@ -292,7 +284,7 @@ export default function QuotationsCreate() {
     reset: resetProduct,
     getValues: getValuesProduct,
     formState: { errors: errorsProduct },
-  } = useForm<ProductFormData>({
+  } = useForm({
     resolver: zodResolver(productSchema),
   })
 
@@ -312,7 +304,7 @@ export default function QuotationsCreate() {
     control: controlService,
     setValue: setValueService,
     formState: { errors: errorsService },
-  } = useForm<ServiceFormData>({
+  } = useForm({
     resolver: zodResolver(serviceSchema),
   })
 
@@ -347,12 +339,11 @@ export default function QuotationsCreate() {
   // }
 
   function onSubmitProduct(data: any) {
-    console.log(data)
     const listProductsSaved = [...products.list]
 
     listProductsSaved.forEach((i) => {
       const findIndexData = data.product.findIndex(
-        (d: any) => d.idProduct === i.id,
+        (d: ProductType) => d.id === i.id,
       )
       if (findIndexData > -1) {
         i.quantity = data.product[findIndexData].quantity
@@ -391,7 +382,7 @@ export default function QuotationsCreate() {
 
     listServicesSaved.forEach((i) => {
       const findIndexData = data.service.findIndex(
-        (d: any) => d.idService === i.id,
+        (d: ServicesType) => d.id === i.id,
       )
       if (findIndexData > -1) {
         i.quantity = data.service[findIndexData].quantity
@@ -569,60 +560,83 @@ export default function QuotationsCreate() {
   function handleIsEditingOptions(type: string) {
     switch (type) {
       case 'service':
-        products.list.forEach((p, index) => {
-          setValueService(
-            `service.${index}.discount`,
-            p.discount.replace('.', ','),
-          )
-          setValueService(
-            `service.${index}.quantity`,
-            `${p.quantity}`.replace('.', ','),
-          )
-        })
         setIsEditingService(true)
         break
       case 'product':
-        products.list.forEach((p, index) => {
-          setValueProduct(
-            `product.${index}.discount`,
-            p.discount.replace('.', ','),
-          )
-          setValueProduct(
-            `product.${index}.quantity`,
-            `${p.quantity}`.replace('.', ','),
-          )
-        })
         setIsEditingProduct(true)
         break
-      // case 'kit':
-      //   setIsEditingKit(true)
-      //   break
+      case 'kit':
+        setIsEditingKit(true)
+        break
       default:
     }
   }
 
   function handleRemoveProduct(id: number) {
-    setProducts({
-      ...products,
-      list: products.list.filter((item, index) => {
-        if (item.id === id) {
-          console.log(item.id === id)
-          // removeProduct(index)
+    setProducts((prevState) => {
+      const newList = prevState.list.map((p) => {
+        if (p.id === id) {
+          const newStatus = { ...p }
+          newStatus.status = 'excluded'
+          return newStatus
         }
-        return item.id !== id
-      }),
-    })
-  }
 
+        return p
+      })
+
+      return {
+        ...prevState,
+        list: newList,
+      }
+    })
+
+    // const productIndex = products.list.findIndex((p) => p.id !== id)
+    // removeProduct(productIndex)
+    // setProducts((prevState) => {
+    //   const newList = prevState.list.filter((p) => p.id !== id)
+
+    //   newList.forEach((i, index) => {
+    //     console.log(i.discount)
+    //     setValueProduct(`product.${index}.id`, i.id)
+    //     setValueProduct(
+    //       `product.${index}.discount`,
+    //       i.discount.replace('.', ','),
+    //     )
+    //     setValueProduct(`product.${i}.quantity`, i.quantity.replace('.', ','))
+    //   })
+
+    //   const totalDiscount = newList.reduce((acc, curr) => {
+    //     return acc + Number(curr.discount) * Number(curr.quantity)
+    //   }, 0)
+    //   const total = newList.reduce((acc, curr) => {
+    //     const totalItem = Number(curr.sale_value) * Number(curr.quantity)
+    //     return acc + totalItem
+    //   }, 0)
+
+    //   return {
+    //     ...prevState,
+    //     list: prevState.list.filter((p) => p.id !== id),
+    //     total,
+    //     totalDiscount,
+    //   }
+    // })
+  }
   function handleRemoveService(id: number) {
-    setServices({
-      ...services,
-      list: services.list.filter((item, index) => {
-        if (item.id === id) {
-          console.log(item.id === id)
+    setServices((prevState) => {
+      const newList = prevState.list.map((s) => {
+        if (s.id === id) {
+          const newStatus = { ...s }
+          newStatus.status = 'excluded'
+          return newStatus
         }
-        return item.id !== id
-      }),
+
+        return s
+      })
+
+      return {
+        ...prevState,
+        list: newList,
+      }
     })
   }
 
@@ -771,73 +785,54 @@ export default function QuotationsCreate() {
     }
     const newList = [...products.list]
 
-    console.log(newList)
     const isExistsProduct = newList.findIndex((p) => p.id === prod.id)
 
     if (isExistsProduct > -1) {
       newList.map((p, index) => {
         if (p.id === prod.id) {
           if (p.status === 'saved') {
-            const newQuantity = `${
-              qtd ? Number(p.quantity) + Number(qtd) : Number(p.quantity) + 1
-            }`
-
             setValueProduct(`product.${index}.discount`, p.discount)
             setValueProduct(
               `product.${index}.quantity`,
-              `${newQuantity}`.replace('.', ','),
-              // `${Number(p.quantity) + 1}`.replace('.', ','),
-            )
-
-            if (p.lastDiscount === undefined && p.lastQuantity === undefined) {
-              return {
-                ...p,
-                // quantity: `${Number(p.quantity) + 1 + Number(qtd)}`,
-                quantity: `${newQuantity}`,
-                lastQuantity: p.quantity,
-                lastDiscount: p.discount,
-              }
-            }
-            return {
-              ...p,
-              // quantity: `${Number(p.quantity) + 1 + Number(qtd)}`,
-              quantity: `${newQuantity}`,
-            }
-          }
-
-          const getValues = getValuesProduct()
-          const isExistInForm = getValues.product.findIndex(
-            (v: any) => v.idProduct === prod.id,
-          )
-          if (isExistInForm === -1) {
-            appendProduct({
-              idProduct: prod.id,
-              quantity: `${qtd ? Number(qtd) : 1}`.replace('.', ','),
-              discount: '0,00',
-              price: prod.sale_value ? prod.sale_value : '0',
-              product_code: prod.product_code,
-              name: prod.name ? prod.name : 'Não informado',
-            })
-          } else {
-            setValueProduct(
-              `product.${index}.quantity`,
-              // `${Number(p.quantity) + 1}`.replace('.', ','),
               `${
                 qtd ? Number(p.quantity) + Number(qtd) : Number(p.quantity) + 1
               }`.replace('.', ','),
+              // `${Number(p.quantity) + 1}`.replace('.', ','),
             )
+            return {
+              ...p,
+              // quantity: `${Number(p.quantity) + 1 + Number(qtd)}`,
+              quantity: `${
+                qtd ? Number(p.quantity) + Number(qtd) : Number(p.quantity) + 1
+              }`,
+            }
           }
 
-          p.status = 'adding'
-          const newQuantity = `${
-            qtd ? Number(p.quantity) + Number(qtd) : Number(p.quantity) + 1
-          }`
-
-          return {
-            ...p,
-            // quantity: `${newQuantity}`,
-            quantity: `${newQuantity}`,
+          if (p.status === 'excluded' || p.status === 'cancelled') {
+            p.status = 'adding'
+            setValueProduct(`product.${index}.discount`, '0,00')
+            setValueProduct(`product.${index}.quantity`, '1')
+            return {
+              ...p,
+              // quantity: `1`,
+              quantity: `${qtd ? Number(qtd) : 1}`,
+            }
           }
+
+          // p.status = 'adding'
+          // const newQuantity = qtd ? Number(qtd) : 1
+          // console.log(newQuantity)
+          // setValueProduct(`product.${index}.quantity`, `${newQuantity}`)
+          // setValueProduct(
+          //   `product.${index}.quantity`,
+          //   // `${Number(p.quantity) + 1}`.replace('.', ','),
+          //   `${newQuantity}`.replace('.', ','),
+          // )
+          // return {
+          //   ...p,
+          //   // quantity: `${newQuantity}`,
+          //   quantity: `${newQuantity}`,
+          // }
         }
         return p
       })
@@ -849,16 +844,11 @@ export default function QuotationsCreate() {
       })
     } else {
       const newProduct = { ...prod }
-
-      appendProduct({
-        idProduct: newProduct.id,
-        quantity: `${qtd ? Number(qtd) : 1}`.replace('.', ','),
-        discount: '0,00',
-        price: prod.sale_value ? prod.sale_value : '0',
-        product_code: prod.product_code,
-        name: prod.name ? prod.name : 'Não informado',
-      })
-
+      const productsListForm = getValuesProduct()
+      console.log(newProduct)
+      console.log(productsListForm.product)
+      console.log(productsListForm)
+      console.log(products.list.length)
       // setValueProduct(
       //   `product.${productsListForm.product.length}.id`,
       //   newProduct.id,
@@ -876,7 +866,7 @@ export default function QuotationsCreate() {
       //   `product.${productsListForm.product.length}.price`,
       //   newProduct.sale_value,
       // )
-
+      console.log('adding product')
       newProduct.status = 'adding'
       newProduct.discount = '0,00'
       newProduct.quantity = `${qtd ? Number(qtd) : 1}`
@@ -895,42 +885,31 @@ export default function QuotationsCreate() {
 
   function handleCancelProducts() {
     const newList = [...products.list]
-    const listForRemoved: number[] = []
+    console.log(newList)
     newList.forEach((i, index) => {
+      setValueProduct(`product.${index}.discount`, i.discount.replace('.', ','))
+      setValueProduct(`product.${index}.quantity`, i.quantity.replace('.', ','))
       if (i.status === 'adding') {
-        listForRemoved.push(index)
-        // removeProduct(index)
         i.status = 'cancelled'
       }
-      if (i.status === 'saved' && i.lastQuantity) {
-        i.quantity = i.lastQuantity
-        setValueProduct(
-          `product.${index}.quantity`,
-          `${i.lastQuantity}`.replace('.', ','),
-        )
-        setValueProduct(
-          `product.${index}.discount`,
-          `${i.lastDiscount}`.replace('.', ','),
-        )
-      }
     })
-    if (listForRemoved.length > 0) {
-      removeProduct(listForRemoved)
-    }
+
     setProducts((prevState) => {
-      const ListForSave = newList.filter((i) => i.status !== 'cancelled')
-      console.log(ListForSave)
-      const totalDiscount = ListForSave.reduce((acc, curr) => {
-        return acc + Number(curr.discount) * Number(curr.quantity)
-      }, 0)
-      const total = ListForSave.reduce((acc, curr) => {
-        const totalItem = Number(curr.sale_value) * Number(curr.quantity)
-        return acc + totalItem
-      }, 0)
+      const totalDiscount = newList
+        .filter((i) => i.status === 'saved')
+        .reduce((acc, curr) => {
+          return acc + Number(curr.discount) * Number(curr.quantity)
+        }, 0)
+      const total = newList
+        .filter((i) => i.status === 'saved')
+        .reduce((acc, curr) => {
+          const totalItem = Number(curr.sale_value) * Number(curr.quantity)
+          return acc + totalItem
+        }, 0)
 
       return {
         ...prevState,
-        list: ListForSave,
+        list: newList,
         totalDiscount,
         total,
       }
@@ -939,7 +918,7 @@ export default function QuotationsCreate() {
     setIsEditingProduct(false)
   }
 
-  function handleAddServices(serv: ServicesType, qtd?: number) {
+  function handleAddServices(serv: ServicesType) {
     if (!isEditingService) {
       setIsEditingService(true)
     }
@@ -952,54 +931,7 @@ export default function QuotationsCreate() {
       newList.map((s, index) => {
         if (s.id === serv.id) {
           if (s.status === 'saved') {
-            const newQuantity = `${
-              qtd
-                ? Number(s.quantity) + Number(qtd)
-                : Number(s.quantity) + Number(serv.standard_quantity)
-            }`
-            setValueService(
-              `service.${index}.discount`,
-              s.discount.replace('.', ','),
-            )
-            setValueService(
-              `service.${index}.quantity`,
-              `${newQuantity}`.replace('.', ','),
-            )
-
-            if (s.lastDiscount === undefined && s.lastQuantity === undefined) {
-              return {
-                ...s,
-                // quantity: `${Number(p.quantity) + 1 + Number(qtd)}`,
-                quantity: `${newQuantity}`,
-                lastQuantity: s.quantity,
-                lastDiscount: s.discount,
-              }
-            }
-
-            return {
-              ...s,
-              quantity: `${newQuantity}`,
-            }
-          }
-
-          const getValues = getValuesProduct()
-          const isExistInForm = getValues.product.findIndex(
-            (v: any) => v.idProduct === serv.id,
-          )
-          if (isExistInForm === -1) {
-            appendService({
-              idService: serv.id,
-              quantity: `${qtd ? Number(qtd) : 1}`.replace('.', ','),
-              discount: '0,00',
-              price: serv.standard_value ? serv.standard_value : '0',
-              service_code: serv.service_code,
-              name: serv.description ? serv.description : 'Não informado',
-            })
-          } else {
-            setValueService(
-              `service.${index}.quantity`,
-              serv.standard_quantity.replace('.', ','),
-            )
+            setValueService(`service.${index}.discount`, s.discount)
             setValueService(
               `service.${index}.quantity`,
               `${Number(s.quantity) + Number(serv.standard_quantity)}`.replace(
@@ -1007,22 +939,42 @@ export default function QuotationsCreate() {
                 ',',
               ),
             )
+            return {
+              ...s,
+              quantity: `${
+                Number(s.quantity) + Number(serv.standard_quantity)
+              }`,
+            }
+          }
+
+          if (s.status === 'excluded' || s.status === 'cancelled') {
+            s.status = 'adding'
+            setValueService(`service.${index}.discount`, '0,00')
+            setValueService(
+              `service.${index}.quantity`,
+              serv.standard_quantity.replace('.', ','),
+            )
+            console.log(serv.standard_quantity)
+            return {
+              ...s,
+              quantity: `${Number(serv.standard_quantity)}`,
+            }
           }
 
           s.status = 'adding'
           const newQuantity =
             Number(s.quantity) + Number(serv.standard_quantity)
-          // setValueService(
-          //   `service.${index}.quantity`,
-          //   serv.standard_quantity.replace('.', ','),
-          // )
-          // setValueService(
-          //   `service.${index}.quantity`,
-          //   `${Number(s.quantity) + Number(serv.standard_quantity)}`.replace(
-          //     '.',
-          //     ',',
-          //   ),
-          // )
+          setValueService(
+            `service.${index}.quantity`,
+            serv.standard_quantity.replace('.', ','),
+          )
+          setValueService(
+            `service.${index}.quantity`,
+            `${Number(s.quantity) + Number(serv.standard_quantity)}`.replace(
+              '.',
+              ',',
+            ),
+          )
           return {
             ...s,
             quantity: `${newQuantity}`,
@@ -1039,15 +991,18 @@ export default function QuotationsCreate() {
     } else {
       const newService = { ...serv }
 
-      appendService({
-        idService: newService.id,
-        quantity: `${qtd ? Number(qtd) : 1}`.replace('.', ','),
-        discount: '0,00',
-        price: newService.standard_value ? newService.standard_value : '0',
-        service_code: newService.service_code,
-        name: newService.description ? newService.description : 'Não informado',
-      })
+      setValueService(`service.${services.list.length}.id`, newService.id)
+      setValueService(
+        `service.${services.list.length}.quantity`,
+        `${Number(newService.standard_quantity)}`.replace('.', ','),
+      )
 
+      setValueService(`service.${services.list.length}.discount`, '0,00')
+      setValueService(
+        `service.${services.list.length}.price`,
+        newService.standard_value,
+      )
+      console.log('adding service')
       newService.status = 'adding'
       newService.discount = '0,00'
       newService.quantity = `${Number(newService.standard_quantity)}`
@@ -1059,6 +1014,106 @@ export default function QuotationsCreate() {
       })
     }
 
+    // setServices((prevState) => {
+    //   const isExistsService = prevState.list.findIndex((s) => s.id === serv.id)
+
+    //   if (isExistsService > -1) {
+    //     const newList = [...prevState.list].map((s, index) => {
+    //       if (s.id === serv.id) {
+    //         setValueService(
+    //           `service.${index}.quantity`,
+    //           `${Number(s.quantity) + Number(serv.standard_quantity)}`.replace(
+    //             '.',
+    //             ',',
+    //           ),
+    //         )
+
+    //         setValueService(`service.${index}.discount`, s.discount)
+    //         setValueService(
+    //           `service.${prevState.list.length}.price`,
+    //           s.standard_value,
+    //         )
+    //         if (s.status === 'saved') {
+    //           setValueService(`service.${index}.discount`, s.discount)
+    //           setValueService(
+    //             `service.${index}.quantity`,
+    //             `${
+    //               Number(s.quantity) + Number(serv.standard_quantity)
+    //             }`.replace('.', ','),
+    //           )
+    //           return {
+    //             ...s,
+    //             quantity: `${
+    //               Number(s.quantity) + Number(serv.standard_quantity)
+    //             }`,
+    //           }
+    //         }
+
+    //         if (s.status === 'excluded' || s.status === 'cancelled') {
+    //           s.status = 'adding'
+    //           setValueService(`service.${index}.discount`, '0,00')
+    //           setValueService(
+    //             `service.${index}.quantity`,
+    //             serv.standard_quantity.replace('.', ','),
+    //           )
+    //           console.log(serv.standard_quantity)
+    //           return {
+    //             ...s,
+    //             quantity: `${Number(serv.standard_quantity)}`,
+    //           }
+    //         }
+    //         s.status = 'adding'
+    //         const newQuantity =
+    //           Number(s.quantity) + Number(serv.standard_quantity)
+    //         setValueService(
+    //           `service.${index}.quantity`,
+    //           serv.standard_quantity.replace('.', ','),
+    //         )
+    //         setValueService(
+    //           `service.${index}.quantity`,
+    //           `${Number(s.quantity) + Number(serv.standard_quantity)}`.replace(
+    //             '.',
+    //             ',',
+    //           ),
+    //         )
+    //         return {
+    //           ...s,
+    //           quantity: `${newQuantity}`.replace('.', ','),
+    //         }
+    //       }
+    //       return s
+    //     })
+    //     return {
+    //       ...prevState,
+    //       list: newList,
+    //     }
+    //   }
+
+    //   setValueService(`service.${prevState.list.length}.id`, serv.id)
+    //   setValueService(
+    //     `service.${prevState.list.length}.quantity`,
+    //     serv.standard_quantity.replace('.', ','),
+    //   )
+    //   setValueService(`service.${prevState.list.length}.discount`, '0')
+    //   setValueService(
+    //     `service.${prevState.list.length}.price`,
+    //     serv.standard_value,
+    //   )
+    //   console.log(serv.standard_quantity.replace('.', ','))
+    //   return {
+    //     ...prevState,
+    //     list: [
+    //       ...prevState.list,
+    //       {
+    //         ...serv,
+    //         quantity: serv.standard_quantity,
+    //         discount: '0',
+    //         status: 'adding',
+    //       },
+    //     ],
+    //   }
+    // })
+
     if (openModalSearchServices) {
       setOpenModalSearchServices(false)
     }
@@ -1066,42 +1121,27 @@ export default function QuotationsCreate() {
 
   function handleCancelServices() {
     const newList = [...services.list]
-
-    const listForRemoved: number[] = []
+    console.log(newList)
     newList.forEach((i, index) => {
       setValueService(`service.${index}.discount`, i.discount.replace('.', ','))
       setValueService(`service.${index}.quantity`, i.quantity.replace('.', ','))
-
       if (i.status === 'adding') {
-        listForRemoved.push(index)
         i.status = 'cancelled'
-      }
-
-      if (i.status === 'saved' && i.lastQuantity) {
-        setValueService(
-          `service.${index}.quantity`,
-          i.lastQuantity.replace('.', ','),
-        )
-        setValueService(
-          `service.${index}.discount`,
-          `${i.lastDiscount}`.replace('.', ','),
-        )
       }
     })
 
-    if (listForRemoved.length > 0) {
-      removeService(listForRemoved)
-    }
-
     setServices((prevState) => {
-      const ListForSave = newList.filter((i) => i.status !== 'cancelled')
-      const totalDiscount = ListForSave.reduce((acc, curr) => {
-        return acc + Number(curr.discount) * Number(curr.quantity)
-      }, 0)
-      const total = ListForSave.reduce((acc, curr) => {
-        const totalItem = Number(curr.standard_value) * Number(curr.quantity)
-        return acc + totalItem
-      }, 0)
+      const totalDiscount = newList
+        .filter((i) => i.status === 'saved')
+        .reduce((acc, curr) => {
+          return acc + Number(curr.discount) * Number(curr.quantity)
+        }, 0)
+      const total = newList
+        .filter((i) => i.status === 'saved')
+        .reduce((acc, curr) => {
+          const totalItem = Number(curr.standard_value) * Number(curr.quantity)
+          return acc + totalItem
+        }, 0)
 
       return {
         ...prevState,
@@ -1169,16 +1209,13 @@ export default function QuotationsCreate() {
     kit.products.forEach((prod) => {
       handleAddProduct(prod.product, Number(prod.quantity))
     })
-    kit.services.forEach((serv) => {
-      handleAddServices(serv.service, Number(serv.quantity))
-    })
 
-    // setKits((prevState) => {
-    //   return {
-    //     ...prevState,
-    //     list: [...prevState.list, kit],
-    //   }
-    // })
+    setKits((prevState) => {
+      return {
+        ...prevState,
+        list: [...prevState.list, kit],
+      }
+    })
 
     if (openModalSearchKit) {
       setOpenModalSearchKit(false)
@@ -1570,7 +1607,12 @@ export default function QuotationsCreate() {
                           })}
                         {isEditingService &&
                           services?.list.length > 0 &&
-                          fieldsService.map((serv, index) => {
+                          services.list.map((serv, index) => {
+                            if (
+                              serv.status === 'excluded' ||
+                              serv.status === 'cancelled'
+                            )
+                              return null
                             return (
                               <TableRow
                                 sx={{
@@ -1583,7 +1625,11 @@ export default function QuotationsCreate() {
                                 <TableCell align="left">
                                   {serv.service_code}
                                 </TableCell>
-                                <TableCell align="left">{serv.name}</TableCell>
+                                <TableCell align="left">
+                                  {serv.description
+                                    ? serv.description
+                                    : 'Não informado'}
+                                </TableCell>
                                 <TableCell align="center">
                                   <InputTableForEdit.number
                                     control={controlService}
@@ -1613,15 +1659,14 @@ export default function QuotationsCreate() {
                                   {/* {formatMoneyPtBR(0)} */}
                                 </TableCell>
                                 <TableCell align="center">
-                                  {formatMoneyPtBR(Number(serv.price))}
+                                  {formatMoneyPtBR(Number(serv.standard_value))}
                                 </TableCell>
                                 <TableCell align="center">
-                                  {serv.price ? (
+                                  {serv.standard_value ? (
                                     <CalcPerUnit
-                                      // @ts-ignore
                                       control={controlService}
                                       index={index}
-                                      price={Number(serv.price)}
+                                      price={Number(serv.standard_value)}
                                       name="service"
                                     />
                                   ) : (
@@ -1636,10 +1681,7 @@ export default function QuotationsCreate() {
                                 </TableCell>
                                 <TableCell align="center">
                                   <ButtonRemoveItens
-                                    onClick={() => {
-                                      removeService(index)
-                                      handleRemoveService(Number(serv.id))
-                                    }}
+                                    onClick={() => handleRemoveService(serv.id)}
                                   >
                                     <DeleteIcon />
                                   </ButtonRemoveItens>
@@ -1734,7 +1776,7 @@ export default function QuotationsCreate() {
                           <TableCell align="center">Desconto(UNID.)</TableCell>
                           <TableCell align="center">Valor</TableCell>
                           <TableCell align="center">Total</TableCell>
-                          {isEditingProduct && fieldsProduct.length > 0 && (
+                          {isEditingProduct && (
                             <TableCell align="center">Ações</TableCell>
                           )}
                         </TableRow>
@@ -1763,23 +1805,29 @@ export default function QuotationsCreate() {
                               </TableCell>
                             </TableRow>
                           )}
-                        {!(fieldsProduct?.length > 0) && isEditingProduct && (
-                          <TableRow
-                            sx={{
-                              '&:last-child td, &:last-child th': {
-                                border: 0,
-                              },
-                            }}
-                          >
-                            <TableCell
-                              align="center"
-                              colSpan={isEditingService ? 7 : 6}
-                              sx={{ paddingTop: 4 }}
+                        {!(
+                          products?.list.filter(
+                            (s) =>
+                              s.status === 'saved' || s.status === 'adding',
+                          ).length > 0
+                        ) &&
+                          isEditingProduct && (
+                            <TableRow
+                              sx={{
+                                '&:last-child td, &:last-child th': {
+                                  border: 0,
+                                },
+                              }}
                             >
-                              Nenhuma peça cadastrada.
-                            </TableCell>
-                          </TableRow>
-                        )}
+                              <TableCell
+                                align="center"
+                                colSpan={isEditingService ? 7 : 6}
+                                sx={{ paddingTop: 4 }}
+                              >
+                                Nenhuma peça cadastrada.
+                              </TableCell>
+                            </TableRow>
+                          )}
                         {!isEditingProduct &&
                           products.list?.length > 0 &&
                           products.list.map((prod) => {
@@ -1825,8 +1873,8 @@ export default function QuotationsCreate() {
                             )
                           })}
                         {isEditingProduct &&
-                          fieldsProduct?.length > 0 &&
-                          fieldsProduct.map((prod, index) => {
+                          products.list?.length > 0 &&
+                          products.list.map((prod, index) => {
                             // setValueProduct(`product.${index}.id`, prod.id)
                             // setValueProduct(
                             //   `product.${index}.quantity`,
@@ -1836,11 +1884,11 @@ export default function QuotationsCreate() {
                             //   `product.${index}.discount`,
                             //   prod.discount.replace('.', ','),
                             // )
-                            // if (
-                            //   prod.status === 'excluded' ||
-                            //   prod.status === 'cancelled'
-                            // )
-                            //   return null
+                            if (
+                              prod.status === 'excluded' ||
+                              prod.status === 'cancelled'
+                            )
+                              return null
 
                             return (
                               <TableRow
@@ -1857,17 +1905,19 @@ export default function QuotationsCreate() {
                                     control={controlProduct}
                                     name={`product.${index}.id`}
                                   /> */}
-                                  {/* <input
+                                  <input
                                     type="text"
                                     readOnly={true}
-                                    {...registerProduct(`product.${index}.Produ`)}
+                                    {...registerProduct(`product.${index}.id`)}
                                     // r={`product.${index}.id`}
                                     style={{
                                       display: 'none',
                                     }}
-                                  /> */}
+                                  />
                                 </TableCell>
-                                <TableCell align="left">{prod.name}</TableCell>
+                                <TableCell align="left">
+                                  {prod.name ? prod.name : 'Não informado'}
+                                </TableCell>
                                 <TableCell align="center">
                                   <InputTableForEdit.number
                                     control={controlProduct}
@@ -1897,18 +1947,16 @@ export default function QuotationsCreate() {
                                   {/* {formatMoneyPtBR(0)} */}
                                 </TableCell>
                                 <TableCell align="center">
-                                  {formatMoneyPtBR(Number(prod.price))}
+                                  {formatMoneyPtBR(Number(prod.sale_value))}
                                 </TableCell>
                                 <TableCell align="center">
                                   {/* {formatMoneyPtBR(0)} */}
-                                  {prod.price ? (
+                                  {prod.sale_value ? (
                                     <CalcPerUnit
-                                      // @ts-ignore
                                       control={controlProduct}
                                       index={index}
-                                      price={Number(prod.price)}
+                                      price={Number(prod.sale_value)}
                                       name="product"
-                                      // setValue={setValueProduct}
                                     />
                                   ) : (
                                     formatMoneyPtBR(0)
@@ -1916,10 +1964,7 @@ export default function QuotationsCreate() {
                                 </TableCell>
                                 <TableCell align="center">
                                   <ButtonRemoveItens
-                                    onClick={() => {
-                                      removeProduct(index)
-                                      handleRemoveProduct(prod.idProduct)
-                                    }}
+                                    onClick={() => handleRemoveProduct(prod.id)}
                                   >
                                     <DeleteIcon />
                                   </ButtonRemoveItens>
@@ -1961,6 +2006,184 @@ export default function QuotationsCreate() {
                         variant="contained"
                         size="small"
                         onClick={handleCancelProducts}
+                      >
+                        cancelar
+                      </ButtonSubmit>
+                    </Stack>
+                  </Paper>
+                )}
+              </Stack>
+
+              {/* Kits */}
+
+              <Stack
+                // component="form"
+                gap={1}
+                // onSubmit={handleSubmit(onSubmitProduct)}
+              >
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <TitleCard sx={{ flex: 1 }}>Kits</TitleCard>
+
+                    <MoreOptionsQuotation
+                      aria-label="options to quotation"
+                      disabledButton={!(kits.list.length > 0)}
+                      buttons={[
+                        {
+                          label: 'Editar',
+                          action: handleIsEditingOptions,
+                          type: 'kit',
+                        },
+                      ]}
+                    />
+                  </Stack>
+                  <DividerCard />
+                  <TableContainer>
+                    <Table aria-label="simple table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Código</TableCell>
+                          <TableCell>Descrição</TableCell>
+                          {isEditingKit && (
+                            <TableCell align="center">Ações</TableCell>
+                          )}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {!(kits.list?.length > 0) && (
+                          <TableRow
+                            sx={{
+                              '&:last-child td, &:last-child th': {
+                                border: 0,
+                              },
+                            }}
+                          >
+                            <TableCell
+                              align="center"
+                              colSpan={isEditingProduct ? 7 : 6}
+                              sx={{ paddingTop: 4 }}
+                            >
+                              Nenhuma Kit cadastrado.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        {/* {!isEditingKit && */}
+                        {!isEditingKit &&
+                          kits.list?.length > 0 &&
+                          kits.list.map((k) => {
+                            return (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                                key={k.kit_id}
+                              >
+                                <TableCell align="left">{k.kit_id}</TableCell>
+                                <TableCell align="left">
+                                  {k.name ? k.name : 'Não informado'}
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                        {/* {isEditingProduct &&
+                          products.list?.length > 0 &&
+                          products.list.map((prod, index) => {
+                            setValueProduct(`product.${index}.id`, prod.id)
+                            return (
+                              <TableRow
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
+                                key={prod.id}
+                              >
+                                <TableCell align="left">
+                                  {prod.product_code}
+                                </TableCell>
+                                <TableCell align="left">
+                                  {prod.name ? prod.name : 'Não informado'}
+                                </TableCell>
+                                <TableCell align="center">
+                                  <InputTableForEdit.number
+                                    control={controlProduct}
+                                    name={`product.${index}.quantity`}
+                                  />
+                                </TableCell>
+                                <TableCell align="center">
+                                  <InputTableForEdit.money
+                                    control={controlProduct}
+                                    name={`product.${index}.discount`}
+                                  />
+                                </TableCell>
+                                <TableCell align="center">
+                                  {formatMoneyPtBR(Number(prod.sale_value))}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {prod.sale_value ? (
+                                    <CalcPerUnit
+                                      control={controlProduct}
+                                      index={index}
+                                      price={Number(prod.sale_value)}
+                                      name="product"
+                                    />
+                                  ) : (
+                                    formatMoneyPtBR(0)
+                                  )}
+                                </TableCell>
+                                <TableCell align="center">
+                                  <ButtonRemoveItens
+                                    onClick={() => handleRemoveProduct(prod.id)}
+                                  >
+                                    <DeleteIcon />
+                                  </ButtonRemoveItens>
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })} */}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Paper>
+                {isEditingProduct && products.list.length > 0 && (
+                  <Paper
+                    sx={{
+                      p: '0 2',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      background: 'transparent',
+                    }}
+                    elevation={0}
+                  >
+                    <Stack
+                      direction="row"
+                      alignSelf="flex-end"
+                      spacing={2}
+                      sx={{ width: 160 }}
+                    >
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        type="submit"
+                      >
+                        salvar
+                      </ButtonSubmit>
+                      <ButtonSubmit
+                        variant="contained"
+                        size="small"
+                        onClick={() => setIsEditingProduct(false)}
                       >
                         cancelar
                       </ButtonSubmit>

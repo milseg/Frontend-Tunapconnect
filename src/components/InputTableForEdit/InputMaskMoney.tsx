@@ -52,7 +52,6 @@ export function InputMoneyMask({
   return (
     <Controller
       render={({ field: { onChange, onBlur, value } }) => {
-        console.log(value)
         return (
           <TextField
             variant="standard"

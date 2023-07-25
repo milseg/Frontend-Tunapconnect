@@ -7,10 +7,18 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 
-import { TableCellHeader, TableRowSBody, TableRowSNoData } from './style'
+import {
+  MuiAccordionDetails,
+  MuiAccordionStyled,
+  MuiAccordionSummary,
+  TableCellHeader,
+  TableRowSBody,
+  TableRowSNoData,
+} from './style'
 import { Stack } from '@mui/system'
-import { useState } from 'react'
-import { Box, CircularProgress } from '@mui/material'
+
+import { Box, CircularProgress, Typography } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import { KitType } from '@/types/quotation'
 
@@ -27,7 +35,14 @@ export default function KitTable({
   isLoading,
   handleDoubleClick,
 }: KitTableProps) {
-  const [kitSelected, setKitSelected] = useState<number | null>(null)
+  const [expanded, setExpanded] = React.useState<number | false>(false)
+
+  const handleChange =
+    (panel: KitType) => (event: React.SyntheticEvent, newExpanded: boolean) => {
+      handleSelectedKit(panel)
+      setExpanded(newExpanded ? panel.kit_id : false)
+    }
+
   return (
     <>
       <TableContainer component={Paper}>
@@ -38,9 +53,9 @@ export default function KitTable({
         >
           <TableHead>
             <TableRow>
-              <TableCellHeader>Código</TableCellHeader>
-              <TableCellHeader>Nome</TableCellHeader>
-              <TableCellHeader>Preço</TableCellHeader>
+              <TableCellHeader>Kits</TableCellHeader>
+
+              {/* <TableCellHeader>Preço</TableCellHeader> */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -51,17 +66,79 @@ export default function KitTable({
                   sx={{
                     '&:last-child td, &:last-child th': { border: 0 },
                   }}
-                  onClick={(e) => {
-                    if (e.detail === 2) {
-                      handleDoubleClick()
-                    }
-                    handleSelectedKit(row)
-                    setKitSelected(row.kit_id)
-                  }}
-                  selected={kitSelected === row.kit_id}
+                  // onClick={(e) => {
+                  //   if (e.detail === 2) {
+                  //     handleDoubleClick()
+                  //   }
+                  //   handleSelectedKit(row)
+                  //   setKitSelected(row.kit_id)
+                  // }}
+                  // selected={kitSelected === row.kit_id}
                 >
-                  <TableCell scope="row">{row.kit_id}</TableCell>
-                  <TableCell scope="row">{row.name}</TableCell>
+                  <TableCell
+                    scope="row"
+                    sx={{
+                      padding: 0,
+                    }}
+                  >
+                    <MuiAccordionStyled
+                      expanded={expanded === row.kit_id}
+                      onChange={handleChange(row)}
+                    >
+                      <MuiAccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1a-content"
+                        id="panel1a-header"
+                        sx={{
+                          // display: 'flex',
+                          // alignItems: 'center',
+                          // justifyContent: 'space-between',
+                          background:
+                            expanded === row.kit_id ? '#1ACABA' : '#fff',
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontWeight: 'bold',
+                            flex: 1,
+                          }}
+                        >
+                          {row.name}
+                        </Typography>
+                      </MuiAccordionSummary>
+                      <MuiAccordionDetails>
+                        <p>
+                          {row.products.map((p, index) => (
+                            <span
+                              key={p.product.name + p.product.id}
+                              style={{
+                                fontSize: '14px',
+                                fontWeight: 'bold',
+                              }}
+                            >
+                              {p.quantity} x {p.product.name ?? 'Não informado'}
+                              {index < row.products.length - 1 ? ', ' : '. '}
+                            </span>
+                          ))}
+                        </p>
+                        <p>
+                          {row.services.map((s, index) => (
+                            <span
+                              key={s.service.description + s.service.id}
+                              style={{
+                                fontSize: '14px',
+                                fontWeight: 'bold',
+                              }}
+                            >
+                              {s.quantity} x{' '}
+                              {s.service.description ?? 'Não informado'}
+                              {index < row.services.length - 1 ? ', ' : '. '}
+                            </span>
+                          ))}
+                        </p>
+                      </MuiAccordionDetails>
+                    </MuiAccordionStyled>
+                  </TableCell>
                 </TableRowSBody>
               ))
             ) : (
@@ -74,7 +151,7 @@ export default function KitTable({
                       </Box>
                     ) : (
                       <>
-                        <p>Nenhuma peça encontrada.</p>
+                        <p>Nenhuma kit encontrado.</p>
                         {/* <ButtonModalNewClient
                           onClick={() => handleModalNewClient()}
                         >

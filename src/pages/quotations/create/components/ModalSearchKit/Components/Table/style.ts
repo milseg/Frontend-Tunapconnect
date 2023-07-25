@@ -1,4 +1,10 @@
-import { alpha, Button } from '@mui/material'
+import Accordion from '@mui/material/Accordion'
+import {
+  AccordionDetails,
+  AccordionSummary,
+  alpha,
+  Button,
+} from '@mui/material'
 import { styled } from '@mui/material/styles'
 
 import TableCell, { tableCellClasses } from '@mui/material/TableCell'
@@ -62,5 +68,31 @@ export const ButtonModalNewClient = styled(Button)(({ theme }) => ({
   },
   '&:disabled': {
     background: '#e0f2f1',
+  },
+}))
+
+export const MuiAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderTop: '1px solid rgba(0, 0, 0, .125)',
+}))
+
+export const MuiAccordionStyled = styled(Accordion)(({ theme }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+
+  '&:not(:last-child)': {
+    borderBottom: 0,
+  },
+  '&:before': {
+    display: 'none',
+  },
+}))
+export const MuiAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
+  // background: '#1ACABA',
+  flexDirection: 'row-reverse',
+  '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+    transform: 'rotate(-90deg)',
+  },
+  '& .MuiAccordionSummary-content': {
+    marginLeft: theme.spacing(1),
   },
 }))

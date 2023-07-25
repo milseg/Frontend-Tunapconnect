@@ -166,6 +166,8 @@ export interface ProductType {
   discount: string
   quantity: string
   status: StatusProductType
+  lastQuantity?: string
+  lastDiscount?: string
 }
 
 type StatusServicesType =
@@ -187,6 +189,8 @@ export interface ServicesType {
   discount: string
   quantity: string
   status: StatusServicesType
+  lastQuantity?: string
+  lastDiscount?: string
 }
 
 export interface TypeQuotationType {
