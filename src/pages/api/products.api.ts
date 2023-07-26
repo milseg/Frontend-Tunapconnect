@@ -1,5 +1,5 @@
 import { apiB } from '@/lib/api'
-import { IProductsRequestDTO } from '@/types/products'
+import { IProductsRequestDTO, ProductType } from '@/types/products'
 
 async function getProductsList({
   queryKey,
@@ -12,8 +12,14 @@ async function getProductsList({
   return response.data
 }
 
+async function getProductsDetail({ queryKey }: any): Promise<ProductType> {
+  const response = await apiB.get<ProductType>(`/products/${queryKey[1]}`)
+  return response.data
+}
+
 const productsListRequests = {
   getProductsList,
+  getProductsDetail,
 }
 
 export default productsListRequests
