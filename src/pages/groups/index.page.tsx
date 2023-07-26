@@ -1,5 +1,6 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable no-unused-vars */
+// @ts-nocheck
 import { useForm } from 'react-hook-form'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
@@ -37,27 +38,23 @@ import { ActionDeleteConfirmations } from '@/helpers/ActionConfirmations'
 import { formatDateTime } from '@/ultis/formatDate'
 import groupsListRequests from '../api/groups.api'
 import theme from '@/styles/config/theme'
-import { GroupsType } from '@/types/groups'
+import { GroupsType, IGroupsEditDTO } from '@/types/groups'
 import { Delete } from '@mui/icons-material'
 import { CustomNoRowsOverlay } from '@/components/TableApp/NoRows'
-import companiesListRequests from '../api/companies.api'
-import { CompaniesType } from '@/types/companies'
 import Link from 'next/link'
 
 type SearchFormProps = {
   search: string
 }
 
-export default function Empresas() {
+export default function Groups() {
   const [pageNumber, setPageNumber] = React.useState(1)
   const [open, setOpen] = useState(false)
-  const [newName, setNewName] = useState<string>('')
-  const [newCnpj, setNewCnpj] = useState<string>('')
-  const [newIntegrationCode, setNewIntegrationCode] = useState<string>('')
-  const [isMobile, setIsMobile] = useState<boolean>(false)
+  const [newName, setNewName] = useState('')
+  const [isMobile, setIsMobile] = useState(false)
   const [editNameId, setEditNameId] = useState<number>()
+  const [actualNameValue, setActualNameValue] = useState<string>()
   const [isLoadingEdit, setIsLoadingEdit] = useState<boolean>(false)
-  const [actualFormValues, setActualFormValues] = useState<CompaniesType>()
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
 
   const queryClient = useQueryClient()
@@ -74,20 +71,19 @@ export default function Empresas() {
     } else {
       setIsMobile(false)
     }
-    console.log(companiesListDto)
   }, [isWeb])
 
   const {
-    data: companiesListDto,
+    data: groupsListDto,
     isFetching,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['companiesList', pageNumber, router.query.nome],
-    queryFn: companiesListRequests.getCompaniesList,
+    queryKey: ['groupsList', pageNumber, router.query.nome],
+    queryFn: groupsListRequests.getGroupsList,
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
+    refetchOnMount: true,
+    // refetchOnReconnect: false,
     keepPreviousData: true,
   })
 
@@ -99,7 +95,7 @@ export default function Empresas() {
 
   async function onSubmitSearch(data: SearchFormProps) {
     await router.push(
-      `/empresas?${data.search ? '&nome=' + data.search : ''}
+      `/groups?${data.search ? '&nome=' + data.search : ''}
      `,
     )
   }
@@ -107,10 +103,8 @@ export default function Empresas() {
   const handleFormEdit = async (event: any) => {
     event.preventDefault()
     setIsLoadingEdit(true)
-    const response = await apiB.put(`/companies/${editNameId}`, {
+    const response = await apiB.put<IGroupsEditDTO>(`/groups/${editNameId}`, {
       name: newName,
-      cnpj: newCnpj,
-      integration_code: newIntegrationCode,
     })
     if (response.status === 200) {
       refetch()
@@ -127,10 +121,10 @@ export default function Empresas() {
     ActionDeleteConfirmations(selectId, handleDelete, '/groups/')
   }
 
-  const openDialogEdit = (actualCompanyValues: CompaniesType) => {
+  const openDialogEdit = (selectId: number, actualName: string) => {
     setOpen(true)
-    setEditNameId(actualCompanyValues.id)
-    setActualFormValues(actualCompanyValues)
+    setEditNameId(selectId)
+    setActualNameValue(actualName)
   }
 
   return (
@@ -149,7 +143,7 @@ export default function Empresas() {
                 fontWeight={700}
                 sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}
               >
-                Empresas
+                Grupos
               </Typography>
               {!isMobile ? (
                 <ButtonAdd
@@ -231,16 +225,19 @@ export default function Empresas() {
                 justifyContent="space-between"
               >
                 <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
-                  {'Id'}
-                </Typography>
-                <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
-                  {'CNPJ'}
-                </Typography>
-                <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
-                  {'Código de integração'}
+                  {'Número'}
                 </Typography>
                 <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
                   {'Nome'}
+                </Typography>
+                <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
+                  {'Criado em'}
+                </Typography>
+                <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
+                  {'Atualizado em'}
+                </Typography>
+                <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
+                  {'Qtd de Empresas'}
                 </Typography>
                 <Typography sx={{ fontSize: { xs: '0.7rem', sm: '1.2rem' } }}>
                   {'Ação'}
@@ -273,108 +270,113 @@ export default function Empresas() {
                       height: 'fit-content',
                     }}
                   >
-                    {companiesListDto &&
-                      companiesListDto.companies.length > 0 &&
-                      companiesListDto.companies.map(
-                        (company: CompaniesType, index) => (
-                          <Stack
-                            key={company.id}
-                            direction="row"
-                            sx={{
-                              width: '100%',
-                              backgroundColor: `${
-                                index % 2 == 0 ? '#FFFFFF' : '#F1F1F1'
-                              }`,
-                              p: 1,
-                              borderRadius: '2px',
-                            }}
-                            justifyContent="space-between"
+                    {groupsListDto &&
+                      groupsListDto.groups.length > 0 &&
+                      groupsListDto.groups.map((group: GroupsType, index) => (
+                        <Stack
+                          key={group.id_group}
+                          direction="row"
+                          sx={{
+                            width: '100%',
+                            backgroundColor: `${
+                              index % 2 == 0 ? '#FFFFFF' : '#F1F1F1'
+                            }`,
+                            p: 1,
+                            borderRadius: '2px',
+                          }}
+                          justifyContent="space-between"
+                        >
+                          <Typography
+                            variant="subtitle1"
+                            color={'#1C4961'}
+                            fontWeight={700}
+                            sx={{ fontSize: { xs: '0.6rem', sm: '1.2rem' } }}
+                            textOverflow={'ellipsis'}
                           >
-                            <Typography
-                              variant="subtitle1"
-                              color={'#1C4961'}
-                              fontWeight={700}
-                              sx={{ fontSize: { xs: '0.6rem', sm: '1.2rem' } }}
-                              textOverflow={'ellipsis'}
+                            {group.id_group}
+                          </Typography>
+                          <Typography
+                            variant="subtitle1"
+                            color={'#1C4961'}
+                            fontWeight={700}
+                            sx={{
+                              width: '40%',
+                              textAlign: 'center',
+                              fontSize: { xs: '0.6rem', sm: '1.2rem' },
+                            }}
+                            textOverflow={'ellipsis'}
+                          >
+                            {group.name}
+                          </Typography>
+                          <Typography
+                            variant="subtitle1"
+                            color={'#1C4961'}
+                            fontWeight={700}
+                            sx={{
+                              width: '40%',
+                              textAlign: 'center',
+                              fontSize: { xs: '0.6rem', sm: '1.2rem' },
+                            }}
+                            textOverflow={'ellipsis'}
+                          >
+                            {formatDateTime(group.created_at)}
+                          </Typography>
+                          <Typography
+                            variant="subtitle1"
+                            color={'#1C4961'}
+                            fontWeight={700}
+                            sx={{
+                              width: '40%',
+                              textAlign: 'center',
+                              fontSize: { xs: '0.6rem', sm: '1.2rem' },
+                            }}
+                            textOverflow={'ellipsis'}
+                          >
+                            {formatDateTime(group.updated_at)}
+                          </Typography>
+                          <Typography
+                            variant="subtitle1"
+                            color={'#1C4961'}
+                            fontWeight={700}
+                            sx={{
+                              width: '40%',
+                              textAlign: 'center',
+                              fontSize: { xs: '0.6rem', sm: '1.2rem' },
+                            }}
+                            textOverflow={'ellipsis'}
+                          >
+                            {group.qtd_empresas}
+                          </Typography>
+                          <Stack direction="row">
+                            {/* <IconButton
+                              aria-label="search"
+                              color="warning"
+                              onClick={() => handleDeleteAction(group.id_group)}
+                              sx={{ marginLeft: 1, color: 'red' }}
                             >
-                              {company.id}
-                            </Typography>
-                            <Typography
-                              variant="subtitle1"
-                              color={'#1C4961'}
-                              fontWeight={700}
-                              sx={{
-                                width: '40%',
-                                textAlign: 'center',
-                                fontSize: { xs: '0.6rem', sm: '1.2rem' },
-                              }}
-                              textOverflow={'ellipsis'}
+                              <Delete />
+                            </IconButton> */}
+                            <Link
+                              href={`/groups/${group.id_group}`}
+                              prefetch={false}
                             >
-                              {company.cnpj}
-                            </Typography>
-                            <Typography
-                              variant="subtitle1"
-                              color={'#1C4961'}
-                              fontWeight={700}
-                              sx={{
-                                width: '40%',
-                                textAlign: 'center',
-                                fontSize: { xs: '0.6rem', sm: '1.2rem' },
-                              }}
-                              textOverflow={'ellipsis'}
-                            >
-                              {company.integration_code}
-                            </Typography>
-                            <Typography
-                              variant="subtitle1"
-                              color={'#1C4961'}
-                              fontWeight={700}
-                              sx={{
-                                width: '40%',
-                                textAlign: 'center',
-                                fontSize: { xs: '0.6rem', sm: '1.2rem' },
-                              }}
-                              textOverflow={'ellipsis'}
-                            >
-                              {company.name}
-                            </Typography>
-                            <Stack direction="row">
-                              {/* <IconButton
+                              <IconButton
                                 aria-label="search"
                                 color="warning"
-                                onClick={() => handleDeleteAction(company.id)}
-                                sx={{ marginLeft: 1, color: 'red' }}
+                                // onClick={() =>
+                                //   openDialogEdit(group.id_group, group.name)
+                                // }
+                                sx={{ marginLeft: 1, color: 'blue' }}
                               >
-                                <Delete />
-                              </IconButton> */}
-                              <Link href={'/empresas/' + company.id}>
-                                <IconButton
-                                  aria-label="search"
-                                  color="warning"
-                                  // onClick={() =>
-                                  //   openDialogEdit({
-                                  //     cnpj: company.cnpj,
-                                  //     id: company.id,
-                                  //     created_at: company.created_at,
-                                  //     integration_code: company.integration_code,
-                                  //     name: company.name,
-                                  //     responsible_name: company.responsible_name,
-                                  //     updated_at: company.updated_at,
-                                  //   })
-                                  // }
-                                  sx={{ marginLeft: 1, color: 'blue' }}
-                                >
-                                  <EditIcon />
-                                </IconButton>
-                              </Link>
-                            </Stack>
+                                <EditIcon />
+                              </IconButton>
+                            </Link>
                           </Stack>
-                        ),
-                      )}
-                    {companiesListDto &&
-                      companiesListDto.companies.length === 0 && (
-                        <CustomNoRowsOverlay />
-                      )}
+                        </Stack>
+                      ))}
+                    {groupsListDto && groupsListDto.groups.length === 0 && (
+                      <CustomNoRowsOverlay />
+                    )}
                   </Paper>
                 )}
               </Paper>
@@ -400,18 +402,17 @@ export default function Empresas() {
               type="submit"
               disableRipple
               onClick={() => setPageNumber((pageNumber) => pageNumber + 1)}
-              disabled={pageNumber === companiesListDto?.total_companies}
+              disabled={pageNumber === groupsListDto?.total_groups}
             >
               <ArrowForwardIosIcon />
             </ButtonPaginate>
           </Stack>
         </Stack>
-        <Dialog open={open} onClose={handleCloseDialogEdit}>
+        {/* <Dialog open={open} onClose={handleCloseDialogEdit}>
           <DialogTitle>Editar Nome</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Para editar o nome, cnpj, id do grupo e código da integração da
-              empresa, insira os valores novos logo abaixo
+              Para editar o nome do grupo, insira o nome novo no campo abaixo
             </DialogContentText>
             <TextField
               autoFocus
@@ -421,30 +422,8 @@ export default function Empresas() {
               type="text"
               fullWidth
               variant="standard"
-              defaultValue={actualFormValues?.name}
+              defaultValue={actualNameValue}
               onInput={(e: any) => setNewName(e.target.value)}
-            />
-            <TextField
-              autoFocus
-              margin="dense"
-              id="cnpj"
-              label="Novo cnpj"
-              type="text"
-              fullWidth
-              variant="standard"
-              defaultValue={actualFormValues?.cnpj}
-              onInput={(e: any) => setNewCnpj(e.target.value)}
-            />
-            <TextField
-              autoFocus
-              margin="dense"
-              id="integration_code"
-              label="Novo código de integração"
-              type="text"
-              fullWidth
-              variant="standard"
-              defaultValue={actualFormValues?.integration_code}
-              onInput={(e: any) => setNewIntegrationCode(e.target.value)}
             />
           </DialogContent>
           {isLoadingEdit ? (
@@ -467,10 +446,10 @@ export default function Empresas() {
               </Button>
             </DialogActions>
           )}
-        </Dialog>
+        </Dialog> */}
       </Container>
     </>
   )
 }
 
-Empresas.auth = true
+Groups.auth = true
