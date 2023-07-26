@@ -137,6 +137,15 @@ export default function Products() {
     refetch()
   }
 
+  async function handleSetProducts(idSelected: number) {
+    const filterSelected = productsListDto?.products.filter(
+      (i) => i.id === idSelected,
+    )[0]
+
+    console.log(idSelected)
+    await router.push(`/produtos/${idSelected}`)
+  }
+
   return (
     <>
       <Container maxWidth="lg" sx={{ mt: 2, mb: 2, p: 1 }}>
@@ -291,7 +300,12 @@ export default function Products() {
                               p: 1,
                               borderRadius: '2px',
                               justifyContent: 'space-between',
+                              ':hover': {
+                                cursor: 'pointer',
+                                backgroundColor: '#F1F1F2',
+                              },
                             }}
+                            onClick={() => handleSetProducts(product.id)}
                           >
                             <Typography
                               variant="subtitle1"
