@@ -37,11 +37,12 @@ import { ActionDeleteConfirmations } from '@/helpers/ActionConfirmations'
 import { formatDateTime } from '@/ultis/formatDate'
 import groupsListRequests from '../api/groups.api'
 import theme from '@/styles/config/theme'
-import { GroupsType, IGroupsEditDTO } from '@/types/groups'
+import { GroupsType } from '@/types/groups'
 import { Delete } from '@mui/icons-material'
 import { CustomNoRowsOverlay } from '@/components/TableApp/NoRows'
 import companiesListRequests from '../api/companies.api'
 import { CompaniesType } from '@/types/companies'
+import Link from 'next/link'
 
 type SearchFormProps = {
   search: string
@@ -106,14 +107,11 @@ export default function Empresas() {
   const handleFormEdit = async (event: any) => {
     event.preventDefault()
     setIsLoadingEdit(true)
-    const response = await apiB.put<IGroupsEditDTO>(
-      `/companies/${editNameId}`,
-      {
-        name: newName,
-        cnpj: newCnpj,
-        integration_code: newIntegrationCode,
-      },
-    )
+    const response = await apiB.put(`/companies/${editNameId}`, {
+      name: newName,
+      cnpj: newCnpj,
+      integration_code: newIntegrationCode,
+    })
     if (response.status === 200) {
       refetch()
       setOpen(false)
@@ -341,32 +339,34 @@ export default function Empresas() {
                               {company.name}
                             </Typography>
                             <Stack direction="row">
-                              <IconButton
+                              {/* <IconButton
                                 aria-label="search"
                                 color="warning"
                                 onClick={() => handleDeleteAction(company.id)}
                                 sx={{ marginLeft: 1, color: 'red' }}
                               >
                                 <Delete />
-                              </IconButton>
-                              <IconButton
-                                aria-label="search"
-                                color="warning"
-                                onClick={() =>
-                                  openDialogEdit({
-                                    cnpj: company.cnpj,
-                                    id: company.id,
-                                    created_at: company.created_at,
-                                    integration_code: company.integration_code,
-                                    name: company.name,
-                                    responsible_name: company.responsible_name,
-                                    updated_at: company.updated_at,
-                                  })
-                                }
-                                sx={{ marginLeft: 1, color: 'blue' }}
-                              >
-                                <EditIcon />
-                              </IconButton>
+                              </IconButton> */}
+                              <Link href={'/empresas/' + company.id}>
+                                <IconButton
+                                  aria-label="search"
+                                  color="warning"
+                                  // onClick={() =>
+                                  //   openDialogEdit({
+                                  //     cnpj: company.cnpj,
+                                  //     id: company.id,
+                                  //     created_at: company.created_at,
+                                  //     integration_code: company.integration_code,
+                                  //     name: company.name,
+                                  //     responsible_name: company.responsible_name,
+                                  //     updated_at: company.updated_at,
+                                  //   })
+                                  // }
+                                  sx={{ marginLeft: 1, color: 'blue' }}
+                                >
+                                  <EditIcon />
+                                </IconButton>
+                              </Link>
                             </Stack>
                           </Stack>
                         ),
