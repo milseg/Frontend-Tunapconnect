@@ -5,6 +5,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'
 import GroupsIcon from '@mui/icons-material/Groups'
 import BusinessIcon from '@mui/icons-material/Business'
+import EngineeringIcon from '@mui/icons-material/Engineering'
 
 export function allRoutes(companySelected: number | null) {
   const routesPaths = [
@@ -88,10 +89,16 @@ export function allRoutesIntranetTunap() {
           href: `/groups`,
         },
         {
-          path: '/empresas',
+          path: '/tunap_company',
           component: <BusinessIcon />,
           title: 'Empresas',
           href: `/tunap_company`,
+        },
+        {
+          path: '/technical_consultant',
+          component: <EngineeringIcon />,
+          title: 'Consultores',
+          href: `/technical_consultant`,
         },
       ],
     },
