@@ -5,6 +5,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'
 import GroupsIcon from '@mui/icons-material/Groups'
 import BusinessIcon from '@mui/icons-material/Business'
+import InventoryIcon from '@mui/icons-material/Inventory'
 
 export function allRoutes(companySelected: number | null) {
   const routesPaths = [
@@ -25,6 +26,12 @@ export function allRoutes(companySelected: number | null) {
       href: `/quotations?company_id=${companySelected}`,
       component: <RequestQuoteIcon />,
       title: 'Orçamento',
+    },
+    {
+      path: '/produtos',
+      href: `/produtos?company_id=${companySelected}`,
+      component: <InventoryIcon />,
+      title: 'Produtos',
     },
   ]
   return routesPaths
