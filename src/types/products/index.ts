@@ -26,3 +26,10 @@ export interface IProductsRequestDTO {
   total_products: number
   products: ProductType[]
 }
+
+export interface IProductsPutDTO {
+  guarantee_value: number
+  sale_value: number
+  tunap_code: string
+  id: number
+}

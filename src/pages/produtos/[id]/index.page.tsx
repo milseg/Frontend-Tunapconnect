@@ -13,6 +13,8 @@ import List from '@mui/material/List'
 
 import Stack from '@mui/material/Stack'
 
+import { apiB } from '@/lib/api'
+
 import {
   DividerCard,
   InfoCardName,
@@ -31,11 +33,22 @@ import { useQuery } from 'react-query'
 import { CompanyContext } from '@/contexts/CompanyContext'
 
 import { MoreOptionsServiceScheduleCreate } from './components/MoreOptionsServiceScheduleCreate'
-import { Skeleton, Typography } from '@mui/material'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Skeleton,
+  TextField,
+  Typography,
+} from '@mui/material'
 
 import { ServiceScheduleContext } from '@/contexts/ServiceScheduleContext'
-import { ProductType } from '@/types/products'
+import { IProductsEditDTO, ProductType } from '@/types/products'
 import productsListRequests from '../../api/products.api'
+import { Loading } from '@/components/Loading'
 // import { useForm } from 'react-hook-form'
 
 const HeaderBreadcrumbData: listBreadcrumb[] = [
@@ -52,15 +65,23 @@ const HeaderBreadcrumbData: listBreadcrumb[] = [
 export default function ServiceSchedulesCreate() {
   const [actionAlerts, setActionAlerts] =
     useState<ActionAlertsStateProps | null>(null)
+  const [open, setOpen] = useState(false)
+  const [newGValue, setNewGvalue] = useState<number>()
+  const [newValue, setNewValue] = useState<number>()
+  const [newTunapCode, setNewTunapCode] = useState<string>('')
+  const [isLoadingEdit, setIsLoadingEdit] = useState<boolean>(false)
 
   const router = useRouter()
+  const handleCloseDialogEdit = () => {
+    setOpen(false)
+  }
 
   const { companySelected } = useContext(CompanyContext)
   const { serviceScheduleState, setServiceScheduleIsCreated } = useContext(
     ServiceScheduleContext,
   )
 
-  const { data: dataProductDetail } = useQuery<ProductType>({
+  const { data: dataProductDetail, refetch } = useQuery<ProductType>({
     queryKey: ['product_detail', router.query.id, companySelected],
     queryFn: productsListRequests.getProductsDetail,
     refetchOnWindowFocus: false,
@@ -79,6 +100,38 @@ export default function ServiceSchedulesCreate() {
       title: '',
       type: 'success',
     })
+  }
+
+  const handleFormEdit = async (event: any) => {
+    event.preventDefault()
+    setIsLoadingEdit(true)
+    try {
+      const response = await apiB.put<IProductsEditDTO>(
+        `/products/${router.query.id}`,
+        {
+          guarantee_value: newGValue ?? dataProductDetail?.guarantee_value,
+          sale_value: newValue ?? dataProductDetail?.sale_value,
+          tunap_code: newTunapCode,
+        },
+      )
+      if (response.status === 200) {
+        refetch()
+        setOpen(false)
+        setIsLoadingEdit(false)
+      }
+    } catch (e: any) {
+      setOpen(false)
+      setIsLoadingEdit(false)
+      setActionAlerts({
+        isOpen: true,
+        title: `${e?.response?.data?.msg ?? 'Error inesperado'}!`,
+        type: 'error',
+      })
+    }
+  }
+
+  const handleOpenDialogEdit = () => {
+    setOpen(true)
   }
 
   useEffect(() => {
@@ -120,14 +173,6 @@ export default function ServiceSchedulesCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Empresa</TitleCard>
-                  <MoreOptionsServiceScheduleCreate
-                    aria-label="options to client"
-                    buttons={[
-                      {
-                        label: 'Editar',
-                      },
-                    ]}
-                  />
                 </Stack>
                 <DividerCard />
                 {dataProductDetail ? (
@@ -221,6 +266,7 @@ export default function ServiceSchedulesCreate() {
                     buttons={[
                       {
                         label: 'Editar',
+                        action: handleOpenDialogEdit,
                       },
                     ]}
                   />
@@ -327,7 +373,6 @@ export default function ServiceSchedulesCreate() {
                   justifyContent="space-between"
                 >
                   <TitleCard>Responsável</TitleCard>
-                  <MoreOptionsServiceScheduleCreate disabledButton />
                 </Stack>
                 <DividerCard />
                 {dataProductDetail ? (
@@ -375,6 +420,76 @@ export default function ServiceSchedulesCreate() {
             />
           )}
         </Grid>
+        <Dialog open={open} onClose={handleCloseDialogEdit}>
+          <DialogTitle>Editar Nome</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Para editar o nome, cnpj, id do grupo e código da integração da
+              empresa, insira os valores novos logo abaixo
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="guarantee_value"
+              label="Novo valor de revenda"
+              type="text"
+              fullWidth
+              variant="standard"
+              defaultValue={dataProductDetail?.guarantee_value}
+              onInput={(e: any) => setNewGvalue(e.target.value)}
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              id="sale_value"
+              label="Novo valor de venda"
+              type="text"
+              fullWidth
+              variant="standard"
+              defaultValue={dataProductDetail?.sale_value}
+              onInput={(e: any) => setNewValue(e.target.value)}
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              id="tunap_code"
+              label="Novo código TUNAP"
+              type="text"
+              fullWidth
+              variant="standard"
+              defaultValue={dataProductDetail?.tunap_code}
+              onInput={(e: any) => setNewTunapCode(e.target.value)}
+            />
+          </DialogContent>
+          {isLoadingEdit ? (
+            <Grid
+              sx={{
+                p: { xs: 0, sm: 2 },
+                display: 'flex',
+                flexDirection: 'column',
+                height: 'fit-content',
+                alignItems: 'flex-end',
+              }}
+            >
+              <Loading />
+            </Grid>
+          ) : (
+            <DialogActions>
+              <Button onClick={handleCloseDialogEdit}>Cancelar</Button>
+              <Button type="submit" onClick={handleFormEdit}>
+                Atualizar
+              </Button>
+            </DialogActions>
+          )}
+        </Dialog>
+        {actionAlerts !== null && (
+          <ActionAlerts
+            isOpen={actionAlerts.isOpen}
+            title={actionAlerts.title}
+            type={actionAlerts.type}
+            handleAlert={handleAlert}
+          />
+        )}
       </Container>
     </>
   )
