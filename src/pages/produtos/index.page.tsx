@@ -302,7 +302,7 @@ export default function Products() {
                               justifyContent: 'space-between',
                               ':hover': {
                                 cursor: 'pointer',
-                                backgroundColor: '#F1F1F2',
+                                backgroundColor: '#F2F2F2',
                               },
                             }}
                             onClick={() => handleSetProducts(product.id)}
@@ -321,7 +321,7 @@ export default function Products() {
                               color={'#1C4961'}
                               fontWeight={700}
                               sx={{
-                                width: 'fit-content',
+                                width: '20%',
                                 textAlign: 'center',
                                 fontSize: { xs: '0.5rem', sm: '1.2rem' },
                               }}
@@ -334,7 +334,7 @@ export default function Products() {
                               color={'#1C4961'}
                               fontWeight={700}
                               sx={{
-                                width: 'fit-content',
+                                width: '20%',
                                 textAlign: 'center',
                                 fontSize: { xs: '0.5rem', sm: '1.2rem' },
                               }}
@@ -347,7 +347,7 @@ export default function Products() {
                               color={'#1C4961'}
                               fontWeight={700}
                               sx={{
-                                width: 'fit-content',
+                                width: '10%',
                                 textAlign: 'center',
                                 fontSize: { xs: '0.5rem', sm: '1.2rem' },
                               }}
