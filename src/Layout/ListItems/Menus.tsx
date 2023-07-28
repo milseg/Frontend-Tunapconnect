@@ -27,12 +27,6 @@ export function allRoutes(companySelected: number | null) {
       component: <RequestQuoteIcon />,
       title: 'Orçamento',
     },
-    {
-      path: '/produtos',
-      href: `/produtos?company_id=${companySelected}`,
-      component: <InventoryIcon />,
-      title: 'Produtos',
-    },
   ]
   return routesPaths
 }
@@ -93,6 +87,12 @@ export function allRoutesIntranetTunap() {
           component: <BusinessIcon />,
           title: 'Empresas',
           href: `/empresas`,
+        },
+        {
+          path: '/produtos',
+          component: <InventoryIcon />,
+          title: 'Produtos',
+          href: `/produtos`,
         },
       ],
     },
