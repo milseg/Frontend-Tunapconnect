@@ -50,21 +50,10 @@ type SearchFormProps = {
 
 export default function Empresas() {
   const [pageNumber, setPageNumber] = React.useState(1)
-  const [open, setOpen] = useState(false)
-  const [newName, setNewName] = useState<string>('')
-  const [newCnpj, setNewCnpj] = useState<string>('')
-  const [newIntegrationCode, setNewIntegrationCode] = useState<string>('')
   const [isMobile, setIsMobile] = useState<boolean>(false)
-  const [editNameId, setEditNameId] = useState<number>()
-  const [isLoadingEdit, setIsLoadingEdit] = useState<boolean>(false)
-  const [actualFormValues, setActualFormValues] = useState<CompaniesType>()
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
 
-  const queryClient = useQueryClient()
   const router = useRouter()
-  const handleCloseDialogEdit = () => {
-    setOpen(false)
-  }
 
   React.useEffect(() => {
     if (!isWeb) {
@@ -102,35 +91,6 @@ export default function Empresas() {
       `/empresas?${data.search ? '&nome=' + data.search : ''}
      `,
     )
-  }
-
-  const handleFormEdit = async (event: any) => {
-    event.preventDefault()
-    setIsLoadingEdit(true)
-    const response = await apiB.put(`/companies/${editNameId}`, {
-      name: newName,
-      cnpj: newCnpj,
-      integration_code: newIntegrationCode,
-    })
-    if (response.status === 200) {
-      refetch()
-      setOpen(false)
-      setIsLoadingEdit(false)
-    }
-  }
-
-  const handleDelete = (id: number) => {
-    refetch()
-  }
-
-  const handleDeleteAction = (selectId: number) => {
-    ActionDeleteConfirmations(selectId, handleDelete, '/groups/')
-  }
-
-  const openDialogEdit = (actualCompanyValues: CompaniesType) => {
-    setOpen(true)
-    setEditNameId(actualCompanyValues.id)
-    setActualFormValues(actualCompanyValues)
   }
 
   return (
@@ -348,62 +308,17 @@ export default function Empresas() {
                                   padding: { xs: '0rem', sm: '8px' },
                                 }}
                               >
-<<<<<<< HEAD:src/pages/empresas/index.page.tsx
-                                <Delete
-                                  sx={{
-                                    width: { xs: '60%', sm: '100%' },
-                                  }}
-                                />
-                              </IconButton>
-                              <IconButton
-                                aria-label="search"
-                                color="warning"
-                                onClick={() =>
-                                  openDialogEdit({
-                                    cnpj: company.cnpj,
-                                    id: company.id,
-                                    created_at: company.created_at,
-                                    integration_code: company.integration_code,
-                                    name: company.name,
-                                    responsible_name: company.responsible_name,
-                                    updated_at: company.updated_at,
-                                  })
-                                }
-                                sx={{
-                                  color: 'blue',
-                                  padding: { xs: '0rem', sm: '8px' },
-                                }}
-                              >
-                                <EditIcon
-                                  sx={{
-                                    width: { xs: '60%', sm: '100%' },
-                                  }}
-                                />
-                              </IconButton>
-=======
                                 <Delete />
                               </IconButton> */}
                               <Link href={'/tunap_company/' + company.id}>
                                 <IconButton
                                   aria-label="search"
                                   color="warning"
-                                  // onClick={() =>
-                                  //   openDialogEdit({
-                                  //     cnpj: company.cnpj,
-                                  //     id: company.id,
-                                  //     created_at: company.created_at,
-                                  //     integration_code: company.integration_code,
-                                  //     name: company.name,
-                                  //     responsible_name: company.responsible_name,
-                                  //     updated_at: company.updated_at,
-                                  //   })
-                                  // }
                                   sx={{ marginLeft: 1, color: 'blue' }}
                                 >
                                   <EditIcon />
                                 </IconButton>
                               </Link>
->>>>>>> 8bc6cdffed5d0f8d2983978de50989363a317f63:src/pages/tunap_company/index.page.tsx
                             </Stack>
                           </Stack>
                         ),
@@ -443,68 +358,6 @@ export default function Empresas() {
             </ButtonPaginate>
           </Stack>
         </Stack>
-        <Dialog open={open} onClose={handleCloseDialogEdit}>
-          <DialogTitle>Editar Nome</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Para editar o nome, cnpj, id do grupo e código da integração da
-              empresa, insira os valores novos logo abaixo
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="name"
-              label="Novo nome"
-              type="text"
-              fullWidth
-              variant="standard"
-              defaultValue={actualFormValues?.name}
-              onInput={(e: any) => setNewName(e.target.value)}
-            />
-            <TextField
-              autoFocus
-              margin="dense"
-              id="cnpj"
-              label="Novo cnpj"
-              type="text"
-              fullWidth
-              variant="standard"
-              defaultValue={actualFormValues?.cnpj}
-              onInput={(e: any) => setNewCnpj(e.target.value)}
-            />
-            <TextField
-              autoFocus
-              margin="dense"
-              id="integration_code"
-              label="Novo código de integração"
-              type="text"
-              fullWidth
-              variant="standard"
-              defaultValue={actualFormValues?.integration_code}
-              onInput={(e: any) => setNewIntegrationCode(e.target.value)}
-            />
-          </DialogContent>
-          {isLoadingEdit ? (
-            <Grid
-              sx={{
-                p: { xs: 0, sm: 2 },
-                display: 'flex',
-                flexDirection: 'column',
-                height: 'fit-content',
-                alignItems: 'flex-end',
-              }}
-            >
-              <Loading />
-            </Grid>
-          ) : (
-            <DialogActions>
-              <Button onClick={handleCloseDialogEdit}>Cancelar</Button>
-              <Button type="submit" onClick={handleFormEdit}>
-                Atualizar
-              </Button>
-            </DialogActions>
-          )}
-        </Dialog>
       </Container>
     </>
   )

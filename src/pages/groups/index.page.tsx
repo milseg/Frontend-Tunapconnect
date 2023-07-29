@@ -26,6 +26,7 @@ import * as React from 'react'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import IconButton from '@mui/material/IconButton'
+import ActionAlerts from '@/components/ActionAlerts'
 import { ButtonAdd, ButtonIcon, TableTitles } from './styles'
 
 import { useState } from 'react'
@@ -47,6 +48,12 @@ type SearchFormProps = {
   search: string
 }
 
+interface actionAlertsProps {
+  isOpen: boolean
+  title: string
+  type: 'success' | 'error' | 'warning'
+}
+
 export default function Groups() {
   const [pageNumber, setPageNumber] = React.useState(1)
   const [open, setOpen] = useState(false)
@@ -55,6 +62,11 @@ export default function Groups() {
   const [editNameId, setEditNameId] = useState<number>()
   const [actualNameValue, setActualNameValue] = useState<string>()
   const [isLoadingEdit, setIsLoadingEdit] = useState<boolean>(false)
+  const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
+    isOpen: false,
+    title: '',
+    type: 'success',
+  })
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
 
   const queryClient = useQueryClient()
@@ -103,14 +115,42 @@ export default function Groups() {
   const handleFormEdit = async (event: any) => {
     event.preventDefault()
     setIsLoadingEdit(true)
-    const response = await apiB.put<IGroupsEditDTO>(`/groups/${editNameId}`, {
-      name: newName,
-    })
-    if (response.status === 200) {
-      refetch()
+    try {
+      const response = await apiB.put<IGroupsEditDTO>(`/groups/${editNameId}`, {
+        name: newName,
+      })
+      if (response.status === 200) {
+        refetch()
+        setOpen(false)
+        setIsLoadingEdit(false)
+      }
+    } catch (e: any) {
       setOpen(false)
       setIsLoadingEdit(false)
+      setActionAlerts({
+        isOpen: true,
+        title: `${e?.response?.data?.msg ?? 'Error inesperado'}!`,
+        type: 'error',
+      })
     }
+  }
+
+  const handleCloseAlert = (isOpen: boolean) => {
+    setActionAlerts((prevState) => ({
+      ...prevState,
+      isOpen,
+    }))
+  }
+  const handleActiveAlert = (
+    isOpen: boolean,
+    type: 'success' | 'error' | 'warning',
+    title: string,
+  ) => {
+    setActionAlerts({
+      isOpen,
+      title,
+      type,
+    })
   }
 
   const handleDelete = (id: number) => {
@@ -348,7 +388,7 @@ export default function Groups() {
                             {group.qtd_empresas}
                           </Typography>
                           <Stack direction="row" sx={{ width: '15%' }}>
-                            {/*<IconButton
+                            {/* <IconButton
                               aria-label="search"
                               color="warning"
                               onClick={() => handleDeleteAction(group.id_group)}
@@ -363,7 +403,7 @@ export default function Groups() {
                                   width: { xs: '80%', sm: '100%' },
                                 }}
                               />
-                            </IconButton>*/}
+                            </IconButton> */}
                             <IconButton
                               aria-label="search"
                               color="warning"
@@ -459,6 +499,12 @@ export default function Groups() {
           )}
         </Dialog>
       </Container>
+      <ActionAlerts
+        isOpen={actionAlerts.isOpen}
+        title={actionAlerts.title}
+        type={actionAlerts.type}
+        handleAlert={handleCloseAlert}
+      />
     </>
   )
 }
