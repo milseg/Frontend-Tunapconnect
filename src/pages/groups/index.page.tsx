@@ -8,13 +8,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import EditIcon from '@mui/icons-material/Edit'
 import SearchIcon from '@mui/icons-material/Search'
 import {
-  Button,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Grid,
   Skeleton,
   Stack,
@@ -33,16 +27,13 @@ import { useState } from 'react'
 import { useQuery, useQueryClient } from 'react-query'
 import { useRouter } from 'next/router'
 import { ButtonPaginate } from '../service-schedule/create/styles'
-import { apiB } from '@/lib/api'
-import { Loading } from '@/components/Loading'
+
 import { ActionDeleteConfirmations } from '@/helpers/ActionConfirmations'
 import { formatDateTime } from '@/ultis/formatDate'
 import groupsListRequests from '../api/groups.api'
 import theme from '@/styles/config/theme'
-import { GroupsType, IGroupsEditDTO } from '@/types/groups'
-import { Delete } from '@mui/icons-material'
+import { GroupsType } from '@/types/groups'
 import { CustomNoRowsOverlay } from '@/components/TableApp/NoRows'
-import Link from 'next/link'
 
 type SearchFormProps = {
   search: string
@@ -56,12 +47,7 @@ interface actionAlertsProps {
 
 export default function Groups() {
   const [pageNumber, setPageNumber] = React.useState(1)
-  const [open, setOpen] = useState(false)
-  const [newName, setNewName] = useState('')
   const [isMobile, setIsMobile] = useState(false)
-  const [editNameId, setEditNameId] = useState<number>()
-  const [actualNameValue, setActualNameValue] = useState<string>()
-  const [isLoadingEdit, setIsLoadingEdit] = useState<boolean>(false)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
     isOpen: false,
     title: '',
@@ -71,9 +57,6 @@ export default function Groups() {
 
   const queryClient = useQueryClient()
   const router = useRouter()
-  const handleCloseDialogEdit = () => {
-    setOpen(false)
-  }
 
   React.useEffect(() => {
     if (!isWeb) {
@@ -110,29 +93,6 @@ export default function Groups() {
       `/groups?${data.search ? '&nome=' + data.search : ''}
      `,
     )
-  }
-
-  const handleFormEdit = async (event: any) => {
-    event.preventDefault()
-    setIsLoadingEdit(true)
-    try {
-      const response = await apiB.put<IGroupsEditDTO>(`/groups/${editNameId}`, {
-        name: newName,
-      })
-      if (response.status === 200) {
-        refetch()
-        setOpen(false)
-        setIsLoadingEdit(false)
-      }
-    } catch (e: any) {
-      setOpen(false)
-      setIsLoadingEdit(false)
-      setActionAlerts({
-        isOpen: true,
-        title: `${e?.response?.data?.msg ?? 'Error inesperado'}!`,
-        type: 'error',
-      })
-    }
   }
 
   const handleCloseAlert = (isOpen: boolean) => {
@@ -455,45 +415,6 @@ export default function Groups() {
             </ButtonPaginate>
           </Stack>
         </Stack>
-        <Dialog open={open} onClose={handleCloseDialogEdit}>
-          <DialogTitle>Editar Nome</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Para editar o nome do grupo, insira o nome novo no campo abaixo
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="name"
-              label="Novo nome"
-              type="text"
-              fullWidth
-              variant="standard"
-              defaultValue={actualNameValue}
-              onInput={(e: any) => setNewName(e.target.value)}
-            />
-          </DialogContent>
-          {isLoadingEdit ? (
-            <Grid
-              sx={{
-                p: { xs: 0, sm: 2 },
-                display: 'flex',
-                flexDirection: 'column',
-                height: 'fit-content',
-                alignItems: 'flex-end',
-              }}
-            >
-              <Loading />
-            </Grid>
-          ) : (
-            <DialogActions>
-              <Button onClick={handleCloseDialogEdit}>Cancelar</Button>
-              <Button type="submit" onClick={handleFormEdit}>
-                Atualizar
-              </Button>
-            </DialogActions>
-          )}
-        </Dialog>
       </Container>
       <ActionAlerts
         isOpen={actionAlerts.isOpen}
