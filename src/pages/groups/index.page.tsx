@@ -157,14 +157,12 @@ export default function Groups() {
     refetch()
   }
 
-  const handleDeleteAction = (selectId: number) => {
-    ActionDeleteConfirmations(selectId, handleDelete, '/groups/')
+  const handleEditGroup = async (selectId: number) => {
+    await router.push(`/groups/edit/${selectId}`)
   }
 
-  const openDialogEdit = (selectId: number, actualName: string) => {
-    setOpen(true)
-    setEditNameId(selectId)
-    setActualNameValue(actualName)
+  const handleDeleteAction = (selectId: number) => {
+    ActionDeleteConfirmations(selectId, handleDelete, '/groups/')
   }
 
   return (
@@ -407,9 +405,7 @@ export default function Groups() {
                             <IconButton
                               aria-label="search"
                               color="warning"
-                              onClick={() =>
-                                openDialogEdit(group.id_group, group.name)
-                              }
+                              onClick={() => handleEditGroup(group.id_group)}
                               sx={{
                                 marginLeft: 1,
                                 color: 'blue',

@@ -92,18 +92,17 @@ export default function ServiceSchedulesCreate() {
     enabled: !!router.query.id,
   })
 
-  // function handleCloseModalPrintInspectionDefault() {
-  //   setOpenPrintInspectionModal(false)
-  // }
-  // function handleCheckListModelListModal() {
-  //   setOpenCheckListModelListModal(false)
-  // }
   function handleAlert(isOpen: boolean) {
     setActionAlerts({
       isOpen,
       title: '',
       type: 'success',
     })
+  }
+
+  const handleOpenEditPage = async () => {
+    const url = `/produtos/edit/${router.query.id}`
+    await router.push(url)
   }
 
   const handleFormEdit = async (event: any) => {
@@ -137,10 +136,6 @@ export default function ServiceSchedulesCreate() {
         type: 'error',
       })
     }
-  }
-
-  const handleOpenDialogEdit = () => {
-    setOpen(true)
   }
 
   useEffect(() => {
@@ -275,7 +270,7 @@ export default function ServiceSchedulesCreate() {
                     buttons={[
                       {
                         label: 'Editar',
-                        action: handleOpenDialogEdit,
+                        action: handleOpenEditPage,
                       },
                     ]}
                   />
