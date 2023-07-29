@@ -41,9 +41,6 @@ export const ButtonLeft = styled(Button)(({ theme }) => ({
   '&:hover': {
     background: '#1ACABA',
   },
-  '&:disabled': {
-    background: 'rgba(0, 0, 0, 0.12)',
-  },
 }))
 export const ButtonCenter = styled(IconButton)(({ theme }) => ({
   color: 'white',
@@ -209,4 +206,48 @@ export const ErrorContainer = styled(Typography)(({ theme }) => ({
   fontSize: 14,
   marginLeft: 5,
   color: 'red',
+}))
+
+export const ButtonAddItens = styled(Button)(({ theme }) => ({
+  color: 'white',
+  background: '#0E948B',
+  borderRadius: 4,
+
+  padding: '5px 10px',
+  flex: 1,
+
+  '&:hover': {
+    background: '#1ACABA',
+  },
+  '&:disabled': {
+    background: 'rgba(0, 0, 0, 0.12)',
+  },
+  '&>svg': {
+    with: 20,
+    height: 20,
+  },
+}))
+
+export const ButtonRemoveItens = styled(IconButton)(({ theme }) => ({
+  color: 'red',
+  // background: '#0E948B',
+  // borderRadius: 4,
+  // borderTopRightRadius: 0,
+  // borderBottomRightRadius: 0,
+  // padding: '5px 16px',
+  // flex: 1,
+  // textTransform: 'none',
+  width: 30,
+  height: 30,
+
+  '&:hover': {
+    background: '#ffcdd2',
+  },
+  '&:disabled': {
+    background: 'rgba(0, 0, 0, 0.12)',
+  },
+  '&>svg': {
+    with: 22,
+    height: 22,
+  },
 }))

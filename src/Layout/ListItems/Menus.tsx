@@ -6,6 +6,7 @@ import RequestQuoteIcon from '@mui/icons-material/RequestQuote'
 import GroupsIcon from '@mui/icons-material/Groups'
 import BusinessIcon from '@mui/icons-material/Business'
 import InventoryIcon from '@mui/icons-material/Inventory'
+import EngineeringIcon from '@mui/icons-material/Engineering'
 
 export function allRoutes(companySelected: number | null) {
   const routesPaths = [
@@ -74,19 +75,31 @@ export function allRoutesIntranetTunap() {
               title: 'Upload Eurobike',
               href: `/upload?status=eurobike`,
             },
+            {
+              path: '/upload',
+              component: null,
+              title: 'Upload Rodobens Auto',
+              href: `/upload?status=rodobens_auto`,
+            },
           ],
         },
         {
           path: '/grupos',
           component: <GroupsIcon />,
           title: 'Grupos',
-          href: `/grupos`,
+          href: `/groups`,
         },
         {
-          path: '/empresas',
+          path: '/tunap_company',
           component: <BusinessIcon />,
           title: 'Empresas',
-          href: `/empresas`,
+          href: `/tunap_company`,
+        },
+        {
+          path: '/technical_consultant',
+          component: <EngineeringIcon />,
+          title: 'Consultores',
+          href: `/technical_consultant`,
         },
         {
           path: '/produtos',

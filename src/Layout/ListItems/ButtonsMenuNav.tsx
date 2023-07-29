@@ -155,6 +155,7 @@ export const ButtonsMenuNav = ({
                             <React.Fragment key={Math.random() * 20000}>
                               {(sub.path === '/grupos' ||
                                 sub.path === '/empresas' ||
+                                sub.path === '/technical_consultant' ||
                                 sub.path === '/produtos') &&
                               sub.href ? (
                                 <Link

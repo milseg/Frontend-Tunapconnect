@@ -8,8 +8,8 @@ import TableRow from '@mui/material/TableRow'
 
 import { IconButton, Stack } from '@mui/material'
 
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+// import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+// import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import { ButtonTextareaReclamation, TextareaReclamation } from './styles'
 import { useState } from 'react'
 import { ClaimServiceResponseType } from '@/types/service-schedule'
@@ -54,10 +54,7 @@ export default function ClaimServiceTable({
   handleSaveClaimService,
   handleRemoveClaimService,
 }: ClaimServiceTableProps) {
-  const [page, setPage] = useState(0)
   const [textareaReclamationValue, setTextareaReclamationValue] = useState('')
-
-  const rowsPerPage = 5
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }} elevation={0}>
@@ -119,46 +116,35 @@ export default function ClaimServiceTable({
             </TableRow>
           </TableHead> */}
           <TableBody>
-            {claimServiceList.slice(
-              page * rowsPerPage,
-              page * rowsPerPage + rowsPerPage,
-            ).length > 0 ? (
-              claimServiceList
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
-                  return (
-                    <TableRow hover key={row.id}>
-                      <TableCell align="left">
-                        {row?.description.includes('\n')
-                          ? row.description
-                              .split(/(\n)/g)
-                              .map((item, index) => {
-                                return item === '\n' ? (
-                                  <br
-                                    key={Math.random() * 2000 + '-' + index}
-                                  />
-                                ) : (
-                                  <span
-                                    key={Math.random() * 2000 + '-' + index}
-                                  >
-                                    {item}
-                                  </span>
-                                )
-                              })
-                          : row.description}
-                      </TableCell>
-                      <TableCell align="right">
-                        <IconButton
-                          aria-label="delete"
-                          color="error"
-                          onClick={() => handleRemoveClaimService(row.id)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
+            {claimServiceList.length > 0 ? (
+              claimServiceList.map((row) => {
+                return (
+                  <TableRow hover key={row.id}>
+                    <TableCell align="left">
+                      {row?.description.includes('\n')
+                        ? row.description.split(/(\n)/g).map((item, index) => {
+                            return item === '\n' ? (
+                              <br key={Math.random() * 2000 + '-' + index} />
+                            ) : (
+                              <span key={Math.random() * 2000 + '-' + index}>
+                                {item}
+                              </span>
+                            )
+                          })
+                        : row.description}
+                    </TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        aria-label="delete"
+                        color="error"
+                        onClick={() => handleRemoveClaimService(row.id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                )
+              })
             ) : (
               <TableRow>
                 <TableCell align="center" colSpan={2}>
@@ -169,7 +155,7 @@ export default function ClaimServiceTable({
           </TableBody>
         </Table>
       </TableContainer>
-      <Stack direction="row" justifyContent="center" gap={1} marginTop={2}>
+      {/* <Stack direction="row" justifyContent="center" gap={1} marginTop={2}>
         <IconButton
           onClick={() => {
             if (page - 1 >= 0) {
@@ -191,7 +177,7 @@ export default function ClaimServiceTable({
         >
           <ArrowForwardIosIcon />
         </IconButton>
-      </Stack>
+      </Stack> */}
     </Paper>
   )
 }

@@ -125,18 +125,23 @@ export function CompanyProvider({ children }: GeralProviderProps) {
   )
 
   useEffect(() => {
-    if (companySelected === null) {
+    if (
+      companySelected === null &&
+      !router.asPath.includes('/checklist-factory-view')
+    ) {
       const cookies = parseCookies()
       if (cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string]) {
         const companySelectedCookie: cookieCompany = JSON.parse(
           cookies[process.env.NEXT_PUBLIC_APP_COOKIE_STORAGE_NAME as string],
         )
-        if (!companySelectedCookie.companySelected) router.push('/company')
+        if (!companySelectedCookie.companySelected) {
+          router.push('/company')
+        }
         setCompanySelected(parseInt(companySelectedCookie.companySelected))
         verifyCompany(companySelectedCookie.companySelected as string)
       } else {
         getSession().then((sessionData) => {
-          if (sessionData?.user.companies.length) {
+          if (sessionData?.user?.companies.length) {
             router.push('/company')
           }
         })

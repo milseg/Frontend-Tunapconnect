@@ -41,6 +41,7 @@ import { useMediaQuery, useTheme } from '@mui/material'
 import { formatMoneyPtBR } from '@/ultis/formatMoneyPtBR'
 import { QuotationResponseType } from '@/types/quotation'
 import { QuotationsContext } from '@/contexts/QuotationContext'
+import Link from 'next/link'
 
 type SearchFormProps = {
   search: string
@@ -364,7 +365,7 @@ export default function QuotationList() {
     router.push(newUrlPagination)
   }
 
-  async function handleSetServiceSchedule(idSelected: number) {
+  async function handleClickRow(idSelected: number) {
     const filterSelected = rows?.quotationListAllData.filter(
       (i) => i.id === idSelected,
     )[0]
@@ -372,7 +373,7 @@ export default function QuotationList() {
     if (filterSelected) {
       setQuotations(filterSelected)
     }
-    // await router.push(`/service-schedule/${idSelected}`)
+    await router.push(`/quotations/${idSelected}`)
   }
 
   useEffect(() => {
@@ -424,27 +425,22 @@ export default function QuotationList() {
           >
             <HeaderBreadcrumb data={HeaderBreadcrumbData} title="Orçamentos" />
             {!isMobile ? (
-              <ButtonAdd
-                size="large"
-                variant="contained"
-                sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
-                startIcon={<AddCircleOutlineIcon />}
-                onClick={async () => {
-                  // await router.push(`/service-schedule/create`)
-                }}
-                // disabled
-              >
-                novo
-              </ButtonAdd>
+              <Link href={'/quotations/create'}>
+                <ButtonAdd
+                  size="large"
+                  variant="contained"
+                  sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
+                  startIcon={<AddCircleOutlineIcon />}
+                >
+                  novo
+                </ButtonAdd>
+              </Link>
             ) : (
-              <ButtonIcon
-                sx={{ alignSelf: 'flex-end', marginRight: '20px' }}
-                onClick={async () => {
-                  // await router.push(`/service-schedule/create`)
-                }}
-              >
-                <AddCircleOutlineIcon />
-              </ButtonIcon>
+              <Link href={'/quotations/create'}>
+                <ButtonIcon sx={{ alignSelf: 'flex-end', marginRight: '20px' }}>
+                  <AddCircleOutlineIcon />
+                </ButtonIcon>
+              </Link>
             )}
           </Stack>
           {/* <Grid
@@ -516,7 +512,7 @@ export default function QuotationList() {
               pages={pages}
               loading={isFetching}
               companyId={companySelected}
-              handleSetServiceSchedule={handleSetServiceSchedule}
+              handleClickRow={handleClickRow}
             />
           ) : (
             <Skeleton variant="rounded" sx={{ width: '100%' }} height={150} />

@@ -36,7 +36,7 @@ export default function CompanyList() {
           return listCompanies
         } else {
           const resp = await api.get('/user/companies')
-          console.log(resp)
+          console.log(resp.data.data)
           addCompaniesList(resp.data.data)
           return resp.data.data
         }
