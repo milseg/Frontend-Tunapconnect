@@ -88,7 +88,7 @@ export default function Empresas() {
 
   async function onSubmitSearch(data: SearchFormProps) {
     await router.push(
-      `/empresas?${data.search ? '&nome=' + data.search : ''}
+      `/tunap_company?${data.search ? '&nome=' + data.search : ''}
      `,
     )
   }

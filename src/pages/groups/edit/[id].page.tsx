@@ -12,6 +12,7 @@ import {
   CircularProgress,
   Typography,
   useMediaQuery,
+  Skeleton,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import ActionAlerts from '@/components/ActionAlerts'
@@ -36,6 +37,7 @@ interface GroupType {
 export default function EditCompanyById() {
   // const [data, setData] = useState<CompanyResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingValues, setIsLoadingValues] = useState(false)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
     isOpen: false,
     title: '',
@@ -105,8 +107,10 @@ export default function EditCompanyById() {
   useEffect(() => {
     async function getData() {
       try {
+        setIsLoadingValues(true)
         const result = await apiB.get<GroupType>(`/groups/${router.query.id}`)
         setValue('name', result.data.group.name)
+        setIsLoadingValues(false)
       } catch (error) {
         console.log(error)
       }
@@ -140,13 +144,17 @@ export default function EditCompanyById() {
         >
           <label>
             Nome
-            <InputText
-              variant="outlined"
-              style={{ marginTop: 2 }}
-              fullWidth
-              error={!!errors.name}
-              {...register('name')}
-            />
+            {!isLoadingValues ? (
+              <InputText
+                variant="outlined"
+                style={{ marginTop: 2 }}
+                fullWidth
+                error={!!errors.name}
+                {...register('name')}
+              />
+            ) : (
+              <Skeleton variant="rounded" sx={{ width: '100%' }} height={60} />
+            )}
             <ErrorContainer>{errors.name?.message}</ErrorContainer>
           </label>
           <Stack flexDirection="row" justifyContent="flex-end" gap={2}>

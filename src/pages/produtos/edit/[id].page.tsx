@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { apiB } from '@/lib/api'
 
 import {
+  Skeleton,
   Backdrop,
   Box,
   CircularProgress,
@@ -35,7 +36,8 @@ export interface GroupType {
 
 export default function EditCompanyById() {
   // const [data, setData] = useState<CompanyResponse | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingData, setIsLoadingData] = useState(false)
+  const [isLoadingValues, setIsLoadingValues] = useState(false)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
     isOpen: false,
     title: '',
@@ -63,7 +65,7 @@ export default function EditCompanyById() {
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
 
   async function onSubmit(dataForm: any) {
-    setIsLoading(true)
+    setIsLoadingData(true)
     try {
       const dataFormatted = {
         guarantee_value: dataForm?.guarantee_value,
@@ -78,7 +80,7 @@ export default function EditCompanyById() {
       )
 
       handleActiveAlert(true, 'success', `${result.data.message}`)
-      setIsLoading(false)
+      setIsLoadingData(false)
       await router.push(`/produtos/${router.query.id}`)
     } catch (error: any) {
       if (error.response.status === 400) {
@@ -86,7 +88,7 @@ export default function EditCompanyById() {
       } else {
         handleActiveAlert(true, 'error', error.response.data.message)
       }
-      setIsLoading(false)
+      setIsLoadingData(false)
     }
   }
 
@@ -111,13 +113,14 @@ export default function EditCompanyById() {
   useEffect(() => {
     async function getData() {
       try {
+        setIsLoadingValues(true)
         const result = await apiB.get<ProductType>(
           `/products/${router.query.id}`,
         )
-        console.log(result.data)
         setValue('guarantee_value', String(result.data.guarantee_value))
         setValue('sale_value', String(result.data.sale_value))
         setValue('tunap_code', result.data.tunap_code)
+        setIsLoadingValues(false)
       } catch (error) {
         console.log(error)
       }
@@ -151,35 +154,47 @@ export default function EditCompanyById() {
         >
           <label>
             Preço de Venda
-            <InputText
-              variant="outlined"
-              style={{ marginTop: 2 }}
-              fullWidth
-              error={!!errors.sale_value}
-              {...register('sale_value')}
-            />
+            {!isLoadingValues ? (
+              <InputText
+                variant="outlined"
+                style={{ marginTop: 2 }}
+                fullWidth
+                error={!!errors.sale_value}
+                {...register('sale_value')}
+              />
+            ) : (
+              <Skeleton variant="rounded" sx={{ width: '100%' }} height={60} />
+            )}
             <ErrorContainer>{errors.sale_value?.message}</ErrorContainer>
           </label>
           <label>
             Preço de revenda
-            <InputText
-              variant="outlined"
-              style={{ marginTop: 2 }}
-              fullWidth
-              error={!!errors.guarantee_value}
-              {...register('guarantee_value')}
-            />
+            {!isLoadingValues ? (
+              <InputText
+                variant="outlined"
+                style={{ marginTop: 2 }}
+                fullWidth
+                error={!!errors.guarantee_value}
+                {...register('guarantee_value')}
+              />
+            ) : (
+              <Skeleton variant="rounded" sx={{ width: '100%' }} height={60} />
+            )}
             <ErrorContainer>{errors.guarantee_value?.message}</ErrorContainer>
           </label>
           <label>
             Código TUNAP
-            <InputText
-              variant="outlined"
-              error={!!errors.tunap_code}
-              style={{ marginTop: 2 }}
-              fullWidth
-              {...register('tunap_code')}
-            />
+            {!isLoadingValues ? (
+              <InputText
+                variant="outlined"
+                error={!!errors.tunap_code}
+                style={{ marginTop: 2 }}
+                fullWidth
+                {...register('tunap_code')}
+              />
+            ) : (
+              <Skeleton variant="rounded" sx={{ width: '100%' }} height={60} />
+            )}
             <ErrorContainer>{errors.guarantee_value?.message}</ErrorContainer>
           </label>
           <Stack flexDirection="row" justifyContent="flex-end" gap={2}>
@@ -188,7 +203,7 @@ export default function EditCompanyById() {
         </Stack>
         <Backdrop
           sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 10 }}
-          open={isLoading}
+          open={isLoadingData}
         >
           <CircularProgress color="inherit" />
         </Backdrop>

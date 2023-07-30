@@ -60,7 +60,7 @@ export default function ModalSearchGroup({
     setGroupList([])
 
     try {
-      const result = await apiB.get(`/grupos?name=${data.search}&limit=10`)
+      const result = await apiB.get(`/groups?name=${data.search}&limit=10`)
       console.log(result)
 
       setGroupList(result.data.groups)
