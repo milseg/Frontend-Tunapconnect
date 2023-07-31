@@ -19,6 +19,7 @@ import {
   CircularProgress,
   Typography,
   useMediaQuery,
+  Skeleton,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import ActionAlerts from '@/components/ActionAlerts'
@@ -91,6 +92,7 @@ newClientFormSchema.required({
 export default function EditCompanyById() {
   const [data, setData] = useState<CompanyResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingValues, setIsLoadingValues] = useState(false)
   const [openModal, setOpenModal] = useState(false)
   const [groupSelected, setGroupSelected] = useState<GroupType | null>(null)
   const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
@@ -191,6 +193,7 @@ export default function EditCompanyById() {
   useEffect(() => {
     async function getData() {
       try {
+        setIsLoadingValues(true)
         const result = await apiB.get(`/companies/${router.query.id}`)
         console.log(result.data)
         // name: '',
@@ -202,6 +205,7 @@ export default function EditCompanyById() {
         // setValue('document', result.data.cnpj)
         setValue('document', conformedCNPJNumber(result.data.company.cnpj))
         setValue('integration_code', result.data.company.integration_code)
+        setIsLoadingValues(false)
       } catch (error) {
         console.log(error)
       }
@@ -236,21 +240,29 @@ export default function EditCompanyById() {
           <label>
             Grupo
             <Stack direction="row" gap={2}>
-              <InputText
-                // variant="outlined"
-                error={!!errors.document}
-                // style={{ marginTop: 11 }}
-                fullWidth
-                value={
-                  groupSelected
-                    ? groupSelected?.name
-                    : data?.group_name
-                    ? data.group_name
-                    : 'Não informado'
-                }
-                // value={data?.group_name ? data.group_name : 'Não informado'}
-                disabled
-              />
+              {!isLoadingValues ? (
+                <InputText
+                  // variant="outlined"
+                  error={!!errors.document}
+                  // style={{ marginTop: 11 }}
+                  fullWidth
+                  value={
+                    groupSelected
+                      ? groupSelected?.name
+                      : data?.group_name
+                      ? data.group_name
+                      : 'Não informado'
+                  }
+                  // value={data?.group_name ? data.group_name : 'Não informado'}
+                  disabled
+                />
+              ) : (
+                <Skeleton
+                  variant="rounded"
+                  sx={{ width: '100%' }}
+                  height={60}
+                />
+              )}
               <ButtonIcon
                 sx={{
                   width: 56,
@@ -265,76 +277,102 @@ export default function EditCompanyById() {
 
           <label>
             Nome
-            <InputText
-              variant="outlined"
-              style={{ marginTop: 2 }}
-              fullWidth
-              error={!!errors.name}
-              {...register('name')}
-            />
+            {!isLoadingValues ? (
+              <InputText
+                variant="outlined"
+                style={{ marginTop: 2 }}
+                fullWidth
+                error={!!errors.name}
+                {...register('name')}
+              />
+            ) : (
+              <Skeleton variant="rounded" sx={{ width: '100%' }} height={60} />
+            )}
             <ErrorContainer>{errors.integration_code?.message}</ErrorContainer>
           </label>
           <label>
             Código de integração
-            <InputText
-              // variant="outlined"
-              // style={{ marginTop: 2 }}
-              fullWidth
-              error={!!errors.name}
-              {...register('integration_code')}
-              disabled
-            />
+            {!isLoadingValues ? (
+              <InputText
+                // variant="outlined"
+                // style={{ marginTop: 2 }}
+                fullWidth
+                error={!!errors.name}
+                {...register('integration_code')}
+                disabled
+              />
+            ) : (
+              <Skeleton variant="rounded" sx={{ width: '100%' }} height={60} />
+            )}
             <ErrorContainer>{errors.integration_code?.message}</ErrorContainer>
           </label>
           <label>
             CNPJ
-            <InputText
-              // variant="outlined"
-              error={!!errors.document}
-              // style={{ marginTop: 2 }}
-              fullWidth
-              {...register('document')}
-              InputProps={{
-                // @ts-ignore
-                inputComponent: TextMaskCNPJ,
-              }}
-              disabled
-            />
+            {!isLoadingValues ? (
+              <InputText
+                // variant="outlined"
+                error={!!errors.document}
+                // style={{ marginTop: 2 }}
+                fullWidth
+                {...register('document')}
+                InputProps={{
+                  // @ts-ignore
+                  inputComponent: TextMaskCNPJ,
+                }}
+                disabled
+              />
+            ) : (
+              <Skeleton variant="rounded" sx={{ width: '100%' }} height={60} />
+            )}
           </label>
           <label>
             Endereço
-            <InputText
-              // variant="outlined"
-              error={!!errors.document}
-              // style={{ marginTop: 11 }}
-              fullWidth
-              value={data?.address_1 ? data.address_1 : 'Não informado'}
-              disabled
-            />
+            {!isLoadingValues ? (
+              <InputText
+                // variant="outlined"
+                error={!!errors.document}
+                // style={{ marginTop: 11 }}
+                fullWidth
+                value={data?.address_1 ? data.address_1 : 'Não informado'}
+                disabled
+              />
+            ) : (
+              <Skeleton variant="rounded" sx={{ width: '100%' }} height={60} />
+            )}
           </label>
           <label>
             Cidade
-            <InputText
-              // variant="outlined"
-              error={!!errors.document}
-              // style={{ marginTop: 11 }}
-              fullWidth
-              value={data?.city ? data.city : 'Não informado'}
-              disabled
-            />
+            {!isLoadingValues ? (
+              <InputText
+                // variant="outlined"
+                error={!!errors.document}
+                // style={{ marginTop: 11 }}
+                fullWidth
+                value={data?.city ? data.city : 'Não informado'}
+                disabled
+              />
+            ) : (
+              <Skeleton variant="rounded" sx={{ width: '100%' }} height={60} />
+            )}
           </label>
           <label>
             Responsável
-            <InputText
-              // variant="outlined"
-              error={!!errors.document}
-              // style={{ marginTop: 11 }}
-              fullWidth
-              value={
-                data?.responsible_name ? data.responsible_name : 'Não informado'
-              }
-              disabled
-            />
+            {!isLoadingValues ? (
+              <InputText
+                // variant="outlined"
+                error={!!errors.document}
+                // style={{ marginTop: 11 }}
+                fullWidth
+                value={
+                  data?.responsible_name
+                    ? data.responsible_name
+                    : 'Não informado'
+                }
+                disabled
+              />
+            ) : (
+              <Skeleton variant="rounded" sx={{ width: '100%' }} height={60} />
+            )}
           </label>
 
           {/* {!isCPF && (

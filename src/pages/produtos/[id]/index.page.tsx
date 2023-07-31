@@ -81,25 +81,28 @@ export default function ServiceSchedulesCreate() {
     ServiceScheduleContext,
   )
 
-  const { data: dataProductDetail, refetch } = useQuery<ProductType>({
+  const {
+    data: dataProductDetail,
+    refetch,
+    isFetching,
+  } = useQuery<ProductType>({
     queryKey: ['product_detail', router.query.id, companySelected],
     queryFn: productsListRequests.getProductsDetail,
     refetchOnWindowFocus: false,
     enabled: !!router.query.id,
   })
 
-  // function handleCloseModalPrintInspectionDefault() {
-  //   setOpenPrintInspectionModal(false)
-  // }
-  // function handleCheckListModelListModal() {
-  //   setOpenCheckListModelListModal(false)
-  // }
   function handleAlert(isOpen: boolean) {
     setActionAlerts({
       isOpen,
       title: '',
       type: 'success',
     })
+  }
+
+  const handleOpenEditPage = async () => {
+    const url = `/produtos/edit/${router.query.id}`
+    await router.push(url)
   }
 
   const handleFormEdit = async (event: any) => {
@@ -118,6 +121,11 @@ export default function ServiceSchedulesCreate() {
         refetch()
         setOpen(false)
         setIsLoadingEdit(false)
+        setActionAlerts({
+          isOpen: true,
+          title: `Produto editado com sucesso!`,
+          type: 'success',
+        })
       }
     } catch (e: any) {
       setOpen(false)
@@ -128,10 +136,6 @@ export default function ServiceSchedulesCreate() {
         type: 'error',
       })
     }
-  }
-
-  const handleOpenDialogEdit = () => {
-    setOpen(true)
   }
 
   useEffect(() => {
@@ -175,7 +179,7 @@ export default function ServiceSchedulesCreate() {
                   <TitleCard>Empresa</TitleCard>
                 </Stack>
                 <DividerCard />
-                {dataProductDetail ? (
+                {dataProductDetail && !isFetching ? (
                   <List dense={false}>
                     <ListItemCard alignItems="flex-start">
                       <InfoCardName>Nome:</InfoCardName>{' '}
@@ -266,13 +270,13 @@ export default function ServiceSchedulesCreate() {
                     buttons={[
                       {
                         label: 'Editar',
-                        action: handleOpenDialogEdit,
+                        action: handleOpenEditPage,
                       },
                     ]}
                   />
                 </Stack>
                 <DividerCard />
-                {dataProductDetail ? (
+                {dataProductDetail && !isFetching ? (
                   <List dense={false}>
                     <ListItemCard>
                       <InfoCardName>Nome:</InfoCardName>{' '}
@@ -375,7 +379,7 @@ export default function ServiceSchedulesCreate() {
                   <TitleCard>Responsável</TitleCard>
                 </Stack>
                 <DividerCard />
-                {dataProductDetail ? (
+                {dataProductDetail && !isFetching ? (
                   <List dense={false}>
                     <ListItemCard>
                       <InfoCardName>Nome:</InfoCardName>{' '}

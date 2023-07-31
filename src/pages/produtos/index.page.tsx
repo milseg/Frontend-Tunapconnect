@@ -4,16 +4,9 @@ import { useForm } from 'react-hook-form'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import EditIcon from '@mui/icons-material/Edit'
 import SearchIcon from '@mui/icons-material/Search'
 import {
-  Button,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Grid,
   Skeleton,
   Stack,
@@ -24,22 +17,14 @@ import {
 import * as React from 'react'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
-import IconButton from '@mui/material/IconButton'
 import { ButtonAdd, ButtonIcon, TableTitles } from './styles'
 
 import { useState, useContext } from 'react'
 import { useQuery, useQueryClient } from 'react-query'
 import { useRouter } from 'next/router'
 import { ButtonPaginate } from '../service-schedule/create/styles'
-import { apiB } from '@/lib/api'
-import { Loading } from '@/components/Loading'
-import { ActionDeleteConfirmations } from '@/helpers/ActionConfirmations'
-import { formatDateTime } from '@/ultis/formatDate'
-import groupsListRequests from '../api/groups.api'
+
 import theme from '@/styles/config/theme'
-import { GroupsType, IGroupsEditDTO } from '@/types/groups'
-import { Delete } from '@mui/icons-material'
-import { CustomNoRowsOverlay } from '@/components/TableApp/NoRows'
 import productsListRequests from '../api/products.api'
 import { CompanyContext } from '@/contexts/CompanyContext'
 import { ProductType } from '@/types/products'
@@ -54,46 +39,7 @@ export default function Products() {
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
   const { companySelected } = useContext(CompanyContext)
 
-  const queryClient = useQueryClient()
   const router = useRouter()
-
-  const exampleReturn = [
-    {
-      id: 1,
-      guarantee_value: 20,
-      sale_value: 40,
-      tunap_code: 'teste',
-      product_code: 'harina-pan',
-    },
-    {
-      id: 2,
-      guarantee_value: 20,
-      sale_value: 40,
-      tunap_code: 'teste',
-      product_code: 'harina-pan',
-    },
-    {
-      id: 3,
-      guarantee_value: 20,
-      sale_value: 40,
-      tunap_code: 'teste',
-      product_code: 'harina-pan',
-    },
-    {
-      id: 4,
-      guarantee_value: 20,
-      sale_value: 40,
-      tunap_code: 'teste',
-      product_code: 'harina-pan',
-    },
-    {
-      id: 5,
-      guarantee_value: 20,
-      sale_value: 40,
-      tunap_code: 'teste',
-      product_code: 'harina-pan',
-    },
-  ]
 
   React.useEffect(() => {
     if (!isWeb) {

@@ -8,13 +8,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import EditIcon from '@mui/icons-material/Edit'
 import SearchIcon from '@mui/icons-material/Search'
 import {
-  Button,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Grid,
   Skeleton,
   Stack,
@@ -26,42 +20,43 @@ import * as React from 'react'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import IconButton from '@mui/material/IconButton'
+import ActionAlerts from '@/components/ActionAlerts'
 import { ButtonAdd, ButtonIcon, TableTitles } from './styles'
 
 import { useState } from 'react'
 import { useQuery, useQueryClient } from 'react-query'
 import { useRouter } from 'next/router'
 import { ButtonPaginate } from '../service-schedule/create/styles'
-import { apiB } from '@/lib/api'
-import { Loading } from '@/components/Loading'
+
 import { ActionDeleteConfirmations } from '@/helpers/ActionConfirmations'
 import { formatDateTime } from '@/ultis/formatDate'
 import groupsListRequests from '../api/groups.api'
 import theme from '@/styles/config/theme'
-import { GroupsType, IGroupsEditDTO } from '@/types/groups'
-import { Delete } from '@mui/icons-material'
+import { GroupsType } from '@/types/groups'
 import { CustomNoRowsOverlay } from '@/components/TableApp/NoRows'
-import Link from 'next/link'
 
 type SearchFormProps = {
   search: string
 }
 
+interface actionAlertsProps {
+  isOpen: boolean
+  title: string
+  type: 'success' | 'error' | 'warning'
+}
+
 export default function Groups() {
   const [pageNumber, setPageNumber] = React.useState(1)
-  const [open, setOpen] = useState(false)
-  const [newName, setNewName] = useState('')
   const [isMobile, setIsMobile] = useState(false)
-  const [editNameId, setEditNameId] = useState<number>()
-  const [actualNameValue, setActualNameValue] = useState<string>()
-  const [isLoadingEdit, setIsLoadingEdit] = useState<boolean>(false)
+  const [actionAlerts, setActionAlerts] = useState<actionAlertsProps>({
+    isOpen: false,
+    title: '',
+    type: 'success',
+  })
   const isWeb = useMediaQuery(theme.breakpoints.up('sm'))
 
   const queryClient = useQueryClient()
   const router = useRouter()
-  const handleCloseDialogEdit = () => {
-    setOpen(false)
-  }
 
   React.useEffect(() => {
     if (!isWeb) {
@@ -100,31 +95,34 @@ export default function Groups() {
     )
   }
 
-  const handleFormEdit = async (event: any) => {
-    event.preventDefault()
-    setIsLoadingEdit(true)
-    const response = await apiB.put<IGroupsEditDTO>(`/groups/${editNameId}`, {
-      name: newName,
+  const handleCloseAlert = (isOpen: boolean) => {
+    setActionAlerts((prevState) => ({
+      ...prevState,
+      isOpen,
+    }))
+  }
+  const handleActiveAlert = (
+    isOpen: boolean,
+    type: 'success' | 'error' | 'warning',
+    title: string,
+  ) => {
+    setActionAlerts({
+      isOpen,
+      title,
+      type,
     })
-    if (response.status === 200) {
-      refetch()
-      setOpen(false)
-      setIsLoadingEdit(false)
-    }
   }
 
   const handleDelete = (id: number) => {
     refetch()
   }
 
-  const handleDeleteAction = (selectId: number) => {
-    ActionDeleteConfirmations(selectId, handleDelete, '/groups/')
+  const handleEditGroup = async (selectId: number) => {
+    await router.push(`/groups/edit/${selectId}`)
   }
 
-  const openDialogEdit = (selectId: number, actualName: string) => {
-    setOpen(true)
-    setEditNameId(selectId)
-    setActualNameValue(actualName)
+  const handleDeleteAction = (selectId: number) => {
+    ActionDeleteConfirmations(selectId, handleDelete, '/groups/')
   }
 
   return (
@@ -348,7 +346,7 @@ export default function Groups() {
                             {group.qtd_empresas}
                           </Typography>
                           <Stack direction="row" sx={{ width: '15%' }}>
-                            {/*<IconButton
+                            {/* <IconButton
                               aria-label="search"
                               color="warning"
                               onClick={() => handleDeleteAction(group.id_group)}
@@ -363,13 +361,11 @@ export default function Groups() {
                                   width: { xs: '80%', sm: '100%' },
                                 }}
                               />
-                            </IconButton>*/}
+                            </IconButton> */}
                             <IconButton
                               aria-label="search"
                               color="warning"
-                              onClick={() =>
-                                openDialogEdit(group.id_group, group.name)
-                              }
+                              onClick={() => handleEditGroup(group.id_group)}
                               sx={{
                                 marginLeft: 1,
                                 color: 'blue',
@@ -419,46 +415,13 @@ export default function Groups() {
             </ButtonPaginate>
           </Stack>
         </Stack>
-        <Dialog open={open} onClose={handleCloseDialogEdit}>
-          <DialogTitle>Editar Nome</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Para editar o nome do grupo, insira o nome novo no campo abaixo
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="name"
-              label="Novo nome"
-              type="text"
-              fullWidth
-              variant="standard"
-              defaultValue={actualNameValue}
-              onInput={(e: any) => setNewName(e.target.value)}
-            />
-          </DialogContent>
-          {isLoadingEdit ? (
-            <Grid
-              sx={{
-                p: { xs: 0, sm: 2 },
-                display: 'flex',
-                flexDirection: 'column',
-                height: 'fit-content',
-                alignItems: 'flex-end',
-              }}
-            >
-              <Loading />
-            </Grid>
-          ) : (
-            <DialogActions>
-              <Button onClick={handleCloseDialogEdit}>Cancelar</Button>
-              <Button type="submit" onClick={handleFormEdit}>
-                Atualizar
-              </Button>
-            </DialogActions>
-          )}
-        </Dialog>
       </Container>
+      <ActionAlerts
+        isOpen={actionAlerts.isOpen}
+        title={actionAlerts.title}
+        type={actionAlerts.type}
+        handleAlert={handleCloseAlert}
+      />
     </>
   )
 }
